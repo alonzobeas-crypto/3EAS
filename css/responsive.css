@@ -1,0 +1,188 @@
+/* ==========================================================================
+   3EAS —RESPONSIVE STYLES
+   ========================================================================== */
+
+/* ── Large Desktop ── */
+@media (max-width: 1200px) {
+    :root { --container-w: 100%; }
+
+    .section-container { padding: 0 32px; }
+    .nav-inner { padding: 0 24px; }
+    .footer-inner { padding: 0 32px; }
+}
+
+/* ── Tablet Landscape ── */
+@media (max-width: 1024px) {
+    :root { --section-pad: 80px; }
+
+    .nav-menu { gap: 0; }
+    .nav-link { padding: 6px 10px; font-size: 0.67rem; }
+
+    .now-playing-bar {
+        grid-template-columns: auto 1fr auto;
+        grid-template-rows: auto auto;
+    }
+
+    .np-volume { grid-column: 3; }
+    .np-progress-wrap { grid-column: 1 / -1; grid-row: 2; }
+    .np-visualizer { display: none; }
+
+    .track-row {
+        grid-template-columns: 32px 48px 1fr auto auto;
+    }
+
+    .track-duration { display: none; }
+}
+
+/* ── Tablet Portrait ── */
+@media (max-width: 768px) {
+    :root { --section-pad: 64px; }
+
+    /* Nav: hide desktop menu, show mobile toggle */
+    .nav-menu { display: none; }
+    .nav-controls { display: none; }
+    .mobile-toggle { display: flex; }
+
+    .nav-brand-line { display: none; }
+
+    /* Hero */
+    .glitch-text { font-size: clamp(4rem, 22vw, 7rem); }
+
+    .tech-bracket-tr,
+    .tech-bracket-br { display: none; }
+
+    .hero-coords-top { font-size: 0.55rem; }
+
+    /* Section headers */
+    .section-title { font-size: clamp(2rem, 8vw, 3.5rem); }
+
+    /* Now Playing */
+    .now-playing-bar {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        gap: 12px;
+    }
+
+    .np-signal-indicator { flex-direction: row; gap: 6px; }
+    .np-controls { justify-content: center; }
+    .np-visualizer { display: none; }
+    .np-volume { justify-content: center; }
+
+    /* Track rows */
+    .track-row {
+        grid-template-columns: 40px 1fr auto;
+        padding: 12px 14px;
+    }
+
+    .track-artwork { display: none; }
+    .track-duration { display: none; }
+    .track-price-tag { display: none; }
+
+    .track-actions {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    /* Filters scroll horizontal */
+    .transmission-filters {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap;
+        gap: 0;
+    }
+
+    /* Gallery */
+    .visuals-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+
+    /* Acquisitions */
+    .acquisitions-grid { grid-template-columns: 1fr; }
+    .acquisition-card { padding: 28px 24px; }
+
+    /* Access */
+    .access-grid { grid-template-columns: 1fr; }
+    .access-block { padding: 28px 24px; }
+    .access-form-row { flex-direction: column; }
+
+    /* Footer */
+    .footer-inner {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+
+    .footer-signal { display: none; }
+
+    /* Modals */
+    .sys-modal { padding: 12px; align-items: flex-end; }
+    .sys-modal-content {
+        max-height: 92vh;
+        padding: 28px 24px;
+        border-bottom: none;
+    }
+
+    .sys-form-row { grid-template-columns: 1fr; }
+
+    .sys-modal--wide .sys-modal-content { max-width: 100%; }
+
+    /* Purchase modal */
+    .purchase-track-info { flex-direction: column; }
+
+    /* Panel */
+    .panel-tabs { overflow-x: auto; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 480px) {
+    :root { --section-pad: 48px; }
+
+    .section-container { padding: 0 20px; }
+    .nav-inner { padding: 0 16px; }
+    .footer-inner { padding: 0 20px; }
+
+    .glitch-text { font-size: clamp(3.5rem, 24vw, 6rem); }
+
+    .corner-label { font-size: 0.5rem; }
+    .corner-bl { left: 20px; }
+    .corner-br { right: 20px; }
+
+    .section-header { margin-bottom: 40px; }
+
+    /* Now playing compact */
+    .np-info { min-width: 0; }
+    .np-title { font-size: 0.75rem; }
+
+    /* Tracks compact */
+    .track-row { padding: 10px 12px; gap: 12px; }
+    .track-title-text { font-size: 0.8rem; }
+    .track-meta-row { gap: 6px; }
+    .track-type-badge { display: none; }
+
+    /* Mobile nav */
+    .mobile-nav-link { font-size: 1.5rem; }
+    .mobile-nav-overlay { padding: 32px 24px; }
+
+    /* Gallery */
+    .visuals-grid { grid-template-columns: repeat(2, 1fr); }
+
+    /* Admin bar */
+    .admin-bar { gap: 8px; }
+    .btn-admin-action { font-size: 0.58rem; padding: 7px 14px; }
+}
+
+/* ── Print ── */
+@media print {
+    .nav-bar, .mobile-nav-overlay, .sys-modal, .toast-container,
+    .admin-bar, .now-playing-bar { display: none !important; }
+
+    .site-section { border: none; page-break-inside: avoid; }
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+    .glitch-text, .glitch-text::before, .glitch-text::after {
+        animation: none;
+    }
+    .signal-dot { animation: none; opacity: 0.7; }
+    .hero-scroll-hint { animation: none; opacity: 0.4; }
+    .footer-signal { animation: none; opacity: 0.7; }
+}
