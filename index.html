@@ -359,6 +359,387 @@ body{
 .ac-stat{font-family:var(--mono);font-size:7px;letter-spacing:2px;color:var(--dimmer);margin-top:12px}
 
 /* ══════════════════════════════
+   BEAT LAB — SOURCE SIGNAL DEMO
+══════════════════════════════ */
+.lab-mini{
+  display:grid;grid-template-columns:repeat(8,1fr);gap:2px;
+  margin:18px 0 6px;padding:10px;
+  background:rgba(0,0,0,.6);border:1px solid var(--dimmer);
+}
+.lab-mini i{
+  display:block;aspect-ratio:1;background:rgba(74,70,64,.18);
+  border:1px solid rgba(74,70,64,.35);position:relative;
+}
+.lab-mini i.lit{background:rgba(184,168,120,.35);border-color:rgba(184,168,120,.7);box-shadow:inset 0 0 6px rgba(232,224,192,.4)}
+.lab-mini i.beat{background:rgba(232,224,192,.85);border-color:var(--hot);box-shadow:0 0 8px rgba(232,224,192,.6),inset 0 0 4px rgba(232,224,192,.9)}
+.ac-stat.lab{color:var(--accent);opacity:.75}
+
+#sLab{
+  padding:0;display:flex;flex-direction:column;
+  background:radial-gradient(ellipse at center,#0a0908 0%,#000 80%);
+}
+#sLab .lab-eyebrow{
+  padding:46px 44px 18px;border-bottom:1px solid var(--dimmer);
+  display:flex;align-items:baseline;justify-content:space-between;gap:24px;flex-shrink:0;
+}
+#sLab .lab-eyebrow .scene-eyebrow{margin-bottom:6px}
+#sLab .lab-eyebrow h2{font-family:var(--vt);font-size:clamp(38px,6vw,72px);letter-spacing:6px;color:var(--fg);line-height:1}
+#sLab .lab-eyebrow .lab-meta{font-family:var(--mono);font-size:8px;letter-spacing:3px;color:var(--dim);text-align:right;line-height:1.7}
+#sLab .lab-meta .v{color:var(--accent)}
+.lab-bg{position:absolute;inset:0;pointer-events:none;background:
+  radial-gradient(circle at 30% 30%,rgba(184,168,120,.05),transparent 55%),
+  radial-gradient(circle at 80% 80%,rgba(184,168,120,.04),transparent 55%);
+  z-index:0;
+}
+#sLab .dev-wrap{
+  flex:1;min-height:0;display:flex;align-items:stretch;justify-content:center;
+  padding:24px 44px 60px;position:relative;
+}
+
+.dev{
+  position:relative;width:100%;max-width:1600px;
+  background:linear-gradient(180deg,#16140f 0%,#0e0c09 100%);
+  border:1px solid var(--border-mid);
+  box-shadow:0 0 80px rgba(184,168,120,.06),inset 0 0 0 1px rgba(184,168,120,.04),0 40px 80px rgba(0,0,0,.7);
+  display:grid;grid-template-rows:auto auto 1fr auto;
+  font-family:var(--mono);
+  overflow:hidden;
+}
+.dev::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.18) 2px,rgba(0,0,0,.18) 3px);
+  mix-blend-mode:multiply;opacity:.4;
+}
+
+/* Device top bar — chrome */
+.dev-top{
+  display:flex;align-items:center;
+  border-bottom:1px solid var(--dimmer);
+  background:linear-gradient(180deg,rgba(184,168,120,.04),transparent);
+  height:44px;flex-shrink:0;
+}
+.dev-brand{
+  font-family:var(--vt);font-size:22px;letter-spacing:4px;color:var(--hot);
+  padding:0 22px;border-right:1px solid var(--dimmer);
+  height:100%;display:flex;align-items:center;
+  text-shadow:0 0 8px rgba(232,224,192,.3);
+}
+.dev-mod{
+  font-family:var(--mono);font-size:8px;letter-spacing:4px;color:var(--dim);
+  padding:0 18px;border-right:1px solid var(--dimmer);
+  height:100%;display:flex;align-items:center;gap:10px;
+}
+.dev-mod .pwr{
+  display:inline-block;width:6px;height:6px;background:var(--accent);
+  box-shadow:0 0 8px var(--accent);animation:blink 1.6s infinite;
+}
+.dev-screws{display:flex;gap:14px;padding:0 14px;margin-left:auto;height:100%;align-items:center}
+.dev-screws i{display:block;width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#3a362d,#0a0908);border:1px solid #1a1813;position:relative}
+.dev-screws i::after{content:'';position:absolute;inset:30%;border-top:1px solid rgba(0,0,0,.7);transform:rotate(28deg)}
+.dev-x{
+  font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--dim);
+  background:none;border:none;border-left:1px solid var(--dimmer);
+  padding:0 22px;height:100%;cursor:none;transition:color .15s,background .15s;
+}
+.dev-x:hover{color:var(--hot);background:rgba(184,168,120,.05)}
+
+/* LCD strip */
+.lcd{
+  display:grid;grid-template-columns:1fr 1fr 1fr 1fr;
+  border-bottom:1px solid var(--dimmer);
+  background:linear-gradient(180deg,#0a1410 0%,#050a08 100%);
+  position:relative;
+}
+.lcd::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.4) 2px,rgba(0,0,0,.4) 3px);
+}
+.lcd-cell{padding:12px 18px;border-right:1px solid rgba(184,168,120,.08);position:relative;z-index:1}
+.lcd-cell:last-child{border-right:none}
+.lcd-lbl{font-family:var(--mono);font-size:7px;letter-spacing:3px;color:rgba(184,168,120,.4);text-transform:uppercase;margin-bottom:4px}
+.lcd-val{font-family:var(--vt);font-size:24px;letter-spacing:2px;color:#cfb87c;text-shadow:0 0 8px rgba(207,184,124,.5),0 0 2px rgba(207,184,124,.8);line-height:1}
+.lcd-val.sm{font-size:16px}
+.lcd-val .un{font-size:10px;letter-spacing:2px;color:rgba(207,184,124,.5);margin-left:4px}
+
+/* Main work area: tabs + grid + side rail */
+.dev-body{
+  display:grid;grid-template-columns:1fr 280px;
+  min-height:0;overflow:hidden;
+}
+.dev-main{
+  padding:20px 22px;display:flex;flex-direction:column;gap:14px;
+  border-right:1px solid var(--dimmer);min-height:0;
+  background:radial-gradient(ellipse at center,rgba(184,168,120,.02) 0%,transparent 70%);
+}
+.tabs{
+  display:flex;gap:1px;background:var(--dimmer);
+  border:1px solid var(--dimmer);align-self:start;
+}
+.tab{
+  font-family:var(--mono);font-size:8px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--dim);padding:8px 16px;background:rgba(0,0,0,.6);border:none;cursor:none;
+  transition:all .15s;
+}
+.tab.on{background:rgba(184,168,120,.08);color:var(--hot);text-shadow:0 0 6px rgba(232,224,192,.4)}
+.tab:hover{color:var(--accent)}
+
+/* Pad grid 8x8 */
+.pads{
+  display:grid;grid-template-columns:repeat(8,1fr);gap:6px;
+  flex:1;min-height:0;
+}
+.pads.hide{display:none}
+.pad{
+  position:relative;aspect-ratio:1;
+  background:linear-gradient(180deg,#1a1814 0%,#0c0b08 100%);
+  border:1px solid var(--border-mid);
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:6px 7px;cursor:none;transition:all .08s;
+  overflow:hidden;
+}
+.pad::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 30%,rgba(232,224,192,0) 0%,rgba(232,224,192,0) 40%,transparent 70%);
+  transition:background .15s;pointer-events:none;
+}
+.pad:hover::before{background:radial-gradient(circle at 50% 30%,rgba(232,224,192,.08) 0%,transparent 60%)}
+.pad.hit{
+  background:linear-gradient(180deg,rgba(232,224,192,.4) 0%,rgba(184,168,120,.2) 100%);
+  border-color:var(--hot);
+  box-shadow:0 0 14px rgba(232,224,192,.5),inset 0 0 12px rgba(232,224,192,.3);
+}
+.pad.hit::before{background:radial-gradient(circle at 50% 30%,rgba(255,250,220,.4) 0%,transparent 60%)}
+.pad.empty{opacity:.5}
+.pad-led{
+  width:4px;height:4px;border-radius:50%;
+  background:rgba(74,70,64,.6);align-self:flex-end;
+  transition:all .1s;
+}
+.pad.armed .pad-led{background:var(--accent);box-shadow:0 0 4px var(--accent)}
+.pad.hit .pad-led{background:var(--hot);box-shadow:0 0 8px var(--hot)}
+.pad-id{font-family:var(--mono);font-size:7px;letter-spacing:1px;color:var(--dimmer)}
+.pad-name{font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--dim);text-transform:uppercase;line-height:1.2}
+.pad.armed .pad-name{color:var(--accent)}
+.pad.hit .pad-name{color:var(--hot);text-shadow:0 0 6px rgba(232,224,192,.5)}
+.pad.empty .pad-name{color:var(--dimmer)}
+
+/* Sequencer */
+.seq{display:none;flex-direction:column;gap:4px;flex:1;min-height:0}
+.seq.show{display:flex}
+.seq-head{
+  display:grid;grid-template-columns:90px repeat(16,1fr);gap:3px;
+  font-family:var(--mono);font-size:7px;letter-spacing:2px;color:var(--dimmer);
+  padding:0 0 4px;
+}
+.seq-head span{text-align:center;padding:2px 0}
+.seq-head span.beat{color:var(--accent)}
+.seq-row{display:grid;grid-template-columns:90px repeat(16,1fr);gap:3px;align-items:center}
+.seq-lbl{
+  font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--dim);
+  padding:6px 8px;border:1px solid var(--dimmer);background:rgba(0,0,0,.4);
+  text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;
+}
+.seq-lbl .ms{font-size:6px;color:var(--dimmer);letter-spacing:1px;display:flex;gap:3px}
+.seq-lbl .ms i{display:inline-block;width:5px;height:5px;border:1px solid var(--dimmer);cursor:none}
+.seq-cell{
+  aspect-ratio:1;background:rgba(74,70,64,.12);border:1px solid var(--border);
+  cursor:none;transition:all .08s;position:relative;
+}
+.seq-cell:hover{background:rgba(184,168,120,.1);border-color:var(--accent)}
+.seq-cell.on{
+  background:linear-gradient(180deg,rgba(184,168,120,.55) 0%,rgba(184,168,120,.25) 100%);
+  border-color:var(--hot);box-shadow:inset 0 0 6px rgba(232,224,192,.4);
+}
+.seq-cell.beat::after{
+  content:'';position:absolute;inset:-1px;border:1px solid var(--hot);
+  box-shadow:0 0 10px rgba(232,224,192,.6);pointer-events:none;
+}
+.seq-cell.on.beat{
+  background:linear-gradient(180deg,rgba(232,224,192,.85) 0%,rgba(184,168,120,.5) 100%);
+  box-shadow:0 0 14px rgba(232,224,192,.7),inset 0 0 8px rgba(255,250,220,.5);
+}
+
+/* Side rail */
+.rail{
+  padding:20px 22px;display:flex;flex-direction:column;gap:18px;
+  background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.7));
+  overflow-y:auto;-ms-overflow-style:none;scrollbar-width:none;
+}
+.rail::-webkit-scrollbar{display:none}
+.rail-section{border-bottom:1px solid var(--dimmer);padding-bottom:18px}
+.rail-section:last-child{border-bottom:none}
+.rail-title{font-family:var(--mono);font-size:7px;letter-spacing:4px;color:var(--dimmer);text-transform:uppercase;margin-bottom:12px}
+
+/* Knob style */
+.knobs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.knob{display:flex;flex-direction:column;align-items:center;gap:8px}
+.knob-dial{
+  width:62px;height:62px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#3a362d 0%,#1a1813 60%,#0a0908 100%);
+  border:1px solid var(--border-mid);position:relative;
+  box-shadow:inset 0 2px 4px rgba(255,255,255,.05),0 4px 8px rgba(0,0,0,.5),0 0 12px rgba(184,168,120,.05);
+}
+.knob-dial::after{
+  content:'';position:absolute;left:50%;top:8px;width:1px;height:18px;
+  background:var(--accent);transform-origin:50% 23px;
+  box-shadow:0 0 4px var(--accent);
+}
+.knob-dial.t-bpm::after{transform:translateX(-50%) rotate(35deg)}
+.knob-dial.t-vol::after{transform:translateX(-50%) rotate(-15deg)}
+.knob-dial.t-swing::after{transform:translateX(-50%) rotate(-110deg)}
+.knob-dial.t-fx::after{transform:translateX(-50%) rotate(60deg)}
+.knob-ticks{
+  position:absolute;inset:-6px;border-radius:50%;
+  background:
+    conic-gradient(from -135deg,
+      transparent 0deg,
+      rgba(184,168,120,.25) 0deg,rgba(184,168,120,.25) 1deg,
+      transparent 1deg,transparent 30deg,
+      rgba(184,168,120,.25) 30deg,rgba(184,168,120,.25) 31deg,
+      transparent 31deg,transparent 60deg,
+      rgba(184,168,120,.25) 60deg,rgba(184,168,120,.25) 61deg,
+      transparent 61deg,transparent 90deg,
+      rgba(184,168,120,.25) 90deg,rgba(184,168,120,.25) 91deg,
+      transparent 91deg,transparent 120deg,
+      rgba(184,168,120,.25) 120deg,rgba(184,168,120,.25) 121deg,
+      transparent 121deg,transparent 150deg,
+      rgba(184,168,120,.25) 150deg,rgba(184,168,120,.25) 151deg,
+      transparent 151deg,transparent 180deg,
+      rgba(184,168,120,.25) 180deg,rgba(184,168,120,.25) 181deg,
+      transparent 181deg,transparent 210deg,
+      rgba(184,168,120,.25) 210deg,rgba(184,168,120,.25) 211deg,
+      transparent 211deg,transparent 240deg,
+      rgba(184,168,120,.25) 240deg,rgba(184,168,120,.25) 241deg,
+      transparent 241deg,transparent 270deg,
+      rgba(184,168,120,.25) 270deg,rgba(184,168,120,.25) 271deg,
+      transparent 271deg
+    );
+  -webkit-mask:radial-gradient(circle,transparent 32px,black 33px,black 36px,transparent 37px);
+          mask:radial-gradient(circle,transparent 32px,black 33px,black 36px,transparent 37px);
+  pointer-events:none;
+}
+.knob-cap{font-family:var(--mono);font-size:7px;letter-spacing:2px;color:var(--dim);text-transform:uppercase}
+.knob-val{font-family:var(--vt);font-size:14px;color:var(--accent);letter-spacing:1px;line-height:1}
+
+/* Slider — vol per pad list */
+.padlist{display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto;-ms-overflow-style:none;scrollbar-width:none}
+.padlist::-webkit-scrollbar{display:none}
+.padlist-row{display:grid;grid-template-columns:48px 1fr 32px;gap:8px;align-items:center;font-family:var(--mono);font-size:7px;letter-spacing:1px;color:var(--dim);text-transform:uppercase}
+.padlist-row .vol{
+  height:4px;background:rgba(74,70,64,.4);position:relative;cursor:none;
+}
+.padlist-row .vol i{
+  position:absolute;left:0;top:0;bottom:0;
+  background:linear-gradient(90deg,rgba(184,168,120,.3),var(--accent));
+  box-shadow:0 0 6px rgba(184,168,120,.4);
+}
+.padlist-row .v{font-family:var(--vt);font-size:11px;color:var(--accent);text-align:right}
+
+/* Transport */
+.transport{display:flex;gap:6px}
+.tbtn{
+  flex:1;font-family:var(--mono);font-size:9px;letter-spacing:2px;
+  background:linear-gradient(180deg,#1a1814,#0c0b08);
+  border:1px solid var(--border-mid);color:var(--dim);
+  padding:10px 8px;cursor:none;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.tbtn:hover{color:var(--accent);border-color:var(--accent);background:linear-gradient(180deg,#2a2620,#16140f)}
+.tbtn.on{color:var(--hot);border-color:var(--hot);background:linear-gradient(180deg,rgba(232,224,192,.2),rgba(184,168,120,.05));text-shadow:0 0 6px rgba(232,224,192,.5)}
+.tbtn .ic{width:8px;height:8px;display:inline-block}
+.tbtn .ic.play{border-left:8px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent;width:0}
+.tbtn .ic.stop{background:currentColor}
+.tbtn .ic.rec{border-radius:50%;background:#cc3a3a;box-shadow:0 0 8px #cc3a3a}
+
+/* VU meter */
+.vu{display:flex;flex-direction:column;gap:4px;font-family:var(--mono);font-size:7px;letter-spacing:2px;color:var(--dimmer)}
+.vu-row{display:grid;grid-template-columns:24px 1fr;gap:6px;align-items:center}
+.vu-bar{display:flex;gap:1px;height:8px}
+.vu-bar i{flex:1;background:rgba(74,70,64,.35);transition:background .15s}
+.vu-bar i.lit{background:var(--accent);box-shadow:0 0 4px var(--accent)}
+.vu-bar i.peak{background:#cc3a3a;box-shadow:0 0 6px #cc3a3a}
+
+.pattern-row{display:flex;align-items:baseline;gap:6px}
+.pattern-row .px{color:#cfb87c;text-shadow:0 0 8px rgba(207,184,124,.5)}
+.artist-in{
+  background:none;border:none;outline:none;
+  font-family:var(--vt);font-size:16px;letter-spacing:1px;
+  color:#cfb87c;text-shadow:0 0 8px rgba(207,184,124,.5),0 0 2px rgba(207,184,124,.8);
+  border-bottom:1px dashed rgba(207,184,124,.35);
+  padding:1px 2px;width:140px;text-transform:uppercase;
+  caret-color:var(--hot);
+}
+.artist-in::placeholder{color:rgba(207,184,124,.35);text-shadow:none}
+.artist-in:focus{border-bottom-color:rgba(207,184,124,.7)}
+
+/* Bottom checkout strip */
+.dev-bot{
+  display:grid;grid-template-columns:1fr auto auto;gap:0;align-items:stretch;
+  border-top:1px solid var(--dimmer);
+  background:linear-gradient(0deg,rgba(184,168,120,.04),transparent);
+  flex-shrink:0;
+}
+.bot-info{padding:14px 22px;display:flex;flex-direction:column;gap:4px;border-right:1px solid var(--dimmer)}
+.bot-eyebrow{font-family:var(--mono);font-size:7px;letter-spacing:4px;color:var(--dimmer);text-transform:uppercase}
+.bot-title{font-family:var(--vt);font-size:18px;color:var(--fg);letter-spacing:2px;line-height:1}
+.bot-sub{font-family:var(--mono);font-size:8px;color:var(--dim);letter-spacing:2px;margin-top:2px}
+.bot-pwyw{
+  display:flex;align-items:center;gap:8px;padding:0 22px;
+  border-right:1px solid var(--dimmer);
+}
+.pwyw-lbl{font-family:var(--mono);font-size:7px;letter-spacing:3px;color:var(--dimmer);text-transform:uppercase}
+.pwyw-input{
+  display:flex;align-items:baseline;border:1px solid var(--border-mid);
+  background:rgba(0,0,0,.5);padding:6px 10px;
+}
+.pwyw-input span{font-family:var(--vt);font-size:20px;color:var(--accent);letter-spacing:1px;margin-right:4px}
+.pwyw-input input{
+  background:none;border:none;outline:none;width:60px;
+  font-family:var(--vt);font-size:22px;color:var(--hot);
+  letter-spacing:1px;
+}
+.pwyw-presets{display:flex;gap:3px}
+.preset{
+  font-family:var(--mono);font-size:7px;letter-spacing:1px;color:var(--dim);
+  border:1px solid var(--dimmer);background:rgba(0,0,0,.4);
+  padding:4px 8px;cursor:none;transition:all .15s;
+}
+.preset:hover,.preset.on{color:var(--hot);border-color:var(--accent);background:rgba(184,168,120,.08)}
+.bot-checkout{
+  display:flex;align-items:center;gap:14px;padding:14px 26px;
+  font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--bg);
+  background:var(--fg);cursor:none;border:none;text-transform:uppercase;
+  transition:all .2s;
+}
+.bot-checkout:hover{background:var(--hot);box-shadow:0 0 24px rgba(232,224,192,.3)}
+.bot-checkout .stripe-mark{
+  font-family:var(--mono);font-size:7px;letter-spacing:1px;color:rgba(0,0,0,.5);
+  border-left:1px solid rgba(0,0,0,.2);padding-left:12px;
+}
+.bot-checkout .arr{font-family:var(--vt);font-size:14px;}
+
+/* Step playhead light strip in sequencer */
+.seq-playhead{
+  display:grid;grid-template-columns:90px repeat(16,1fr);gap:3px;
+  margin-top:4px;
+}
+.seq-ph-cell{
+  height:3px;background:rgba(74,70,64,.2);border-radius:0;
+}
+.seq-ph-cell.act{background:var(--hot);box-shadow:0 0 8px var(--hot)}
+
+@media(max-width:900px){
+  .dev-body{grid-template-columns:1fr}
+  .rail{border-top:1px solid var(--dimmer)}
+  .lcd{grid-template-columns:1fr 1fr}
+  .lcd-cell:nth-child(2){border-right:none}
+  .dev-bot{grid-template-columns:1fr;}
+  .bot-pwyw{border-right:none;border-top:1px solid var(--dimmer);padding:14px 22px}
+  .bot-info{border-right:none}
+  .bot-checkout{justify-content:center}
+}
+
+/* ══════════════════════════════
    SCENE 05 — SIGNAL
 ══════════════════════════════ */
 #s5{justify-content:center;padding:80px 60px}
@@ -468,7 +849,7 @@ body{
 <div id="intro">
   <div class="intro-word">3EAS</div>
   <div class="intro-line"></div>
-  <div class="intro-sub">Signal & Sound // 8Y8.4IK Recordings</div>
+  <div class="intro-sub">Signal & Sound</div>
 </div>
 
 <!-- TOPBAR -->
@@ -478,8 +859,9 @@ body{
     <a href="#" class="tb-link" onclick="goScene(1);return false"><span class="n">01</span>TRANSMISSIONS</a>
     <a href="#" class="tb-link" onclick="goScene(2);return false"><span class="n">02</span>VISUALS</a>
     <a href="#" class="tb-link" onclick="goScene(3);return false"><span class="n">03</span>ACQUISITIONS</a>
-    <a href="#" class="tb-link" onclick="goScene(4);return false"><span class="n">04</span>SIGNAL</a>
-    <a href="#" class="tb-link" onclick="goScene(5);return false"><span class="n">05</span>ACCESS</a>
+    <a href="#" class="tb-link" onclick="goScene(4);return false"><span class="n">04</span>LAB</a>
+    <a href="#" class="tb-link" onclick="goScene(5);return false"><span class="n">05</span>SIGNAL</a>
+    <a href="#" class="tb-link" onclick="goScene(6);return false"><span class="n">06</span>ACCESS</a>
   </div>
   <div class="tb-right">
     <div class="live-dot"></div>
@@ -495,13 +877,14 @@ body{
   <div class="vdot" onclick="goScene(3)"></div>
   <div class="vdot" onclick="goScene(4)"></div>
   <div class="vdot" onclick="goScene(5)"></div>
+  <div class="vdot" onclick="goScene(6)"></div>
 </div>
 
 <!-- TICKER -->
 <div id="ticker">
   <div class="ti">
-    <span>3EAS-001 <span class="sep">◈</span> LINCOLN HEIGHTS, NELA <span class="sep">◈</span> 34.0590°N 118.2321°W <span class="sep">◈</span> SIGNAL ACTIVE <span class="sep">◈</span> 8Y8.4IK RECORDINGS <span class="sep">◈</span> CAPTURE DON'T KILL <span class="sep">◈</span> FREQUENCY AS LANGUAGE <span class="sep">◈</span> STATUS: TRANSMITTING <span class="sep">◈</span></span>
-    <span>3EAS-001 <span class="sep">◈</span> LINCOLN HEIGHTS, NELA <span class="sep">◈</span> 34.0590°N 118.2321°W <span class="sep">◈</span> SIGNAL ACTIVE <span class="sep">◈</span> 8Y8.4IK RECORDINGS <span class="sep">◈</span> CAPTURE DON'T KILL <span class="sep">◈</span> FREQUENCY AS LANGUAGE <span class="sep">◈</span> STATUS: TRANSMITTING <span class="sep">◈</span></span>
+    <span>3EAS-001 <span class="sep">◈</span> LINCOLN HEIGHTS, NELA <span class="sep">◈</span> 34.0590°N 118.2321°W <span class="sep">◈</span> SIGNAL ACTIVE <span class="sep">◈</span> CAPTURE DON'T KILL <span class="sep">◈</span> FREQUENCY AS LANGUAGE <span class="sep">◈</span> STATUS: TRANSMITTING <span class="sep">◈</span></span>
+    <span>3EAS-001 <span class="sep">◈</span> LINCOLN HEIGHTS, NELA <span class="sep">◈</span> 34.0590°N 118.2321°W <span class="sep">◈</span> SIGNAL ACTIVE <span class="sep">◈</span> CAPTURE DON'T KILL <span class="sep">◈</span> FREQUENCY AS LANGUAGE <span class="sep">◈</span> STATUS: TRANSMITTING <span class="sep">◈</span></span>
   </div>
 </div>
 
@@ -519,7 +902,7 @@ body{
     <div class="s1-main" style="padding:0 60px;position:relative;z-index:10">
       <div class="s1-title" id="hw1">3EAS</div>
       <div class="s1-sub" id="s1sub">
-        <div class="s1-sub-text">SIGNAL & SOUND // 8Y8.4IK RECORDINGS</div>
+        <div class="s1-sub-text">SIGNAL & SOUND</div>
         <div class="s1-rule"></div>
         <div class="s1-tag">CAPTURE DON'T KILL</div>
       </div>
@@ -531,7 +914,7 @@ body{
       </div>
     </div>
     <div class="s1-scroll" id="s1scroll">SCROLL TO ENTER SYSTEM</div>
-    <div class="scene-counter">01 / 06</div>
+    <div class="scene-counter">01 / 07</div>
   </section>
 
   <!-- S2: TRANSMISSIONS -->
@@ -558,7 +941,7 @@ body{
         </div>
       </div>
     </div>
-    <div class="scene-counter">02 / 06</div>
+    <div class="scene-counter">02 / 07</div>
   </section>
 
   <!-- S3: VISUALS -->
@@ -574,7 +957,7 @@ body{
       <div class="vc"><div class="vph"><div class="vph-txt">ART DIRECTION<br>— SIGNAL PENDING —</div></div><div class="vcap">VIEW →</div></div>
       <div class="vc"><div class="vph"><div class="vph-txt">VIDEO<br>— SIGNAL PENDING —</div></div><div class="vcap">PLAY →</div></div>
     </div>
-    <div class="scene-counter">03 / 06</div>
+    <div class="scene-counter">03 / 07</div>
   </section>
 
   <!-- S4: ACQUISITIONS -->
@@ -609,11 +992,29 @@ body{
         <div class="ac-stat">— SIGNAL PENDING</div>
       </div>
     </div>
-    <div class="scene-counter">04 / 06</div>
+    <div class="scene-counter">04 / 07</div>
   </section>
 
-  <!-- S5: SIGNAL -->
-  <section class="scene" id="s5" data-scene="4">
+  <!-- S5: BEAT LAB (full scene) -->
+  <section class="scene" id="sLab" data-scene="4">
+    <div class="lab-bg"></div>
+    <div class="lab-eyebrow">
+      <div>
+        <span class="scene-eyebrow">04 — INTERACTIVE // SOURCE SIGNAL</span>
+        <h2>BEAT LAB</h2>
+      </div>
+      <div class="lab-meta">
+        64 PADS // 16 STEPS // 8 TRACKS<br>
+        STATUS: <span class="v">LIVE</span> &nbsp;//&nbsp; PAYMENT: <span class="v">PWYW</span><br>
+        SAMPLES: <span class="v">3EAS ARCHIVE</span>
+      </div>
+    </div>
+    <div class="dev-wrap" id="devWrap"></div>
+    <div class="scene-counter">05 / 07</div>
+  </section>
+
+  <!-- S6: SIGNAL -->
+  <section class="scene" id="s5" data-scene="5">
     <div class="s5-top">
       <span class="scene-eyebrow">04 — FREQUENCY AS LANGUAGE</span>
       <h2 class="scene-title">SIGNAL</h2>
@@ -628,14 +1029,14 @@ body{
       <div>
         <div class="sb"><div class="sb-lbl">CURRENT TRANSMISSION</div><div class="sb-val">BROADCAST ENTITY // ONLINE<br>NODE: 3EAS-001<br>ORIGIN: LINCOLN HEIGHTS, NELA<br>34.0590°N 118.2321°W<br>STATUS: ACTIVE</div></div>
         <div class="sb"><div class="sb-lbl">CONNECTED NODES</div><div class="sb-val">ON/NOTICE // ACTIVE<br>SELEXIONES // BUILDING</div></div>
-        <div class="sb"><div class="sb-lbl">BROADCAST ID</div><div class="sb-val">3EAS-001<br>8Y8.4IK RECORDINGS<br>© 2026</div></div>
+        <div class="sb"><div class="sb-lbl">BROADCAST ID</div><div class="sb-val">3EAS-001<br>© 2026</div></div>
       </div>
     </div>
-    <div class="scene-counter">05 / 06</div>
+    <div class="scene-counter">06 / 07</div>
   </section>
 
-  <!-- S6: ACCESS -->
-  <section class="scene" id="s6" data-scene="5">
+  <!-- S7: ACCESS -->
+  <section class="scene" id="s6" data-scene="6">
     <div class="s6-head">
       <span class="scene-eyebrow">05 — JOIN THE FREQUENCY</span>
       <h2 class="scene-title">ACCESS</h2>
@@ -648,7 +1049,7 @@ body{
         <a href="https://www.onnoticemusic.com/" target="_blank" class="lrow">ON/NOTICE <span class="larr">→</span></a>
 
         <div style="padding:24px 0;border-bottom:1px solid var(--dimmer)">
-          <p style="font-family:var(--mono);font-size:7px;letter-spacing:3px;color:var(--dimmer);line-height:2.4">3EAS // 8Y8.4IK RECORDINGS<br>LINCOLN HEIGHTS, NELA // © 2026</p>
+          <p style="font-family:var(--mono);font-size:7px;letter-spacing:3px;color:var(--dimmer);line-height:2.4">3EAS<br>LINCOLN HEIGHTS, NELA // © 2026<br><span style="font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--dim);opacity:.55">PASSWORDSPILLS</span></p>
         </div>
       </div>
       <div class="lform">
@@ -660,7 +1061,7 @@ body{
         <div class="fok" id="fok">SIGNAL RECEIVED. ▮</div>
       </div>
     </div>
-    <div class="scene-counter">06 / 06</div>
+    <div class="scene-counter">07 / 07</div>
   </section>
 
 </div>
@@ -671,6 +1072,120 @@ body{
   <span id="sp-title" style="color:var(--dim);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">STANDBY</span>
   <button id="sp-mute" onclick="spToggle()" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:7px;letter-spacing:2px;padding:3px 8px;cursor:none;transition:all .15s">MUTE</button>
 </div>
+
+<!-- BEAT LAB SCENE PLACEHOLDER -->
+<template id="labTemplate">
+  <div class="dev" role="region" aria-label="3EAS Source Signal Beat Lab">
+    <!-- Top chrome -->
+    <div class="dev-top">
+      <div class="dev-brand">3EAS</div>
+      <div class="dev-mod"><span class="pwr"></span>SOURCE SIGNAL // LAB v0.1</div>
+      <div class="dev-screws"><i></i><i></i><i></i></div>
+      <button class="dev-x" onclick="goScene(3)" title="Back to Acquisitions">BACK ←</button>
+    </div>
+
+    <!-- LCD strip -->
+    <div class="lcd">
+      <div class="lcd-cell">
+        <div class="lcd-lbl">PATTERN</div>
+        <div class="lcd-val sm pattern-row"><span class="px">3EAS x</span><input id="artistName" class="artist-in" type="text" placeholder="YOUR NAME" maxlength="18" oninput="updateArtist()" autocomplete="off"></div>
+      </div>
+      <div class="lcd-cell">
+        <div class="lcd-lbl">TEMPO</div>
+        <div class="lcd-val" id="lcdBpm">120<span class="un">BPM</span></div>
+      </div>
+      <div class="lcd-cell">
+        <div class="lcd-lbl">BAR // STEP</div>
+        <div class="lcd-val" id="lcdBar">01.<span id="lcdStep">07</span></div>
+      </div>
+      <div class="lcd-cell">
+        <div class="lcd-lbl">STATUS</div>
+        <div class="lcd-val sm" id="lcdStat">▶ PLAYING</div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="dev-body">
+      <div class="dev-main">
+        <div class="tabs">
+          <button class="tab on" data-tab="pads" onclick="setTab('pads')">PADS</button>
+          <button class="tab" data-tab="seq" onclick="setTab('seq')">SEQUENCER</button>
+        </div>
+
+        <!-- 8x8 PAD GRID -->
+        <div class="pads" id="pads"></div>
+
+        <!-- 8x16 SEQUENCER -->
+        <div class="seq" id="seq">
+          <div class="seq-head" id="seqHead"></div>
+          <div id="seqRows"></div>
+          <div class="seq-playhead" id="seqPh"></div>
+        </div>
+      </div>
+
+      <!-- Side rail -->
+      <aside class="rail">
+        <div class="rail-section">
+          <div class="rail-title">// CONTROL</div>
+          <div class="knobs">
+            <div class="knob">
+              <div class="knob-dial t-bpm"><div class="knob-ticks"></div></div>
+              <div class="knob-cap">TEMPO</div>
+              <div class="knob-val">120</div>
+            </div>
+            <div class="knob">
+              <div class="knob-dial t-vol"><div class="knob-ticks"></div></div>
+              <div class="knob-cap">MASTER</div>
+              <div class="knob-val">078</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rail-section">
+          <div class="rail-title">// PAD VOLUME</div>
+          <div class="padlist" id="padlist"></div>
+        </div>
+
+        <div class="rail-section">
+          <div class="rail-title">// TRANSPORT</div>
+          <div class="transport">
+            <button class="tbtn on"><span class="ic play"></span>PLAY</button>
+            <button class="tbtn"><span class="ic stop"></span>STOP</button>
+            <button class="tbtn"><span class="ic rec"></span>REC</button>
+          </div>
+        </div>
+
+        <div class="rail-section">
+          <div class="rail-title">// OUTPUT METER</div>
+          <div class="vu">
+            <div class="vu-row"><span>L</span><div class="vu-bar" id="vuL"></div></div>
+            <div class="vu-row"><span>R</span><div class="vu-bar" id="vuR"></div></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Bottom checkout -->
+    <div class="dev-bot">
+      <div class="bot-info">
+        <span class="bot-eyebrow">// EXPORT YOUR FREQUENCY</span>
+        <div class="bot-title" id="botTitle">3EAS x — YOUR NAME</div>
+        <div class="bot-sub">.WAV STEMS + STEREO BOUNCE — 24bit 48kHz</div>
+      </div>
+      <div class="bot-pwyw">
+        <span class="pwyw-lbl">NAME<br>YOUR<br>PRICE</span>
+        <div class="pwyw-input"><span>$</span><input id="pwyw" type="text" value="5" inputmode="decimal"></div>
+        <div class="pwyw-presets">
+          <button class="preset" onclick="setPrice(0,this)">FREE</button>
+          <button class="preset on" onclick="setPrice(5,this)">$5</button>
+          <button class="preset" onclick="setPrice(15,this)">$15</button>
+          <button class="preset" onclick="setPrice(50,this)">$50</button>
+        </div>
+      </div>
+      <button class="bot-checkout">CHECKOUT <span class="arr">→</span><span class="stripe-mark">STRIPE</span></button>
+    </div>
+  </div>
+</template>
 
 <!-- TWEAKS -->
 <div id="tp">
@@ -700,8 +1215,6 @@ body{
 </div>
 
 <script>
-window.addEventListener('error',e=>{console.warn('[3EAS]',e.message);return true});
-window.addEventListener('unhandledrejection',e=>{console.warn('[3EAS]',e.reason);e.preventDefault()});
 /* ─── MILITARY TIME ─── */
 function updateClock(){
   const now=new Date();
@@ -834,7 +1347,7 @@ setTimeout(()=>{
 
 /* ─── TRACKS ─── */
 const TRACKS=[
-  {id:1,title:'WAR WITHIN A BREATH',artist:'3EAS',type:'release',dur:0,src:null},
+  {id:1,title:'WAR WITHIN A BREATH',artist:'3EAS',type:'release',dur:0,src:'https://www.dropbox.com/scl/fi/fnam7kqarxrrc2bg3bwpi/3EAS-War-Within-a-Breath-Remix.wav?rlkey=5swfm22d435m5902b0xv8gp1c&dl=1'},
   {id:2,title:'LINCOLN HEIGHTS FREQ',artist:'3EAS',type:'dj-mix',dur:0,src:null},
   {id:3,title:'DATA SLAVES',artist:'3EAS',type:'exclusive',dur:0,src:null},
   {id:4,title:"CAPTURE DON'T KILL",artist:'3EAS',type:'release',dur:0,src:null},
@@ -940,13 +1453,13 @@ function subForm(){
 
 /* ─── SITE PLAYLIST ─── */
 const SP_TRACKS=[
-  {title:'A.I. BABY',src:'audio/ai-baby.mp3'},
-  {title:'BASICK WAR DANCE',src:'audio/basick-war-dance.mp3'},
-  {title:'EXILED MARCOS',src:'audio/exiled-marcos.mp3'},
-  {title:'ICE COLD FEAR',src:'audio/ice-cold-fear.mp3'},
-  {title:'JORDAN MAXWELL FOOTSIES',src:'audio/jordan-maxwell-footsies.mp3'},
-  {title:'RITCHIE CURANDERO',src:'audio/ritchie-curandero.mp3'},
-  {title:'MR ROBOT INTRO',src:'audio/mr-robot-intro.mp3'},
+  {title:'A.I. BABY',src:'uploads/A.I. Baby - 11.30.2023 (ABAI 1).wav'},
+  {title:'BASICK WAR DANCE',src:'uploads/Basick War Dance.wav'},
+  {title:'EXILED / MARCOS',src:'uploads/Exiled:Marcos.wav'},
+  {title:'ICE COLD FEAR',src:'uploads/ICE Cold Fear.wav'},
+  {title:'JORDAN MAXWELL FOOTSIES',src:'uploads/Jordan Maxwell Footsies.wav'},
+  {title:'RITCHIE CURANDERO',src:'uploads/Ritchie Curandero.mp3'},
+  {title:'MR ROBOT INTRO',src:'uploads/Mr Robot Intro.wav'},
 ];
 let spIdx=0,spMuted=false,spStarted=false;
 const spAudio=new Audio();
@@ -954,21 +1467,13 @@ spAudio.volume=0.35;
 spAudio.volume=0.35;
 spAudio.addEventListener('ended',()=>spLoad(spIdx+1));
 
-spAudio.addEventListener('error',()=>{
-  document.getElementById('sp-title').textContent='OFFLINE';
-});
-
 function spLoad(idx){
   spIdx=idx%SP_TRACKS.length;
   const t=SP_TRACKS[spIdx];
-  try{
-    spAudio.src=t.src;
-    spAudio.load();
-    spAudio.play().catch(()=>{});
-    document.getElementById('sp-title').textContent=t.title;
-  }catch(e){
-    document.getElementById('sp-title').textContent='STANDBY';
-  }
+  spAudio.src=t.src;
+  spAudio.load();
+  spAudio.play().catch(()=>{});
+  document.getElementById('sp-title').textContent=t.title;
 }
 
 function spStart(){
@@ -991,9 +1496,216 @@ function spToggle(){
   else dot.style.animation='blink 1.3s infinite';
 }
 
+/* ─── BEAT LAB ─── */
+const PAD_KIT=[
+  // Row A — kicks/subs
+  {n:'KCK 01',s:'A.I.'},{n:'KCK 02',s:'BASICK'},{n:'SUB',s:'EXILED'},{n:'808',s:'ICE'},
+  {n:'KCK LO',s:'JMX'},{n:'BOOM',s:'RTC'},{n:'THMP',s:'RIVER'},{n:'KCK FX',s:'TRMLO'},
+  // Row B — snares/claps
+  {n:'SNR 01',s:'A.I.'},{n:'SNR 02',s:'BASICK'},{n:'CLAP',s:'EXILED'},{n:'RIM',s:'ICE'},
+  {n:'SLAP',s:'JMX'},{n:'CRACK',s:'MR.R'},{n:'SNR FX',s:'RIVER'},{n:'CLP RV',s:'TRMLO'},
+  // Row C — hats/perc
+  {n:'HAT C',s:'A.I.'},{n:'HAT O',s:'BASICK'},{n:'SHKR',s:'EXILED'},{n:'TICK',s:'ICE'},
+  {n:'PERC',s:'JMX'},{n:'BELL',s:'RTC'},{n:'CYM',s:'RIVER'},{n:'HAT FX',s:'TRMLO'},
+  // Row D — vox/chops
+  {n:'VOX 01',s:'JMX'},{n:'VOX 02',s:'MR.R'},{n:'STAB',s:'A.I.'},{n:'WORD',s:'EXILED'},
+  {n:'CHANT',s:'RTC'},{n:'WHISPR',s:'ICE'},{n:'SCREAM',s:'BASICK'},{n:'VOX FX',s:'TRMLO'},
+  // Row E — melodics
+  {n:'KEYS',s:'RTC'},{n:'BASS',s:'EXILED'},{n:'PAD',s:'A.I.'},{n:'PLUCK',s:'JMX'},
+  {n:'LEAD',s:'BASICK'},{n:'ORGAN',s:'MR.R'},{n:'STR',s:'TRMLO'},{n:'GTR',s:'RIVER'},
+  // Row F — fx/textures
+  {n:'NOISE',s:'A.I.'},{n:'STATIC',s:'ICE'},{n:'DRONE',s:'JMX'},{n:'TAPE',s:'RTC'},
+  {n:'SCAN',s:'MR.R'},{n:'GLTCH',s:'BASICK'},{n:'SWELL',s:'TRMLO'},{n:'AIR',s:'RIVER'},
+  // Row G — slices
+  {n:'CHOP 1',s:'EXILED'},{n:'CHOP 2',s:'A.I.'},{n:'CHOP 3',s:'JMX'},{n:'CHOP 4',s:'BASICK'},
+  {n:'LOOP A',s:'RTC'},{n:'LOOP B',s:'MR.R'},{n:'LOOP C',s:'ICE'},{n:'LOOP D',s:'TRMLO'},
+  // Row H — fills/risers
+  {n:'FILL 1',s:'BASICK'},{n:'FILL 2',s:'EXILED'},{n:'RISE',s:'A.I.'},{n:'IMPCT',s:'JMX'},
+  {n:'CRASH',s:'RIVER'},{n:'WHOOSH',s:'MR.R'},{n:'SWP',s:'TRMLO'},{n:'END',s:'RTC'},
+];
+const ROW_LABELS=['KICKS','SNARES','HATS','VOX','MELODY','FX','SLICES','FILLS'];
+const PATTERN=[
+  [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], // kick
+  [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,1], // snare
+  [1,0,1,0, 1,0,1,0, 1,0,1,1, 1,0,1,0], // hat
+  [0,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,0,0], // vox
+  [1,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,0], // melody
+  [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,1,0,0], // fx
+  [0,0,1,0, 0,0,0,0, 0,1,0,0, 0,0,0,0], // slices
+  [0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0], // fills
+];
+const PAD_VOLS=[88,72,55,68,90,42,77,60];
+
+function buildPads(){
+  const root=document.getElementById('pads');
+  let h='';
+  PAD_KIT.forEach((p,i)=>{
+    const row=Math.floor(i/8);
+    const col=i%8;
+    const id=String.fromCharCode(65+row)+(col+1);
+    const armed=PATTERN[row]?.some(v=>v)?'armed':'';
+    h+=`<div class="pad ${armed}" data-i="${i}" data-row="${row}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <span class="pad-id">${id}</span>
+        <span class="pad-led"></span>
+      </div>
+      <div>
+        <div class="pad-name">${p.n}</div>
+        <div style="font-family:var(--mono);font-size:6px;letter-spacing:1px;color:var(--dimmer);text-transform:uppercase;margin-top:2px">${p.s}</div>
+      </div>
+    </div>`;
+  });
+  root.innerHTML=h;
+  root.querySelectorAll('.pad').forEach(p=>{
+    p.addEventListener('mousedown',()=>{
+      p.classList.add('hit');
+      setTimeout(()=>p.classList.remove('hit'),180);
+    });
+  });
+}
+
+function buildSeq(){
+  const head=document.getElementById('seqHead');
+  let hh='<span></span>';
+  for(let i=0;i<16;i++){
+    const beat=(i%4===0);
+    hh+=`<span class="${beat?'beat':''}">${String(i+1).padStart(2,'0')}</span>`;
+  }
+  head.innerHTML=hh;
+
+  const rows=document.getElementById('seqRows');
+  let r='';
+  for(let row=0;row<8;row++){
+    r+=`<div class="seq-row" style="margin-bottom:3px">
+      <div class="seq-lbl">${ROW_LABELS[row]}<span class="ms"><i></i><i></i></span></div>`;
+    for(let s=0;s<16;s++){
+      const beat=(s%4===0)?'beat':'';
+      const on=PATTERN[row][s]?'on':'';
+      r+=`<div class="seq-cell ${beat} ${on}" data-row="${row}" data-step="${s}"></div>`;
+    }
+    r+='</div>';
+  }
+  rows.innerHTML=r;
+  rows.querySelectorAll('.seq-cell').forEach(c=>{
+    c.addEventListener('click',()=>{
+      const row=+c.dataset.row,step=+c.dataset.step;
+      PATTERN[row][step]=PATTERN[row][step]?0:1;
+      c.classList.toggle('on');
+    });
+  });
+
+  // playhead strip
+  const ph=document.getElementById('seqPh');
+  let p='<div></div>';
+  for(let i=0;i<16;i++)p+=`<div class="seq-ph-cell" data-step="${i}"></div>`;
+  ph.innerHTML=p;
+}
+
+function buildPadList(){
+  const root=document.getElementById('padlist');
+  let h='';
+  ROW_LABELS.forEach((l,i)=>{
+    h+=`<div class="padlist-row">
+      <span>${l}</span>
+      <div class="vol"><i style="width:${PAD_VOLS[i]}%"></i></div>
+      <span class="v">${PAD_VOLS[i]}</span>
+    </div>`;
+  });
+  root.innerHTML=h;
+}
+
+function buildMini(){
+  const root=document.getElementById('labMini');
+  if(!root)return;
+  let h='';
+  // Show 8x8 with subtle pattern of "lit" cells
+  const lit=new Set([0,2,7,9,11,14,17,19,22,26,28,31,33,36,40,44,48,53,57,60,62]);
+  const beat=new Set([18]);
+  for(let i=0;i<64;i++){
+    const cls=beat.has(i)?'beat':lit.has(i)?'lit':'';
+    h+=`<i class="${cls}"></i>`;
+  }
+  root.innerHTML=h;
+  // Animate beat cell traveling
+  let bp=18;
+  setInterval(()=>{
+    const cells=root.children;
+    if(!cells.length)return;
+    cells[bp]?.classList.remove('beat');
+    if(lit.has(bp))cells[bp]?.classList.add('lit');
+    bp=(bp+1)%64;
+    cells[bp]?.classList.add('beat');
+    cells[bp]?.classList.remove('lit');
+  },180);
+}
+
+let labStep=6,labOpen=false,labTimer=null;
+function tickLab(){
+  if(!labOpen)return;
+  labStep=(labStep+1)%16;
+  // playhead
+  document.querySelectorAll('#seqPh .seq-ph-cell').forEach((c,i)=>c.classList.toggle('act',i===labStep));
+  // light columns in sequencer
+  document.querySelectorAll('#seqRows .seq-cell').forEach(c=>c.classList.remove('beat'));
+  document.querySelectorAll(`#seqRows .seq-cell[data-step="${labStep}"]`).forEach(c=>c.classList.add('beat'));
+  // strobe pads that are firing this step
+  document.querySelectorAll('.pad').forEach(p=>p.classList.remove('hit'));
+  PATTERN.forEach((row,ri)=>{
+    if(row[labStep]){
+      // strobe one random pad in that row
+      const off=ri*8+Math.floor(Math.random()*8);
+      const pad=document.querySelector(`.pad[data-i="${off}"]`);
+      pad?.classList.add('hit');
+      setTimeout(()=>pad?.classList.remove('hit'),120);
+    }
+  });
+  // LCD step
+  const ls=document.getElementById('lcdStep');
+  if(ls)ls.textContent=String(labStep+1).padStart(2,'0');
+  // VU meter random
+  ['vuL','vuR'].forEach(id=>{
+    const v=document.getElementById(id);
+    if(!v)return;
+    if(!v.children.length)v.innerHTML=Array(20).fill('<i></i>').join('');
+    const lvl=Math.floor(Math.random()*16+4);
+    [...v.children].forEach((b,i)=>{
+      b.classList.toggle('lit',i<lvl);
+      b.classList.toggle('peak',i>=lvl-1&&i<lvl&&i>15);
+    });
+  });
+}
+
+function setTab(t){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  document.getElementById('pads').classList.toggle('hide',t!=='pads');
+  document.getElementById('seq').classList.toggle('show',t==='seq');
+}
+
+function mountLab(){
+  const wrap=document.getElementById('devWrap');
+  const tpl=document.getElementById('labTemplate');
+  if(!wrap||!tpl||wrap.children.length)return;
+  wrap.appendChild(tpl.content.cloneNode(true));
+  buildPads();buildSeq();buildPadList();
+  labOpen=true;
+  if(!labTimer)labTimer=setInterval(tickLab,260);
+}
+function openLab(){goScene(4)}
+function setPrice(v,btn){
+  document.querySelectorAll('.preset').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('pwyw').value=v===0?'0':v;
+}
+function updateArtist(){
+  const v=document.getElementById('artistName').value.trim().toUpperCase();
+  const t=document.getElementById('botTitle');
+  if(t)t.textContent=v?`3EAS x ${v}`:'3EAS x — YOUR NAME';
+}
+mountLab();buildMini();
+
 /* ─── TWEAKS ─── */
 const TWEAK_DEFAULTS=/*EDITMODE-BEGIN*/{
-  "fx": "scan",
+  "fx": "waves",
   "scan": true,
   "grain": 0.04
 }/*EDITMODE-END*/;
