@@ -1196,6 +1196,7 @@ body{
       <button class="tpopt on" onclick="setFX('waves',this)">Waves</button>
       <button class="tpopt" onclick="setFX('particles',this)">Particles</button>
       <button class="tpopt" onclick="setFX('scan',this)">Scan</button>
+      <button class="tpopt" onclick="setFX('adversarial',this)">Adv. Noise</button>
     </div>
   </div>
   <div class="tprow">
@@ -1268,7 +1269,7 @@ function initHP(){
 resizeHero();window.addEventListener('resize',resizeHero);
 function heroLoop(){
   ht+=.003;hx.clearRect(0,0,hw,hh);
-  if(hfx==='waves')drawHW();else if(hfx==='particles')drawHP();else drawScan();
+  if(hfx==='waves')drawHW();else if(hfx==='particles')drawHP();else if(hfx==='adversarial')drawAdv();else drawScan();
   requestAnimationFrame(heroLoop);
 }
 heroLoop();
@@ -1299,6 +1300,67 @@ function drawHP(){
     const dx=hpart[i].x-hpart[j].x,dy=hpart[i].y-hpart[j].y,d=Math.sqrt(dx*dx+dy*dy);
     if(d<90){hx.beginPath();hx.strokeStyle=`rgba(184,168,120,${.04*(1-d/90)})`;hx.lineWidth=.5;hx.moveTo(hpart[i].x,hpart[i].y);hx.lineTo(hpart[j].x,hpart[j].y);hx.stroke()}
   }
+}
+let advBuf=null,advW=0,advH=0,advFrame=0;
+function drawAdv(){
+  const sw=Math.max(60,Math.floor(hw/8));
+  const sh=Math.max(40,Math.floor(hh/8));
+  if(!advBuf||advW!==sw||advH!==sh){advBuf=document.createElement('canvas');advBuf.width=sw;advBuf.height=sh;advW=sw;advH=sh}
+  const bx=advBuf.getContext('2d');
+  const id=bx.createImageData(sw,sh);
+  const d=id.data;
+  advFrame++;
+  // High-frequency colored perturbation — mimics FGSM/PGD pattern
+  for(let y=0;y<sh;y++){
+    for(let x=0;x<sw;x++){
+      const i=(y*sw+x)*4;
+      // Patchy structure: low-freq envelope * high-freq noise
+      const env=Math.sin(x*.18+ht*2)*Math.cos(y*.22+ht*1.3)+Math.sin((x+y)*.09+ht);
+      const n=(Math.random()-.5)*2;
+      const sign=env*n;
+      // Adversarial perturbation tints — magenta/cyan/amber bias
+      const ch=(x*7+y*3+advFrame)%3;
+      const amp=80+Math.abs(env)*60;
+      d[i]   = ch===0?128+sign*amp*1.1:128+sign*amp*.4;
+      d[i+1] = ch===1?128+sign*amp*.9 :128+sign*amp*.3;
+      d[i+2] = ch===2?128+sign*amp*1.2:128+sign*amp*.5;
+      d[i+3] = 28+Math.abs(env)*22;
+    }
+  }
+  bx.putImageData(id,0,0);
+  hx.save();
+  hx.imageSmoothingEnabled=false;
+  hx.globalCompositeOperation='screen';
+  hx.globalAlpha=.55;
+  hx.drawImage(advBuf,0,0,hw,hh);
+  hx.restore();
+  // Cursor perturbation hotspot — denser noise around mouse
+  if(mx&&my){
+    const r=140;
+    hx.save();
+    hx.globalCompositeOperation='screen';
+    for(let i=0;i<60;i++){
+      const a=Math.random()*Math.PI*2,d2=Math.random()*r;
+      const px=mx+Math.cos(a)*d2,py=my+Math.sin(a)*d2;
+      const fall=1-d2/r;
+      const hue=Math.random()<.33?'232,80,120':Math.random()<.5?'80,200,232':'232,200,80';
+      hx.fillStyle=`rgba(${hue},${.18*fall})`;
+      hx.fillRect(px,py,1+Math.random()*2,1+Math.random()*2);
+    }
+    hx.restore();
+  }
+  // Occasional horizontal tear lines (classifier confusion bands)
+  if(Math.random()<.04){
+    const ty=Math.random()*hh;
+    hx.fillStyle='rgba(232,80,120,.12)';
+    hx.fillRect(0,ty,hw,1+Math.random()*2);
+    hx.fillStyle='rgba(80,200,232,.12)';
+    hx.fillRect(0,ty+2,hw,1);
+  }
+  // Faint label readout — "PERTURBATION ε=0.03" style
+  hx.fillStyle='rgba(184,168,120,.18)';
+  hx.font='9px "Share Tech Mono",monospace';
+  hx.fillText(`ε=${(.03+Math.sin(ht*3)*.005).toFixed(4)}  L∞ NORM  CONF: ${(99-Math.random()*4).toFixed(2)}%`,20,hh-12);
 }
 function drawScan(){
   const lc=Math.floor((ht*60)%hh);
@@ -1347,11 +1409,11 @@ setTimeout(()=>{
 
 /* ─── TRACKS ─── */
 const TRACKS=[
-  {id:1,title:'WAR WITHIN A BREATH',artist:'3EAS',type:'release',dur:0,src:'https://www.dropbox.com/scl/fi/fnam7kqarxrrc2bg3bwpi/3EAS-War-Within-a-Breath-Remix.wav?rlkey=5swfm22d435m5902b0xv8gp1c&dl=1'},
-  {id:2,title:'LINCOLN HEIGHTS FREQ',artist:'3EAS',type:'dj-mix',dur:0,src:null},
-  {id:3,title:'DATA SLAVES',artist:'3EAS',type:'exclusive',dur:0,src:null},
-  {id:4,title:"CAPTURE DON'T KILL",artist:'3EAS',type:'release',dur:0,src:null},
-  {id:5,title:'SELEXIONES MIX VOL.1',artist:'3EAS × ON/NOTICE',type:'dj-mix',dur:0,src:null},
+  {id:1,title:"IF IT WASN'T FOR YOU",artist:'COMING JULY 18 2026',type:'pending',dur:0,src:null},
+  {id:2,title:'WAR WITHIN A BREATH',artist:'3EAS',type:'release',dur:0,src:'uploads/3EAS - War Within a Breath (Remix).mp3'},
+  {id:3,title:'COMING SOON',artist:'3EAS',type:'pending',dur:0,src:null},
+  {id:4,title:'COMING SOON',artist:'3EAS',type:'pending',dur:0,src:null},
+  {id:5,title:'COMING SOON',artist:'3EAS',type:'pending',dur:0,src:null},
 ];
 const fmt=s=>{if(!s||isNaN(s))return'0:00';return`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`};
 let cur2=null,playing=false,wdata=[];
@@ -1378,6 +1440,22 @@ audio.addEventListener('error',()=>{
   document.getElementById('pbtn').textContent='▶';
 });
 
+// Pause the site jukebox whenever the transmissions player starts playing.
+// Resume it (from where it left off) when the transmissions player pauses or ends.
+function spDuck(){
+  if(!spStarted)return;
+  spActive&&spActive.pause();
+  spIdle&&spIdle.pause();
+}
+function spUnduck(){
+  if(!spStarted||spMuted)return;
+  spActive&&spActive.play().catch(()=>{});
+}
+audio.addEventListener('play',spDuck);
+audio.addEventListener('playing',spDuck);
+audio.addEventListener('pause',spUnduck);
+audio.addEventListener('ended',spUnduck);
+
 function renderTL(){
   document.getElementById('tracklist').innerHTML=TRACKS.map((t,i)=>`
     <div class="trow${cur2?.id===t.id?' on':''}" onclick="selT(${t.id})">
@@ -1385,7 +1463,7 @@ function renderTL(){
       <div class="tart"><span class="tart-ph">SIG</span></div>
       <div><div class="tt">${t.title}</div><div class="tmeta">${t.artist}</div></div>
       <span class="ttype${t.type==='exclusive'?' excl':''}">${t.type.replace('-',' ')}</span>
-      <span class="tdur">${t.src?'—:——':'NO SRC'}</span>
+      <span class="tdur">${t.src?'—:——':''}</span>
     </div>`).join('');
 }
 
@@ -1462,24 +1540,79 @@ const SP_TRACKS=[
   {title:'MR ROBOT INTRO',src:'uploads/Mr Robot Intro.wav'},
 ];
 let spIdx=0,spMuted=false,spStarted=false;
-const spAudio=new Audio();
-spAudio.volume=0.35;
-spAudio.volume=0.35;
-spAudio.addEventListener('ended',()=>spLoad(spIdx+1));
+const SP_VOL=0.35;       // master jukebox volume
+const SP_XFADE=6;        // crossfade duration in seconds
+// Two audio decks so tracks blend instead of hard-cutting
+const spA=new Audio(),spB=new Audio();
+[spA,spB].forEach(a=>{a.volume=0;a.preload='auto';a.crossOrigin='anonymous'});
+let spActive=spA,spIdle=spB,spFading=false;
 
-function spLoad(idx){
-  spIdx=idx%SP_TRACKS.length;
-  const t=SP_TRACKS[spIdx];
-  spAudio.src=t.src;
-  spAudio.load();
-  spAudio.play().catch(()=>{});
-  document.getElementById('sp-title').textContent=t.title;
+function spSetTitle(t){document.getElementById('sp-title').textContent=t}
+
+function spPlayDeck(deck,track){
+  deck.src=track.src;
+  deck.currentTime=0;
+  deck.volume=0;
+  deck.muted=spMuted;
+  deck.load();
+  return deck.play().catch(()=>{});
 }
+
+function spFadeTo(deck,target,dur){
+  return new Promise(res=>{
+    const start=performance.now(),from=deck.volume;
+    function step(now){
+      const t=Math.min(1,(now-start)/(dur*1000));
+      deck.volume=from+(target-from)*t;
+      if(t<1)requestAnimationFrame(step);else res();
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+function spCrossfade(){
+  if(spFading)return;
+  spFading=true;
+  const nextIdx=(spIdx+1)%SP_TRACKS.length;
+  const nextTrack=SP_TRACKS[nextIdx];
+  spPlayDeck(spIdle,nextTrack).then(()=>{
+    spSetTitle(`${SP_TRACKS[spIdx].title}  ⇢  ${nextTrack.title}`);
+    Promise.all([
+      spFadeTo(spActive,0,SP_XFADE),
+      spFadeTo(spIdle,SP_VOL,SP_XFADE)
+    ]).then(()=>{
+      spActive.pause();
+      // swap decks
+      [spActive,spIdle]=[spIdle,spActive];
+      spIdx=nextIdx;
+      spSetTitle(nextTrack.title);
+      spFading=false;
+    });
+  });
+}
+
+// Watch the active deck — start crossfade when within SP_XFADE of the end
+function spWatch(){
+  if(spStarted&&!spFading&&spActive.duration&&!isNaN(spActive.duration)){
+    if(spActive.duration-spActive.currentTime<=SP_XFADE+0.2){
+      spCrossfade();
+    }
+  }
+  requestAnimationFrame(spWatch);
+}
+
+// Safety net if a track ends without crossfade firing (very short tracks etc.)
+[spA,spB].forEach(a=>a.addEventListener('ended',()=>{
+  if(!spFading&&a===spActive)spCrossfade();
+}));
 
 function spStart(){
   if(spStarted)return;
   spStarted=true;
-  spLoad(0);
+  spIdx=0;
+  spSetTitle(SP_TRACKS[0].title);
+  spPlayDeck(spActive,SP_TRACKS[0]).then(()=>spFadeTo(spActive,SP_VOL,2));
+  requestAnimationFrame(spWatch);
 }
 document.addEventListener('click',spStart,{once:true});
 document.addEventListener('keydown',spStart,{once:true});
@@ -1487,7 +1620,7 @@ document.getElementById('scroll').addEventListener('scroll',spStart,{once:true})
 
 function spToggle(){
   spMuted=!spMuted;
-  spAudio.muted=spMuted;
+  spA.muted=spMuted;spB.muted=spMuted;
   const btn=document.getElementById('sp-mute');
   const dot=document.getElementById('sp-dot');
   btn.textContent=spMuted?'UNMUTE':'MUTE';
