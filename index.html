@@ -1070,6 +1070,9 @@ body{
 <div id="site-player" style="position:fixed;bottom:38px;left:0;z-index:490;display:flex;align-items:center;gap:12px;padding:8px 16px;border-top:1px solid var(--dimmer);border-right:1px solid var(--dimmer);background:rgba(0,0,0,.92);font-family:var(--mono);font-size:7px;letter-spacing:3px;color:var(--dimmer);cursor:none;transition:opacity .3s">
   <div id="sp-dot" style="width:5px;height:5px;background:var(--accent);animation:blink 1.3s infinite;flex-shrink:0"></div>
   <span id="sp-title" style="color:var(--dim);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">STANDBY</span>
+  <button id="sp-play" onclick="spPlay()" title="Play" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:7px;letter-spacing:2px;padding:3px 8px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dimmer)';this.style.borderColor='var(--dimmer)'">PLAY ▶</button>
+  <button id="sp-skip" onclick="spSkip()" title="Next track" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:7px;letter-spacing:2px;padding:3px 8px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dimmer)';this.style.borderColor='var(--dimmer)'">SKIP ▶▶</button>
+  <button id="sp-stop" onclick="spStop()" title="Stop" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:7px;letter-spacing:2px;padding:3px 8px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dimmer)';this.style.borderColor='var(--dimmer)'">STOP ■</button>
   <button id="sp-mute" onclick="spToggle()" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:7px;letter-spacing:2px;padding:3px 8px;cursor:none;transition:all .15s">MUTE</button>
 </div>
 
@@ -1188,6 +1191,7 @@ body{
 </template>
 
 <!-- TWEAKS -->
+<button id="tp-toggle" onclick="document.getElementById('tp').classList.toggle('vis')" title="System tweaks" style="position:fixed;bottom:38px;right:10px;z-index:610;width:30px;height:30px;border:1px solid var(--dimmer);background:rgba(0,0,0,.92);color:var(--dim);font-family:var(--mono);font-size:14px;line-height:1;cursor:none;transition:color .15s,border-color .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dim)';this.style.borderColor='var(--dimmer)'">⚙</button>
 <div id="tp">
   <div class="tptitle">// SYSTEM TWEAKS</div>
   <div class="tprow">
@@ -1443,12 +1447,12 @@ audio.addEventListener('error',()=>{
 // Pause the site jukebox whenever the transmissions player starts playing.
 // Resume it (from where it left off) when the transmissions player pauses or ends.
 function spDuck(){
-  if(!spStarted)return;
+  if(!spStarted||spStopped)return;
   spActive&&spActive.pause();
   spIdle&&spIdle.pause();
 }
 function spUnduck(){
-  if(!spStarted||spMuted)return;
+  if(!spStarted||spMuted||spStopped)return;
   if(!spActive)return;
   // Restore volume in case the fade-in got interrupted by a duck
   if(!spFading)spActive.volume=SP_VOL;
@@ -1648,6 +1652,40 @@ function spStart(){
 document.addEventListener('click',spStart,{once:true});
 document.addEventListener('keydown',spStart,{once:true});
 document.getElementById('scroll').addEventListener('scroll',spStart,{once:true});
+
+function spPlay(){
+  if(!spStarted){spStart();return;}
+  if(spStopped){
+    spStopped=false;
+    const dot=document.getElementById('sp-dot');
+    if(dot){dot.style.background='var(--accent)';dot.style.animation='blink 1.3s infinite'}
+    spSetTitle(SP_TRACKS[spIdx]?.title||'—');
+    if(spActive){spActive.volume=SP_VOL;spActive.play().catch(()=>{})}
+    return;
+  }
+  if(spActive&&spActive.paused){
+    if(!spFading)spActive.volume=SP_VOL;
+    spActive.play().catch(()=>{});
+  }
+}
+// Skip = crossfade to a new random track immediately.
+function spSkip(){
+  if(!spStarted){spStart();return;}
+  if(spStopped){spStopped=false;spStart();return;}
+  if(spFading)return;
+  // Force an immediate crossfade by short-circuiting the watch threshold.
+  spCrossfade();
+}
+// Stop = halt the jukebox until user explicitly resumes (skip or refresh).
+let spStopped=false;
+function spStop(){
+  if(!spStarted)return;
+  spStopped=true;
+  spA.pause();spB.pause();
+  spSetTitle('STOPPED');
+  const dot=document.getElementById('sp-dot');
+  if(dot){dot.style.background='var(--dimmer)';dot.style.animation='none'}
+}
 
 function spToggle(){
   spMuted=!spMuted;
