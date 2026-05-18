@@ -1449,7 +1449,10 @@ function spDuck(){
 }
 function spUnduck(){
   if(!spStarted||spMuted)return;
-  spActive&&spActive.play().catch(()=>{});
+  if(!spActive)return;
+  // Restore volume in case the fade-in got interrupted by a duck
+  if(!spFading)spActive.volume=SP_VOL;
+  spActive.play().catch(()=>{});
 }
 audio.addEventListener('play',spDuck);
 audio.addEventListener('playing',spDuck);
