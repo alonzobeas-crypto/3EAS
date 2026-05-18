@@ -1542,13 +1542,26 @@ const SP_TRACKS=[
   {title:'RITCHIE CURANDERO',src:'uploads/Ritchie Curandero.mp3'},
   {title:'MR ROBOT INTRO',src:'uploads/Mr Robot Intro.wav'},
 ];
-let spIdx=0,spMuted=false,spStarted=false;
+let spIdx=0,spMuted=false,spStarted=false,spUnlocked=false;
 const SP_VOL=0.35;       // master jukebox volume
 const SP_XFADE=6;        // crossfade duration in seconds
 // Two audio decks so tracks blend instead of hard-cutting
 const spA=new Audio(),spB=new Audio();
 [spA,spB].forEach(a=>{a.volume=0;a.preload='auto';a.crossOrigin='anonymous'});
 let spActive=spA,spIdle=spB,spFading=false;
+
+// Tiny silent WAV (44.1k mono, ~5ms) — used to "unlock" both decks under one user gesture
+const SP_SILENT='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+function spUnlock(){
+  if(spUnlocked)return Promise.resolve();
+  spUnlocked=true;
+  // Play the silent clip on BOTH decks within this gesture; pause immediately.
+  // Subsequent .play() calls (e.g. for crossfade) will then be permitted.
+  return Promise.all([spA,spB].map(a=>{
+    a.src=SP_SILENT;
+    return a.play().then(()=>{a.pause();a.currentTime=0}).catch(()=>{});
+  }));
+}
 
 function spSetTitle(t){document.getElementById('sp-title').textContent=t}
 
@@ -1573,12 +1586,24 @@ function spFadeTo(deck,target,dur){
   });
 }
 
+function spPickNext(){
+  if(SP_TRACKS.length<=1)return 0;
+  let i;do{i=Math.floor(Math.random()*SP_TRACKS.length)}while(i===spIdx);
+  return i;
+}
+
 function spCrossfade(){
   if(spFading)return;
   spFading=true;
-  const nextIdx=(spIdx+1)%SP_TRACKS.length;
+  const nextIdx=spPickNext();
   const nextTrack=SP_TRACKS[nextIdx];
   spPlayDeck(spIdle,nextTrack).then(()=>{
+    // If the play call was blocked, abort the crossfade so we don't fade audible -> silence
+    if(spIdle.paused){
+      console.warn('[jukebox] next deck blocked from playing — skipping crossfade');
+      spFading=false;
+      return;
+    }
     spSetTitle(`${SP_TRACKS[spIdx].title}  ⇢  ${nextTrack.title}`);
     Promise.all([
       spFadeTo(spActive,0,SP_XFADE),
@@ -1612,10 +1637,13 @@ function spWatch(){
 function spStart(){
   if(spStarted)return;
   spStarted=true;
-  spIdx=0;
-  spSetTitle(SP_TRACKS[0].title);
-  spPlayDeck(spActive,SP_TRACKS[0]).then(()=>spFadeTo(spActive,SP_VOL,2));
-  requestAnimationFrame(spWatch);
+  // Unlock both decks under the current user gesture, then start a random track
+  spUnlock().then(()=>{
+    spIdx=Math.floor(Math.random()*SP_TRACKS.length);
+    spSetTitle(SP_TRACKS[spIdx].title);
+    spPlayDeck(spActive,SP_TRACKS[spIdx]).then(()=>spFadeTo(spActive,SP_VOL,2));
+    requestAnimationFrame(spWatch);
+  });
 }
 document.addEventListener('click',spStart,{once:true});
 document.addEventListener('keydown',spStart,{once:true});
