@@ -337,7 +337,7 @@ body{
 ══════════════════════════════ */
 #s4{justify-content:center;padding:0 60px}
 .s4-head{position:absolute;top:0;left:0;right:0;padding:52px 60px 28px;border-bottom:1px solid var(--dimmer)}
-.acq-layout{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--dimmer);width:100%}
+.acq-layout{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--dimmer);width:100%}
 .ac{
   background:rgba(0,0,0,.88);padding:32px 28px;position:relative;
   transition:background .2s;cursor:none;
@@ -819,6 +819,49 @@ body{
 .fsub:hover{background:transparent;color:var(--fg)}
 .fok{display:none;margin-top:10px;font-family:var(--mono);font-size:8px;letter-spacing:3px;color:rgba(120,255,120,.7)}
 
+/* ── SCENE 07 — DISPATCH ── */
+#s7{padding:0;display:flex;flex-direction:column}
+.s7-head{padding:52px 44px 28px;border-bottom:1px solid var(--dimmer);flex-shrink:0;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.s7-rss{font-family:var(--mono);font-size:8px;letter-spacing:3px;color:var(--accent);text-decoration:none;border:1px solid var(--dimmer);padding:8px 14px;transition:all .15s;cursor:none;white-space:nowrap}
+.s7-rss:hover{border-color:var(--accent);background:rgba(184,168,120,.05)}
+.s7-rss .ic{display:inline-block;width:6px;height:6px;background:var(--accent);border-radius:50%;margin-right:6px;vertical-align:middle;animation:blink 1.6s infinite}
+.s7-body{flex:1;display:grid;grid-template-columns:340px 1fr;overflow:hidden}
+.dispatch-list{border-right:1px solid var(--dimmer);overflow-y:auto;-ms-overflow-style:none;scrollbar-width:none;background:rgba(0,0,0,.92)}
+.dispatch-list::-webkit-scrollbar{display:none}
+.dpost-row{
+  display:block;padding:22px 24px;border-bottom:1px solid var(--dimmer);
+  cursor:none;transition:background .15s;position:relative;
+  text-decoration:none;color:inherit;
+}
+.dpost-row:hover{background:rgba(184,168,120,.04)}
+.dpost-row.on{background:rgba(184,168,120,.06)}
+.dpost-row.on::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent)}
+.dpost-meta{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:7px;letter-spacing:3px;color:var(--dimmer);margin-bottom:8px}
+.dpost-row.on .dpost-meta{color:var(--accent)}
+.dpost-tt{font-family:var(--vt);font-size:24px;letter-spacing:2px;color:var(--fg);line-height:1.1;margin-bottom:6px;text-transform:uppercase}
+.dpost-sum{font-family:var(--body);font-size:12px;color:var(--dim);line-height:1.7;opacity:.75}
+.dpost-tags{display:flex;gap:4px;margin-top:10px;flex-wrap:wrap}
+.dtag{font-family:var(--mono);font-size:6px;letter-spacing:2px;color:var(--dimmer);border:1px solid var(--dimmer);padding:2px 6px;text-transform:uppercase}
+.dispatch-view{padding:48px 64px;overflow-y:auto;-ms-overflow-style:none;scrollbar-width:none;background:rgba(0,0,0,.88)}
+.dispatch-view::-webkit-scrollbar{display:none}
+.dview-empty{font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--dimmer);text-transform:uppercase;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;line-height:2}
+.dview-meta{font-family:var(--mono);font-size:8px;letter-spacing:4px;color:var(--accent);margin-bottom:14px;display:flex;gap:14px;align-items:center}
+.dview-meta .sep{color:var(--dimmer)}
+.dview-title{font-family:var(--vt);font-size:clamp(36px,5vw,64px);letter-spacing:3px;color:var(--hot);line-height:1;margin-bottom:24px;text-transform:uppercase}
+.dview-divider{height:1px;background:var(--dimmer);margin:28px 0;max-width:240px}
+.dview-body{font-family:var(--body);font-size:15px;line-height:2;color:var(--fg);max-width:680px}
+.dview-body p{margin-bottom:18px}
+.dview-body a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(184,168,120,.3);transition:border-color .15s}
+.dview-body a:hover{border-color:var(--accent)}
+.dview-body strong{color:var(--hot)}
+.dview-tags{display:flex;gap:6px;margin-top:32px;flex-wrap:wrap}
+.dispatch-loading{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--dimmer);padding:32px 24px;animation:pulse 1.5s infinite}
+@media(max-width:768px){
+  .s7-body{grid-template-columns:1fr}
+  .dispatch-list{border-right:none;border-bottom:1px solid var(--dimmer);max-height:38vh}
+  .dispatch-view{padding:32px 24px}
+}
+
 /* ── SCENE ANIMATIONS ── */
 .scene-eyebrow,.scene-title,.s2-body,.vgrid,.acq-layout,.s5-grid,.s5-top,.s6-body{
   opacity:0;transform:translateY(16px);
@@ -885,9 +928,10 @@ body{
     <a href="#" class="tb-link" onclick="goScene(1);return false"><span class="n">01</span>TRANSMISSIONS</a>
     <a href="#" class="tb-link" onclick="goScene(2);return false"><span class="n">02</span>VISUALS</a>
     <a href="#" class="tb-link" onclick="goScene(3);return false"><span class="n">03</span>ACQUISITIONS</a>
-    <a href="#" class="tb-link" onclick="goScene(4);return false"><span class="n">04</span>LAB</a>
-    <a href="#" class="tb-link" onclick="goScene(5);return false"><span class="n">05</span>SIGNAL</a>
-    <a href="#" class="tb-link" onclick="goScene(6);return false"><span class="n">06</span>ACCESS</a>
+    <a href="#" class="tb-link" onclick="goScene(4);return false"><span class="n">04</span>DISPATCH</a>
+    <a href="#" class="tb-link" onclick="goScene(5);return false"><span class="n">05</span>LAB</a>
+    <a href="#" class="tb-link" onclick="goScene(6);return false"><span class="n">06</span>SIGNAL</a>
+    <a href="#" class="tb-link" onclick="goScene(7);return false"><span class="n">07</span>ACCESS</a>
     <a href="https://ko-fi.com/3eascortex" target="_blank" class="tb-link" style="color:var(--accent)"><span class="n">◈</span>SUPPORT</a>
   </div>
   <div class="tb-right">
@@ -905,6 +949,7 @@ body{
   <div class="vdot" onclick="goScene(4)"></div>
   <div class="vdot" onclick="goScene(5)"></div>
   <div class="vdot" onclick="goScene(6)"></div>
+  <div class="vdot" onclick="goScene(7)"></div>
 </div>
 
 <!-- TICKER -->
@@ -941,7 +986,7 @@ body{
       </div>
     </div>
     <div class="s1-scroll" id="s1scroll">SCROLL TO ENTER SYSTEM</div>
-    <div class="scene-counter">01 / 07</div>
+    <div class="scene-counter">01 / 08</div>
   </section>
 
   <!-- S2: TRANSMISSIONS -->
@@ -968,7 +1013,7 @@ body{
         </div>
       </div>
     </div>
-    <div class="scene-counter">02 / 07</div>
+    <div class="scene-counter">02 / 08</div>
   </section>
 
   <!-- S3: VISUALS -->
@@ -993,7 +1038,7 @@ body{
       <div class="vc"><div class="vph"><div class="vph-txt">ART DIRECTION<br>— SIGNAL PENDING —</div></div><div class="vcap">VIEW →</div></div>
       <div class="vc"><div class="vph"><div class="vph-txt">VIDEO<br>— SIGNAL PENDING —</div></div><div class="vcap">PLAY →</div></div>
     </div>
-    <div class="scene-counter">03 / 07</div>
+    <div class="scene-counter">03 / 08</div>
   </section>
 
   <!-- S4: ACQUISITIONS -->
@@ -1008,7 +1053,7 @@ body{
         <div class="ac-cat">APPAREL // CDK COLLECTION</div>
         <div class="ac-name">THE UNIFORM</div>
         <div class="ac-desc">Apparel & accessories.<br>The signal has a dress code.<br>Wear the frequency.</div>
-        <div class="ac-foot"><div class="ac-price">INCOMING</div><button class="ac-btn" onclick="nfy(this)">NOTIFY ME →</button></div>
+        <div class="ac-foot"><div class="ac-price">INCOMING</div><a class="ac-btn" href="https://www.etsy.com/shop/3EASCORTEX" target="_blank" style="text-decoration:none;color:var(--accent);border-color:rgba(184,168,120,.3)">SHOP ETSY →</a></div>
         <div class="ac-stat">— SIGNAL PENDING</div>
       </div>
       <div class="ac">
@@ -1016,7 +1061,7 @@ body{
         <div class="ac-cat">DIGITAL // SOUND KITS</div>
         <div class="ac-name">SOURCE SIGNAL</div>
         <div class="ac-desc">Sample packs. Raw material.<br>Acquire the frequency.<br>Build with the source.</div>
-        <div class="ac-foot"><div class="ac-price">INCOMING</div><button class="ac-btn" onclick="nfy(this)">NOTIFY ME →</button></div>
+        <div class="ac-foot"><div class="ac-price">INCOMING</div><a class="ac-btn" href="https://3eascortex.gumroad.com/" target="_blank" style="text-decoration:none;color:var(--accent);border-color:rgba(184,168,120,.3)">SHOP GUMROAD →</a></div>
         <div class="ac-stat">— SIGNAL PENDING</div>
       </div>
       <div class="ac">
@@ -1024,19 +1069,47 @@ body{
         <div class="ac-cat">PHYSICAL // LIMITED PRESS</div>
         <div class="ac-name">ARTIFACTS</div>
         <div class="ac-desc">Vinyl. Tapes. Physical media.<br>Limited pressings. No restock.<br>The object IS the signal.</div>
-        <div class="ac-foot"><div class="ac-price">INCOMING</div><button class="ac-btn" onclick="nfy(this)">NOTIFY ME →</button></div>
+        <div class="ac-foot"><div class="ac-price">INCOMING</div><a class="ac-btn" href="https://www.etsy.com/shop/3EASCORTEX" target="_blank" style="text-decoration:none;color:var(--accent);border-color:rgba(184,168,120,.3)">SHOP ETSY →</a></div>
         <div class="ac-stat">— SIGNAL PENDING</div>
       </div>
+      <div class="ac">
+        <div class="ac-idx">04</div>
+        <div class="ac-cat">SERVICES // BY COMMISSION</div>
+        <div class="ac-name">COMMISSIONS</div>
+        <div class="ac-desc">Custom beats. Production.<br>Guitar, keys, Ableton sessions.<br>Tune your own frequency.</div>
+        <div class="ac-foot"><div class="ac-price">INTAKE</div><button class="ac-btn" onclick="requestCommission()" style="color:var(--accent);border-color:rgba(184,168,120,.3)">REQUEST →</button></div>
+        <div class="ac-stat">— CHANNEL OPEN</div>
+      </div>
     </div>
-    <div class="scene-counter">04 / 07</div>
+    <div class="scene-counter">04 / 08</div>
   </section>
 
-  <!-- S5: BEAT LAB (full scene) -->
-  <section class="scene" id="sLab" data-scene="4">
+  <!-- S5: DISPATCH (BLOG) -->
+  <section class="scene" id="s7" data-scene="4" data-screen-label="05 Dispatch">
+    <div class="s7-head">
+      <div>
+        <span class="scene-eyebrow">04 — ONGOING TRANSMISSIONS</span>
+        <h2 class="scene-title">DISPATCH</h2>
+      </div>
+      <a class="s7-rss" href="feed.xml" target="_blank" title="RSS feed"><span class="ic"></span>RSS — SUBSCRIBE</a>
+    </div>
+    <div class="s7-body">
+      <div class="dispatch-list" id="dispatchList">
+        <div class="dispatch-loading">▸ SCANNING FREQUENCY…</div>
+      </div>
+      <div class="dispatch-view" id="dispatchView">
+        <div class="dview-empty">◦ SELECT A TRANSMISSION<br>FROM THE ARCHIVE</div>
+      </div>
+    </div>
+    <div class="scene-counter">05 / 08</div>
+  </section>
+
+  <!-- S6: BEAT LAB (full scene) -->
+  <section class="scene" id="sLab" data-scene="5">
     <div class="lab-bg"></div>
     <div class="lab-eyebrow">
       <div>
-        <span class="scene-eyebrow">04 — INTERACTIVE // SOURCE SIGNAL</span>
+        <span class="scene-eyebrow">05 — INTERACTIVE // SOURCE SIGNAL</span>
         <h2>BEAT LAB</h2>
       </div>
       <div class="lab-meta">
@@ -1055,13 +1128,13 @@ body{
         <span class="lab-cs-note">SAMPLE PACK + INTERACTIVE LAB — SIGNAL PENDING</span>
       </div>
     </div>
-    <div class="scene-counter">05 / 07</div>
+    <div class="scene-counter">06 / 08</div>
   </section>
 
-  <!-- S6: SIGNAL -->
-  <section class="scene" id="s5" data-scene="5">
+  <!-- S7: SIGNAL -->
+  <section class="scene" id="s5" data-scene="6">
     <div class="s5-top">
-      <span class="scene-eyebrow">04 — FREQUENCY AS LANGUAGE</span>
+      <span class="scene-eyebrow">06 — FREQUENCY AS LANGUAGE</span>
       <h2 class="scene-title">SIGNAL</h2>
     </div>
     <div class="s5-grid">
@@ -1077,13 +1150,13 @@ body{
         <div class="sb"><div class="sb-lbl">BROADCAST ID</div><div class="sb-val">3EAS-001<br>© 2026</div></div>
       </div>
     </div>
-    <div class="scene-counter">06 / 07</div>
+    <div class="scene-counter">07 / 08</div>
   </section>
 
-  <!-- S7: ACCESS -->
-  <section class="scene" id="s6" data-scene="6">
+  <!-- S8: ACCESS -->
+  <section class="scene" id="s6" data-scene="7">
     <div class="s6-head">
-      <span class="scene-eyebrow">05 — JOIN THE FREQUENCY</span>
+      <span class="scene-eyebrow">07 — JOIN THE FREQUENCY</span>
       <h2 class="scene-title">ACCESS</h2>
     </div>
     <div class="s6-body">
@@ -1107,7 +1180,7 @@ body{
         <div class="fok" id="fok">SIGNAL RECEIVED. ▮</div>
       </div>
     </div>
-    <div class="scene-counter">07 / 07</div>
+    <div class="scene-counter">08 / 08</div>
   </section>
 
 </div>
@@ -1575,6 +1648,67 @@ renderTL();drawWavePl();
 
 /* ─── INTERACTIONS ─── */
 function nfy(b){if(b.classList.contains('done'))return;b.classList.add('done');b.textContent='NOTIFIED ✓'}
+function requestCommission(){
+  goScene(7);
+  setTimeout(()=>{
+    const m=document.getElementById('fm');
+    if(m){m.value='COMMISSION REQUEST — (beats / production / guitar / ableton): ';m.focus();}
+  },800);
+}
+
+/* ─── DISPATCH (BLOG) ─── */
+let dispatchPosts=[],dispatchActive=null;
+async function loadDispatch(){
+  const list=document.getElementById('dispatchList');
+  try{
+    const res=await fetch('posts.json',{cache:'no-cache'});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    dispatchPosts=(data.posts||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    renderDispatchList();
+    // Deep-link via hash (#dispatch-001)
+    const m=location.hash.match(/#dispatch-(.+)/i);
+    if(m){const p=dispatchPosts.find(p=>p.id===m[1]);if(p)showDispatch(p.id)}
+  }catch(err){
+    list.innerHTML=`<div class="dispatch-loading" style="animation:none;color:var(--dim)">▸ NO TRANSMISSIONS<br><span style="font-size:7px;color:var(--dimmer);letter-spacing:2px">(${err.message})</span></div>`;
+  }
+}
+function renderDispatchList(){
+  const list=document.getElementById('dispatchList');
+  if(!dispatchPosts.length){list.innerHTML='<div class="dispatch-loading" style="animation:none">▸ ARCHIVE EMPTY</div>';return}
+  list.innerHTML=dispatchPosts.map(p=>`
+    <a class="dpost-row${dispatchActive===p.id?' on':''}" href="#dispatch-${p.id}" onclick="showDispatch('${p.id}');return false">
+      <div class="dpost-meta">
+        <span>DISP-${String(p.id).padStart(3,'0')}</span>
+        <span>${(p.date||'').replace(/-/g,'.')}</span>
+      </div>
+      <div class="dpost-tt">${p.title||'—'}</div>
+      <div class="dpost-sum">${p.summary||''}</div>
+      ${p.tags&&p.tags.length?`<div class="dpost-tags">${p.tags.map(t=>`<span class="dtag">${t}</span>`).join('')}</div>`:''}
+    </a>
+  `).join('');
+}
+function showDispatch(id){
+  const p=dispatchPosts.find(p=>p.id===id);
+  if(!p)return;
+  dispatchActive=id;
+  renderDispatchList();
+  const view=document.getElementById('dispatchView');
+  view.scrollTop=0;
+  view.innerHTML=`
+    <div class="dview-meta">
+      <span>DISP-${String(p.id).padStart(3,'0')}</span><span class="sep">//</span>
+      <span>${(p.date||'').replace(/-/g,'.')}</span><span class="sep">//</span>
+      <span>FROM 3EAS-001</span>
+    </div>
+    <h1 class="dview-title">${p.title||'—'}</h1>
+    <div class="dview-divider"></div>
+    <div class="dview-body">${p.body||''}</div>
+    ${p.tags&&p.tags.length?`<div class="dview-tags">${p.tags.map(t=>`<span class="dtag">${t}</span>`).join('')}</div>`:''}
+  `;
+  history.replaceState(null,'','#dispatch-'+id);
+}
+loadDispatch();
 function subForm(){
   const n=document.getElementById('fn').value,e=document.getElementById('fe').value;
   if(!n||!e)return;
@@ -1953,7 +2087,7 @@ mountLab();buildMini();
 
 /* ─── TWEAKS ─── */
 const TWEAK_DEFAULTS=/*EDITMODE-BEGIN*/{
-  "fx": "waves",
+  "fx": "scan",
   "scan": true,
   "grain": 0.04
 }/*EDITMODE-END*/;
