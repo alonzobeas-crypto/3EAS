@@ -1594,7 +1594,7 @@ const SP_TRACKS=[
 ];
 let spIdx=0,spMuted=false,spStarted=false,spUnlocked=false;
 const SP_VOL=0.35;       // master jukebox volume
-const SP_XFADE=6;        // crossfade duration in seconds
+const SP_XFADE=2.5;      // crossfade duration in seconds
 // Two audio decks so tracks blend instead of hard-cutting
 const spA=new Audio(),spB=new Audio();
 [spA,spB].forEach(a=>{a.volume=0;a.preload='auto';a.crossOrigin='anonymous'});
