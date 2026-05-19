@@ -978,7 +978,16 @@ body{
       <h2 class="scene-title">VISUALS</h2>
     </div>
     <div class="vgrid">
-      <div class="vc"><div class="vph"><div class="vph-txt">PRIMARY ARCHIVE<br>— SIGNAL PENDING —</div></div><div class="vcap">VIEW ARCHIVE →</div></div>
+      <div class="vc" style="cursor:pointer" onclick="this.querySelector('video').play()">
+        <video
+          src="https://www.dropbox.com/scl/fi/yln24yh9z120nffaq3zcp/copy_7450F917-3DE6-46AF-A1BA-80950831CA0A.MOV?rlkey=r3repzj94809euc4rc23pydsn&dl=1"
+          autoplay muted loop playsinline preload="metadata"
+          style="width:100%;height:100%;object-fit:cover;display:block;background:#000"
+          onerror="this.style.display='none';this.parentElement.querySelector('.vph').style.display='flex'"
+        ></video>
+        <div class="vph" style="position:absolute;inset:0;display:none"><div class="vph-txt">PRIMARY ARCHIVE<br>— SIGNAL PENDING —</div></div>
+        <div class="vcap">PRIMARY ARCHIVE →</div>
+      </div>
       <div class="vc"><div class="vph"><div class="vph-txt">LIVE CAPTURE<br>— SIGNAL PENDING —</div></div><div class="vcap">VIEW →</div></div>
       <div class="vc"><div class="vph"><div class="vph-txt">STUDIO<br>— SIGNAL PENDING —</div></div><div class="vcap">VIEW →</div></div>
       <div class="vc"><div class="vph"><div class="vph-txt">ART DIRECTION<br>— SIGNAL PENDING —</div></div><div class="vcap">VIEW →</div></div>
