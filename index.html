@@ -396,6 +396,32 @@ body{
   padding:24px 44px 60px;position:relative;
 }
 
+/* Coming-soon overlay over Beat Lab */
+.lab-cs{
+  position:absolute;inset:24px 44px 60px;z-index:50;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;
+  pointer-events:none;
+}
+.lab-cs::before{
+  content:'';position:absolute;inset:0;
+  background:rgba(0,0,0,.78);
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+}
+.lab-cs-inner{
+  position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:14px;
+  padding:36px 56px;border:1px solid var(--accent);
+  background:rgba(0,0,0,.55);
+}
+.lab-cs-tag{font-family:var(--mono);font-size:8px;letter-spacing:5px;color:var(--dim);text-transform:uppercase}
+.lab-cs-title{
+  font-family:var(--vt);font-size:clamp(56px,9vw,120px);letter-spacing:6px;color:var(--hot);
+  text-shadow:0 0 24px rgba(232,224,192,.25);line-height:1;
+  animation:glitch 7s infinite;
+}
+.lab-cs-sub{font-family:var(--mono);font-size:9px;letter-spacing:4px;color:var(--accent);text-transform:uppercase}
+.lab-cs-rule{width:200px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.lab-cs-note{font-family:var(--mono);font-size:8px;letter-spacing:3px;color:var(--dimmer);text-transform:uppercase;margin-top:4px}
+
 .dev{
   position:relative;width:100%;max-width:1600px;
   background:linear-gradient(180deg,#16140f 0%,#0e0c09 100%);
@@ -862,6 +888,7 @@ body{
     <a href="#" class="tb-link" onclick="goScene(4);return false"><span class="n">04</span>LAB</a>
     <a href="#" class="tb-link" onclick="goScene(5);return false"><span class="n">05</span>SIGNAL</a>
     <a href="#" class="tb-link" onclick="goScene(6);return false"><span class="n">06</span>ACCESS</a>
+    <a href="https://ko-fi.com/3eascortex" target="_blank" class="tb-link" style="color:var(--accent)"><span class="n">◈</span>SUPPORT</a>
   </div>
   <div class="tb-right">
     <div class="live-dot"></div>
@@ -1010,6 +1037,15 @@ body{
       </div>
     </div>
     <div class="dev-wrap" id="devWrap"></div>
+    <div class="lab-cs" aria-hidden="true">
+      <div class="lab-cs-inner">
+        <span class="lab-cs-tag">// SOURCE SIGNAL // STATUS</span>
+        <div class="lab-cs-title">COMING SOON</div>
+        <div class="lab-cs-rule"></div>
+        <span class="lab-cs-sub">BEAT LAB · IN CALIBRATION</span>
+        <span class="lab-cs-note">SAMPLE PACK + INTERACTIVE LAB — SIGNAL PENDING</span>
+      </div>
+    </div>
     <div class="scene-counter">05 / 07</div>
   </section>
 
@@ -1043,10 +1079,11 @@ body{
     </div>
     <div class="s6-body">
       <div class="llinks">
+        <a href="https://www.onnoticemusic.com/" target="_blank" class="lrow">ON/NOTICE <span class="larr">→</span></a>
         <a href="https://instagram.com/zo.losangeles" target="_blank" class="lrow">INSTAGRAM <span class="larr">→</span></a>
         <a href="https://tidal.com/artist/57535077/u" target="_blank" class="lrow">TIDAL <span class="larr">→</span></a>
         <a href="https://www.mixcloud.com/live/SELEXIONES/" target="_blank" class="lrow">SELEXIONES RADIO <span class="larr">→</span></a>
-        <a href="https://www.onnoticemusic.com/" target="_blank" class="lrow">ON/NOTICE <span class="larr">→</span></a>
+        <a href="https://ko-fi.com/3eascortex" target="_blank" class="lrow">KO-FI / SUPPORT <span class="larr">→</span></a>
 
         <div style="padding:24px 0;border-bottom:1px solid var(--dimmer)">
           <p style="font-family:var(--mono);font-size:7px;letter-spacing:3px;color:var(--dimmer);line-height:2.4">3EAS<br>LINCOLN HEIGHTS, NELA // © 2026<br><span style="font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--dim);opacity:.55">PASSWORDSPILLS</span></p>
@@ -1191,7 +1228,7 @@ body{
 </template>
 
 <!-- TWEAKS -->
-<button id="tp-toggle" onclick="document.getElementById('tp').classList.toggle('vis')" title="System tweaks" style="position:fixed;bottom:38px;right:10px;z-index:610;width:30px;height:30px;border:1px solid var(--dimmer);background:rgba(0,0,0,.92);color:var(--dim);font-family:var(--mono);font-size:14px;line-height:1;cursor:none;transition:color .15s,border-color .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dim)';this.style.borderColor='var(--dimmer)'">⚙</button>
+<button id="tp-toggle" onclick="document.getElementById('tp').classList.toggle('vis')" title="System tweaks" style="position:fixed;bottom:38px;right:0;z-index:610;padding:8px 14px;border:1px solid var(--dimmer);border-right:none;background:rgba(0,0,0,.92);color:var(--accent);font-family:var(--mono);font-size:8px;letter-spacing:3px;line-height:1;cursor:none;transition:all .15s;display:flex;align-items:center;gap:6px" onmouseover="this.style.color='var(--hot)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--accent)';this.style.borderColor='var(--dimmer)'">⚙ TWEAKS</button>
 <div id="tp">
   <div class="tptitle">// SYSTEM TWEAKS</div>
   <div class="tprow">
