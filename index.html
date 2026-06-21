@@ -975,6 +975,10 @@ body{
   .tb-links{display:none}
   #topnav{padding:0}
   .s1-main{padding:0 24px}
+  /* center hero on phone */
+  #s1{align-items:center;text-align:center}
+  #s1 .s1-main{display:flex;flex-direction:column;align-items:center}
+  .s1-sub,.s1-status{justify-content:center}
   .s1-title{font-size:clamp(120px,26vw,200px)}
   .s1-scroll,.s1-coords{display:none}
   .s2-body,.s6-body{grid-template-columns:1fr}
@@ -987,6 +991,35 @@ body{
   .vc:nth-child(n+2){aspect-ratio:1}
   .scene{padding-left:24px!important;padding-right:24px!important}
   .s4-head,.s5-grid,.llinks,.lform{padding-left:24px!important;padding-right:24px!important}
+
+  /* jukebox: make it readable on phone */
+  #site-player{
+    left:0!important;right:0!important;bottom:30px!important;
+    width:100%!important;box-sizing:border-box!important;
+    gap:8px!important;padding:12px 14px!important;
+    background:rgba(0,0,0,.97)!important;
+    border-right:none!important;
+    justify-content:flex-start!important;flex-wrap:wrap!important;
+  }
+  #sp-title{color:var(--accent)!important;font-size:13px!important;max-width:46%!important;flex:1 1 auto!important}
+  #site-player button{
+    color:var(--accent)!important;border-color:var(--accent)!important;
+    font-size:11px!important;padding:8px 12px!important;flex:0 0 auto!important;
+  }
+  #sp-dot{width:9px!important;height:9px!important}
+
+  /* let content-tall scenes grow & scroll instead of clipping (full bio, etc.) */
+  #scroll{scroll-snap-type:y proximity}
+  .scene{height:auto;min-height:100vh;overflow:visible}
+  .s2-body{overflow:visible}
+  .tracklist{overflow:visible}
+  .player{overflow:visible}
+  .s5-grid{overflow:visible}
+  /* transmissions: pull header left, fit the long title */
+  .s2-head{padding:64px 20px 18px!important}
+  .scene-title{font-size:38px;letter-spacing:2px}
+  .trow{padding:0 16px}
+  .player{padding:24px 20px}
 }
 </style>
 </head>
@@ -1461,6 +1494,14 @@ document.addEventListener('mousemove',e=>{
 document.addEventListener('mouseover',e=>{
   cur.classList.toggle('big',!!e.target.closest('a,button,.trow,.vc,.ac,.lrow,.vdot'));
 });
+// Touch: drive the FX (waves/particles) from finger position
+function spTouchFX(e){
+  const t=e.touches&&e.touches[0];
+  if(!t)return;
+  mx=t.clientX;my=t.clientY;
+}
+document.addEventListener('touchstart',spTouchFX,{passive:true});
+document.addEventListener('touchmove',spTouchFX,{passive:true});
 
 /* ─── GRAIN ─── */
 const gc=document.getElementById('grain-canvas');
