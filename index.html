@@ -1186,13 +1186,13 @@ body{
 </div>
 
 <!-- SITE PLAYLIST -->
-<div id="site-player" style="position:fixed;bottom:38px;left:0;z-index:490;display:flex;align-items:center;gap:12px;padding:8px 16px;border-top:1px solid var(--dimmer);border-right:1px solid var(--dimmer);background:rgba(0,0,0,.92);font-family:var(--mono);font-size:7px;letter-spacing:3px;color:var(--dimmer);cursor:none;transition:opacity .3s">
-  <div id="sp-dot" style="width:5px;height:5px;background:var(--accent);animation:blink 1.3s infinite;flex-shrink:0"></div>
-  <span id="sp-title" style="color:var(--dim);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">STANDBY</span>
-  <button id="sp-play" onclick="spPlay()" title="Play" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:7px;letter-spacing:2px;padding:3px 8px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dimmer)';this.style.borderColor='var(--dimmer)'">PLAY ▶</button>
-  <button id="sp-skip" onclick="spSkip()" title="Next track" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:7px;letter-spacing:2px;padding:3px 8px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dimmer)';this.style.borderColor='var(--dimmer)'">SKIP ▶▶</button>
-  <button id="sp-stop" onclick="spStop()" title="Stop" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:7px;letter-spacing:2px;padding:3px 8px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dimmer)';this.style.borderColor='var(--dimmer)'">STOP ■</button>
-  <button id="sp-mute" onclick="spToggle()" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:7px;letter-spacing:2px;padding:3px 8px;cursor:none;transition:all .15s">MUTE</button>
+<div id="site-player" style="position:fixed;bottom:38px;left:0;z-index:490;display:flex;align-items:center;gap:18px;padding:14px 26px;border-top:1px solid var(--dimmer);border-right:1px solid var(--dimmer);background:rgba(0,0,0,.92);font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--dimmer);cursor:none;transition:opacity .3s">
+  <div id="sp-dot" style="width:8px;height:8px;background:var(--accent);animation:blink 1.3s infinite;flex-shrink:0"></div>
+  <span id="sp-title" style="color:var(--dim);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px">STANDBY</span>
+  <button id="sp-play" onclick="spPlay()" title="Play" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:10px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dimmer)';this.style.borderColor='var(--dimmer)'">PLAY ▶</button>
+  <button id="sp-skip" onclick="spSkip()" title="Next track" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:10px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dimmer)';this.style.borderColor='var(--dimmer)'">SKIP ▶▶</button>
+  <button id="sp-stop" onclick="spStop()" title="Stop" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:10px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dimmer)';this.style.borderColor='var(--dimmer)'">STOP ■</button>
+  <button id="sp-mute" onclick="spToggle()" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:10px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s">MUTE</button>
 </div>
 
 <!-- BEAT LAB SCENE PLACEHOLDER -->
@@ -1718,6 +1718,7 @@ function subForm(){
 
 /* ─── SITE PLAYLIST ─── */
 const SP_TRACKS=[
+  {title:'BAZANTAR / HANCOCK',src:'uploads/BAZANTAR : HANCOCK.wav'},
   {title:'A.I. BABY',src:'uploads/A.I. Baby - 11.30.2023 (ABAI 1).wav'},
   {title:'BASICK WAR DANCE',src:'uploads/Basick War Dance.wav'},
   {title:'EXILED / MARCOS',src:'uploads/Exiled:Marcos.wav'},
