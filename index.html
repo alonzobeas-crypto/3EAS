@@ -180,10 +180,19 @@ body{
   opacity:0;transition:opacity .5s;
 }
 #ticker.show{opacity:1}
-.ti{display:flex;animation:tick 45s linear infinite;white-space:nowrap}
-.ti span{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--dimmer);padding-right:56px}
-.ti .sep{color:var(--dim)}
+.ti{display:flex;animation:tick 80s linear infinite;white-space:nowrap}
+.ti span{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--fg);padding-right:56px}
+.ti .sep{color:var(--accent)}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes glitch-shift{
+  0%,100%{transform:translate(0,0);opacity:1}
+  92%{transform:translate(0,0);opacity:1}
+  93%{transform:translate(-2px,1px);opacity:.8;text-shadow:2px 0 var(--accent),-2px 0 #0ff}
+  94%{transform:translate(2px,-1px);opacity:1;text-shadow:-2px 0 var(--accent),2px 0 #0ff}
+  95%{transform:translate(-1px,0);opacity:.7;text-shadow:1px 0 var(--accent)}
+  96%{transform:translate(0,0);opacity:1;text-shadow:none}
+}
+#ticker{animation:glitch-shift 6s steps(1) infinite}
 
 /* ══════════════════════════════
    SCENE 01 — HERO
@@ -985,6 +994,11 @@ body{
   .player,.lform{border-left:none;border-top:1px solid var(--dimmer)}
   .s5-grid{grid-template-columns:1fr;gap:32px}
   .acq-layout{grid-template-columns:1fr}
+  /* tall scenes: start content at top instead of vertical-centering (kills big gaps) */
+  #s4,#s5{justify-content:flex-start!important}
+  #s4 .s4-head{position:static!important;padding:64px 20px 18px!important}
+  #s4 .acq-layout{margin-top:0!important}
+  #s5{padding-top:64px}
   #vnav{display:none}
   .vgrid{grid-template-columns:1fr 1fr;grid-template-rows:auto}
   .vc:nth-child(1){grid-column:span 2;grid-row:auto;aspect-ratio:16/7}
@@ -1008,9 +1022,20 @@ body{
   }
   #sp-dot{width:9px!important;height:9px!important}
 
+  /* beat lab: hide oversized instrument (it's in CALIBRATING state) & fit the card */
+  #sLab .dev-wrap{display:none!important}
+  .lab-cs{inset:96px 16px 54px!important;position:absolute!important}
+  .lab-cs-inner{padding:28px 22px!important}
+  .lab-cs-title{font-size:44px!important;letter-spacing:2px!important}
+  .lab-cs-sub{font-size:10px!important}
+  .lab-cs-note{font-size:9px!important;text-align:center}
+  #sLab .lab-eyebrow{flex-direction:column;gap:6px;padding:64px 20px 18px}
+  #sLab .lab-eyebrow h2{font-size:40px!important}
+  #sLab .lab-eyebrow .lab-meta{text-align:left}
+
   /* let content-tall scenes grow & scroll instead of clipping (full bio, etc.) */
-  #scroll{scroll-snap-type:y proximity}
-  .scene{height:auto;min-height:100vh;overflow:visible}
+  #scroll{scroll-snap-type:none!important}
+  .scene{height:auto;min-height:100vh;overflow:visible;scroll-snap-align:none!important}
   .s2-body{overflow:visible}
   .tracklist{overflow:visible}
   .player{overflow:visible}
@@ -1086,10 +1111,8 @@ body{
 
 <!-- TICKER -->
 <div id="ticker">
-  <div class="ti">
-    <span>3EAS-001 <span class="sep">◈</span> LINCOLN HEIGHTS, NELA <span class="sep">◈</span> 34.0590°N 118.2321°W <span class="sep">◈</span> SIGNAL ACTIVE <span class="sep">◈</span> CAPTURE DON'T KILL <span class="sep">◈</span> FREQUENCY AS LANGUAGE <span class="sep">◈</span> STATUS: TRANSMITTING <span class="sep">◈</span></span>
-    <span>3EAS-001 <span class="sep">◈</span> LINCOLN HEIGHTS, NELA <span class="sep">◈</span> 34.0590°N 118.2321°W <span class="sep">◈</span> SIGNAL ACTIVE <span class="sep">◈</span> CAPTURE DON'T KILL <span class="sep">◈</span> FREQUENCY AS LANGUAGE <span class="sep">◈</span> STATUS: TRANSMITTING <span class="sep">◈</span></span>
-  </div>
+  <div class="ti" id="ti1"></div>
+  <div class="ti" id="ti2"></div>
 </div>
 
 <!-- SCROLL -->
@@ -1265,7 +1288,7 @@ body{
   <!-- S7: SIGNAL -->
   <section class="scene" id="s5" data-scene="6">
     <div class="s5-top">
-      <span class="scene-eyebrow">06 — FREQUENCY AS LANGUAGE</span>
+      <span class="scene-eyebrow">06 — FREQUENCY IS OUR LANGUAGE</span>
       <h2 class="scene-title">SIGNAL</h2>
     </div>
     <div class="s5-grid">
@@ -1319,13 +1342,13 @@ body{
 </div>
 
 <!-- SITE PLAYLIST -->
-<div id="site-player" style="position:fixed;bottom:38px;left:0;z-index:490;display:flex;align-items:center;gap:18px;padding:14px 26px;border-top:1px solid var(--dimmer);border-right:1px solid var(--dimmer);background:rgba(0,0,0,.92);font-family:var(--mono);font-size:13px;letter-spacing:3px;color:var(--dimmer);cursor:none;transition:opacity .3s">
+<div id="site-player" style="position:fixed;bottom:38px;left:0;z-index:490;display:flex;align-items:center;gap:18px;padding:14px 26px;border-top:1px solid var(--dim);border-right:1px solid var(--dim);background:rgba(20,20,20,.94);font-family:var(--mono);font-size:13px;letter-spacing:3px;color:var(--dim);cursor:none;transition:opacity .3s">
   <div id="sp-dot" style="width:8px;height:8px;background:var(--accent);animation:blink 1.3s infinite;flex-shrink:0"></div>
-  <span id="sp-title" style="color:var(--dim);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px">STANDBY</span>
-  <button id="sp-play" onclick="spPlay()" title="Play" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dimmer)';this.style.borderColor='var(--dimmer)'">PLAY ▶</button>
-  <button id="sp-skip" onclick="spSkip()" title="Next track" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dimmer)';this.style.borderColor='var(--dimmer)'">SKIP ▶▶</button>
-  <button id="sp-stop" onclick="spStop()" title="Stop" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dimmer)';this.style.borderColor='var(--dimmer)'">STOP ■</button>
-  <button id="sp-mute" onclick="spToggle()" style="background:none;border:1px solid var(--dimmer);color:var(--dimmer);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s">MUTE</button>
+  <span id="sp-title" style="color:var(--fg);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px">STANDBY</span>
+  <button id="sp-play" onclick="spPlay()" title="Play" style="background:none;border:1px solid var(--dim);color:var(--dim);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dim)';this.style.borderColor='var(--dim)'">PLAY ▶</button>
+  <button id="sp-skip" onclick="spSkip()" title="Next track" style="background:none;border:1px solid var(--dim);color:var(--dim);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dim)';this.style.borderColor='var(--dim)'">SKIP ▶▶</button>
+  <button id="sp-stop" onclick="spStop()" title="Stop" style="background:none;border:1px solid var(--dim);color:var(--dim);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dim)';this.style.borderColor='var(--dim)'">STOP ■</button>
+  <button id="sp-mute" onclick="spToggle()" style="background:none;border:1px solid var(--dim);color:var(--dim);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s">MUTE</button>
 </div>
 
 <!-- BEAT LAB SCENE PLACEHOLDER -->
@@ -1528,7 +1551,7 @@ function resizeHero(){
   if(hfx==='particles'||hfx==='combined')initHP();
 }
 function initHP(){
-  hpart=Array.from({length:140},()=>({x:Math.random()*hw,y:Math.random()*hh,vx:(Math.random()-.5)*.2,vy:(Math.random()-.5)*.2,r:Math.random()*.8+.3}));
+  hpart=Array.from({length:220},()=>({x:Math.random()*hw,y:Math.random()*hh,vx:(Math.random()-.5)*.2,vy:(Math.random()-.5)*.2,r:Math.random()*.8+.3}));
 }
 resizeHero();window.addEventListener('resize',resizeHero);
 function heroLoop(){
@@ -1622,7 +1645,7 @@ const TRACKS=[
   {id:4,title:'COMING SOON',artist:'3EAS',type:'pending',dur:0,src:null},
   {id:5,title:'COMING SOON',artist:'3EAS',type:'pending',dur:0,src:null},
 ];
-const fmt=s=>{if(!s||isNaN(s))return'0:00';return`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`};
+const fmt=s=>{if(!s||!isFinite(s))return'0:00';return`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`};
 let cur2=null,playing=false,wdata=[];
 
 // Real audio element
@@ -1721,6 +1744,7 @@ function togPlay(){
   if(!cur2){selT(TRACKS[0].id);return;}
   if(!cur2.src){return;}
   if(audio.paused){
+    spStop();
     audio.play().then(()=>{playing=true;document.getElementById('pbtn').textContent='⏸'});
   } else {
     audio.pause();playing=false;document.getElementById('pbtn').textContent='▶';
@@ -1802,6 +1826,8 @@ function subForm(){
 
 /* ─── SITE PLAYLIST ─── */
 const SP_TRACKS=[
+  {title:'AHS - PALESTINE',src:'uploads/AHS Palestine (ABAI1).wav'},
+  {title:'DIVESTA',src:'uploads/Divesta - 3EAS.mp3'},
   {title:'BAZANTAR / HANCOCK',src:'uploads/BAZANTAR : HANCOCK.wav'},
   {title:'MALCOLM X / LIBS',src:'uploads/Malcolm X - Libs copy.mp3'},
   {title:'A.I. BABY',src:'uploads/A.I. Baby - 11.30.2023 (ABAI 1).wav'},
@@ -1813,6 +1839,12 @@ const SP_TRACKS=[
   {title:'MR ROBOT INTRO',src:'uploads/Mr Robot Intro.wav',gain:1.7},
 ];
 let spIdx=0,spMuted=false,spStarted=false,spUnlocked=false;
+let spBag=[],spBagPos=0;
+function spShuffle(){
+  spBag=SP_TRACKS.map((_,i)=>i);
+  for(let i=spBag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[spBag[i],spBag[j]]=[spBag[j],spBag[i]];}
+  spBagPos=0;
+}
 const SP_VOL=0.35;       // master jukebox volume
 function spVol(i){return Math.min(1,SP_VOL*(SP_TRACKS[i]?.gain||1));} // per-track gain
 const SP_XFADE=2.5;      // crossfade duration in seconds
@@ -1850,7 +1882,7 @@ function spFadeTo(deck,target,dur){
     const start=performance.now(),from=deck.volume;
     function step(now){
       const t=Math.min(1,(now-start)/(dur*1000));
-      deck.volume=from+(target-from)*t;
+      deck.volume=Math.max(0,Math.min(1,from+(target-from)*t));
       if(t<1)requestAnimationFrame(step);else res();
     }
     requestAnimationFrame(step);
@@ -1859,8 +1891,11 @@ function spFadeTo(deck,target,dur){
 
 function spPickNext(){
   if(SP_TRACKS.length<=1)return 0;
-  let i;do{i=Math.floor(Math.random()*SP_TRACKS.length)}while(i===spIdx);
-  return i;
+  if(spBagPos>=spBag.length){
+    // reshuffle, but avoid repeating the track we just finished at the seam
+    do{spShuffle()}while(spBag[0]===spIdx);
+  }
+  return spBag[spBagPos++];
 }
 
 function spCrossfade(){
@@ -1909,8 +1944,9 @@ function spStart(){
   if(spStarted)return;
   spStarted=true;
   // Unlock both decks under the current user gesture, then start a random track
+  spShuffle();
+  spIdx=spBag[spBagPos++];
   spUnlock().then(()=>{
-    spIdx=Math.floor(Math.random()*SP_TRACKS.length);
     spSetTitle(SP_TRACKS[spIdx].title);
     spPlayDeck(spActive,SP_TRACKS[spIdx]).then(()=>spFadeTo(spActive,spVol(spIdx),2));
     requestAnimationFrame(spWatch);
@@ -1919,8 +1955,811 @@ function spStart(){
 document.addEventListener('click',spStart,{once:true});
 document.addEventListener('keydown',spStart,{once:true});
 document.getElementById('scroll').addEventListener('scroll',spStart,{once:true});
+// Try to autoplay immediately on load. Most browsers block audio with sound
+// until a user gesture — if this gets rejected, the listeners above still
+// start it on the visitor's first click/key/scroll.
+window.addEventListener('load',()=>spStart());
+spStart();
+
+(function(){
+  const items=[
+    '3EAS-001','LINCOLN HEIGHTS, NELA','34.0590°N 118.2321°W','SIGNAL ACTIVE',
+    "CAPTURE DON'T KILL",'YOU HAVE RECEIVED THE SIGNAL','THEY ARE JUST A RITUAL','AMERICA IS ONLY AN EXPERIMENT','NEW MUSIC COMING SOON','SATELLITES ORBITING EARTH: ~9,000 ACTIVE','PARA TODOS TODO, NADA PARA NOSOTROS','\u00a1YA BASTA!','DO YOU SMELL THE GRAPHENE?','ARE YOU HUNGRY?',"DON'T OBEY",'WORSHIP THE MUSIC, NOT THE MAN','TOTAL ICE DEPORTATIONS: <span id="deportclock">0</span>','SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE','STOP ATTENDING RITUALS','CAN YOU PAY THE RENT?','PENTAGON BUDGET 2025: $1.312 TRILLION','PENTAGON BUDGET 2024: $824 BILLION','ARE YOU CON(CERN)ED?','PSYOP AFTER PSYOP','DISCLOSURE?','DIVEST FROM THEIR ALGORITHM','GROW FOOD','YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?','ARE YOU ADDICTED TO FEAR?',"DON'T INGEST THE D.A.R.P.A. TECH",'STATUS: TRANSMITTING',
+    'TOTAL ICE DEPORTATIONS: <span id="deportclock2">0</span>',
+    'MEXICO CITY: <span id="tz-cdmx">--:--</span>',
+    'LOS ANGELES: <span id="tz-la">--:--</span>',
+    'NEW YORK: <span id="tz-ny">--:--</span>',
+    'LONDON: <span id="tz-london">--:--</span>',
+    'SHANGHAI: <span id="tz-shanghai">--:--</span>',
+    'TOKYO: <span id="tz-tokyo">--:--</span>',
+    'PASSWORDPILLS','ON/NOTICE',
+    'US NATIONAL DEBT: <span id="debtclock">$0</span>',
+    'US NATIONAL DEBT: <span id="debtclock2">$0</span>',
+    'DOOMSDAY CLOCK: 85 SECONDS TO MIDNIGHT',
+    'WORLD POPULATION: <span id="popclock">0</span>',
+    'WORLD POPULATION: <span id="popclock2">0</span>',
+    'CO<sub>2</sub> EMITTED THIS YEAR: <span id="co2clock">0</span> TONS',
+    'CO<sub>2</sub> EMITTED THIS YEAR: <span id="co2clock2">0</span> TONS',
+    'FOREST LOST THIS YEAR: <span id="forestclock">0</span> HA',
+    'FOREST LOST THIS YEAR: <span id="forestclock2">0</span> HA',
+    'WATER CONSUMED THIS YEAR: <span id="waterclock">0</span>L',
+    'WATER CONSUMED THIS YEAR: <span id="waterclock2">0</span>L',
+    'INTERNET USERS WORLDWIDE: <span id="netclock">0</span>',
+    'INTERNET USERS WORLDWIDE: <span id="netclock2">0</span>',
+    'CELLPHONES SOLD TODAY: <span id="phoneclock">0</span>',
+    'CELLPHONES SOLD TODAY: <span id="phoneclock2">0</span>',
+    'ACTIVE CONFLICT: UKRAINE',
+    'ACTIVE CONFLICT: SUDAN',
+    'ACTIVE CONFLICT: GAZA',
+    'ACTIVE CONFLICT: MYANMAR',
+    'ACTIVE CONFLICT: YEMEN',
+    'ACTIVE CONFLICT: DR CONGO',
+    'ACTIVE CONFLICT: SAHEL'
+  ];
+  function shuffled(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+  const es={
+    'SIGNAL ACTIVE':'SEÑAL ACTIVA',
+    "CAPTURE DON'T KILL":'CAPTURA NO MATES',
+    'YOU HAVE RECEIVED THE SIGNAL':'HAS RECIBIDO LA SEÑAL',
+    'THEY ARE JUST A RITUAL':'SOLO SON UN RITUAL',
+    'AMERICA IS ONLY AN EXPERIMENT':'AMÉRICA ES SOLO UN EXPERIMENTO',
+    'NEW MUSIC COMING SOON':'MÚSICA NUEVA PRONTO',
+    '¡YA BASTA!':'¡YA BASTA!',
+    'DO YOU SMELL THE GRAPHENE?':'¿HUELES EL GRAFENO?',
+    'ARE YOU HUNGRY?':'¿TIENES HAMBRE?',
+    "DON'T OBEY":'NO OBEDEZCAS',
+    'WORSHIP THE MUSIC, NOT THE MAN':'ADORA LA MÚSICA, NO AL HOMBRE',
+    'SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE':'APOYA LA SEÑAL, MANTÉN VIVA LA TRANSMISIÓN',
+    'STOP ATTENDING RITUALS':'DEJA DE ASISTIR A RITUALES',
+    'CAN YOU PAY THE RENT?':'¿PUEDES PAGAR LA RENTA?',
+    'ARE YOU CON(CERN)ED?':'¿ESTÁS PREOCUPADO?',
+    'PSYOP AFTER PSYOP':'PSYOP TRAS PSYOP',
+    'DISCLOSURE?':'¿DIVULGACIÓN?',
+    'GROW FOOD':'CULTIVA TU COMIDA',
+    'YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?':'TÚ PAGAS SUS PORTALES. ¿VERDAD PEGASUS?',
+    'ARE YOU ADDICTED TO FEAR?':'¿ERES ADICTO AL MIEDO?',
+    "DON'T INGEST THE D.A.R.P.A. TECH":'NO INGIERAS LA TECNOLOGÍA D.A.R.P.A.',
+    'STATUS: TRANSMITTING':'ESTADO: TRANSMITIENDO'
+  };
+
+  const ru={
+    'SIGNAL ACTIVE':'СИГНАЛ АКТИВЕН',
+    "CAPTURE DON'T KILL":'ЗАХВАТЬ, НЕ УБИВАТЬ',
+    'YOU HAVE RECEIVED THE SIGNAL':'ВЫ ПОЛУЧИЛИ СИГНАЛ',
+    'THEY ARE JUST A RITUAL':'ЭТО ПРОСТО РИТУАЛ',
+    'AMERICA IS ONLY AN EXPERIMENT':'АМЕРИКА — ВСЕГО ЛИШЬ ЭКСПЕРИМЕНТ',
+    'NEW MUSIC COMING SOON':'НОВАЯ МУЗЫКА СКОРО',
+    'DO YOU SMELL THE GRAPHENE?':'ВЫ ЧУВСТВУЕТЕ ЗАПАХ ГРАФЕНА?',
+    'ARE YOU HUNGRY?':'ВЫ ГОЛОДНЫ?',
+    "DON'T OBEY":'НЕ ПОДЧИНЯЙСЯ',
+    'WORSHIP THE MUSIC, NOT THE MAN':'ПОКЛОНЯЙСЯ МУЗЫКЕ, А НЕ ЧЕЛОВЕКУ',
+    'SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE':'ПОДДЕРЖИ СИГНАЛ, ПОМОГИ СОХРАНИТЬ ТРАНСЛЯЦИЮ',
+    'STOP ATTENDING RITUALS':'ПЕРЕСТАНЬТЕ ПОСЕЩАТЬ РИТУАЛЫ',
+    'CAN YOU PAY THE RENT?':'ТЫ МОЖЕШЬ ОПЛАТИТЬ АРЕНДУ?',
+    'ARE YOU CON(CERN)ED?':'ТЫ ОБЕСПОКОЕН?',
+    'PSYOP AFTER PSYOP':'ПСИХОПЕРАЦИЯ ЗА ПСИХОПЕРАЦИЕЙ',
+    'DISCLOSURE?':'РАСКРЫТИЕ?',
+    'GROW FOOD':'ВЫРАЩИВАЙ ЕДУ',
+    'YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?':'ТЫ ПЛАТИШЬ ЗА ИХ ПОРТАЛЫ. ВЕРНО, PEGASUS?',
+    'ARE YOU ADDICTED TO FEAR?':'ТЫ ЗАВИСИШЬ ОТ СТРАХА?',
+    "DON'T INGEST THE D.A.R.P.A. TECH":'НЕ ПРИНИМАЙ ТЕХНОЛОГИИ D.A.R.P.A.',
+    'STATUS: TRANSMITTING':'СТАТУС: ТРАНСЛЯЦИЯ'
+  };
+
+  const pt={
+    'SIGNAL ACTIVE':'SINAL ATIVO',
+    "CAPTURE DON'T KILL":'CAPTURE NÃO MATE',
+    'YOU HAVE RECEIVED THE SIGNAL':'VOCÊ RECEBEU O SINAL',
+    'THEY ARE JUST A RITUAL':'ELES SÃO APENAS UM RITUAL',
+    'AMERICA IS ONLY AN EXPERIMENT':'A AMÉRICA É SÓ UM EXPERIMENTO',
+    'NEW MUSIC COMING SOON':'MÚSICA NOVA EM BREVE',
+    'DO YOU SMELL THE GRAPHENE?':'VOCÊ SENTE O CHEIRO DO GRAFENO?',
+    'ARE YOU HUNGRY?':'VOCÊ ESTÁ COM FOME?',
+    "DON'T OBEY":'NÃO OBEDEÇA',
+    'WORSHIP THE MUSIC, NOT THE MAN':'ADORE A MÚSICA, NÃO O HOMEM',
+    'SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE':'APOIE O SINAL, AJUDE A MANTER A TRANSMISSÃO VIVA',
+    'STOP ATTENDING RITUALS':'PARE DE FREQUENTAR RITUAIS',
+    'CAN YOU PAY THE RENT?':'VOCÊ CONSEGUE PAGAR O ALUGUEL?',
+    'ARE YOU CON(CERN)ED?':'VOCÊ ESTÁ PREOCUPADO?',
+    'PSYOP AFTER PSYOP':'PSYOP APÓS PSYOP',
+    'DISCLOSURE?':'DIVULGAÇÃO?',
+    'GROW FOOD':'CULTIVE COMIDA',
+    'YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?':'VOCÊ PAGA PELOS PORTAIS DELES. NÉ, PEGASUS?',
+    'ARE YOU ADDICTED TO FEAR?':'VOCÊ É VICIADO EM MEDO?',
+    "DON'T INGEST THE D.A.R.P.A. TECH":'NÃO INGIRA A TECNOLOGIA D.A.R.P.A.',
+    'STATUS: TRANSMITTING':'STATUS: TRANSMITINDO'
+  };
+
+  const zh={
+    'SIGNAL ACTIVE':'信号活跃',
+    "CAPTURE DON'T KILL":'只拍不杀',
+    'YOU HAVE RECEIVED THE SIGNAL':'你已收到信号',
+    'THEY ARE JUST A RITUAL':'它们只是一种仪式',
+    'AMERICA IS ONLY AN EXPERIMENT':'美国只是一个实验',
+    'NEW MUSIC COMING SOON':'新音乐即将推出',
+    'DO YOU SMELL THE GRAPHENE?':'你闻到石墨烯的气味了吗？',
+    'ARE YOU HUNGRY?':'你饿了吗？',
+    "DON'T OBEY":'不要服从',
+    'WORSHIP THE MUSIC, NOT THE MAN':'崇拜音乐，而非人',
+    'SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE':'支持信号，帮助保持传输活跃',
+    'STOP ATTENDING RITUALS':'停止参与仪式',
+    'CAN YOU PAY THE RENT?':'你交得起房租吗？',
+    'ARE YOU CON(CERN)ED?':'你担心吗？',
+    'PSYOP AFTER PSYOP':'一次又一次的心理战',
+    'DISCLOSURE?':'公开？',
+    'GROW FOOD':'自己种粮食',
+    'YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?':'你在为他们的门户付费。对吧，PEGASUS？',
+    'ARE YOU ADDICTED TO FEAR?':'你沉迷于恐惧吗？',
+    "DON'T INGEST THE D.A.R.P.A. TECH":'不要摄入 D.A.R.P.A. 技术',
+    'STATUS: TRANSMITTING':'状态：传输中'
+  };
+
+  const ja={
+    'SIGNAL ACTIVE':'シグナル作動中',
+    "CAPTURE DON'T KILL":'捕えよ、殺すな',
+    'YOU HAVE RECEIVED THE SIGNAL':'あなたはシグナルを受け取った',
+    'THEY ARE JUST A RITUAL':'それらはただの儀式だ',
+    'AMERICA IS ONLY AN EXPERIMENT':'アメリカは実験にすぎない',
+    'NEW MUSIC COMING SOON':'新曲、まもなく登場',
+    'DO YOU SMELL THE GRAPHENE?':'グラフェンの匀いがするか？',
+    'ARE YOU HUNGRY?':'お腹が空いていますか？',
+    "DON'T OBEY":'従うな',
+    'WORSHIP THE MUSIC, NOT THE MAN':'人ではなく音楽を崇拝せよ',
+    'SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE':'シグナルを支え、発信を継続させよう',
+    'STOP ATTENDING RITUALS':'儀式への参加をやめよ',
+    'CAN YOU PAY THE RENT?':'家賃を支払えますか？',
+    'ARE YOU CON(CERN)ED?':'心配ですか？',
+    'PSYOP AFTER PSYOP':'次々と続く心理作戦',
+    'DISCLOSURE?':'情報開示？',
+    'GROW FOOD':'食料を自分で育てよ',
+    'YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?':'彼らのポータルにあなたが支払っている。ね、PEGASUS？',
+    'ARE YOU ADDICTED TO FEAR?':'恐怖に依存していませんか？',
+    "DON'T INGEST THE D.A.R.P.A. TECH":'D.A.R.P.A. の技術を取り込むな',
+    'STATUS: TRANSMITTING':'ステータス：発信中'
+  };
+  const ar={
+    'SIGNAL ACTIVE':'الإشارة نشطة',
+    "CAPTURE DON'T KILL":'صوّر، لا تقتل',
+    'YOU HAVE RECEIVED THE SIGNAL':'لقد استلمت الإشارة',
+    'THEY ARE JUST A RITUAL':'إنها مجرد طقس',
+    'AMERICA IS ONLY AN EXPERIMENT':'أمريكا مجرد تجربة',
+    'NEW MUSIC COMING SOON':'موسيقى جديدة قريباً',
+    'DO YOU SMELL THE GRAPHENE?':'هل تشم رائحة الجرافين؟',
+    'ARE YOU HUNGRY?':'هل أنت جائع؟',
+    "DON'T OBEY":'لا تطع',
+    'WORSHIP THE MUSIC, NOT THE MAN':'اعبد الموسيقى، لا الرجل',
+    'SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE':'ادعم الإشارة، ساعد في إبقاء البث حياً',
+    'STOP ATTENDING RITUALS':'توقف عن حضور الطقوس',
+    'CAN YOU PAY THE RENT?':'هل تستطيع دفع الإيجار؟',
+    'ARE YOU CON(CERN)ED?':'هل أنت قلق؟',
+    'PSYOP AFTER PSYOP':'حرب نفسية تلو الأخرى',
+    'DISCLOSURE?':'الكشف؟',
+    'GROW FOOD':'ازرع طعامك',
+    'YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?':'أنت تدفع ثمن بواباتهم. أليس كذلك يا PEGASUS؟',
+    'ARE YOU ADDICTED TO FEAR?':'هل أنت مدمن على الخوف؟',
+    "DON'T INGEST THE D.A.R.P.A. TECH":'لا تبتلع تقنية D.A.R.P.A.',
+    'STATUS: TRANSMITTING':'الحالة: يجري البث'
+  };
+
+  const nah={
+    'SIGNAL ACTIVE':'TLAPOHUALLI YOLTOC',
+    "CAPTURE DON'T KILL":'MAXITZQUI, AMO XIMICTI',
+    'YOU HAVE RECEIVED THE SIGNAL':'OTIKMOCUITLAHUI IN TLAPOHUALLI',
+    'THEY ARE JUST A RITUAL':'ZAN NECHICOLIZTLI',
+    'AMERICA IS ONLY AN EXPERIMENT':'AMERICA ZAN NEYECOLIZTLI',
+    'NEW MUSIC COMING SOON':'YANCUIC CUICATL HUALLAUH',
+    'DO YOU SMELL THE GRAPHENE?':'TIQUINEQUI IN GRAFENO IHYAC?',
+    'ARE YOU HUNGRY?':'TIMAYANQUI?',
+    "DON'T OBEY":'AMO XITLACAMATI',
+    'WORSHIP THE MUSIC, NOT THE MAN':'XIMOTLAYECOLTI IN CUICATL, AMO IN TLACATL',
+    'SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE':'XIPALEHUI IN TLAPOHUALLI',
+    'STOP ATTENDING RITUALS':'XICAHUA IN NECHICOLIZTLI',
+    'CAN YOU PAY THE RENT?':'HUELITIZ TICTLAXTLAHUAZ IN CALCOHUALLI?',
+    'ARE YOU CON(CERN)ED?':'TIMOMAUHTIA?',
+    'PSYOP AFTER PSYOP':'NEYOLCUEPALIZTLI IHUAN OCCEQUI',
+    'DISCLOSURE?':'TLANEXTILIZTLI?',
+    'GROW FOOD':'XITLATOCA TONACAYOTL',
+    'YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?':'TEHUATL TICTLAXTLAHUA IN INTLATZACUILLOHUAN. PEGASUS?',
+    'ARE YOU ADDICTED TO FEAR?':'TIMOTLALIA IHUICPA MAHUIZTLI?',
+    "DON'T INGEST THE D.A.R.P.A. TECH":'AMO XICUA IN D.A.R.P.A. TLAMATILIZTLI',
+    'STATUS: TRANSMITTING':'TLAPOHUALLI: NENOTZALO'
+  };
+
+  const hi={
+    'SIGNAL ACTIVE':'सिग्नल सक्रिय है',
+    "CAPTURE DON'T KILL":'कैद करो, मारो मत',
+    'YOU HAVE RECEIVED THE SIGNAL':'आपको सिग्नल मिल गया है',
+    'THEY ARE JUST A RITUAL':'वे सिर्फ एक अनुष्ठान हैं',
+    'AMERICA IS ONLY AN EXPERIMENT':'अमेरिका सिर्फ एक प्रयोग है',
+    'NEW MUSIC COMING SOON':'नया संगीत जल्द आ रहा है',
+    'DO YOU SMELL THE GRAPHENE?':'क्या आपको ग्राफीन की गंध आती है?',
+    'ARE YOU HUNGRY?':'क्या आपको भूख लगी है?',
+    "DON'T OBEY":'आज्ञा मत मानो',
+    'WORSHIP THE MUSIC, NOT THE MAN':'संगीत की पूजा करो, इंसान की नहीं',
+    'SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE':'सिग्नल का समर्थन करो, प्रसारण को जीवित रखने में मदद करो',
+    'STOP ATTENDING RITUALS':'अनुष्ठानों में जाना बंद करो',
+    'CAN YOU PAY THE RENT?':'क्या आप किराया दे सकते हैं?',
+    'ARE YOU CON(CERN)ED?':'क्या आप चिंतित हैं?',
+    'PSYOP AFTER PSYOP':'एक के बाद एक मनोवैज्ञानिक ऑपरेशन',
+    'DISCLOSURE?':'खुलासा?',
+    'GROW FOOD':'अपना भोजन उगाओ',
+    'YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?':'आप उनके पोर्टल्स के लिए भुगतान कर रहे हैं। है ना, PEGASUS?',
+    'ARE YOU ADDICTED TO FEAR?':'क्या आप डर के आदी हैं?',
+    "DON'T INGEST THE D.A.R.P.A. TECH":'D.A.R.P.A. तकनीक मत निगलो',
+    'STATUS: TRANSMITTING':'स्थिति: प्रसारण जारी है'
+  };
+
+  const ur={
+    'SIGNAL ACTIVE':'سگنل فعال ہے',
+    "CAPTURE DON'T KILL":'قید کرو، مارو مت',
+    'YOU HAVE RECEIVED THE SIGNAL':'آپ کو سگنل مل گیا ہے',
+    'THEY ARE JUST A RITUAL':'وہ محض ایک رسم ہیں',
+    'AMERICA IS ONLY AN EXPERIMENT':'امریکہ محض ایک تجربہ ہے',
+    'NEW MUSIC COMING SOON':'نیا موسیقی جلد آ رہی ہے',
+    'DO YOU SMELL THE GRAPHENE?':'کیا آپ کو گریفین کی بو آتی ہے؟',
+    'ARE YOU HUNGRY?':'کیا آپ بھوکے ہیں؟',
+    "DON'T OBEY":'اطاعت مت کرو',
+    'WORSHIP THE MUSIC, NOT THE MAN':'موسیقی کی عبادت کرو، انسان کی نہیں',
+    'SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE':'سگنل کی حمایت کرو، ٹرانسمیشن کو زندہ رکھنے میں مدد کرو',
+    'STOP ATTENDING RITUALS':'رسومات میں جانا بند کرو',
+    'CAN YOU PAY THE RENT?':'کیا آپ کرایہ ادا کر سکتے ہیں؟',
+    'ARE YOU CON(CERN)ED?':'کیا آپ فکر مند ہیں؟',
+    'PSYOP AFTER PSYOP':'ایک کے بعد ایک نفسیاتی جنگ',
+    'DISCLOSURE?':'انکشاف؟',
+    'GROW FOOD':'اپنی خوراک اگاؤ',
+    'YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?':'آپ ان کے پورٹلز کی قیمت ادا کر رہے ہیں۔ ٹھیک ہے، PEGASUS؟',
+    'ARE YOU ADDICTED TO FEAR?':'کیا آپ خوف کے عادی ہیں؟',
+    "DON'T INGEST THE D.A.R.P.A. TECH":'D.A.R.P.A. ٹیکنالوجی نگلو مت',
+    'STATUS: TRANSMITTING':'حالت: نشریات جاری ہیں'
+  };
+
+  const ko={
+    'SIGNAL ACTIVE':'신호 활성화',
+    "CAPTURE DON'T KILL":'포촩하라, 죽이지 마라',
+    'YOU HAVE RECEIVED THE SIGNAL':'당신은 신호를 받았다',
+    'THEY ARE JUST A RITUAL':'그것들은 그저 의식일 뿐이다',
+    'AMERICA IS ONLY AN EXPERIMENT':'미국은 그저 실험일 뿐이다',
+    'NEW MUSIC COMING SOON':'새 음악이 곧 나온다',
+    'DO YOU SMELL THE GRAPHENE?':'그래필의 냄새가 나는가?',
+    'ARE YOU HUNGRY?':'배고프니?',
+    "DON'T OBEY":'복종하지 마라',
+    'WORSHIP THE MUSIC, NOT THE MAN':'사람이 아니라 음악을 순배하라',
+    'SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE':'신호를 지원하고 송신을 살아있게 하라',
+    'STOP ATTENDING RITUALS':'의식에 참석하지 마라',
+    'CAN YOU PAY THE RENT?':'월세를 낼 수 있나요?',
+    'ARE YOU CON(CERN)ED?':'걱정되나요?',
+    'PSYOP AFTER PSYOP':'심리전이 계속된다',
+    'DISCLOSURE?':'공개?',
+    'GROW FOOD':'식량을 직접 재배하라',
+    'YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?':'당신은 그들의 포털을 위해 비용을 지불하고 있다. 그렇지, PEGASUS?',
+    'ARE YOU ADDICTED TO FEAR?':'공포에 중독되었나요?',
+    "DON'T INGEST THE D.A.R.P.A. TECH":'D.A.R.P.A. 기술을 섭취하지 마라',
+    'STATUS: TRANSMITTING':'상태: 송신 중'
+  };
+
+  const hy={
+    'SIGNAL ACTIVE':'Սիգնալը ակտիվ է',
+    "CAPTURE DON'T KILL":'գրիր, մի սպանիր',
+    'YOU HAVE RECEIVED THE SIGNAL':'Դուք ստացել եք սիգնալը',
+    'THEY ARE JUST A RITUAL':'Դրանք համարկ արարողություն են',
+    'AMERICA IS ONLY AN EXPERIMENT':'Ամերիկան միայն փորձ է',
+    'NEW MUSIC COMING SOON':'Նոր երաժշտությունը շուտով կգա',
+    'DO YOU SMELL THE GRAPHENE?':'Գրաֆենի հոտն առնում ես?',
+    'ARE YOU HUNGRY?':'Նշիում եջակա?',
+    "DON'T OBEY":'Մի նըկարկիր',
+    'WORSHIP THE MUSIC, NOT THE MAN':'Պաշտիր երաժշտությանը, ոչ անձին',
+    'SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE':'Աջակցիր սիգնալին, օգնիր պահպանել կապը ապրից',
+    'STOP ATTENDING RITUALS':'Դադարեք արարողություններին մասնակցելուց',
+    'CAN YOU PAY THE RENT?':'Կարող եք վճարել վարձավճարը?',
+    'ARE YOU CON(CERN)ED?':'Մտահոգված եք?',
+    'PSYOP AFTER PSYOP':'Հոգեբանական գործողություն մեկը մյուսի',
+    'DISCLOSURE?':'Բացահայտում?',
+    'GROW FOOD':'Աշկատեք ձեր սնունդը',
+    'YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?':'Դուք վճարում եք նրանք դռների համար. Այնպես, PEGASUS?',
+    'ARE YOU ADDICTED TO FEAR?':'Կախովից կախված եք?',
+    "DON'T INGEST THE D.A.R.P.A. TECH":'Մի ուտեք D.A.R.P.A. տեխնոլոգիան',
+    'STATUS: TRANSMITTING':'Կարգավիճակ։ հաղորդում'
+  };
+
+  const nv={
+    'SIGNAL ACTIVE':'BEE AK\'E\'ELCH\u00cd\u00cdD\u00cd YAA N\u00c1\u00c1LT\u2019I\u2019',
+    "CAPTURE DON'T KILL":'BIDIN\u00cdIL, T\u2019\u00c1\u00c1D\u00ed\u00ed NIZHONIGO \u00e1nid\u00e1\u00e1h',
+    'YOU HAVE RECEIVED THE SIGNAL':'BEE AK\'E\'ELCH\u00cd\u00cdD\u00cd \u00e1n\u00e1nih\u00e1sin',
+    'THEY ARE JUST A RITUAL':'\u00c1K\u00f3t\u2019\u00e9ego naach\u2019id \u00e1t\u2019\u00e9',
+    'AMERICA IS ONLY AN EXPERIMENT':'MERIC\u00c1 \u00e1ko naaltsoos \u00e1lah',
+    'NEW MUSIC COMING SOON':'\u1e0analtsoos siz\u00ee\u00ed doo t\u2019\u00e1adoo hodi\u00edn\u00e1a da',
+    'DO YOU SMELL THE GRAPHENE?':'GRAPHENE bich\u2019\u00ed\u2019 \u00edn\u00edst\u2019i\u2019ish?',
+    'ARE YOU HUNGRY?':'D\u00edchin n\u00ednizin?',
+    "DON'T OBEY":'T\u2019\u00e1\u00e1 hosh\u2019\u00e1 bik\u2019ehgo \u00e1din\u00e9elyaa',
+    'WORSHIP THE MUSIC, NOT THE MAN':'\u1e0aaltsoos y\u00e1n\u00e1\u2019\u00e1lyaa, doo hastiin bee \u00e1t\u2019\u00e9ii da',
+    'SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE':'BEE AK\'E\'ELCH\u00cd\u00cdD\u00cd b\u00e1\u00e1h\u00e1de\u00e9zt\u2019i\u2019, i\u00edna hoolzhish',
+    'STOP ATTENDING RITUALS':'Naach\u2019id doo bee ho\u2019dii\u0142\u00ee\u00ed\u0142 da',
+    'CAN YOU PAY THE RENT?':'B\u00e9eso b\u00e1\u00e1 n\u00e1\u00e1n\u00edd\u1e91\u00ee\u00ed\u0142 sha\u2019?',
+    'ARE YOU CON(CERN)ED?':'B\u00e1\u00e1h\u00e1de\u00e9zt\u2019i\u2019ish?',
+    'PSYOP AFTER PSYOP':'\u00cdINTS\u00cdKEES \u00e1lah \u00e1lah',
+    'DISCLOSURE?':'BAA HOZHDOOTA\u2019?',
+    'GROW FOOD':'CH\u2019I\u2019YAAN N\u00c1\u00c1N\u00cdT\u1e91\u00cd',
+    'YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?':'B\u00e9eso b\u00e1\u00e1 n\u00edn\u00edzt\u2019i\u2019 bi na\u2019ni\u0142kaad\u00ed. PEGASUS?',
+    'ARE YOU ADDICTED TO FEAR?':'Ch\u2019\u00ednd\u00ee b\u00e1\u00e1h\u00e1de\u00e9zt\u2019i\u2019ish?',
+    "DON'T INGEST THE D.A.R.P.A. TECH":'D.A.R.P.A. bee \u00e1\u00e1d\u00e1\u00e1 \u00e1din\u00e9elyaa',
+    'STATUS: TRANSMITTING':'\u00c1LAAJ\u00cd: NAALTSOOS HODIINA\u2019'
+  };
+
+  const lkt={
+    'SIGNAL ACTIVE':'\u010ea\u017euha wa\u0161te un',
+    "CAPTURE DON'T KILL":'Oy\u0161pe ye, ktepi \u0161ni',
+    'YOU HAVE RECEIVED THE SIGNAL':'\u010ea\u017euha ol\u0113 nici\u010dha\u017ei',
+    'THEY ARE JUST A RITUAL':'H\u0113\u010dhel wa\u010dhipi ecun kin he',
+    'AMERICA IS ONLY AN EXPERIMENT':'Amerika he oh\u2019ank\u0113 \u010dha',
+    'NEW MUSIC COMING SOON':'Ta\u0161iya olowa\u014b t\u2019a\u014bka \u0113 u kte',
+    'DO YOU SMELL THE GRAPHENE?':'Graphene \u010dha\u014b i\u0161nala he?',
+    'ARE YOU HUNGRY?':'Wote\u010dhi\u014b he?',
+    "DON'T OBEY":'Oh\u2019a\u014bl kte \u0161ni',
+    'WORSHIP THE MUSIC, NOT THE MAN':'Olowa\u014b ec\u2019u\u014b wa\u010dhin\u010dha, wica\u0161a \u0161ni',
+    'SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE':'\u010ea\u017euha owic\u2019akiya, oyate okiyaka un kte',
+    'STOP ATTENDING RITUALS':'Wa\u010dhipi el yau kte \u0161ni',
+    'CAN YOU PAY THE RENT?':'Mazaska iyeya\u010dhe he?',
+    'ARE YOU CON(CERN)ED?':'Nit\u2019a\u014bhan he?',
+    'PSYOP AFTER PSYOP':'Wa\u010dha\u014bl ok\u2019ic\u2019iyapi \u00f3ta',
+    'DISCLOSURE?':'Owoyake?',
+    'GROW FOOD':'Wo\u017eupi ec\u2019u\u014b',
+    'YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?':'Mazaska iyeya\u010dhe tona ognaka kin. PEGASUS?',
+    'ARE YOU ADDICTED TO FEAR?':'Kok\u2019i\u014bze el iyokipi he?',
+    "DON'T INGEST THE D.A.R.P.A. TECH":'D.A.R.P.A. wow\u00e1\u0161\u2019ak\u0113 yatka \u0161ni',
+    'STATUS: TRANSMITTING':'IY\u00c1: \u010ea\u017euha un'
+  };
+
+  // Extra labels: satellites/doomsday/pentagon/protest phrases + dynamic
+  // counter labels + conflict-list prefix, merged into each language dict.
+  const extra={
+    es:{
+      SATELLITES:'SATÉLITES ORBITANDO LA TIERRA: ~9,000 ACTIVOS',
+      DOOMSDAY:'RELOJ DEL APOCALIPSIS: 85 SEGUNDOS PARA LA MEDIANOCHE',
+      PENT25:'PRESUPUESTO DEL PENTÁGONO 2025: $1.312 BILLONES',
+      PENT24:'PRESUPUESTO DEL PENTÁGONO 2024: $824 MIL MILLONES',
+      CONFLICT:'CONFLICTO ACTIVO:',
+      DEBT:'DEUDA NACIONAL DE EE.UU.:',
+      POP:'POBLACIÓN MUNDIAL:',
+      CO2:'CO2 EMITIDO ESTE AÑO:',
+      FOREST:'BOSQUE PERDIDO ESTE AÑO:',
+      WATER:'AGUA CONSUMIDA ESTE AÑO:',
+      NET:'USUARIOS DE INTERNET EN EL MUNDO:',
+      PHONE:'CELULARES VENDIDOS HOY:',
+      DEPORT:'TOTAL DE DEPORTACIONES DE ICE:'
+    },
+    ru:{
+      SATELLITES:'СПУТНИКИ НА ОРБИТЕ ЗЕМЛИ: ~9000 АКТИВНЫХ',
+      DOOMSDAY:'ЧАСЫ СУДНОГО ДНЯ: 85 СЕКУНД ДО ПОЛУНОЧИ',
+      PENT25:'БЮДЖЕТ ПЕНТАГОНА 2025: $1.312 ТРЛН.',
+      PENT24:'БЮДЖЕТ ПЕНТАГОНА 2024: $824 МЛРД.',
+      CONFLICT:'АКТИВНЫЙ КОНФЛИКТ:',
+      DEBT:'ГОСДОЛГ США:',
+      POP:'НАСЕЛЕНИЕ МИРА:',
+      CO2:'ВЫБРОСЫ CO2 ЗА ГОД:',
+      FOREST:'ПОТЕРЯ ЛЕСА ЗА ГОД:',
+      WATER:'РАСХОД ВОДЫ ЗА ГОД:',
+      NET:'ПОЛЬЗОВАТЕЛИ ИНТЕРНЕТА В МИРЕ:',
+      PHONE:'ПРОДАНО ТЕЛЕФОНОВ СЕГОДНЯ:',
+      DEPORT:'ВСЕГО ДЕПОРТАЦИЙ ICE:'
+    },
+    pt:{
+      SATELLITES:'SATÉLITES ORBITANDO A TERRA: ~9.000 ATIVOS',
+      DOOMSDAY:'RELÓGIO DO APOCALIPSE: 85 SEGUNDOS PARA A MEIA-NOITE',
+      PENT25:'ORÇAMENTO DO PENTÁGONO 2025: US$ 1,312 TRILHÃO',
+      PENT24:'ORÇAMENTO DO PENTÁGONO 2024: US$ 824 BILHÕES',
+      CONFLICT:'CONFLITO ATIVO:',
+      DEBT:'DÍVIDA NACIONAL DOS EUA:',
+      POP:'POPULAÇÃO MUNDIAL:',
+      CO2:'CO2 EMITIDO ESTE ANO:',
+      FOREST:'FLORESTA PERDIDA ESTE ANO:',
+      WATER:'ÁGUA CONSUMIDA ESTE ANO:',
+      NET:'USUÁRIOS DE INTERNET NO MUNDO:',
+      PHONE:'CELULARES VENDIDOS HOJE:',
+      DEPORT:'TOTAL DE DEPORTAÇÕES DO ICE:'
+    },
+    zh:{
+      SATELLITES:'绕地卫星：约 9,000 颗活跃',
+      DOOMSDAY:'末日时钟：距凌晚 85 秒',
+      PENT25:'2025 年五角大厦预算：1.312 万亿美元',
+      PENT24:'2024 年五角大厦预算：8240 亿美元',
+      CONFLICT:'活跃冲突：',
+      DEBT:'美国国债：',
+      POP:'世界人口：',
+      CO2:'今年排放的二氧化碳：',
+      FOREST:'今年森林损失：',
+      WATER:'今年用水量：',
+      NET:'全球互联网用户：',
+      PHONE:'今天售出的手机：',
+      DEPORT:'移民局驱逐总数：'
+    },
+    ja:{
+      SATELLITES:'地球を周回中の衛星：約9,000基が稼働中',
+      DOOMSDAY:'終末時計：真夜中まで85秒',
+      PENT25:'2025年度国防総省予算：1兆5,120億ドル',
+      PENT24:'2024年度国防総省予算：8,240億ドル',
+      CONFLICT:'紛争発生中：',
+      DEBT:'米国の国債：',
+      POP:'世界人口：',
+      CO2:'今年のCO2排出量：',
+      FOREST:'今年の森林消失：',
+      WATER:'今年の水消費量：',
+      NET:'世界のインターネット利用者：',
+      PHONE:'本日の携帯電話販売台数：',
+      DEPORT:'ICEによる退去強制総数：'
+    },
+    ar:{
+      SATELLITES:'الأقمار التي تدور حول الأرض: ~9,000 نشط',
+      DOOMSDAY:'ساعة القيامة: 85 ثانية قبل منتصف الليل',
+      PENT25:'ميزانية البنتاجون 2025: 1.312 تريليون دولار',
+      PENT24:'ميزانية البنتاجون 2024: 824 مليار دولار',
+      CONFLICT:'نزاع نشط:',
+      DEBT:'الدين الوطني الأمريكي:',
+      POP:'سكان العالم:',
+      CO2:'انبعاثات CO2 هذا العام:',
+      FOREST:'الغابات المفقودة هذا العام:',
+      WATER:'المياه المستهلكة هذا العام:',
+      NET:'مستخدمو الإنترنت عالمياً:',
+      PHONE:'الهواتف المباعة اليوم:',
+      DEPORT:'إجمالي عمليات الترحيل:'
+    },
+    nah:{
+      SATELLITES:'CITLALTOTOMEH IPAN ILHUICATL: ~9,000 TLACHIXTOQUEH',
+      DOOMSDAY:'TLAMILIZ TLAPOHUALLI: 85 IN TLAYOHUA',
+      PENT25:'PENTAGONO TLACALAQUILLI 2025: $1.312 TRILLON',
+      PENT24:'PENTAGONO TLACALAQUILLI 2024: $824 MIL MILLON',
+      CONFLICT:'NECHICOLIZTLI:',
+      DEBT:'ESTADOS UNIDOS ITLAXTLAHUIL:',
+      POP:'CEMANAHUAC TLACAMEH:',
+      CO2:'CO2 IN XIHUITL:',
+      FOREST:'CUAUHTLA POLIUHQUI XIHUITL:',
+      WATER:'ATL TLAHUANTLI XIHUITL:',
+      NET:'CEMANAHUAC TEQUITINI:',
+      PHONE:'TELEFONHUAN NAMACOQUEH AXCAN:',
+      DEPORT:'ICE TEQUIXTILIZTLI:'
+    },
+    hi:{
+      SATELLITES:'पृथ्वी की परिक्रमा कर रहे उपग्रह: ~9,000 सक्रिय',
+      DOOMSDAY:'डूम्सडे घड़ी: आधी रात से 85 सेकंड पहले',
+      PENT25:'पेंटागन बजट 2025: $1.312 ट्रिलियन',
+      PENT24:'पेंटागन बजट 2024: $824 अरब',
+      CONFLICT:'सक्रिय संघर्ष:',
+      DEBT:'अमेरिकी राष्ट्रीय कर्ज:',
+      POP:'विश्व जनसंख्या:',
+      CO2:'इस वर्ष जारी CO2:',
+      FOREST:'इस वर्ष वन हानि:',
+      WATER:'इस वर्ष खपत पानी:',
+      NET:'दुनियाभर इंटरनेट उपयोगकर्ता:',
+      PHONE:'आज बिके मोबाइल:',
+      DEPORT:'कुल ICE निर्वासन:'
+    },
+    ur:{
+      SATELLITES:'زمین کے گرد چکر لگانے والے سیٹلائٹ: ~9,000 فعال',
+      DOOMSDAY:'قیامت کی گھڑی: آدھی رات سے 85 سیکنڌ',
+      PENT25:'پینٹاگون بجٹ 2025: $1.312 ٹریلین',
+      PENT24:'پینٹاگون بجٹ 2024: $824 ارب',
+      CONFLICT:'فعال تنازع:',
+      DEBT:'امریکی قومی قرض:',
+      POP:'عالمی آبادی:',
+      CO2:'اس سال CO2 اخراج:',
+      FOREST:'اس سال جنگلات کا نقصان:',
+      WATER:'اس سال پانی کا استعمال:',
+      NET:'دنیا بھر میں انٹرنیٹ صارفین:',
+      PHONE:'آج فروخت ھونے والے موبائل:',
+      DEPORT:'ICE کی کل ملک بدری:'
+    },
+    ko:{
+      SATELLITES:'지구 굤도 위성: 약 9,000기 가동 중',
+      DOOMSDAY:'종말 시계: 자정 85초 전',
+      PENT25:'2025년 펜타곤 예산: 1조 3120억 달러',
+      PENT24:'2024년 펜타곤 예산: 8240억 달러',
+      CONFLICT:'활성 분쟁:',
+      DEBT:'미국 국가 부채:',
+      POP:'세계 인구:',
+      CO2:'올해 배출된 CO2:',
+      FOREST:'올해 산림 손실:',
+      WATER:'올해 물 소비량:',
+      NET:'전 세계 인터넷 사용자:',
+      PHONE:'오늘 판매된 휴대폰:',
+      DEPORT:'ICE 총 추방 건수:'
+    },
+    hy:{
+      SATELLITES:'Արբան շրջափողող արբածաններ։ ≈ 9,000',
+      DOOMSDAY:'Դատաստրոփի ժամացույց։ 85 վայրկյան առաջ',
+      PENT25:'Պենտագոնի բյուջե։ 2025։ 1.312 տրիլիոն',
+      PENT24:'Պենտագոնի բյուջե։ 2024։ 824 մլրդ',
+      CONFLICT:'Ակտիվ հակամարտ։',
+      DEBT:'ԱՄՆ-ի պետք։',
+      POP:'Աշխարհի բնակչություն։',
+      CO2:'CO2–ի արտահոսությունը ս։թ–ին։',
+      FOREST:'Անտառի կորուստը ս։թ–ին։',
+      WATER:'Ձուրի սպառումը ս։թ–ին։',
+      NET:'Աշխարհի ուժագործողներ։',
+      PHONE:'Այսօր վածառված հեռախոսներ։',
+      DEPORT:'ICE–ի արտաքսումները ընդհանուր։'
+    },
+    nv:{
+      SATELLITES:'S\u00f3\u2019 na\u2019alkaahi ni\u0142ch\u2019i b\u00e1\u00e1h\u00e1: ~9,000',
+      DOOMSDAY:'HODOOTL\u2019IZH TL\u2019\u00c9\u2019 84 SECOND',
+      PENT25:'PENTAGON B\u00e9eso 2025: $1.312 TRILLION',
+      PENT24:'PENTAGON B\u00e9eso 2024: $824 BILLION',
+      CONFLICT:'\u00c1N\u00e1\u00e1l\u2019\u00ee\u00ed:',
+      DEBT:'MERIC\u00c1 B\u00e9eso baa \u00e1din\u00e9\u00e9lyaa:',
+      POP:'N\u00ed\u2019 t\u2019\u00e1\u00e1l\u00e1\u2019\u00ed:',
+      CO2:'CO2 \u00e1lah nid\u00eez\u00eed:',
+      FOREST:'TS\u00e9\u00e9h \u00e1n\u00e1\u00e1sd\u1e91\u00ed\u00ed\u0142:',
+      WATER:'T\u00f3 y\u00e1\u00e1n\u00edd\u00eez\u00eed:',
+      NET:'BEE AK\u2019E\u2019ELCH\u00cd\u00cdD\u00cd n\u00e1\u00e1n\u00edd\u00eez\u00eed:',
+      PHONE:'B\u00e9eso na\u2019azt\u2019i\u2019\u00ed:',
+      DEPORT:'ICE \u00e1din\u00e9\u00e9lyaa:'
+    },
+    lkt:{
+      SATELLITES:'Mahp\u00edya el mak\u2019oce oyakiya: ~9,000',
+      DOOMSDAY:'\u010dha\u014b\u0142i o\u2019ihanke: 85 seconds',
+      PENT25:'Pentagon mazaska 2025: $1.312 trillion',
+      PENT24:'Pentagon mazaska 2024: $824 billion',
+      CONFLICT:'Okiz\u0113 un:',
+      DEBT:'Amerika mazaska iyokipi:',
+      POP:'Maka oyate:',
+      CO2:'CO2 waniyetu kin:',
+      FOREST:'\u010dhan waniyetu okastaka:',
+      WATER:'Mni waniyetu iyu\u0161ka:',
+      NET:'Internet iyus\u2019a:',
+      PHONE:'T\u0113l\u0113phone o\u017eupi anpetu:',
+      DEPORT:'ICE tona ognaka:'
+    }
+  };
+  Object.assign(es,{'¡YA BASTA!':'¡YA BASTA!'});
+  [es,ru,pt,zh,ja,ar,nah,hi,ur,ko,hy,nv,lkt].forEach((dict,i)=>{
+    const key=['es','ru','pt','zh','ja','ar','nah','hi','ur','ko','hy','nv','lkt'][i];
+    Object.assign(dict,{
+      'SATELLITES ORBITING EARTH: ~9,000 ACTIVE':extra[key].SATELLITES,
+      'DOOMSDAY CLOCK: 85 SECONDS TO MIDNIGHT':extra[key].DOOMSDAY,
+      'PENTAGON BUDGET 2025: $1.312 TRILLION':extra[key].PENT25,
+      'PENTAGON BUDGET 2024: $824 BILLION':extra[key].PENT24
+    });
+    dict.__conflict=extra[key].CONFLICT;
+    dict.__labels={debt:extra[key].DEBT,pop:extra[key].POP,co2:extra[key].CO2,forest:extra[key].FOREST,water:extra[key].WATER,net:extra[key].NET,phone:extra[key].PHONE,deport:extra[key].DEPORT};
+  });
+
+  const langs=[es,ru,pt,zh,ja,ar,nah,hi,ur,ko,hy,nv,lkt];
+  // Weighted so English stays most common, Spanish a close second, others rare.
+  function pickLang(){
+    const r=Math.random();
+    if(r<0.55)return es;
+    const rest=[ru,pt,zh,ja,ar,nah,hi,ur,ko,hy,nv,lkt];
+    return rest[Math.floor(Math.random()*rest.length)];
+  }
+
+  function render(id,arr){
+    document.getElementById(id).innerHTML=arr.map(t=>`<span>${t}</span>`).join(' <span class="sep">\u25c8</span> ')+' <span class="sep">\u25c8</span>';
+  }
+  // Plain (non-glitching) translation swap — each pass, translatable phrases
+  // have a chance to render in a random language (Spanish/Russian/Portuguese/
+  // Chinese/Japanese), no glitch flash attached.
+  const CLOCK_BASE={
+    debtclock:'debt',debtclock2:'debt',
+    popclock:'pop',popclock2:'pop',
+    co2clock:'co2',co2clock2:'co2',
+    forestclock:'forest',forestclock2:'forest',
+    waterclock:'water',waterclock2:'water',
+    netclock:'net',netclock2:'net',
+    phoneclock:'phone',phoneclock2:'phone',
+    deportclock:'deport',deportclock2:'deport'
+  };
+  function translateItem(t,dict){
+    if(dict[t]!==undefined)return dict[t];
+    const cm=t.match(/^ACTIVE CONFLICT: (.+)$/);
+    if(cm&&dict.__conflict)return dict.__conflict+' '+cm[1];
+    const idm=t.match(/id="([a-z0-9]+)"/);
+    if(idm&&dict.__labels){
+      const base=CLOCK_BASE[idm[1]];
+      if(base&&dict.__labels[base])return t.replace(/^[^<]+/,dict.__labels[base]+' ');
+    }
+    return t;
+  }
+  function localize(arr){
+    return arr.map(t=>{
+      const dict=pickLang();
+      const translated=translateItem(t,dict);
+      return (translated!==t&&Math.random()<0.3)?translated:t;
+    });
+  }
+  render('ti1',localize(shuffled(items)));
+  render('ti2',localize(shuffled(items)));
+  setInterval(()=>{render('ti1',localize(shuffled(items)));render('ti2',localize(shuffled(items)));},45000);
+
+  // Occasional real-time glitch: briefly flip some visible phrases to a random language
+  function glitchTranslate(){
+    [document.getElementById('ti1'),document.getElementById('ti2')].forEach(el=>{
+      if(!el)return;
+      const spans=Array.from(el.children).filter(c=>c.tagName==='SPAN'&&!c.classList.contains('sep'));
+      spans.forEach(sp=>{
+        const orig=sp.textContent;
+        const dict=pickLang();
+        const t=dict[orig];
+        if(t&&Math.random()<0.35){
+          sp.textContent=t;
+          sp.style.textShadow='2px 0 var(--accent),-2px 0 #0ff';
+          setTimeout(()=>{sp.textContent=orig;sp.style.textShadow='';},2800);
+        }
+      });
+    });
+  }
+
+  // Occasional signal-jump glitch: skip the ticker to a random point mid-scroll
+  function glitchJump(){
+    const els=[document.getElementById('ti1'),document.getElementById('ti2')];
+    els.forEach(el=>{
+      if(!el)return;
+      const dur=60; // must match .ti animation-duration
+      const jumpTo=-(Math.random()*dur);
+      el.style.animation='none';
+      el.getBoundingClientRect();
+      el.style.animation=`tick ${dur}s linear infinite`;
+      el.style.animationDelay=jumpTo+'s';
+    });
+    const ticker=document.getElementById('ticker');
+    if(ticker){
+      ticker.style.transition='none';
+      ticker.style.opacity='.4';
+      ticker.style.filter='hue-rotate(90deg)';
+      setTimeout(()=>{ticker.style.opacity='';ticker.style.filter='';},90);
+    }
+    glitchTranslate();
+    glitchCorrupt();
+  }
+  setInterval(glitchJump,45000);
+
+  // Character-level corruption: randomly flip letter case and swap a few
+  // letters for leetspeak-style numbers, briefly, on visible ticker spans.
+  const LEET={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9'};
+  function glitchCorrupt(){
+    [document.getElementById('ti1'),document.getElementById('ti2')].forEach(el=>{
+      if(!el)return;
+      const spans=Array.from(el.children).filter(c=>c.tagName==='SPAN'&&!c.classList.contains('sep'));
+      spans.forEach(sp=>{
+        if(sp.querySelector('span'))return; // skip items with a nested live-clock span
+        if(Math.random()>0.4)return;
+        const orig=sp.textContent;
+        const chars=orig.split('');
+        for(let i=0;i<chars.length;i++){
+          const c=chars[i];
+          if(/[a-zA-Z]/.test(c)&&Math.random()<0.18){
+            const up=c.toUpperCase();
+            if(LEET[up]&&Math.random()<0.5){chars[i]=LEET[up];}
+            else{chars[i]=(c===up)?c.toLowerCase():up;}
+          }
+        }
+        sp.textContent=chars.join('');
+        sp.style.textShadow='2px 0 var(--accent),-2px 0 #0ff';
+        setTimeout(()=>{sp.textContent=orig;sp.style.textShadow='';},2200);
+      });
+    });
+  }
+})();
+
+// US National Debt live estimate — seeded from U.S. Treasury Fiscal Data
+// (~$39.72T as of Jul 4, 2026), extrapolated at ~$1.3B/day since no live
+// API is reachable from here. Not an exact real-time feed.
+(function(){
+  const BASE=39.72e12, BASE_TIME=new Date('2026-07-04T00:00:00Z').getTime();
+  const PER_MS=1.3e9/86400000;
+  function tick(){
+    const val=BASE+(Date.now()-BASE_TIME)*PER_MS;
+    const txt='$'+val.toLocaleString('en-US',{maximumFractionDigits:0});
+    ['debtclock','debtclock2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=txt});
+  }
+  tick();
+  setInterval(tick,1000);
+})();
+
+// Undernourished people worldwide — seeded from FAO/Statista (~673.2M, 2024
+// figure), drifting slightly upward per WFP trend data. Estimate, not live feed.
+(function(){
+  const BASE=673.2e6, BASE_TIME=new Date('2026-01-01T00:00:00Z').getTime();
+  const PER_MS=9e6/(365*86400000); // ~9M/yr drift
+  function tick(){
+    const val=BASE+(Date.now()-BASE_TIME)*PER_MS;
+    const txt=Math.round(val).toLocaleString('en-US');
+    ['hungerclock','hungerclock2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=txt});
+  }
+  tick();
+  setInterval(tick,1000);
+})();
+
+// World population — seeded from Worldometer/UN estimate (~8.3025B as of
+// Jul 11, 2026), extrapolated at ~70M/yr net growth. Estimate, not live feed.
+(function(){
+  const BASE=8302580776, BASE_TIME=new Date('2026-07-11T00:00:00Z').getTime();
+  const PER_MS=70e6/(365*86400000);
+  function tick(){
+    const val=BASE+(Date.now()-BASE_TIME)*PER_MS;
+    const txt=Math.round(val).toLocaleString('en-US');
+    ['popclock','popclock2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=txt});
+  }
+  tick();
+  setInterval(tick,1000);
+})();
+
+// Global environmental counters — seeded from GlobalStats Live (Jul 12, 2026
+// snapshot), extrapolated at their displayed per-second rates. Estimates.
+(function(){
+  const specs=[
+    {ids:['co2clock','co2clock2'],base:18990220168,perSec:1140},
+    {ids:['forestclock','forestclock2'],base:5275061,perSec:0.32},
+    {ids:['waterclock','waterclock2'],base:2110024.5e6,perSec:127e6}
+  ];
+  const seedTime=new Date('2026-07-12T17:07:08-07:00').getTime();
+  function tick(){
+    const dt=(Date.now()-seedTime)/1000;
+    specs.forEach(s=>{
+      const val=s.base+dt*s.perSec;
+      const txt=Math.round(val).toLocaleString('en-US');
+      s.ids.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=txt});
+    });
+  }
+  tick();
+  setInterval(tick,1000);
+})();
+
+// Internet users worldwide — seeded from DataReportal (~5.43B, 2025),
+// growing ~235M/yr. Cellphones sold today — resets at local midnight,
+// ~472M/yr → ~15/sec (Statspanda/Gartner figures). Estimates.
+(function(){
+  const NET_BASE=5.43e9, NET_TIME=new Date('2026-01-01T00:00:00Z').getTime();
+  const NET_PER_MS=235e6/(365*86400000);
+  function tick(){
+    const netVal=NET_BASE+(Date.now()-NET_TIME)*NET_PER_MS;
+    const netTxt=Math.round(netVal).toLocaleString('en-US');
+    ['netclock','netclock2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=netTxt});
+
+    const now=new Date();
+    const midnight=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
+    const secsToday=(now.getTime()-midnight)/1000;
+    const phoneTxt=Math.round(secsToday*15).toLocaleString('en-US');
+    ['phoneclock','phoneclock2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=phoneTxt});
+  }
+  tick();
+  setInterval(tick,1000);
+})();
+
+// City clocks — live local time via Intl timezone formatting.
+(function(){
+  const zones=[
+    ['tz-cdmx','America/Mexico_City'],
+    ['tz-la','America/Los_Angeles'],
+    ['tz-ny','America/New_York'],
+    ['tz-london','Europe/London'],
+    ['tz-shanghai','Asia/Shanghai'],
+    ['tz-tokyo','Asia/Tokyo']
+  ];
+  function tick(){
+    zones.forEach(([id,tz])=>{
+      const el=document.getElementById(id);
+      if(!el)return;
+      el.textContent=new Intl.DateTimeFormat('en-US',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:tz}).format(new Date());
+    });
+  }
+  tick();
+  setInterval(tick,1000);
+})();
+
+// ICE deportations — seeded from deportationtracker.live (241,440 total,
+// Jul 12, 2026 snapshot), extrapolated at their displayed ~289/day rate.
+(function(){
+  const BASE=241440, SEED_TIME=new Date('2026-07-12T17:57:17-07:00').getTime();
+  const PER_MS=289/86400000;
+  function tick(){
+    const val=BASE+(Date.now()-SEED_TIME)*PER_MS;
+    const txt=Math.round(val).toLocaleString('en-US');
+    ['deportclock','deportclock2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=txt});
+  }
+  tick();
+  setInterval(tick,1000);
+})();
 
 function spPlay(){
+  if(audio&&!audio.paused){audio.pause();playing=false;const b=document.getElementById('pbtn');if(b)b.textContent='▶';}
   if(!spStarted){spStart();return;}
   if(spStopped){
     spStopped=false;
@@ -2195,8 +3034,7 @@ function setGrain(v,b){
   window.parent.postMessage({type:'__edit_mode_set_keys',edits:{grain:v}},'*');
 }
 window.addEventListener('message',e=>{
-  if(e.data?.type==='__activate_edit_mode')document.getElementById('tp').classList.add('vis');
-  else if(e.data?.type==='__deactivate_edit_mode')document.getElementById('tp').classList.remove('vis');
+  if(e.data?.type==='__deactivate_edit_mode')document.getElementById('tp').classList.remove('vis');
 });
 window.parent.postMessage({type:'__edit_mode_available'},'*');
 </script>
