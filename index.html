@@ -567,7 +567,7 @@ body{
 .pad.armed .pad-led{background:var(--accent);box-shadow:0 0 4px var(--accent)}
 .pad.hit .pad-led{background:var(--hot);box-shadow:0 0 8px var(--hot)}
 .pad-id{font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--dimmer)}
-.pad-name{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--dim);text-transform:uppercase;line-height:1.2}
+.pad-name{font-family:var(--mono);font-size:9px;letter-spacing:.5px;color:var(--dim);text-transform:uppercase;line-height:1.15;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .pad.armed .pad-name{color:var(--accent)}
 .pad.hit .pad-name{color:var(--hot);text-shadow:0 0 6px rgba(232,224,192,.5)}
 .pad.empty .pad-name{color:var(--dimmer)}
@@ -1966,12 +1966,25 @@ function spPlayDeck(deck,track){
 function spFadeTo(deck,target,dur){
   return new Promise(res=>{
     const start=performance.now(),from=deck.volume;
-    function step(now){
-      const t=Math.min(1,(now-start)/(dur*1000));
+    // requestAnimationFrame stops entirely when the tab/phone is backgrounded
+    // — that could freeze a crossfade mid-way (stuck volume, spFading never
+    // clears, deck swap never happens), which is exactly what sounded like a
+    // glitchy transition. setInterval keeps ticking (throttled, not halted)
+    // in the background, and a hard timeout guarantees this always resolves.
+    const iv=setInterval(step,50);
+    const safety=setTimeout(finish,dur*1000+1500);
+    function step(){
+      const t=Math.min(1,(performance.now()-start)/(dur*1000));
       deck.volume=Math.max(0,Math.min(1,from+(target-from)*t));
-      if(t<1)requestAnimationFrame(step);else res();
+      if(t>=1)finish();
     }
-    requestAnimationFrame(step);
+    function finish(){
+      deck.volume=target;
+      clearInterval(iv);
+      clearTimeout(safety);
+      res();
+    }
+    step();
   });
 }
 
@@ -2077,14 +2090,25 @@ function ensureSpWatch(){
     spFading=true;
     const nextIdx=spPickNext();
     const nextTrack=SP_TRACKS[nextIdx];
-    spPlayDeck(spIdle,nextTrack).then(()=>{
-      spActive.pause();
-      [spActive,spIdle]=[spIdle,spActive];
-      spIdx=nextIdx;
-      spSetTitle(nextTrack.title);
-      spActive.volume=0;
-      spFadeTo(spActive,spVol(nextIdx),0.4).then(()=>{spFading=false;});
-    });
+    const trySwap=(idx,track,attempt)=>{
+      attempt=attempt||0;
+      spPlayDeck(spIdle,track).then(()=>{
+        // Same guard as spCrossfade: if this track was blocked/failed, don't
+        // swap to a paused deck and go silent forever — retry another track.
+        if(spIdle.paused&&attempt<SP_TRACKS.length){
+          const idx2=spPickNext();
+          trySwap(idx2,SP_TRACKS[idx2],attempt+1);
+          return;
+        }
+        spActive.pause();
+        [spActive,spIdle]=[spIdle,spActive];
+        spIdx=idx;
+        spSetTitle(track.title);
+        spActive.volume=0;
+        spFadeTo(spActive,spVol(idx),0.4).then(()=>{spFading=false;});
+      });
+    };
+    trySwap(nextIdx,nextTrack);
   }
 }));
 
@@ -3095,8 +3119,10 @@ function spPlay(){
 function spSkip(){
   if(!spStarted){spStart();return;}
   if(spStopped){spStopped=false;spStart();return;}
-  if(spFading)return;
-  // Force an immediate crossfade by short-circuiting the watch threshold.
+  // Never just no-op: if a crossfade is genuinely mid-flight, cut it short
+  // instead of ignoring the button press (a stuck spFading flag was making
+  // skip do nothing at all).
+  if(spFading)spFading=false;
   spCrossfade();
 }
 // Stop = halt the jukebox until user explicitly resumes (skip or refresh).
