@@ -2009,7 +2009,11 @@ function spCrossfade(attempt){
 let spWatching=false;
 function spWatch(){
   if(spStarted&&!spFading&&spActive.duration&&!isNaN(spActive.duration)){
-    if(spActive.duration-spActive.currentTime<=SP_XFADE+0.2){
+    // Scale the lead-in for short clips (intros, one-off samples) so the
+    // crossfade window never exceeds ~1/3 of the track — otherwise it could
+    // fire almost immediately after the track starts, sounding like a glitch.
+    const lead=Math.min(SP_XFADE,spActive.duration/3);
+    if(spActive.duration-spActive.currentTime<=lead+0.2){
       spCrossfade();
     }
   }
@@ -2020,14 +2024,27 @@ function ensureSpWatch(){if(spWatching)return;spWatching=true;requestAnimationFr
 // Safety net if a track ends without crossfade firing (very short tracks etc.)
 [spA,spB].forEach(a=>a.addEventListener('ended',()=>{
   if(a===spActive){
-    if(!spFading)spCrossfade();
-    else{
+    if(spFading){
       // A crossfade is already in flight (or stuck) but the active deck ran
       // out first — never let this go silent: force spFading clear and kick
       // a fresh crossfade instead of pausing.
       spFading=false;
-      spCrossfade();
     }
+    // A track can end before spWatch's lead-in threshold caught it (e.g. a
+    // short clip, or bad file-length metadata) — hard-cutting to the next
+    // track sounded like a glitch, so fade the next one in quickly instead
+    // of jumping straight to full volume.
+    spFading=true;
+    const nextIdx=spPickNext();
+    const nextTrack=SP_TRACKS[nextIdx];
+    spPlayDeck(spIdle,nextTrack).then(()=>{
+      spActive.pause();
+      [spActive,spIdle]=[spIdle,spActive];
+      spIdx=nextIdx;
+      spSetTitle(nextTrack.title);
+      spActive.volume=0;
+      spFadeTo(spActive,spVol(nextIdx),0.4).then(()=>{spFading=false;});
+    });
   }
 }));
 
