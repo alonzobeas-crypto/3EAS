@@ -3,9 +3,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>3EAS</title>
-<link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Courier+Prime:ital@0;1&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Courier+Prime:ital@0;1&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -22,21 +24,27 @@
   --mono:   'Share Tech Mono', monospace;
   --body:   'Courier Prime', monospace;
 }
-html{overflow:hidden}
+html{overflow:hidden;height:-webkit-fill-available}
 body{
   background:var(--bg);color:var(--fg);
   font-family:var(--mono);
-  height:100vh;overflow:hidden;
+  height:100vh;height:100dvh;overflow:hidden;
   cursor:none;
   -webkit-font-smoothing:antialiased;
 }
 
 /* ── FX OVERLAYS ── */
-.scanlines{
+@keyframes spflash{0%,100%{color:var(--dim);border-color:var(--dim)}50%{color:var(--accent);border-color:var(--accent)}}
+#sp-play.on{animation:spflash 2.4s ease-in-out infinite}
   position:fixed;inset:0;
   background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(216,212,200,.015) 3px,rgba(216,212,200,.015) 4px);
   pointer-events:none;z-index:800;
 }
+@keyframes tvroll{0%{background-position:0 0}100%{background-position:0 100vh}}
+#tvglitch{position:fixed;inset:0;z-index:9998;pointer-events:none;opacity:0;mix-blend-mode:overlay}
+#tvglitch.on{opacity:1;background:repeating-linear-gradient(0deg,rgba(255,255,255,.08) 0px,rgba(255,255,255,.08) 1px,transparent 1px,transparent 3px),linear-gradient(rgba(120,255,220,.06),rgba(255,80,120,.06));animation:tvroll .12s linear infinite}
+#tvglitch.on::after{content:'';position:absolute;left:0;right:0;height:14px;background:rgba(255,255,255,.12);animation:tvband 1.6s linear infinite}
+@keyframes tvband{0%{top:-14px}100%{top:100vh}}
 .scanbeam{
   position:fixed;left:0;width:100%;height:2px;
   background:linear-gradient(90deg,transparent,rgba(184,168,120,.05),transparent);
@@ -107,7 +115,7 @@ body{
 
 /* ── SCENES ── */
 .scene{
-  height:100vh;scroll-snap-align:start;
+  height:100vh;height:100dvh;scroll-snap-align:start;
   position:relative;overflow:hidden;
   display:flex;flex-direction:column;
   border-bottom:1px solid var(--dimmer);
@@ -180,7 +188,8 @@ body{
   opacity:0;transition:opacity .5s;
 }
 #ticker.show{opacity:1}
-.ti{display:flex;animation:tick 80s linear infinite;white-space:nowrap}
+.ti{display:flex;animation:tick 80s linear infinite;white-space:nowrap;animation-play-state:running}
+#ticker.slow .ti{animation-duration:240s}
 .ti span{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--fg);padding-right:56px}
 .ti .sep{color:var(--accent)}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
@@ -983,74 +992,97 @@ body{
 @media(max-width:768px){
   .tb-links{display:none}
   #topnav{padding:0}
-  .s1-main{padding:0 24px}
-  /* center hero on phone */
-  #s1{align-items:center;text-align:center}
-  #s1 .s1-main{display:flex;flex-direction:column;align-items:center}
+  .s1-main{padding:0 18px}
+  /* center hero on phone, kill dead space top/bottom */
+  #s1{align-items:center;justify-content:center;text-align:center;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+  #s1 .s1-main{display:flex;flex-direction:column;align-items:center;gap:0}
   .s1-sub,.s1-status{justify-content:center}
-  .s1-title{font-size:clamp(120px,26vw,200px)}
+  .s1-title{font-size:clamp(90px,26vw,160px)}
+  .s1-sub{margin-top:0}
+  .s1-status{margin-top:2px;padding-top:2px;gap:2px 8px}
+  .s1-title{line-height:.9}
   .s1-scroll,.s1-coords{display:none}
   .s2-body,.s6-body{grid-template-columns:1fr}
   .player,.lform{border-left:none;border-top:1px solid var(--dimmer)}
-  .s5-grid{grid-template-columns:1fr;gap:32px}
+  .s5-grid{grid-template-columns:1fr;gap:6px}
   .acq-layout{grid-template-columns:1fr}
   /* tall scenes: start content at top instead of vertical-centering (kills big gaps) */
   #s4,#s5{justify-content:flex-start!important}
-  #s4 .s4-head{position:static!important;padding:64px 20px 18px!important}
+  #s4 .s4-head{position:static!important;padding:8px 12px 4px!important}
   #s4 .acq-layout{margin-top:0!important}
-  #s5{padding-top:64px}
+  #s5{padding-top:4px}
+  .ac{padding:8px!important}
+  .ac-idx{font-size:32px!important;top:6px!important;right:10px!important}
+  .ac-cat{font-size:8px!important;letter-spacing:2px!important;margin-bottom:4px!important}
+  .ac-name{font-size:26px!important;letter-spacing:1px!important;margin-bottom:4px!important}
+  .ac-desc{font-size:13px!important;line-height:1.4!important;margin:2px 0!important}
+  .ac-foot{margin-top:4px!important}
+  .ac-price{font-size:16px!important}
+  .ac-btn{padding:5px 10px!important;font-size:8px!important}
+  .ac-stat{margin-top:4px!important;font-size:8px!important}
+  .acq-layout{gap:1px!important}
   #vnav{display:none}
   .vgrid{grid-template-columns:1fr 1fr;grid-template-rows:auto}
-  .vc:nth-child(1){grid-column:span 2;grid-row:auto;aspect-ratio:16/7}
+  .vc:nth-child(1){grid-column:span 2;grid-row:auto;aspect-ratio:9/13}
+  .vc:nth-child(1) video{object-fit:contain!important}
   .vc:nth-child(n+2){aspect-ratio:1}
-  .scene{padding-left:24px!important;padding-right:24px!important}
-  .s4-head,.s5-grid,.llinks,.lform{padding-left:24px!important;padding-right:24px!important}
+  .scene{padding-left:10px!important;padding-right:10px!important;padding-top:4px!important;padding-bottom:4px!important}
+  .s4-head,.s5-grid,.llinks,.lform,.s7-head{padding-left:10px!important;padding-right:10px!important}
+  .s7-head{padding-top:8px!important;padding-bottom:3px!important}
 
-  /* jukebox: make it readable on phone */
+  /* jukebox: make it readable on phone, sit above home-indicator/nav bar */
   #site-player{
-    left:0!important;right:0!important;bottom:30px!important;
+    left:0!important;right:0!important;bottom:calc(30px + env(safe-area-inset-bottom))!important;
     width:100%!important;box-sizing:border-box!important;
-    gap:8px!important;padding:12px 14px!important;
+    gap:6px!important;padding:8px 10px!important;
     background:rgba(0,0,0,.97)!important;
     border-right:none!important;
     justify-content:flex-start!important;flex-wrap:wrap!important;
   }
-  #sp-title{color:var(--accent)!important;font-size:13px!important;max-width:46%!important;flex:1 1 auto!important}
+  #sp-title{color:var(--accent)!important;font-size:11px!important;min-width:0!important;max-width:none!important;flex:1 1 100%!important;order:-1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #site-player button{
     color:var(--accent)!important;border-color:var(--accent)!important;
-    font-size:11px!important;padding:8px 12px!important;flex:0 0 auto!important;
+    font-size:9px!important;letter-spacing:1px!important;padding:6px 8px!important;flex:0 0 auto!important;
   }
-  #sp-dot{width:9px!important;height:9px!important}
+  #sp-dot{width:7px!important;height:7px!important;flex-shrink:0}
 
   /* beat lab: hide oversized instrument (it's in CALIBRATING state) & fit the card */
   #sLab .dev-wrap{display:none!important}
-  .lab-cs{inset:96px 16px 54px!important;position:absolute!important}
-  .lab-cs-inner{padding:28px 22px!important}
+  .lab-cs{inset:16px 6px 12px!important;position:absolute!important}
+  .lab-cs-inner{padding:6px 8px!important}
   .lab-cs-title{font-size:44px!important;letter-spacing:2px!important}
   .lab-cs-sub{font-size:10px!important}
   .lab-cs-note{font-size:9px!important;text-align:center}
-  #sLab .lab-eyebrow{flex-direction:column;gap:6px;padding:64px 20px 18px}
+  #sLab .lab-eyebrow{flex-direction:column;gap:1px;padding:8px 12px 3px}
   #sLab .lab-eyebrow h2{font-size:40px!important}
   #sLab .lab-eyebrow .lab-meta{text-align:left}
 
   /* let content-tall scenes grow & scroll instead of clipping (full bio, etc.) */
   #scroll{scroll-snap-type:none!important}
-  .scene{height:auto;min-height:100vh;overflow:visible;scroll-snap-align:none!important}
+  .scene{height:auto;min-height:0;overflow:visible;scroll-snap-align:none!important}
+  #s1{min-height:100dvh}
+  /* content now sits in normal scroll flow on mobile (no snap panels) — don't
+     wait for a scroll-triggered "active" class to fade it in, or sections
+     pop in abruptly (looked like a glitch) as you scroll past them */
+  .scene-eyebrow,.scene-title,.s2-body,.vgrid,.acq-layout,.s5-grid,.s5-top,.s6-body{opacity:1!important;transform:none!important;transition:none!important}
   .s2-body{overflow:visible}
   .tracklist{overflow:visible}
   .player{overflow:visible}
   .s5-grid{overflow:visible}
   /* transmissions: pull header left, fit the long title */
-  .s2-head{padding:64px 20px 18px!important}
-  .scene-title{font-size:38px;letter-spacing:2px}
-  .trow{padding:0 16px}
-  .player{padding:24px 20px}
+  .s2-head{padding:8px 12px 3px!important}
+  .scene-title{font-size:30px;letter-spacing:1px}
+  .trow{padding:0 10px;min-height:32px!important}
+  .player{padding:8px 10px}
+  .scene-eyebrow{font-size:9px}
+  .p-label{margin-bottom:2px!important}
+  .sig-dots{margin-bottom:4px!important}
 }
 </style>
 </head>
 <body>
 
-<!-- FX -->
+<div id="tvglitch"></div>
 <canvas id="s1-canvas"></canvas>
 <div id="threads" aria-hidden="true">
   <div class="tech-v"></div>
@@ -1179,8 +1211,8 @@ body{
     <div class="vgrid">
       <div class="vc" style="cursor:pointer" onclick="this.querySelector('video').play()">
         <video
-          src="https://www.dropbox.com/scl/fi/yln24yh9z120nffaq3zcp/copy_7450F917-3DE6-46AF-A1BA-80950831CA0A.MOV?rlkey=r3repzj94809euc4rc23pydsn&dl=1"
-          autoplay muted loop playsinline preload="metadata"
+          data-src="https://www.dropbox.com/scl/fi/yln24yh9z120nffaq3zcp/copy_7450F917-3DE6-46AF-A1BA-80950831CA0A.MOV?rlkey=r3repzj94809euc4rc23pydsn&raw=1"
+          muted loop playsinline preload="none"
           style="width:100%;height:100%;object-fit:cover;display:block;background:#000"
           onerror="this.style.display='none';this.parentElement.querySelector('.vph').style.display='flex'"
         ></video>
@@ -1526,6 +1558,22 @@ function spTouchFX(e){
 document.addEventListener('touchstart',spTouchFX,{passive:true});
 document.addEventListener('touchmove',spTouchFX,{passive:true});
 
+// Suppress the synthetic click a touch-scroll gesture fires on whatever's
+// under the finger at touchend — without this, dragging over a .trow while
+// scrolling was mistakenly switching the "now playing" track.
+let __touchStartX=0,__touchStartY=0,__touchDragged=false;
+document.addEventListener('touchstart',e=>{
+  const t=e.touches&&e.touches[0];if(!t)return;
+  __touchStartX=t.clientX;__touchStartY=t.clientY;__touchDragged=false;
+},{passive:true});
+document.addEventListener('touchmove',e=>{
+  const t=e.touches&&e.touches[0];if(!t)return;
+  if(Math.abs(t.clientX-__touchStartX)>10||Math.abs(t.clientY-__touchStartY)>10)__touchDragged=true;
+},{passive:true});
+document.addEventListener('click',e=>{
+  if(__touchDragged){e.preventDefault();e.stopPropagation();__touchDragged=false;}
+},{capture:true});
+
 /* ─── GRAIN ─── */
 const gc=document.getElementById('grain-canvas');
 const gx=gc.getContext('2d');
@@ -1608,7 +1656,14 @@ const dots=document.querySelectorAll('.vdot');
 let curScene=0;
 function goScene(n){scroll.scrollTo({top:n*window.innerHeight,behavior:'smooth'})}
 function onScroll(){
-  const idx=Math.round(scroll.scrollTop/window.innerHeight);
+  // Find whichever scene's top is closest to (but not past) the current
+  // scroll position — works even though mobile scenes have variable height
+  // (desktop scenes are exactly one viewport tall, so this still matches).
+  const st=scroll.scrollTop;
+  let idx=0;
+  for(let i=0;i<scenes.length;i++){
+    if(scenes[i].offsetTop<=st+window.innerHeight*0.4)idx=i;
+  }
   if(idx===curScene)return;
   curScene=idx;
   dots.forEach((d,i)=>d.classList.toggle('active',i===curScene));
@@ -1850,7 +1905,14 @@ function spVol(i){return Math.min(1,SP_VOL*(SP_TRACKS[i]?.gain||1));} // per-tra
 const SP_XFADE=2.5;      // crossfade duration in seconds
 // Two audio decks so tracks blend instead of hard-cutting
 const spA=new Audio(),spB=new Audio();
-[spA,spB].forEach(a=>{a.volume=0;a.preload='auto';a.crossOrigin='anonymous'});
+[spA,spB].forEach(a=>{a.volume=0;a.preload='metadata';a.crossOrigin='anonymous'});
+function spSyncFlash(){
+  const btn=document.getElementById('sp-play');
+  if(!btn)return;
+  const anyPlaying=(!spA.paused&&!spA.ended)||(!spB.paused&&!spB.ended);
+  btn.classList.toggle('on',anyPlaying);
+}
+[spA,spB].forEach(a=>{['play','pause','ended'].forEach(ev=>a.addEventListener(ev,spSyncFlash))});
 let spActive=spA,spIdle=spB,spFading=false;
 
 // Tiny silent WAV (44.1k mono, ~5ms) — used to "unlock" both decks under one user gesture
@@ -1893,7 +1955,7 @@ function spPickNext(){
   if(SP_TRACKS.length<=1)return 0;
   if(spBagPos>=spBag.length){
     // reshuffle, but avoid repeating the track we just finished at the seam
-    do{spShuffle()}while(spBag[0]===spIdx);
+    do{spShuffle()}while(SP_TRACKS.length>1 && spBag[0]===spIdx);
   }
   return spBag[spBagPos++];
 }
@@ -1926,6 +1988,7 @@ function spCrossfade(){
 }
 
 // Watch the active deck — start crossfade when within SP_XFADE of the end
+let spWatching=false;
 function spWatch(){
   if(spStarted&&!spFading&&spActive.duration&&!isNaN(spActive.duration)){
     if(spActive.duration-spActive.currentTime<=SP_XFADE+0.2){
@@ -1934,6 +1997,7 @@ function spWatch(){
   }
   requestAnimationFrame(spWatch);
 }
+function ensureSpWatch(){if(spWatching)return;spWatching=true;requestAnimationFrame(spWatch);}
 
 // Safety net if a track ends without crossfade firing (very short tracks etc.)
 [spA,spB].forEach(a=>a.addEventListener('ended',()=>{
@@ -1948,24 +2012,61 @@ function spStart(){
   spIdx=spBag[spBagPos++];
   spUnlock().then(()=>{
     spSetTitle(SP_TRACKS[spIdx].title);
-    spPlayDeck(spActive,SP_TRACKS[spIdx]).then(()=>spFadeTo(spActive,spVol(spIdx),2));
-    requestAnimationFrame(spWatch);
+    spPlayDeck(spActive,SP_TRACKS[spIdx]).then(()=>{
+      if(spActive.paused){
+        // Autoplay was blocked (no user gesture yet) — release the guard and
+        // re-arm the gesture listeners so the next real click/key/scroll retries.
+        spStarted=false;spBagPos--;
+        armSpGestureRetry();
+        return;
+      }
+      spFadeTo(spActive,spVol(spIdx),2);
+      ensureSpWatch();
+    });
   });
 }
-document.addEventListener('click',spStart,{once:true});
-document.addEventListener('keydown',spStart,{once:true});
-document.getElementById('scroll').addEventListener('scroll',spStart,{once:true});
+function armSpGestureRetry(){
+  document.removeEventListener('click',spStart);
+  document.removeEventListener('keydown',spStart);
+  document.removeEventListener('touchstart',spStart);
+  document.removeEventListener('touchend',spStart);
+  document.getElementById('scroll').removeEventListener('scroll',spStart);
+  document.addEventListener('click',spStart,{once:true});
+  document.addEventListener('keydown',spStart,{once:true});
+  document.addEventListener('touchstart',spStart,{once:true});
+  document.addEventListener('touchend',spStart,{once:true});
+  document.getElementById('scroll').addEventListener('scroll',spStart,{once:true});
+}
+armSpGestureRetry();
 // Try to autoplay immediately on load. Most browsers block audio with sound
 // until a user gesture — if this gets rejected, the listeners above still
 // start it on the visitor's first click/key/scroll.
 window.addEventListener('load',()=>spStart());
 spStart();
 
+// Lazy-load the primary archive video only after the page has settled, with
+// a stall fallback so a slow/unreachable remote source can't hang anything.
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    const v=document.querySelector('.vgrid video[data-src]');
+    if(!v)return;
+    const ph=v.parentElement.querySelector('.vph');
+    const fallback=()=>{v.style.display='none';if(ph)ph.style.display='flex'};
+    const stallTimer=setTimeout(fallback,4000);
+    v.addEventListener('loadeddata',()=>{clearTimeout(stallTimer);v.play().catch(()=>{})},{once:true});
+    v.addEventListener('stalled',fallback,{once:true});
+    v.addEventListener('abort',fallback,{once:true});
+    v.addEventListener('error',fallback,{once:true});
+    v.src=v.dataset.src;
+    v.load();
+  },300);
+});
+
 (function(){
   const items=[
     '3EAS-001','LINCOLN HEIGHTS, NELA','34.0590°N 118.2321°W','SIGNAL ACTIVE',
-    "CAPTURE DON'T KILL",'YOU HAVE RECEIVED THE SIGNAL','THEY ARE JUST A RITUAL','AMERICA IS ONLY AN EXPERIMENT','NEW MUSIC COMING SOON','SATELLITES ORBITING EARTH: ~9,000 ACTIVE','PARA TODOS TODO, NADA PARA NOSOTROS','\u00a1YA BASTA!','DO YOU SMELL THE GRAPHENE?','ARE YOU HUNGRY?',"DON'T OBEY",'WORSHIP THE MUSIC, NOT THE MAN','TOTAL ICE DEPORTATIONS: <span id="deportclock">0</span>','SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE','STOP ATTENDING RITUALS','CAN YOU PAY THE RENT?','PENTAGON BUDGET 2025: $1.312 TRILLION','PENTAGON BUDGET 2024: $824 BILLION','ARE YOU CON(CERN)ED?','PSYOP AFTER PSYOP','DISCLOSURE?','DIVEST FROM THEIR ALGORITHM','GROW FOOD','YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?','ARE YOU ADDICTED TO FEAR?',"DON'T INGEST THE D.A.R.P.A. TECH",'STATUS: TRANSMITTING',
-    'TOTAL ICE DEPORTATIONS: <span id="deportclock2">0</span>',
+    "CAPTURE DON'T KILL",'YOU HAVE RECEIVED THE SIGNAL','THEY ARE JUST A RITUAL','AMERICA IS ONLY AN EXPERIMENT','NEW MUSIC COMING SOON','SATELLITES ORBITING EARTH: ~9,000 ACTIVE','PARA TODOS TODO, NADA PARA NOSOTROS','\u00a1YA BASTA!','DO YOU SMELL THE GRAPHENE?','ARE YOU HUNGRY?',"DON'T OBEY",'WORSHIP THE MUSIC, NOT THE MAN','TOTAL ICE DEPORTATIONS: <span id="deportclock">0</span>','BTC: $<span id="btcclock">--</span>','ETH: $<span id="ethclock">--</span>','GOLD: $<span id="goldclock">--</span>/oz','SILVER: $<span id="silverclock">--</span>/oz','OIL (WTI): $<span id="oilclock">--</span>/bbl','SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE','STOP ATTENDING RITUALS','CAN YOU PAY THE RENT?','PENTAGON BUDGET 2025: $1.312 TRILLION','PENTAGON BUDGET 2024: $824 BILLION','ARE YOU CON(CERN)ED?','PSYOP AFTER PSYOP','DISCLOSURE?','DIVEST FROM THEIR ALGORITHM','<a href="https://unlimitedhangout.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">UNLIMITED HANGOUT</a>','<a href="https://earthsgreatestenemy.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">EARTH\'S GREATEST ENEMY</a>','<a href="https://www.bennjordan.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">BENN JORDAN</a>','<a href="https://nym.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">NYM</a>','<a href="https://thesecretteachings.info/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE SECRET TEACHINGS</a>','<a href="https://www.kpfk.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">KPFK</a>','<a href="https://www.trackaipac.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">TRACK AIPAC</a>','<a href="https://schoolsforchiapas.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SCHOOLS FOR CHIAPAS</a>','<a href="https://cultivateelevate.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">CULTIVATE ELEVATE</a>','<a href="https://www.acallforanuprising.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">A CALL FOR AN UPRISING</a>','<a href="https://www.thehighersidechats.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE HIGHERSIDE CHATS</a>','<a href="https://corbettreport.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE CORBETT REPORT</a>','<a href="https://www.onnoticemusic.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">EVERYTHING IS A LIE</a>','<a href="https://ai-2027.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">AI 2027</a>','<a href="https://blog.redwoodresearch.org/p/ai-futurism-reading-list" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">AI FUTURISM READING LIST</a>','20 YEARS OF DATA WILL LIVE HERE ONLY','GROW FOOD','YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?','ARE YOU ADDICTED TO FEAR?',"DON'T INGEST THE D.A.R.P.A. TECH",'STATUS: TRANSMITTING',
+    'TOTAL ICE DEPORTATIONS: <span id="deportclock2">0</span>','BTC: $<span id="btcclock2">--</span>','ETH: $<span id="ethclock2">--</span>','GOLD: $<span id="goldclock2">--</span>/oz','SILVER: $<span id="silverclock2">--</span>/oz','OIL (WTI): $<span id="oilclock2">--</span>/bbl',
     'MEXICO CITY: <span id="tz-cdmx">--:--</span>',
     'LOS ANGELES: <span id="tz-la">--:--</span>',
     'NEW YORK: <span id="tz-ny">--:--</span>',
@@ -2574,6 +2675,7 @@ spStart();
       if(!el)return;
       const spans=Array.from(el.children).filter(c=>c.tagName==='SPAN'&&!c.classList.contains('sep'));
       spans.forEach(sp=>{
+        if(sp.querySelector('a'))return;
         const orig=sp.textContent;
         const dict=pickLang();
         const t=dict[orig];
@@ -2591,7 +2693,7 @@ spStart();
     const els=[document.getElementById('ti1'),document.getElementById('ti2')];
     els.forEach(el=>{
       if(!el)return;
-      const dur=60; // must match .ti animation-duration
+      const dur=80; // must match .ti animation-duration
       const jumpTo=-(Math.random()*dur);
       el.style.animation='none';
       el.getBoundingClientRect();
@@ -2610,6 +2712,30 @@ spStart();
   }
   setInterval(glitchJump,45000);
 
+  // Full-site glitch: every 2 minutes, distort the whole page for ~2s.
+  function siteGlitch(){
+    const el=document.documentElement;
+    el.style.transition='none';
+    let flickers=0;
+    const flick=setInterval(()=>{
+      flickers++;
+      const big=Math.random()<0.3;
+      el.style.transform=`translate(${(Math.random()-.5)*(big?40:14)}px,${(Math.random()-.5)*(big?24:10)}px) scale(${1+(Math.random()-.5)*0.04}) skewX(${(Math.random()-.5)*(big?6:2)}deg)`;
+      el.style.filter=`hue-rotate(${Math.random()*360}deg) saturate(${1+Math.random()*4}) contrast(${1+Math.random()*1.4}) invert(${Math.random()<0.15?1:0}) blur(${Math.random()<0.2?(Math.random()*3):0}px)`;
+      el.style.opacity=Math.random()<0.15?(0.5+Math.random()*0.3):1;
+      el.style.textShadow=Math.random()<0.4?`${(Math.random()-.5)*6}px 0 rgba(255,0,60,.5),${(Math.random()-.5)*6}px 0 rgba(0,255,255,.5)`:'';
+      if(flickers>28){
+        clearInterval(flick);
+        el.style.filter='';
+        el.style.transform='';
+        el.style.opacity='';
+        el.style.textShadow='';
+        const tv=document.getElementById('tvglitch');if(tv)tv.classList.remove('on');
+      }
+    },70);
+  }
+  setInterval(siteGlitch,120000);
+
   // Character-level corruption: randomly flip letter case and swap a few
   // letters for leetspeak-style numbers, briefly, on visible ticker spans.
   const LEET={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9'};
@@ -2618,6 +2744,12 @@ spStart();
       if(!el)return;
       const spans=Array.from(el.children).filter(c=>c.tagName==='SPAN'&&!c.classList.contains('sep'));
       spans.forEach(sp=>{
+        if(sp.querySelector('a')){
+          const a=sp.querySelector('a');
+          a.style.textShadow='2px 0 var(--accent),-2px 0 #0ff';
+          setTimeout(()=>{a.style.textShadow='';},2200);
+          return;
+        }
         if(sp.querySelector('span'))return; // skip items with a nested live-clock span
         if(Math.random()>0.4)return;
         const orig=sp.textContent;
@@ -2744,6 +2876,71 @@ spStart();
   setInterval(tick,1000);
 })();
 
+// Gold/Silver spot price — live fetch, refreshed every 60s.
+(function(){
+  function tick(){
+    fetch('https://api.gold-api.com/price/XAU').then(r=>r.json()).then(d=>{
+      const p=d&&d.price;
+      if(!p)return;
+      const txt=Number(p).toLocaleString('en-US',{maximumFractionDigits:2});
+      ['goldclock','goldclock2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=txt});
+    }).catch(()=>{});
+    fetch('https://api.gold-api.com/price/XAG').then(r=>r.json()).then(d=>{
+      const p=d&&d.price;
+      if(!p)return;
+      const txt=Number(p).toLocaleString('en-US',{maximumFractionDigits:2});
+      ['silverclock','silverclock2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=txt});
+    }).catch(()=>{});
+  }
+  tick();
+  setInterval(tick,60000);
+})();
+
+// Oil (WTI) spot price — live fetch from Stooq (free, no key), refreshed every 60s.
+(function(){
+  function tick(){
+    fetch('https://api.allorigins.win/raw?url='+encodeURIComponent('https://stooq.com/q/l/?s=cl.f&f=sd2t2ohlcv&h&e=csv'))
+      .then(r=>r.text())
+      .then(csv=>{
+        const lines=csv.trim().split('\n');
+        if(lines.length<2)return;
+        const cols=lines[1].split(',');
+        const close=parseFloat(cols[6]);
+        if(!close||isNaN(close))throw new Error('no price');
+        const txt=close.toLocaleString('en-US',{maximumFractionDigits:2});
+        ['oilclock','oilclock2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=txt});
+      }).catch(()=>fallback());
+  }
+  function fallback(){
+    fetch('https://api.allorigins.win/raw?url='+encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/CL=F'))
+      .then(r=>r.json())
+      .then(d=>{
+        const p=d?.chart?.result?.[0]?.meta?.regularMarketPrice;
+        if(!p)return;
+        const txt=Number(p).toLocaleString('en-US',{maximumFractionDigits:2});
+        ['oilclock','oilclock2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=txt});
+      }).catch(()=>{});
+  }
+  tick();
+  setInterval(tick,60000);
+})();
+
+// BTC/ETH price — live fetch from CoinGecko public API, refreshed every 30s.
+(function(){
+  function tick(){
+    fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd')
+      .then(r=>r.json())
+      .then(d=>{
+        const btc=d&&d.bitcoin&&d.bitcoin.usd;
+        const eth=d&&d.ethereum&&d.ethereum.usd;
+        if(btc){const txt=Math.round(btc).toLocaleString('en-US');['btcclock','btcclock2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=txt});}
+        if(eth){const txt=Math.round(eth).toLocaleString('en-US');['ethclock','ethclock2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=txt});}
+      }).catch(()=>{});
+  }
+  tick();
+  setInterval(tick,30000);
+})();
+
 // ICE deportations — seeded from deportationtracker.live (241,440 total,
 // Jul 12, 2026 snapshot), extrapolated at their displayed ~289/day rate.
 (function(){
@@ -2756,6 +2953,34 @@ spStart();
   }
   tick();
   setInterval(tick,1000);
+})();
+
+// Hover on a ticker link: slow the scroll and intensify the glitch.
+(function(){
+  const ticker=document.getElementById('ticker');
+  if(!ticker)return;
+  let hoverGlitchTimer=null;
+  ticker.addEventListener('mouseover',e=>{
+    const a=e.target.closest('a');
+    if(!a)return;
+    ticker.classList.add('slow');
+    if(!hoverGlitchTimer){
+      const pulse=()=>{
+        a.style.textShadow=`${(Math.random()-.5)*5}px 0 var(--accent),${(Math.random()-.5)*5}px 0 #0ff`;
+        glitchCorrupt();
+        if(Math.random()<0.5)glitchTranslate();
+      };
+      pulse();
+      hoverGlitchTimer=setInterval(pulse,350);
+    }
+  });
+  ticker.addEventListener('mouseout',e=>{
+    if(!e.target.closest('a'))return;
+    if(ticker.querySelector('a:hover'))return;
+    ticker.classList.remove('slow');
+    clearInterval(hoverGlitchTimer);
+    hoverGlitchTimer=null;
+  });
 })();
 
 function spPlay(){
