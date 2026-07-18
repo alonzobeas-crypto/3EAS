@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1727,17 +1728,21 @@ audio.addEventListener('error',()=>{
 
 // Pause the site jukebox whenever the transmissions player starts playing.
 // Resume it (from where it left off) when the transmissions player pauses or ends.
+let spDucked=false;
 function spDuck(){
   if(!spStarted||spStopped)return;
+  spDucked=true;
   spActive&&spActive.pause();
   spIdle&&spIdle.pause();
 }
 function spUnduck(){
+  spDucked=false;
   if(!spStarted||spMuted||spStopped)return;
   if(!spActive)return;
   // Restore volume in case the fade-in got interrupted by a duck
   if(!spFading)spActive.volume=spVol(spIdx);
   spActive.play().catch(()=>{});
+  if(spFading&&spIdle)spIdle.play().catch(()=>{});
 }
 audio.addEventListener('play',spDuck);
 audio.addEventListener('playing',spDuck);
@@ -1911,10 +1916,10 @@ const spA=new Audio(),spB=new Audio();
 // 'ended' handler ever runs, sounding like the song "cut off". Detect this
 // and resume the same deck automatically rather than let it sit silent.
 [spA,spB].forEach(a=>{
-  a.addEventListener('stalled',()=>{if(a===spActive&&spStarted)a.play().catch(()=>{})});
-  a.addEventListener('waiting',()=>{if(a===spActive&&spStarted)a.play().catch(()=>{})});
+  a.addEventListener('stalled',()=>{if(a===spActive&&spStarted&&!spStopped&&!spDucked)a.play().catch(()=>{})});
+  a.addEventListener('waiting',()=>{if(a===spActive&&spStarted&&!spStopped&&!spDucked)a.play().catch(()=>{})});
   a.addEventListener('suspend',()=>{
-    if(a===spActive&&spStarted&&a.paused&&!spFading)a.play().catch(()=>{});
+    if(a===spActive&&spStarted&&a.paused&&!spFading&&!spStopped&&!spDucked)a.play().catch(()=>{});
   });
 });
 function spSyncFlash(){
@@ -3130,6 +3135,7 @@ let spStopped=false;
 function spStop(){
   if(!spStarted)return;
   spStopped=true;
+  spDucked=false;
   spA.pause();spB.pause();
   spSetTitle('STOPPED');
   const dot=document.getElementById('sp-dot');
