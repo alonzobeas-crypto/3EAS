@@ -1960,16 +1960,28 @@ function spPickNext(){
   return spBag[spBagPos++];
 }
 
-function spCrossfade(){
+function spCrossfade(attempt){
+  attempt=attempt||0;
   if(spFading)return;
   spFading=true;
   const nextIdx=spPickNext();
   const nextTrack=SP_TRACKS[nextIdx];
   spPlayDeck(spIdle,nextTrack).then(()=>{
-    // If the play call was blocked, abort the crossfade so we don't fade audible -> silence
+    // If the play call was blocked (stalled file, network hiccup, etc.) don't
+    // just give up — the jukebox must never go silent on its own. Retry with
+    // another track from the bag, a few times, before falling back to a hard
+    // (non-crossfaded) switch.
     if(spIdle.paused){
-      console.warn('[jukebox] next deck blocked from playing — skipping crossfade');
+      console.warn('[jukebox] next deck blocked from playing — retrying',nextTrack.title);
       spFading=false;
+      if(attempt<SP_TRACKS.length){spCrossfade(attempt+1);}
+      else{
+        // Last resort: force-play straight on the active deck so audio never stops.
+        spActive.pause();
+        [spActive,spIdle]=[spIdle,spActive];
+        spIdx=nextIdx;
+        spPlayDeck(spActive,SP_TRACKS[spIdx]).then(()=>{spFadeTo(spActive,spVol(spIdx),0.3);spSetTitle(SP_TRACKS[spIdx].title);});
+      }
       return;
     }
     spSetTitle(`${SP_TRACKS[spIdx].title}  ⇢  ${nextTrack.title}`);
@@ -2001,7 +2013,14 @@ function ensureSpWatch(){if(spWatching)return;spWatching=true;requestAnimationFr
 
 // Safety net if a track ends without crossfade firing (very short tracks etc.)
 [spA,spB].forEach(a=>a.addEventListener('ended',()=>{
-  if(!spFading&&a===spActive)spCrossfade();
+  if(a===spActive){
+    if(!spFading)spCrossfade();
+    else{
+      // Crossfade was already in flight but the active deck ran out first
+      // (slow next-track load) — force it silent rather than let it replay from 0.
+      a.pause();
+    }
+  }
 }));
 
 function spStart(){
