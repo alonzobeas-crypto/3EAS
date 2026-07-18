@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -276,7 +277,7 @@ body{
 .st-item .live{color:var(--hot);animation:pulse 2s infinite}
 
 .s1-scroll{
-  position:absolute;bottom:48px;left:60px;z-index:10;
+  position:absolute;bottom:130px;left:60px;z-index:10;
   font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--dimmer);
   display:flex;align-items:center;gap:12px;
   opacity:0;transition:opacity 1s 2.8s;
@@ -1172,7 +1173,7 @@ body{
         <div class="st-item">CLEARANCE<span class="v">OPEN</span></div>
       </div>
     </div>
-    <div class="s1-scroll" id="s1scroll">SCROLL TO ENTER SYSTEM</div>
+    <div class="s1-scroll" id="s1scroll" onclick="spStart()" style="cursor:pointer">TAP TO ENTER · SCROLL TO EXPLORE</div>
     <div class="scene-counter">01 / 08</div>
   </section>
 
@@ -1953,17 +1954,26 @@ function spPlayDeck(deck,track){
   deck.muted=spMuted;
   deck._lastDur=null;deck._stableSince=0;
   deck.load();
-  const playP=deck.play().catch(()=>{});
   // Large/uncompressed files (esp. WAVs) can take a while to buffer enough
   // for real playback to start — a short timeout was mistaking "still
   // buffering" for "blocked" and skipping to another track before the file
   // ever got a chance to play. Only bail early on a genuine decode/network
   // error; otherwise give it a generous window to start.
+  //
+  // BUT an autoplay-policy block is a DIFFERENT thing entirely — the browser
+  // rejects play() for that almost instantly (milliseconds), it never just
+  // sits pending. Swallowing that rejection and waiting for the full 12s
+  // stall timeout was locking spStarted=true (via spStart's caller) for
+  // ~12 real seconds after every blocked auto-attempt, during which any
+  // genuine click from the visitor was silently ignored because spStart()
+  // early-returns while spStarted is still true. Resolving as soon as
+  // play() settles (success OR rejection) fixes that; the 12s timer now
+  // only matters for the rare case where play() never settles at all.
   return new Promise(resolve=>{
     let done=false;
     const finish=()=>{if(done)return;done=true;resolve();};
     deck.addEventListener('error',finish,{once:true});
-    playP.then(()=>{if(!deck.paused)finish();});
+    deck.play().then(finish,finish);
     setTimeout(finish,12000);
   });
 }
@@ -2135,6 +2145,8 @@ function spStart(){
       }
       spFadeTo(spActive,spVol(spIdx),2);
       ensureSpWatch();
+      const s1=document.getElementById('s1scroll');
+      if(s1){s1.style.transition='opacity .6s';s1.style.opacity='0';}
     });
   });
 }
@@ -3123,7 +3135,22 @@ function spPlay(){
 // Skip = crossfade to a new random track immediately.
 function spSkip(){
   if(!spStarted){spStart();return;}
-  if(spStopped){spStopped=false;spStart();return;}
+  if(spStopped){
+    // Was previously routed through spStart(), which no-ops here because
+    // spStop() never resets spStarted — that left Stop-then-Skip as a dead
+    // end (stuck on "STOPPED" forever). Resume directly instead.
+    spStopped=false;
+    const dot=document.getElementById('sp-dot');
+    if(dot){dot.style.background='var(--accent)';dot.style.animation='blink 1.3s infinite'}
+    const nextIdx=spPickNext();
+    spPlayDeck(spActive,SP_TRACKS[nextIdx]).then(()=>{
+      spIdx=nextIdx;
+      spFadeTo(spActive,spVol(spIdx),0.3);
+      spSetTitle(SP_TRACKS[spIdx].title);
+      ensureSpWatch();
+    });
+    return;
+  }
   // Never just no-op: if a crossfade is genuinely mid-flight, cut it short
   // instead of ignoring the button press (a stuck spFading flag was making
   // skip do nothing at all).
