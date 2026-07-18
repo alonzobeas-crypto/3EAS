@@ -1936,7 +1936,13 @@ function spPlayDeck(deck,track){
   deck.volume=0;
   deck.muted=spMuted;
   deck.load();
-  return deck.play().catch(()=>{});
+  const playP=deck.play().catch(()=>{});
+  // Some tracks can stall (slow load, flaky network) and play() never
+  // resolves or rejects — that used to leave spFading stuck true forever,
+  // so the NEXT track's 'ended' event force-paused playback instead of
+  // advancing. Race against a timeout so we always move on.
+  const timeout=new Promise(res=>setTimeout(res,6000));
+  return Promise.race([playP,timeout]);
 }
 
 function spFadeTo(deck,target,dur){
@@ -2016,9 +2022,11 @@ function ensureSpWatch(){if(spWatching)return;spWatching=true;requestAnimationFr
   if(a===spActive){
     if(!spFading)spCrossfade();
     else{
-      // Crossfade was already in flight but the active deck ran out first
-      // (slow next-track load) — force it silent rather than let it replay from 0.
-      a.pause();
+      // A crossfade is already in flight (or stuck) but the active deck ran
+      // out first — never let this go silent: force spFading clear and kick
+      // a fresh crossfade instead of pausing.
+      spFading=false;
+      spCrossfade();
     }
   }
 }));
