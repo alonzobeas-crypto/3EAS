@@ -18,7 +18,7 @@ window.emailConfig = {
     publicKey: 'YOUR_PUBLIC_KEY',
     
     // Email address that will receive contact form submissions
-    recipientEmail: 'info@beasmusic.com',
+    recipientEmail: 'passwordpills@pm.me',
     
     // Enable/disable email sending (set to false during development)
     enabled: true
