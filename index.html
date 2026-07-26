@@ -1927,12 +1927,12 @@ const SP_TRACKS=[
   {title:'ICE COLD FEAR',src:'uploads/ICE Cold Fear.wav'},
   {title:'JORDAN MAXWELL FOOTSIES',src:'uploads/Jordan Maxwell Footsies.wav'},
   {title:'HEDGES 2026',src:'uploads/Hedges 2026.mp3'},
-  {title:'MR ROBOT INTRO',src:'uploads/Mr Robot Intro.wav',gain:1.7},
+  {title:'MR ROBOT INTRO',src:'uploads/Mr Robot Intro.wav',gain:2.8},
   {title:'I DON\'T HAVE A SHADOW ANYMORE',src:'uploads/I Don\'t Have a Shadow Anymore.mp3'},
   {title:'3EAS - JULY 18 2026',src:'uploads/3EAS July 18 2026.mp3'},
   {title:"3EAS - CAN'T SMELL YOU",src:"uploads/3EAS - Can't Smell You .mp3"},
   {title:'3EAS - DO YOU FUCK YOUR CHATBOT',src:'uploads/3EAS - Do You Fuck Your Chatbot%3F.mp3'},
-  {title:'3EAS - LATE NIGHT CALLS',src:'uploads/3EAS - Late Night Calls.mp3'},
+  {title:'3EAS - LATE NIGHT CALLS',src:'uploads/3EAS - Late Night Calls.mp3',gain:2.6},
   {title:'3EAS - WOMEN AND CHILDREN',src:'uploads/3EAS - Women and Children.mp3'},
   {title:'3EAS - ICE COLD MURDER',src:'uploads/3EAS - Ice Cold Murder.mp3'},
   {title:'3EAS - CUBIC ZIRCONIA',src:'uploads/3EAS - Cubic Zirconia.mp3'},
@@ -1998,6 +1998,26 @@ function spUnlock(){
 
 function spSetTitle(t){document.getElementById('sp-title').textContent=t}
 
+// A single check right after a play() promise settles isn't reliable proof
+// of an actual block — on a real connection (especially large WAV files off
+// GitHub Pages, not instant local disk) a deck can still be mid-buffer at
+// that exact instant and start fine a moment later. A single 400ms grace
+// check wasn't enough room for that in practice — this polls repeatedly
+// across a much longer window before finally concluding it's genuinely
+// stuck, so a slow-loading track gets real time instead of being abandoned
+// for a random different one.
+function spWaitForPlay(deck,myGen,getGen){
+  return new Promise(resolve=>{
+    const deadline=Date.now()+3000;
+    const poll=()=>{
+      if(getGen&&myGen!==getGen()){resolve(false);return;}
+      if(!deck.paused){resolve(true);return;}
+      if(Date.now()>=deadline){resolve(false);return;}
+      setTimeout(poll,300);
+    };
+    poll();
+  });
+}
 function spPlayDeck(deck,track){
   deck.src=track.src;
   deck.currentTime=0;
@@ -2086,16 +2106,9 @@ function spCrossfade(attempt){
     // another track from the bag, a few times, before falling back to a hard
     // (non-crossfaded) switch.
     if(spIdle.paused){
-      // A single paused-check right as the promise settles isn't reliable
-      // proof of an actual block — on a real (non-instant-local) network,
-      // a track can still be mid-buffer at that exact instant and start
-      // fine a moment later. Jumping straight to "blocked, try another
-      // track" here was abandoning perfectly good tracks under real-world
-      // network conditions, which read exactly like "glitches right when
-      // it loads, then switches." Give it one short grace window first.
-      setTimeout(()=>{
+      spWaitForPlay(spIdle,myGen,()=>spGen).then(started=>{
         if(myGen!==spGen){spIdle&&spIdle.pause();return;}
-        if(!spIdle.paused){
+        if(started){
           spCrossfadeCommit(nextIdx,nextTrack,myGen);
           return;
         }
@@ -2109,7 +2122,7 @@ function spCrossfade(attempt){
           spIdx=nextIdx;
           spPlayDeck(spActive,SP_TRACKS[spIdx]).then(()=>{spFadeTo(spActive,spVol(spIdx),0.3);spSetTitle(SP_TRACKS[spIdx].title);});
         }
-      },400);
+      });
       return;
     }
     spCrossfadeCommit(nextIdx,nextTrack,myGen);
@@ -2188,11 +2201,30 @@ function ensureSpWatch(){
     const trySwap=(idx,track,attempt)=>{
       attempt=attempt||0;
       spPlayDeck(spIdle,track).then(()=>{
-        // Same guard as spCrossfade: if this track was blocked/failed, don't
-        // swap to a paused deck and go silent forever — retry another track.
-        if(spIdle.paused&&attempt<SP_TRACKS.length){
-          const idx2=spPickNext();
-          trySwap(idx2,SP_TRACKS[idx2],attempt+1);
+        // Same guard as spCrossfade: a single paused-check right as the
+        // promise settles isn't reliable proof of an actual block — on a
+        // real network the track can still be mid-buffer at that exact
+        // instant and start fine a moment later. This handler was missing
+        // the grace window spCrossfade already has, so a track ending
+        // naturally could jump straight to ANOTHER random track the instant
+        // the next one looked (falsely) blocked — exactly the "starts a
+        // song and jumps to another" symptom.
+        if(spIdle.paused){
+          spWaitForPlay(spIdle).then(started=>{
+            if(started){
+              spActive.pause();
+              [spActive,spIdle]=[spIdle,spActive];
+              spIdx=idx;
+              spSetTitle(track.title);
+              spActive.volume=0;
+              spFadeTo(spActive,spVol(idx),0.4).then(()=>{spFading=false;});
+              return;
+            }
+            if(attempt<SP_TRACKS.length){
+              const idx2=spPickNext();
+              trySwap(idx2,SP_TRACKS[idx2],attempt+1);
+            }
+          });
           return;
         }
         spActive.pause();
@@ -2270,7 +2302,7 @@ window.addEventListener('load',()=>{
 (function(){
   const items=[
     '3EAS-001','LINCOLN HEIGHTS, NELA','34.0590°N 118.2321°W','SIGNAL ACTIVE',
-    "CAPTURE DON'T KILL",'YOU HAVE RECEIVED THE SIGNAL','THEY ARE JUST A RITUAL','AMERICA IS ONLY AN EXPERIMENT','NEW MUSIC COMING SOON','SATELLITES ORBITING EARTH: ~9,000 ACTIVE','PARA TODOS TODO, NADA PARA NOSOTROS','\u00a1YA BASTA!','DO YOU SMELL THE GRAPHENE?','ARE YOU HUNGRY?',"DON'T OBEY",'WORSHIP THE MUSIC, NOT THE MAN','TOTAL ICE DEPORTATIONS: <span id="deportclock">0</span>','BTC: $<span id="btcclock">--</span>','ETH: $<span id="ethclock">--</span>','GOLD: $<span id="goldclock">--</span>/oz','SILVER: $<span id="silverclock">--</span>/oz','OIL (WTI): $<span id="oilclock">--</span>/bbl','SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE','STOP ATTENDING RITUALS','CAN YOU PAY THE RENT?','PENTAGON BUDGET 2025: $1.312 TRILLION','PENTAGON BUDGET 2024: $824 BILLION','ARE YOU CON(CERN)ED?','PSYOP AFTER PSYOP','DISCLOSURE?','DIVEST FROM THEIR ALGORITHM','<a href="https://unlimitedhangout.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">UNLIMITED HANGOUT</a>','<a href="https://earthsgreatestenemy.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">EARTH\'S GREATEST ENEMY</a>','<a href="https://www.bennjordan.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">BENN JORDAN</a>','<a href="https://nym.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">NYM</a>','<a href="https://thesecretteachings.info/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE SECRET TEACHINGS</a>','<a href="https://www.kpfk.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">KPFK</a>','<a href="https://www.trackaipac.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">TRACK AIPAC</a>','<a href="https://schoolsforchiapas.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SCHOOLS FOR CHIAPAS</a>','<a href="https://cultivateelevate.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">CULTIVATE ELEVATE</a>','<a href="https://www.acallforanuprising.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">A CALL FOR AN UPRISING</a>','<a href="https://www.thehighersidechats.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE HIGHERSIDE CHATS</a>','<a href="https://corbettreport.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE CORBETT REPORT</a>','<a href="https://www.onnoticemusic.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">EVERYTHING IS A LIE</a>','<a href="https://ai-2027.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">AI 2027</a>','<a href="https://blog.redwoodresearch.org/p/ai-futurism-reading-list" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">AI FUTURISM READING LIST</a>','20 YEARS OF DATA WILL LIVE HERE ONLY','GROW FOOD','YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?','ARE YOU ADDICTED TO FEAR?','ARE YOU SCARED TO BE JUDGED?','FUCK YOU - CANCEL ME','IM TOO HUMAN SOMETIMES','LOS ANGELES GAVE ME PERMANENT PTSD','THEY WILL SACRIFICE YOU, IF YOU LET THEM',"DON'T INGEST THE D.A.R.P.A. TECH",'STATUS: TRANSMITTING',
+    "CAPTURE DON'T KILL",'YOU HAVE RECEIVED THE SIGNAL','THEY ARE JUST A RITUAL','AMERICA IS ONLY AN EXPERIMENT','NEW MUSIC COMING SOON','SATELLITES ORBITING EARTH: ~9,000 ACTIVE','PARA TODOS TODO, NADA PARA NOSOTROS','\u00a1YA BASTA!','DO YOU SMELL THE GRAPHENE?','ARE YOU HUNGRY?',"DON'T OBEY",'WORSHIP THE MUSIC, NOT THE MAN','TOTAL ICE DEPORTATIONS: <span id="deportclock">0</span>','BTC: $<span id="btcclock">--</span>','ETH: $<span id="ethclock">--</span>','GOLD: $<span id="goldclock">--</span>/oz','SILVER: $<span id="silverclock">--</span>/oz','OIL (WTI): $<span id="oilclock">--</span>/bbl','SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE','STOP ATTENDING RITUALS','CAN YOU PAY THE RENT?','PENTAGON BUDGET 2025: $1.312 TRILLION','PENTAGON BUDGET 2024: $824 BILLION','ARE YOU CON(CERN)ED?','PSYOP AFTER PSYOP','DISCLOSURE?','DIVEST FROM THEIR ALGORITHM','<a href="https://unlimitedhangout.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">UNLIMITED HANGOUT</a>','<a href="https://earthsgreatestenemy.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">EARTH\'S GREATEST ENEMY</a>','<a href="https://www.bennjordan.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">BENN JORDAN</a>','<a href="https://nym.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">NYM</a>','<a href="https://thesecretteachings.info/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE SECRET TEACHINGS</a>','<a href="https://www.kpfk.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">KPFK</a>','<a href="https://www.trackaipac.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">TRACK AIPAC</a>','<a href="https://schoolsforchiapas.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SCHOOLS FOR CHIAPAS</a>','<a href="https://cultivateelevate.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">CULTIVATE ELEVATE</a>','<a href="https://www.acallforanuprising.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">A CALL FOR AN UPRISING</a>','<a href="https://www.thehighersidechats.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE HIGHERSIDE CHATS</a>','<a href="https://corbettreport.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE CORBETT REPORT</a>','<a href="https://www.onnoticemusic.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">ON/NOTICE</a>','<a href="https://ai-2027.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">AI 2027</a>','<a href="https://blog.redwoodresearch.org/p/ai-futurism-reading-list" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">AI FUTURISM READING LIST</a>','<a href="https://youtu.be/77f_xr6RBwM" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">TRUTH STREAM MEDIA</a>','<a href="https://selexiones.com" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SELEXIONES</a>','<a href="https://sacredlessons.com" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SACRED LESSONS</a>','20 YEARS OF DATA WILL LIVE HERE ONLY','GROW FOOD','YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?','ARE YOU ADDICTED TO FEAR?','ARE YOU SCARED TO BE JUDGED?','FUCK YOU - CANCEL ME','IM TOO HUMAN SOMETIMES','LOS ANGELES GAVE ME PERMANENT PTSD','THEY WILL SACRIFICE YOU, IF YOU LET THEM','BUBBLES. ARE YOU IN ONE?','MICRO COMPLIANCE IS YOUR WHOLE DAY',"DON'T INGEST THE D.A.R.P.A. TECH",'STATUS: TRANSMITTING',
     'TOTAL ICE DEPORTATIONS: <span id="deportclock2">0</span>','BTC: $<span id="btcclock2">--</span>','ETH: $<span id="ethclock2">--</span>','GOLD: $<span id="goldclock2">--</span>/oz','SILVER: $<span id="silverclock2">--</span>/oz','OIL (WTI): $<span id="oilclock2">--</span>/bbl',
     'MEXICO CITY: <span id="tz-cdmx">--:--</span>',
     'LOS ANGELES: <span id="tz-la">--:--</span>',
@@ -2328,6 +2360,8 @@ window.addEventListener('load',()=>{
     'IM TOO HUMAN SOMETIMES':'A VECES SOY DEMASIADO HUMANO',
     'LOS ANGELES GAVE ME PERMANENT PTSD':'LOS ÁNGELES ME DEJÓ CON TEPT PERMANENTE',
     'THEY WILL SACRIFICE YOU, IF YOU LET THEM':'TE SACRIFICARÁN, SI SE LOS PERMITES',
+    'BUBBLES. ARE YOU IN ONE?':'BURBUJAS. ¿ESTÁS EN UNA?',
+    'MICRO COMPLIANCE IS YOUR WHOLE DAY':'EL MICRO CUMPLIMIENTO ES TU DÍA ENTERO',
     "DON'T INGEST THE D.A.R.P.A. TECH":'NO INGIERAS LA TECNOLOGÍA D.A.R.P.A.',
     'STATUS: TRANSMITTING':'ESTADO: TRANSMITIENDO'
   };
