@@ -2,6 +2,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,7 +39,11 @@ body{
 
 /* ── FX OVERLAYS ── */
 @keyframes spflash{0%,100%{color:var(--dim);border-color:var(--dim)}50%{color:var(--accent);border-color:var(--accent)}}
-#sp-play.on{animation:spflash 2.4s ease-in-out infinite}
+#sp-play.on{animation:spflash 2.4s ease-in-out infinite,spplayglitch 2.6s steps(1) infinite,spplaypulse 1.8s ease-in-out infinite}
+@keyframes spplayglitch{0%,84%,100%{transform:translateX(0) skewX(0)}85%{transform:translateX(-3px) skewX(3deg)}86%{transform:translateX(2px) skewX(-2deg)}87%{transform:translateX(-2px) skewX(1deg)}88%{transform:translateX(1px)}89%{transform:translateX(0)}}
+@keyframes spplaypulse{0%,100%{box-shadow:0 0 0 rgba(90,200,120,0)}50%{box-shadow:0 0 16px rgba(90,200,120,.8)}}
+#sp-stop.stopped{animation:spstopglow 1.6s ease-in-out infinite}
+@keyframes spstopglow{0%,100%{box-shadow:0 0 0 rgba(168,105,90,0);border-color:var(--dim);color:var(--dim)}50%{box-shadow:0 0 16px rgba(168,105,90,.75);border-color:#a8695a;color:#a8695a}}
   position:fixed;inset:0;
   background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(216,212,200,.015) 3px,rgba(216,212,200,.015) 4px);
   pointer-events:none;z-index:800;
@@ -157,7 +162,7 @@ body{
 .tb-link .n{color:var(--dimmer);margin-right:5px;font-size:10px}
 .tb-right{
   margin-left:auto;display:flex;align-items:center;
-  padding:0 18px;border-left:1px solid var(--dimmer);
+  padding:0 18px;
   gap:8px;font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--dim);
 }
 .live-dot{
@@ -185,15 +190,15 @@ body{
 /* ── TICKER ── */
 #ticker{
   position:fixed;bottom:0;left:0;right:0;z-index:500;
-  height:30px;border-top:1px solid var(--dimmer);
+  height:38px;border-top:1px solid var(--dimmer);
   background:rgba(0,0,0,.96);
   overflow:hidden;display:flex;align-items:center;
   opacity:0;transition:opacity .5s;
 }
 #ticker.show{opacity:1}
-.ti{display:flex;animation:tick 80s linear infinite;white-space:nowrap;animation-play-state:running}
+.ti{display:flex;animation:tick 95s linear infinite;white-space:nowrap;animation-play-state:running}
 #ticker.slow .ti{animation-duration:240s}
-.ti span{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--fg);padding-right:56px}
+.ti span{font-family:var(--mono);font-size:17px;letter-spacing:3px;color:var(--fg);padding-right:56px}
 .ti .sep{color:var(--accent)}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @keyframes glitch-shift{
@@ -242,20 +247,21 @@ body{
   position:relative;display:inline-block;
   clip-path:inset(0 0 100% 0);
   transition:clip-path .9s cubic-bezier(.16,1,.3,1);
-  animation:glitch 6s 2s infinite;
-  text-shadow:0 0 80px rgba(232,224,192,.06);
+  animation:glitch-hero 4s 1s infinite;
+  text-shadow:0 0 80px rgba(232,224,192,.06),0 0 50px rgba(168,105,90,.18);
 }
 .s1-title::before{
   content:'3EAS';position:absolute;top:0;left:0;
-  color:rgba(106,26,26,.6);
-  animation:glitchA 6s .1s infinite;
+  color:rgba(168,105,90,.78);
+  animation:glitchA-hero 4s .1s infinite;
 }
 .s1-title::after{
   content:'3EAS';position:absolute;top:0;left:0;
   color:rgba(26,60,26,.5);
-  animation:glitchA 6s .2s infinite;
+  animation:glitchA-hero 4s .2s infinite;
 }
-@keyframes glitchA{0%,88%,100%{clip-path:none;transform:none;opacity:0}89%{clip-path:polygon(0 10%,100% 10%,100% 35%,0 35%);transform:translateX(5px);opacity:.6}90%{clip-path:polygon(0 55%,100% 55%,100% 80%,0 80%);transform:translateX(-5px);opacity:.6}91%{opacity:0}}
+@keyframes glitch-hero{0%,80%,100%{transform:translateX(0) skewX(0)}81%{transform:translateX(-7px) skewX(1deg)}82.5%{transform:translateX(6px) skewX(-.5deg)}84%{transform:translateX(-4px)}85.5%{transform:translateX(3px)}87%{transform:translateX(0)}}
+@keyframes glitchA-hero{0%,80%,100%{clip-path:none;transform:none;opacity:0}81%{clip-path:polygon(0 8%,100% 8%,100% 30%,0 30%);transform:translateX(8px);opacity:.8}82.5%{clip-path:polygon(0 40%,100% 40%,100% 60%,0 60%);transform:translateX(-8px);opacity:.75}84%{clip-path:polygon(0 65%,100% 65%,100% 88%,0 88%);transform:translateX(5px);opacity:.6}86%{opacity:0}}
 .s1-title.vis{clip-path:inset(0 0 0% 0)}
 
 .s1-sub{
@@ -995,6 +1001,8 @@ body{
 @media(max-width:768px){
   .tb-links{display:none}
   #topnav{padding:0}
+  .tb-brand{font-size:18px;padding:0 14px;letter-spacing:2px}
+  .tb-right{font-size:8px;letter-spacing:1px;padding:0 12px;gap:5px}
   .s1-main{padding:0 18px}
   /* center hero on phone, kill dead space top/bottom */
   #s1{align-items:center;justify-content:center;text-align:center;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
@@ -1128,7 +1136,7 @@ body{
   </div>
   <div class="tb-right">
     <div class="live-dot"></div>
-    SIGNAL ACTIVE &nbsp;|&nbsp; <span id="mil-time">00:00:00</span>
+    <span id="mil-time">00:00:00</span>
   </div>
 </nav>
 
@@ -1303,7 +1311,7 @@ body{
       </div>
       <div class="lab-meta">
         64 PADS // 16 STEPS // 8 TRACKS<br>
-        STATUS: <span class="v">LIVE</span> &nbsp;//&nbsp; PAYMENT: <span class="v">PWYW</span><br>
+        STATUS: <span class="v">IN DEVELOPMENT</span> &nbsp;//&nbsp; PAYMENT: <span class="v">PWYW</span><br>
         SAMPLES: <span class="v">3EAS ARCHIVE</span>
       </div>
     </div>
@@ -1364,11 +1372,9 @@ body{
       </div>
       <div class="lform">
         <div class="lform-intro">OPEN CHANNEL — TRANSMIT YOUR FREQUENCY</div>
-        <label class="fl">NAME</label><input class="fi" id="fn" placeholder="—">
-        <label class="fl">EMAIL</label><input class="fi" id="fe" type="email" placeholder="—">
-        <label class="fl">MESSAGE</label><input class="fi" id="fm" placeholder="—">
-        <button class="fsub" onclick="subForm()">TRANSMIT →</button>
-        <div class="fok" id="fok">SIGNAL RECEIVED. ▮</div>
+        <div class="lrow" id="emailReveal" onclick="revealEmail(this)" style="cursor:pointer;margin-top:18px;user-select:text">
+          <span id="emailRevealText">CLICK TO REVEAL FREQUENCY</span> <span class="larr" id="emailRevealArr">→</span>
+        </div>
       </div>
     </div>
     <div class="scene-counter">08 / 08</div>
@@ -1379,11 +1385,11 @@ body{
 <!-- SITE PLAYLIST -->
 <div id="site-player" style="position:fixed;bottom:38px;left:0;z-index:490;display:flex;align-items:center;gap:18px;padding:14px 26px;border-top:1px solid var(--dim);border-right:1px solid var(--dim);background:rgba(20,20,20,.94);font-family:var(--mono);font-size:13px;letter-spacing:3px;color:var(--dim);cursor:none;transition:opacity .3s">
   <div id="sp-dot" style="width:8px;height:8px;background:var(--accent);animation:blink 1.3s infinite;flex-shrink:0"></div>
-  <span id="sp-title" style="color:var(--fg);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px">STANDBY</span>
-  <button id="sp-play" onclick="spPlay()" title="Play" style="background:none;border:1px solid var(--dim);color:var(--dim);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dim)';this.style.borderColor='var(--dim)'">PLAY ▶</button>
-  <button id="sp-skip" onclick="spSkip()" title="Next track" style="background:none;border:1px solid var(--dim);color:var(--dim);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dim)';this.style.borderColor='var(--dim)'">SKIP ▶▶</button>
-  <button id="sp-stop" onclick="spStop()" title="Stop" style="background:none;border:1px solid var(--dim);color:var(--dim);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dim)';this.style.borderColor='var(--dim)'">STOP ■</button>
-  <button id="sp-mute" onclick="spToggle()" style="background:none;border:1px solid var(--dim);color:var(--dim);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s">MUTE</button>
+  <span id="sp-title" style="color:var(--fg);width:280px;flex:0 0 280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px">STANDBY</span>
+  <button id="sp-play" onclick="spPlay()" title="Play" style="background:none;border:1px solid var(--dim);color:var(--dim);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s;flex:0 0 auto" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dim)';this.style.borderColor='var(--dim)'">PLAY ▶</button>
+  <button id="sp-skip" onclick="spSkip()" title="Next track" style="background:none;border:1px solid var(--dim);color:var(--dim);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s;flex:0 0 auto" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dim)';this.style.borderColor='var(--dim)'">SKIP ▶▶</button>
+  <button id="sp-stop" onclick="spStop()" title="Stop" style="background:none;border:1px solid var(--dim);color:var(--dim);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s;flex:0 0 auto" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dim)';this.style.borderColor='var(--dim)'">STOP ■</button>
+  <button id="sp-mute" onclick="spToggle()" style="background:none;border:1px solid var(--dim);color:var(--dim);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s;flex:0 0 auto">MUTE</button>
 </div>
 
 <!-- BEAT LAB SCENE PLACEHOLDER -->
@@ -1602,7 +1608,7 @@ function resizeHero(){
   if(hfx==='particles'||hfx==='combined')initHP();
 }
 function initHP(){
-  hpart=Array.from({length:220},()=>({x:Math.random()*hw,y:Math.random()*hh,vx:(Math.random()-.5)*.2,vy:(Math.random()-.5)*.2,r:Math.random()*.8+.3}));
+  hpart=Array.from({length:220},()=>({x:Math.random()*hw,y:Math.random()*hh,vx:(Math.random()-.5)*.15,vy:(Math.random()-.5)*.15,r:Math.random()*.8+.3,wa:Math.random()*Math.PI*2}));
 }
 resizeHero();window.addEventListener('resize',resizeHero);
 function heroLoop(){
@@ -1633,7 +1639,18 @@ function drawHP(){
   hpart.forEach(p=>{
     const dx=mx-p.x,dy=my-p.y,d=Math.sqrt(dx*dx+dy*dy);
     if(d<100){p.vx-=dx/d*.1;p.vy-=dy/d*.1}
-    p.vx*=.97;p.vy*=.97;p.x+=p.vx;p.y+=p.vy;
+    // Gentle organic wander — like a microbe drifting under a scope. The
+    // heading angle itself drifts slowly and randomly (rather than jittering
+    // velocity directly), which keeps the motion smooth and meandering
+    // instead of noisy. This also keeps particles perpetually adrift instead
+    // of decaying to a dead stop the way pure damping did.
+    p.wa+=(Math.random()-.5)*.35;
+    p.vx+=Math.cos(p.wa)*.006;
+    p.vy+=Math.sin(p.wa)*.006;
+    p.vx*=.985;p.vy*=.985;
+    const sp=Math.sqrt(p.vx*p.vx+p.vy*p.vy),maxSp=.22;
+    if(sp>maxSp){p.vx=p.vx/sp*maxSp;p.vy=p.vy/sp*maxSp;}
+    p.x+=p.vx;p.y+=p.vy;
     if(p.x<0)p.x=hw;if(p.x>hw)p.x=0;if(p.y<0)p.y=hh;if(p.y>hh)p.y=0;
     hx.beginPath();hx.arc(p.x,p.y,p.r*1.9,0,Math.PI*2);
     hx.fillStyle='rgba(200,186,140,.85)';hx.fill();
@@ -1697,7 +1714,7 @@ setTimeout(()=>{
 
 /* ─── TRACKS ─── */
 const TRACKS=[
-  {id:1,title:"IF IT WASN'T FOR YOU",artist:'COMING JULY 18 2026',type:'pending',dur:0,src:null},
+  {id:1,title:"IF IT WASN'T FOR YOU",artist:'COMING SOON',type:'pending',dur:0,src:null},
   {id:2,title:'WAR WITHIN A BREATH',artist:'3EAS',type:'release',dur:0,src:'uploads/3EAS - War Within a Breath (Remix).mp3'},
   {id:3,title:'COMING SOON',artist:'3EAS',type:'pending',dur:0,src:null},
   {id:4,title:'COMING SOON',artist:'3EAS',type:'pending',dur:0,src:null},
@@ -1901,6 +1918,8 @@ const SP_TRACKS=[
   {title:'MR ROBOT INTRO',src:'uploads/Mr Robot Intro.wav',gain:1.7},
   {title:'I DON\'T HAVE A SHADOW ANYMORE',src:'uploads/I Don\'t Have a Shadow Anymore.mp3'},
   {title:'3EAS - JULY 18 2026',src:'uploads/3EAS July 18 2026.mp3'},
+  {title:'3EAS - DRIFTWOOD (SACRED LESSONS EDIT)',src:'uploads/3EAS-Driftwood-Sacred-Lessons-Edit.mp3'},
+  {title:"3EAS - CAN'T SMELL YOU",src:'uploads/3EAS-Cant-Smell-You.mp3'},
 ];
 let spIdx=0,spMuted=false,spStarted=false,spUnlocked=false;
 let spBag=[],spBagPos=0;
@@ -1926,11 +1945,23 @@ const spA=new Audio(),spB=new Audio();
     if(a===spActive&&spStarted&&a.paused&&!spFading&&!spStopped&&!spDucked)a.play().catch(()=>{});
   });
 });
+function revealEmail(el){
+  const span=document.getElementById('emailRevealText');
+  const arr=document.getElementById('emailRevealArr');
+  if(!span)return;
+  span.textContent='passwordpills@pm.me';
+  if(arr)arr.style.display='none';
+  el.style.cursor='text';
+  el.onclick=null;
+}
 function spSyncFlash(){
   const btn=document.getElementById('sp-play');
-  if(!btn)return;
-  const anyPlaying=(!spA.paused&&!spA.ended)||(!spB.paused&&!spB.ended);
-  btn.classList.toggle('on',anyPlaying);
+  if(btn){
+    const anyPlaying=(!spA.paused&&!spA.ended)||(!spB.paused&&!spB.ended);
+    btn.classList.toggle('on',anyPlaying);
+  }
+  const stopBtn=document.getElementById('sp-stop');
+  if(stopBtn)stopBtn.classList.toggle('stopped',!!spStopped);
 }
 [spA,spB].forEach(a=>{['play','pause','ended'].forEach(ev=>a.addEventListener(ev,spSyncFlash))});
 let spActive=spA,spIdle=spB,spFading=false;
@@ -2015,13 +2046,24 @@ function spPickNext(){
   return spBag[spBagPos++];
 }
 
+let spGen=0;
 function spCrossfade(attempt){
   attempt=attempt||0;
   if(spFading)return;
   spFading=true;
+  const myGen=++spGen;
   const nextIdx=spPickNext();
   const nextTrack=SP_TRACKS[nextIdx];
   spPlayDeck(spIdle,nextTrack).then(()=>{
+    // A newer crossfade (typically from a fast follow-up skip) has already
+    // started since this one began loading. Rapid skip-clicking used to let
+    // multiple of these run concurrently, each swapping spActive/spIdle out
+    // from under the others once their (wildly-varying-length) load times
+    // resolved out of order — landing more pause() calls than play() calls
+    // and leaving both decks silent with nothing left to recover them. If
+    // we've been superseded, quietly stop the deck we were loading into and
+    // don't touch any shared state.
+    if(myGen!==spGen){spIdle&&spIdle.pause();return;}
     // If the play call was blocked (stalled file, network hiccup, etc.) don't
     // just give up — the jukebox must never go silent on its own. Retry with
     // another track from the bag, a few times, before falling back to a hard
@@ -2044,6 +2086,7 @@ function spCrossfade(attempt){
       spFadeTo(spActive,0,SP_XFADE),
       spFadeTo(spIdle,spVol(nextIdx),SP_XFADE)
     ]).then(()=>{
+      if(myGen!==spGen){return;}
       spActive.pause();
       // swap decks
       [spActive,spIdle]=[spIdle,spActive];
@@ -2193,7 +2236,7 @@ window.addEventListener('load',()=>{
 (function(){
   const items=[
     '3EAS-001','LINCOLN HEIGHTS, NELA','34.0590°N 118.2321°W','SIGNAL ACTIVE',
-    "CAPTURE DON'T KILL",'YOU HAVE RECEIVED THE SIGNAL','THEY ARE JUST A RITUAL','AMERICA IS ONLY AN EXPERIMENT','NEW MUSIC COMING SOON','SATELLITES ORBITING EARTH: ~9,000 ACTIVE','PARA TODOS TODO, NADA PARA NOSOTROS','\u00a1YA BASTA!','DO YOU SMELL THE GRAPHENE?','ARE YOU HUNGRY?',"DON'T OBEY",'WORSHIP THE MUSIC, NOT THE MAN','TOTAL ICE DEPORTATIONS: <span id="deportclock">0</span>','BTC: $<span id="btcclock">--</span>','ETH: $<span id="ethclock">--</span>','GOLD: $<span id="goldclock">--</span>/oz','SILVER: $<span id="silverclock">--</span>/oz','OIL (WTI): $<span id="oilclock">--</span>/bbl','SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE','STOP ATTENDING RITUALS','CAN YOU PAY THE RENT?','PENTAGON BUDGET 2025: $1.312 TRILLION','PENTAGON BUDGET 2024: $824 BILLION','ARE YOU CON(CERN)ED?','PSYOP AFTER PSYOP','DISCLOSURE?','DIVEST FROM THEIR ALGORITHM','<a href="https://unlimitedhangout.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">UNLIMITED HANGOUT</a>','<a href="https://earthsgreatestenemy.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">EARTH\'S GREATEST ENEMY</a>','<a href="https://www.bennjordan.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">BENN JORDAN</a>','<a href="https://nym.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">NYM</a>','<a href="https://thesecretteachings.info/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE SECRET TEACHINGS</a>','<a href="https://www.kpfk.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">KPFK</a>','<a href="https://www.trackaipac.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">TRACK AIPAC</a>','<a href="https://schoolsforchiapas.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SCHOOLS FOR CHIAPAS</a>','<a href="https://cultivateelevate.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">CULTIVATE ELEVATE</a>','<a href="https://www.acallforanuprising.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">A CALL FOR AN UPRISING</a>','<a href="https://www.thehighersidechats.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE HIGHERSIDE CHATS</a>','<a href="https://corbettreport.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE CORBETT REPORT</a>','<a href="https://www.onnoticemusic.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">EVERYTHING IS A LIE</a>','<a href="https://ai-2027.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">AI 2027</a>','<a href="https://blog.redwoodresearch.org/p/ai-futurism-reading-list" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">AI FUTURISM READING LIST</a>','20 YEARS OF DATA WILL LIVE HERE ONLY','GROW FOOD','YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?','ARE YOU ADDICTED TO FEAR?',"DON'T INGEST THE D.A.R.P.A. TECH",'STATUS: TRANSMITTING',
+    "CAPTURE DON'T KILL",'YOU HAVE RECEIVED THE SIGNAL','THEY ARE JUST A RITUAL','AMERICA IS ONLY AN EXPERIMENT','NEW MUSIC COMING SOON','SATELLITES ORBITING EARTH: ~9,000 ACTIVE','PARA TODOS TODO, NADA PARA NOSOTROS','\u00a1YA BASTA!','DO YOU SMELL THE GRAPHENE?','ARE YOU HUNGRY?',"DON'T OBEY",'WORSHIP THE MUSIC, NOT THE MAN','TOTAL ICE DEPORTATIONS: <span id="deportclock">0</span>','BTC: $<span id="btcclock">--</span>','ETH: $<span id="ethclock">--</span>','GOLD: $<span id="goldclock">--</span>/oz','SILVER: $<span id="silverclock">--</span>/oz','OIL (WTI): $<span id="oilclock">--</span>/bbl','SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE','STOP ATTENDING RITUALS','CAN YOU PAY THE RENT?','PENTAGON BUDGET 2025: $1.312 TRILLION','PENTAGON BUDGET 2024: $824 BILLION','ARE YOU CON(CERN)ED?','PSYOP AFTER PSYOP','DISCLOSURE?','DIVEST FROM THEIR ALGORITHM','<a href="https://unlimitedhangout.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">UNLIMITED HANGOUT</a>','<a href="https://earthsgreatestenemy.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">EARTH\'S GREATEST ENEMY</a>','<a href="https://www.bennjordan.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">BENN JORDAN</a>','<a href="https://nym.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">NYM</a>','<a href="https://thesecretteachings.info/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE SECRET TEACHINGS</a>','<a href="https://www.kpfk.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">KPFK</a>','<a href="https://www.trackaipac.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">TRACK AIPAC</a>','<a href="https://schoolsforchiapas.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SCHOOLS FOR CHIAPAS</a>','<a href="https://cultivateelevate.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">CULTIVATE ELEVATE</a>','<a href="https://www.acallforanuprising.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">A CALL FOR AN UPRISING</a>','<a href="https://www.thehighersidechats.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE HIGHERSIDE CHATS</a>','<a href="https://corbettreport.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE CORBETT REPORT</a>','<a href="https://www.onnoticemusic.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">EVERYTHING IS A LIE</a>','<a href="https://ai-2027.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">AI 2027</a>','<a href="https://blog.redwoodresearch.org/p/ai-futurism-reading-list" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">AI FUTURISM READING LIST</a>','20 YEARS OF DATA WILL LIVE HERE ONLY','GROW FOOD','YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?','ARE YOU ADDICTED TO FEAR?','ARE YOU SCARED TO BE JUDGED?','FUCK YOU - CANCEL ME','IM TOO HUMAN SOMETIMES','LOS ANGELES GAVE ME PERMANENT PTSD','THEY WILL SACRIFICE YOU, IF YOU LET THEM',"DON'T INGEST THE D.A.R.P.A. TECH",'STATUS: TRANSMITTING',
     'TOTAL ICE DEPORTATIONS: <span id="deportclock2">0</span>','BTC: $<span id="btcclock2">--</span>','ETH: $<span id="ethclock2">--</span>','GOLD: $<span id="goldclock2">--</span>/oz','SILVER: $<span id="silverclock2">--</span>/oz','OIL (WTI): $<span id="oilclock2">--</span>/bbl',
     'MEXICO CITY: <span id="tz-cdmx">--:--</span>',
     'LOS ANGELES: <span id="tz-la">--:--</span>',
@@ -2247,6 +2290,10 @@ window.addEventListener('load',()=>{
     'GROW FOOD':'CULTIVA TU COMIDA',
     'YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?':'TÚ PAGAS SUS PORTALES. ¿VERDAD PEGASUS?',
     'ARE YOU ADDICTED TO FEAR?':'¿ERES ADICTO AL MIEDO?',
+    'ARE YOU SCARED TO BE JUDGED?':'¿TIENES MIEDO A SER JUZGADO?',
+    'IM TOO HUMAN SOMETIMES':'A VECES SOY DEMASIADO HUMANO',
+    'LOS ANGELES GAVE ME PERMANENT PTSD':'LOS ÁNGELES ME DEJÓ CON TEPT PERMANENTE',
+    'THEY WILL SACRIFICE YOU, IF YOU LET THEM':'TE SACRIFICARÁN, SI SE LOS PERMITES',
     "DON'T INGEST THE D.A.R.P.A. TECH":'NO INGIERAS LA TECNOLOGÍA D.A.R.P.A.',
     'STATUS: TRANSMITTING':'ESTADO: TRANSMITIENDO'
   };
@@ -2821,7 +2868,7 @@ window.addEventListener('load',()=>{
     const els=[document.getElementById('ti1'),document.getElementById('ti2')];
     els.forEach(el=>{
       if(!el)return;
-      const dur=80; // must match .ti animation-duration
+      const dur=95; // must match .ti animation-duration
       const jumpTo=-(Math.random()*dur);
       el.style.animation='none';
       el.getBoundingClientRect();
@@ -3156,8 +3203,10 @@ function spSkip(){
   }
   // Never just no-op: if a crossfade is genuinely mid-flight, cut it short
   // instead of ignoring the button press (a stuck spFading flag was making
-  // skip do nothing at all).
-  if(spFading)spFading=false;
+  // skip do nothing at all). Bump spGen too, so the old attempt's promise
+  // (which may still be loading in the background) recognizes on arrival
+  // that it's been superseded and quietly bails instead of racing this one.
+  if(spFading){spFading=false;spGen++;}
   spCrossfade();
 }
 // Stop = halt the jukebox until user explicitly resumes (skip or refresh).
@@ -3166,6 +3215,12 @@ function spStop(){
   if(!spStarted)return;
   spStopped=true;
   spDucked=false;
+  // If a crossfade was still loading in the background when Stop was
+  // pressed (e.g. right after a skip), its promise keeps running and would
+  // otherwise see both decks paused here, mistake that for a blocked play,
+  // and start retrying on its own — fighting Stop/Play right after. Bumping
+  // spGen and clearing spFading marks it stale so it quietly backs off.
+  spFading=false;spGen++;
   spA.pause();spB.pause();
   spSetTitle('STOPPED');
   const dot=document.getElementById('sp-dot');
