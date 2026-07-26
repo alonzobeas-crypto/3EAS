@@ -4,6 +4,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1920,6 +1921,7 @@ const SP_TRACKS=[
   {title:'I DON\'T HAVE A SHADOW ANYMORE',src:'uploads/I Don\'t Have a Shadow Anymore.mp3'},
   {title:'3EAS - JULY 18 2026',src:'uploads/3EAS July 18 2026.mp3'},
   {title:"3EAS - CAN'T SMELL YOU",src:"uploads/3EAS - Can't Smell You .mp3"},
+  {title:'3EAS - DO YOU FUCK YOUR CHATBOT',src:'uploads/3EAS - Do You Fuck Your Chatbot.mp3'},
   {title:'3EAS - CUBIC ZIRCONIA',src:'uploads/3EAS - Cubic Zirconia.mp3'},
   {title:'RITCHIE CURANDERO',src:'uploads/Ritchie Curandero.mp3'},
 ];
@@ -2071,18 +2073,36 @@ function spCrossfade(attempt){
     // another track from the bag, a few times, before falling back to a hard
     // (non-crossfaded) switch.
     if(spIdle.paused){
-      console.warn('[jukebox] next deck blocked from playing — retrying',nextTrack.title);
-      spFading=false;
-      if(attempt<SP_TRACKS.length){spCrossfade(attempt+1);}
-      else{
-        // Last resort: force-play straight on the active deck so audio never stops.
-        spActive.pause();
-        [spActive,spIdle]=[spIdle,spActive];
-        spIdx=nextIdx;
-        spPlayDeck(spActive,SP_TRACKS[spIdx]).then(()=>{spFadeTo(spActive,spVol(spIdx),0.3);spSetTitle(SP_TRACKS[spIdx].title);});
-      }
+      // A single paused-check right as the promise settles isn't reliable
+      // proof of an actual block — on a real (non-instant-local) network,
+      // a track can still be mid-buffer at that exact instant and start
+      // fine a moment later. Jumping straight to "blocked, try another
+      // track" here was abandoning perfectly good tracks under real-world
+      // network conditions, which read exactly like "glitches right when
+      // it loads, then switches." Give it one short grace window first.
+      setTimeout(()=>{
+        if(myGen!==spGen){spIdle&&spIdle.pause();return;}
+        if(!spIdle.paused){
+          spCrossfadeCommit(nextIdx,nextTrack,myGen);
+          return;
+        }
+        console.warn('[jukebox] next deck blocked from playing — retrying',nextTrack.title);
+        spFading=false;
+        if(attempt<SP_TRACKS.length){spCrossfade(attempt+1);}
+        else{
+          // Last resort: force-play straight on the active deck so audio never stops.
+          spActive.pause();
+          [spActive,spIdle]=[spIdle,spActive];
+          spIdx=nextIdx;
+          spPlayDeck(spActive,SP_TRACKS[spIdx]).then(()=>{spFadeTo(spActive,spVol(spIdx),0.3);spSetTitle(SP_TRACKS[spIdx].title);});
+        }
+      },400);
       return;
     }
+    spCrossfadeCommit(nextIdx,nextTrack,myGen);
+  });
+}
+function spCrossfadeCommit(nextIdx,nextTrack,myGen){
     spSetTitle(`${SP_TRACKS[spIdx].title}  ⇢  ${nextTrack.title}`);
     Promise.all([
       spFadeTo(spActive,0,SP_XFADE),
@@ -2096,7 +2116,6 @@ function spCrossfade(attempt){
       spSetTitle(nextTrack.title);
       spFading=false;
     });
-  });
 }
 
 // Watch the active deck — start crossfade when within SP_XFADE of the end
