@@ -378,7 +378,7 @@ body{
 .ac-idx{font-family:var(--vt);font-size:60px;color:var(--dimmer);line-height:1;opacity:.2;position:absolute;top:16px;right:20px}
 .ac-cat{font-family:var(--mono);font-size:9px;letter-spacing:4px;color:var(--dim);opacity:.5;margin-bottom:16px}
 .ac-name{font-family:var(--vt);font-size:42px;letter-spacing:3px;color:var(--fg);line-height:1;margin-bottom:12px}
-.ac-desc{font-family:var(--body);font-size:17px;color:var(--dim);line-height:1.9;margin-bottom:24px;opacity:.65}
+.ac-desc{font-family:var(--body);font-size:17px;color:var(--dim);line-height:1.9;margin-bottom:24px;opacity:.9}
 .ac-foot{display:flex;align-items:center;justify-content:space-between}
 .ac-price{font-family:var(--vt);font-size:24px;color:var(--accent);letter-spacing:2px}
 .ac-btn{
@@ -388,7 +388,7 @@ body{
 }
 .ac-btn:hover{color:var(--accent);border-color:rgba(184,168,120,.3)}
 .ac-btn.done{color:var(--accent);border-color:rgba(184,168,120,.3)}
-.ac-stat{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--dimmer);margin-top:12px}
+.ac-stat{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--dim);margin-top:12px}
 
 /* ══════════════════════════════
    BEAT LAB — SOURCE SIGNAL DEMO
@@ -876,7 +876,7 @@ body{
 .dtag{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--dimmer);border:1px solid var(--dimmer);padding:2px 6px;text-transform:uppercase}
 .dispatch-view{padding:48px 64px;overflow-y:auto;-ms-overflow-style:none;scrollbar-width:none;background:rgba(0,0,0,.88)}
 .dispatch-view::-webkit-scrollbar{display:none}
-.dview-empty{font-family:var(--mono);font-size:13px;letter-spacing:4px;color:var(--dimmer);text-transform:uppercase;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;line-height:2}
+.dview-empty{font-family:var(--mono);font-size:13px;letter-spacing:4px;color:var(--dim);text-transform:uppercase;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;line-height:2}
 .dview-meta{font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--accent);margin-bottom:14px;display:flex;gap:14px;align-items:center}
 .dview-meta .sep{color:var(--dimmer)}
 .dview-title{font-family:var(--vt);font-size:clamp(36px,5vw,64px);letter-spacing:3px;color:var(--hot);line-height:1;margin-bottom:24px;text-transform:uppercase}
@@ -1944,6 +1944,19 @@ function spShuffle(){
   for(let i=spBag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[spBag[i],spBag[j]]=[spBag[j],spBag[i]];}
   spBagPos=0;
 }
+// Bag-shuffle guarantees no repeats WITHIN a single pass through all tracks,
+// but the seam between one pass and the next was only checked one track
+// deep (spBag[0] vs the track that just finished) — a track that played
+// near the END of one pass could land near the START of the next pass and
+// play again just 2-3 songs later, which sounds like "that one again
+// already" on a 20-track pool. Remember the last few plays and keep the
+// start of every fresh bag clear of all of them, not just the latest one.
+const SP_RECENT_N=Math.min(4,SP_TRACKS.length-1);
+let spRecent=[];
+function spRemember(idx){
+  spRecent.push(idx);
+  if(spRecent.length>SP_RECENT_N)spRecent.shift();
+}
 const SP_VOL=0.35;       // master jukebox volume
 function spVol(i){return Math.min(1,SP_VOL*(SP_TRACKS[i]?.gain||1));} // per-track gain
 const SP_XFADE=2.5;      // crossfade duration in seconds
@@ -2076,10 +2089,23 @@ function spFadeTo(deck,target,dur){
 function spPickNext(){
   if(SP_TRACKS.length<=1)return 0;
   if(spBagPos>=spBag.length){
-    // reshuffle, but avoid repeating the track we just finished at the seam
-    do{spShuffle()}while(SP_TRACKS.length>1 && spBag[0]===spIdx);
+    spShuffle();
+    // Push any track still in recent memory past the lookback window
+    // instead of reshuffling from scratch (which risked looping or, on a
+    // small track list, never converging) — a single deterministic pass.
+    for(let i=0;i<Math.min(SP_RECENT_N,spBag.length);i++){
+      if(spRecent.includes(spBag[i])){
+        let swapWith=-1;
+        for(let j=Math.max(i+1,SP_RECENT_N);j<spBag.length;j++){
+          if(!spRecent.includes(spBag[j])){swapWith=j;break;}
+        }
+        if(swapWith!==-1){[spBag[i],spBag[swapWith]]=[spBag[swapWith],spBag[i]];}
+      }
+    }
   }
-  return spBag[spBagPos++];
+  const idx=spBag[spBagPos++];
+  spRemember(idx);
+  return idx;
 }
 
 let spGen=0;
@@ -2185,10 +2211,16 @@ function ensureSpWatch(){
 [spA,spB].forEach(a=>a.addEventListener('ended',()=>{
   if(a===spActive){
     if(spFading){
-      // A crossfade is already in flight (or stuck) but the active deck ran
-      // out first — never let this go silent: force spFading clear and kick
-      // a fresh crossfade instead of pausing.
-      spFading=false;
+      // A crossfade is already in flight — it owns spIdle and WILL complete
+      // the swap itself; spFadeTo/spPlayDeck/spWaitForPlay each carry their
+      // own timeout, so it can't hang forever (worst case ~16s). Starting a
+      // SECOND, independent transition here used to load a different random
+      // track into that same spIdle deck, racing the in-flight crossfade —
+      // whichever promise resolved last won, so a track that had already
+      // crossfaded in cleanly got silently swapped again a couple seconds
+      // later for an unrelated track. That's the "plays two songs, then
+      // jumps to a new one" glitch. Just let the in-flight crossfade finish.
+      return;
     }
     // A track can end before spWatch's lead-in threshold caught it (e.g. a
     // short clip, or bad file-length metadata) — hard-cutting to the next
@@ -2244,6 +2276,7 @@ function spStart(){
   // Unlock both decks under the current user gesture, then start a random track
   spShuffle();
   spIdx=spBag[spBagPos++];
+  spRemember(spIdx);
   spUnlock().then(()=>{
     spSetTitle(SP_TRACKS[spIdx].title);
     spPlayDeck(spActive,SP_TRACKS[spIdx]).then(()=>{
@@ -2969,9 +3002,21 @@ var glitchTranslate, glitchCorrupt;
       const dur=95; // must match .ti animation-duration
       const jumpTo=-(Math.random()*dur);
       el.style.animation='none';
-      el.getBoundingClientRect();
-      el.style.animation=`tick ${dur}s linear infinite`;
-      el.style.animationDelay=jumpTo+'s';
+      // A synchronous getBoundingClientRect() forces a reflow on desktop
+      // browsers, but mobile Safari doesn't reliably commit the "animation:
+      // none" state before the very next line re-enables it in the same
+      // tick — so instead of landing cleanly on the new random offset, the
+      // ticker visibly snaps back to its start frame first, reads as the
+      // scroll "cutting off" rather than continuously jumping. A double
+      // requestAnimationFrame guarantees a paint has actually happened with
+      // animation:none applied before we turn it back on, which is the
+      // standard cross-browser-safe way to force a CSS animation restart.
+      requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{
+          el.style.animation=`tick ${dur}s linear infinite`;
+          el.style.animationDelay=jumpTo+'s';
+        });
+      });
     });
     const ticker=document.getElementById('ticker');
     if(ticker){
