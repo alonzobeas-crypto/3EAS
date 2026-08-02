@@ -214,11 +214,11 @@ body{
   opacity:0;transition:opacity .5s;
 }
 #ticker.show{opacity:1}
-.ti{display:flex;animation:tick 95s linear infinite;white-space:nowrap;animation-play-state:running}
-#ticker.slow .ti{animation-duration:240s}
+.ti{display:flex;animation:tick 92s linear infinite;white-space:nowrap;animation-play-state:running}
+#ticker.slow .ti{animation-duration:230s}
 .ti span{font-family:var(--mono);font-size:17px;letter-spacing:3px;color:var(--fg);padding-right:56px}
 .ti .sep{color:var(--accent)}
-@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-100%)}}
 @keyframes glitch-shift{
   0%,100%{transform:translate(0,0);opacity:1}
   92%{transform:translate(0,0);opacity:1}
@@ -3025,7 +3025,7 @@ var glitchTranslate, glitchCorrupt;
     render('ti2',localize(h2));
   }
   renderTickerCycle();
-  setInterval(renderTickerCycle,45000);
+  setInterval(renderTickerCycle,92000);
 
   // Occasional real-time glitch: briefly flip some visible phrases to a random language
   glitchTranslate=function(){
@@ -3051,7 +3051,7 @@ var glitchTranslate, glitchCorrupt;
     const els=[document.getElementById('ti1'),document.getElementById('ti2')];
     els.forEach(el=>{
       if(!el)return;
-      const dur=95; // must match .ti animation-duration
+      const dur=92; // must match .ti animation-duration
       const jumpTo=-(Math.random()*dur);
       el.style.animation='none';
       // A synchronous getBoundingClientRect() forces a reflow on desktop
@@ -3080,13 +3080,13 @@ var glitchTranslate, glitchCorrupt;
     glitchTranslate();
     glitchCorrupt();
   }
-  // Offset from the content-reshuffle timer (also 45s, started a few lines
+  // Offset from the content-reshuffle timer (now 80s, started a few lines
   // below this) — same period, different phase, so the text swap and the
   // jump-glitch never land in the same instant. Without this stagger they
   // fire together every cycle: content replaces AND the scroll animation
   // resets at once, reading as one jarring double-hit instead of two
   // separate, spread-out glitch beats.
-  setTimeout(()=>{glitchJump();setInterval(glitchJump,45000);},20000);
+  setTimeout(()=>{glitchJump();setInterval(glitchJump,92000);},20000);
 
   // Full-site glitch: every 2 minutes, distort the whole page for ~2s.
   function siteGlitch(){
