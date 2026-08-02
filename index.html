@@ -1972,6 +1972,7 @@ const SP_TRACKS=[
   {title:'3EAS - ICE COLD MURDER',src:'uploads/3EAS - Ice Cold Murder.mp3',gain:0.63},
   {title:'3EAS - CUBIC ZIRCONIA',src:'uploads/3EAS - Cubic Zirconia.mp3',gain:1.01},
   {title:'RITCHIE CURANDERO',src:'uploads/Ritchie Curandero.mp3',gain:2.86},
+  {title:'3EAS - DRAW BLOOD FOR SPRING',src:'uploads/3EAS - Draw Blood for Spring.mp3',gain:1.36},
 ];
 let spIdx=0,spMuted=false,spStarted=false,spUnlocked=false;
 let spBag=[],spBagPos=0;
@@ -2208,6 +2209,16 @@ function spCrossfadeCommit(nextIdx,nextTrack,myGen){
 // Watch the active deck — start crossfade when within SP_XFADE of the end
 let spWatching=false;
 function spWatch(){
+  // A freshly-loaded deck (cold cache, no Range data yet — worst on the very
+  // first track at page load) can report a duration estimate that's stable
+  // for a tick or two but still WRONG before the real value arrives via a
+  // later durationchange. The stableFor debounce below only guards against a
+  // single bad→good jump; a wrong-but-briefly-stable plateau early on could
+  // still pass it and fire the crossfade a few seconds in, sounding like the
+  // first song "skips." No legitimate crossfade should ever need to fire
+  // this early, so just refuse to evaluate at all until playback is well
+  // underway — cheap, unconditional, and can't be fooled by a bad estimate.
+  if(spActive.currentTime<8)return;
   // Some MP3s stream without a Content-Length header, so the browser's
   // duration estimate can jump around (even drop) as more of the file is
   // parsed — trusting a bad low estimate was triggering the crossfade way
