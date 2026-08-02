@@ -2434,21 +2434,17 @@ var glitchTranslate, glitchCorrupt;
     'ACTIVE CONFLICT: SAHEL'
   ];
   function shuffled(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-  // Plain shuffle has no memory — every 45s reshuffle could put an item
-  // right back near the front seconds after it was just on screen, and
-  // ti1/ti2 shuffled independently could show the same line in both lanes
-  // at once. This tracks what was recently front-loaded (shared across
-  // both lanes) and pushes those items toward the back of the next
-  // shuffle instead, so the rotation actually feels like it's moving
-  // through the list rather than repeating.
-  let tickerCooldown=new Set();
-  function shuffledNoRepeat(arr){
+  // Each cycle, shuffle the FULL item list once and split it between the two
+  // lanes — so every item appears exactly once across ti1+ti2 combined, and
+  // nothing repeats (in either lane) until the whole set has played through.
+  // Previously each lane independently shuffled the entire array, so every
+  // item showed once per lane per cycle (twice total) with only a partial
+  // cooldown on the front of the list — items still surfaced twice within
+  // the same pass.
+  function nextTickerHalves(arr){
     const a=shuffled(arr);
-    const front=[],back=[];
-    a.forEach(x=>(tickerCooldown.has(x)?back:front).push(x));
-    const result=front.concat(back);
-    tickerCooldown=new Set(result.slice(0,18));
-    return result;
+    const mid=Math.ceil(a.length/2);
+    return [a.slice(0,mid),a.slice(mid)];
   }
   const es={
     'SIGNAL ACTIVE':'SEÑAL ACTIVA',
@@ -3023,9 +3019,13 @@ var glitchTranslate, glitchCorrupt;
       return (translated!==t&&Math.random()<0.3)?translated:t;
     });
   }
-  render('ti1',localize(shuffledNoRepeat(items)));
-  render('ti2',localize(shuffledNoRepeat(items)));
-  setInterval(()=>{render('ti1',localize(shuffledNoRepeat(items)));render('ti2',localize(shuffledNoRepeat(items)));},45000);
+  function renderTickerCycle(){
+    const [h1,h2]=nextTickerHalves(items);
+    render('ti1',localize(h1));
+    render('ti2',localize(h2));
+  }
+  renderTickerCycle();
+  setInterval(renderTickerCycle,45000);
 
   // Occasional real-time glitch: briefly flip some visible phrases to a random language
   glitchTranslate=function(){
