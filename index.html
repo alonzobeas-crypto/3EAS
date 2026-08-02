@@ -49,8 +49,8 @@ body{
 #tvglitch.on{opacity:1;background:repeating-linear-gradient(0deg,rgba(255,255,255,.08) 0px,rgba(255,255,255,.08) 1px,transparent 1px,transparent 3px),linear-gradient(rgba(120,255,220,.06),rgba(255,80,120,.06));animation:tvroll .12s linear infinite}
 #tvglitch.on::after{content:'';position:absolute;left:0;right:0;height:14px;background:rgba(255,255,255,.12);animation:tvband 1.6s linear infinite}
 @keyframes tvband{0%{top:-14px}100%{top:100vh}}
-#matrixRain{position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:0;transition:opacity 1s ease}
-#matrixRain.on{opacity:1;mix-blend-mode:screen}
+#matrixRain{position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:0;transition:opacity .3s}
+#matrixRain.on{opacity:1}
 .scanbeam{
   position:fixed;left:0;width:100%;height:2px;
   background:linear-gradient(90deg,transparent,rgba(184,168,120,.05),transparent);
@@ -1589,11 +1589,7 @@ updateClock();
 
 /* ─── CURSOR ─── */
 const cur=document.getElementById('cur'),curDot=document.getElementById('cur-dot');
-// Off-screen default, not (0,0) — (0,0) IS the upper-left corner, so an
-// unmoved default cursor there meant the particle repulsion force in
-// drawHP() treated that corner as a permanent phantom cursor and kept
-// pushing particles out of it until the person's real mouse/touch moved.
-let mx=-1000,my=-1000;
+let mx=0,my=0;
 document.addEventListener('mousemove',e=>{
   mx=e.clientX;my=e.clientY;
   cur.style.cssText=`left:${mx}px;top:${my}px`;
@@ -1652,12 +1648,7 @@ function resizeHero(){
   if(hfx==='particles'||hfx==='combined')initHP();
 }
 function initHP(){
-  // Desktop gets a denser field; phone stays exactly as it was. Same
-  // 768px breakpoint the rest of the site's mobile overrides use, checked
-  // live each call so resizing across it (e.g. rotating a tablet) adjusts
-  // correctly instead of sticking with whatever count was set at load.
-  const count=window.innerWidth>768?420:220;
-  hpart=Array.from({length:count},()=>({x:Math.random()*hw,y:Math.random()*hh,vx:(Math.random()-.5)*.15,vy:(Math.random()-.5)*.15,r:Math.random()*.8+.3,wa:Math.random()*Math.PI*2}));
+  hpart=Array.from({length:220},()=>({x:Math.random()*hw,y:Math.random()*hh,vx:(Math.random()-.5)*.15,vy:(Math.random()-.5)*.15,r:Math.random()*.8+.3,wa:Math.random()*Math.PI*2}));
 }
 resizeHero();window.addEventListener('resize',resizeHero);
 function heroLoop(){
@@ -2401,7 +2392,7 @@ var glitchTranslate, glitchCorrupt;
 (function(){
   const items=[
     '3EAS-001','LINCOLN HEIGHTS, NELA','34.0590°N 118.2321°W','SIGNAL ACTIVE',
-    "CAPTURE DON'T KILL",'YOU HAVE RECEIVED THE SIGNAL','THEY ARE JUST A RITUAL','AMERICA IS ONLY AN EXPERIMENT','NEW MUSIC COMING SOON','SATELLITES ORBITING EARTH: ~9,000 ACTIVE','PARA TODOS TODO, NADA PARA NOSOTROS','\u00a1YA BASTA!','DO YOU SMELL THE GRAPHENE?','ARE YOU HUNGRY?',"DON'T OBEY",'WORSHIP THE MUSIC, NOT THE MAN','TOTAL ICE DEPORTATIONS: <span id="deportclock">0</span>','BTC: $<span id="btcclock">--</span>','ETH: $<span id="ethclock">--</span>','GOLD: $<span id="goldclock">--</span>/oz','SILVER: $<span id="silverclock">--</span>/oz','OIL (WTI): $<span id="oilclock">--</span>/bbl','SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE','STOP ATTENDING RITUALS','CAN YOU PAY THE RENT?','PENTAGON BUDGET 2025: $1.312 TRILLION','PENTAGON BUDGET 2024: $824 BILLION','ARE YOU CON(CERN)ED?','PSYOP AFTER PSYOP','DISCLOSURE?','DIVEST FROM THEIR ALGORITHM','<a href="https://unlimitedhangout.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">UNLIMITED HANGOUT</a>','<a href="https://earthsgreatestenemy.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">EARTH\'S GREATEST ENEMY</a>','<a href="https://www.bennjordan.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">BENN JORDAN</a>','<a href="https://nym.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">NYM</a>','<a href="https://thesecretteachings.info/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE SECRET TEACHINGS</a>','<a href="https://www.kpfk.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">KPFK</a>','<a href="https://www.trackaipac.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">TRACK AIPAC</a>','<a href="https://schoolsforchiapas.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SCHOOLS FOR CHIAPAS</a>','<a href="https://cultivateelevate.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">CULTIVATE ELEVATE</a>','<a href="https://www.acallforanuprising.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">A CALL FOR AN UPRISING</a>','<a href="https://www.thehighersidechats.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE HIGHERSIDE CHATS</a>','<a href="https://corbettreport.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE CORBETT REPORT</a>','<a href="https://www.onnoticemusic.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">ON/NOTICE</a>','<a href="https://ai-2027.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">AI 2027</a>','<a href="https://blog.redwoodresearch.org/p/ai-futurism-reading-list" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">AI FUTURISM READING LIST</a>','<a href="https://youtu.be/77f_xr6RBwM" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">TRUTH STREAM MEDIA</a>','<a href="https://selexiones.com" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SELEXIONES</a>','<a href="https://sacredlessons.com" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SACRED LESSONS</a>','<a href="https://www.forbes.com/profile/daniel-ek/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SPOTIFY IS YOUR ENEMY</a>','<a href="https://sloptracker.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SLOPTRACKER</a>','<a href="https://deoxy.xyz/mirror/deoxy.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">DEOXY ARCHIVE</a>','<a href="https://www.topmusicattorney.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">TOP MUSIC ATTORNEY</a>','<a href="https://musically.com/blog/2025/04/28/poisonify/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">POISONIFY</a>','20 YEARS OF DATA WILL LIVE HERE ONLY','GROW FOOD','YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?','ARE YOU ADDICTED TO FEAR?','ARE YOU SCARED TO BE JUDGED?','FUCK YOU - CANCEL ME','IM TOO HUMAN SOMETIMES','LOS ANGELES GAVE ME PERMANENT PTSD','THEY WILL SACRIFICE YOU, IF YOU LET THEM','BUBBLES. ARE YOU IN ONE?','MICRO COMPLIANCE IS YOUR WHOLE DAY',"DON'T INGEST THE D.A.R.P.A. TECH",'STATUS: TRANSMITTING','YOUR ONLY CULTURE IS CONSPIRACY','I MISS YOU OMAR','I\'M WAITING FOR YOU CEDRIC',
+    "CAPTURE DON'T KILL",'YOU HAVE RECEIVED THE SIGNAL','THEY ARE JUST A RITUAL','AMERICA IS ONLY AN EXPERIMENT','NEW MUSIC COMING SOON','SATELLITES ORBITING EARTH: ~9,000 ACTIVE','PARA TODOS TODO, NADA PARA NOSOTROS','\u00a1YA BASTA!','DO YOU SMELL THE GRAPHENE?','ARE YOU HUNGRY?',"DON'T OBEY",'WORSHIP THE MUSIC, NOT THE MAN','TOTAL ICE DEPORTATIONS: <span id="deportclock">0</span>','BTC: $<span id="btcclock">--</span>','ETH: $<span id="ethclock">--</span>','GOLD: $<span id="goldclock">--</span>/oz','SILVER: $<span id="silverclock">--</span>/oz','OIL (WTI): $<span id="oilclock">--</span>/bbl','SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE','STOP ATTENDING RITUALS','CAN YOU PAY THE RENT?','PENTAGON BUDGET 2025: $1.312 TRILLION','PENTAGON BUDGET 2024: $824 BILLION','ARE YOU CON(CERN)ED?','PSYOP AFTER PSYOP','DISCLOSURE?','DIVEST FROM THEIR ALGORITHM','<a href="https://unlimitedhangout.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">UNLIMITED HANGOUT</a>','<a href="https://earthsgreatestenemy.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">EARTH\'S GREATEST ENEMY</a>','<a href="https://www.bennjordan.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">BENN JORDAN</a>','<a href="https://nym.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">NYM</a>','<a href="https://thesecretteachings.info/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE SECRET TEACHINGS</a>','<a href="https://www.kpfk.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">KPFK</a>','<a href="https://www.trackaipac.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">TRACK AIPAC</a>','<a href="https://schoolsforchiapas.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SCHOOLS FOR CHIAPAS</a>','<a href="https://cultivateelevate.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">CULTIVATE ELEVATE</a>','<a href="https://www.acallforanuprising.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">A CALL FOR AN UPRISING</a>','<a href="https://www.thehighersidechats.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE HIGHERSIDE CHATS</a>','<a href="https://corbettreport.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE CORBETT REPORT</a>','<a href="https://www.onnoticemusic.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">ON/NOTICE</a>','<a href="https://ai-2027.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">AI 2027</a>','<a href="https://blog.redwoodresearch.org/p/ai-futurism-reading-list" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">AI FUTURISM READING LIST</a>','<a href="https://youtu.be/77f_xr6RBwM" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">TRUTH STREAM MEDIA</a>','<a href="https://selexiones.com" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SELEXIONES</a>','<a href="https://sacredlessons.com" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SACRED LESSONS</a>','<a href="https://www.forbes.com/profile/daniel-ek/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SPOTIFY IS YOUR ENEMY</a>','<a href="https://sloptracker.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SLOPTRACKER</a>','<a href="https://deoxy.xyz/mirror/deoxy.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">DEOXY ARCHIVE</a>','<a href="https://www.topmusicattorney.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">TOP MUSIC ATTORNEY</a>','<a href="https://musically.com/blog/2025/04/28/poisonify/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">POISONIFY</a>','20 YEARS OF DATA WILL LIVE HERE ONLY','GROW FOOD','YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?','ARE YOU ADDICTED TO FEAR?','ARE YOU SCARED TO BE JUDGED?','FUCK YOU - CANCEL ME','IM TOO HUMAN SOMETIMES','LOS ANGELES GAVE ME PERMANENT PTSD','THEY WILL SACRIFICE YOU, IF YOU LET THEM','BUBBLES. ARE YOU IN ONE?','MICRO COMPLIANCE IS YOUR WHOLE DAY',"DON'T INGEST THE D.A.R.P.A. TECH",'STATUS: TRANSMITTING','YOUR ONLY CULTURE IS CONSPIRACY','I MISS YOU OMAR','I\'M WAITING FOR YOU CEDRIC','WHO\'S YOUR HANDLER?','WHY WAS MY GRANDFATHER REALLY MURDERED?',
     'TOTAL ICE DEPORTATIONS: <span id="deportclock2">0</span>','BTC: $<span id="btcclock2">--</span>','ETH: $<span id="ethclock2">--</span>','GOLD: $<span id="goldclock2">--</span>/oz','SILVER: $<span id="silverclock2">--</span>/oz','OIL (WTI): $<span id="oilclock2">--</span>/bbl',
     'MEXICO CITY: <span id="tz-cdmx">--:--</span>',
     'LOS ANGELES: <span id="tz-la">--:--</span>',
@@ -3064,13 +3055,7 @@ var glitchTranslate, glitchCorrupt;
     glitchTranslate();
     glitchCorrupt();
   }
-  // Offset from the content-reshuffle timer (also 45s, started a few lines
-  // below this) — same period, different phase, so the text swap and the
-  // jump-glitch never land in the same instant. Without this stagger they
-  // fire together every cycle: content replaces AND the scroll animation
-  // resets at once, reading as one jarring double-hit instead of two
-  // separate, spread-out glitch beats.
-  setTimeout(()=>{glitchJump();setInterval(glitchJump,45000);},20000);
+  setInterval(glitchJump,45000);
 
   // Full-site glitch: every 2 minutes, distort the whole page for ~2s.
   function siteGlitch(){
@@ -3100,27 +3085,8 @@ var glitchTranslate, glitchCorrupt;
   // Self-contained: builds/tears down its own canvas context each run
   // rather than keeping a persistent animation loop alive the whole time
   // the site is open.
-  //
-  // This was originally a straight vertical-column "Matrix code rain" —
-  // dense, uniform, opaque. It looked like a foreign effect pasted on top
-  // of the site (rain on a windshield) instead of something native to it.
-  // Rebuilt around the site's own visual grammar instead: the mono/VT323
-  // glyph set, the ticker's ◈ separator and coordinate notation, the same
-  // horizontal scanline sweep drawScan() already uses on the hero canvas,
-  // and 'screen' blending + partial opacity so it merges INTO whatever's
-  // under it (scanlines, particles, grain) rather than painting flat over
-  // it. Sparse and irregular instead of a dense grid — reads as signal
-  // interference, not weather.
-  // Code-matrix rain, not the kaleidoscope — back to falling glyphs. To
-  // still cover "all directions" (the ask right before this one), streams
-  // now enter from all four edges — down, up, left, right — instead of
-  // only falling. Same column logic in every orientation, just aimed
-  // differently. Site palette only, sparse/dropout instead of a dense
-  // uniform grid (that's what avoided the "rain on a windshield" read
-  // before), screen-blended so it merges into the page instead of sitting
-  // on top of it.
-  let matrixRAF=null,matrixStop=0,matrixStreamCache=[];
-  const MATRIX_CHARS='アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ◈°';
+  let matrixDrops=null,matrixRAF=null,matrixStop=0;
+  const MATRIX_CHARS='アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   function runMatrixRain(){
     const canvas=document.getElementById('matrixRain');
     if(!canvas)return;
@@ -3130,108 +3096,45 @@ var glitchTranslate, glitchCorrupt;
     canvas.height=window.innerHeight*dpr;
     canvas.style.width='100%';canvas.style.height='100%';
     ctx.setTransform(dpr,0,0,dpr,0,0);
-    // Blending with the real site now happens at the CSS layer
-    // (mix-blend-mode:screen on the canvas element) instead of here.
-    // globalCompositeOperation:'screen' was left on for every draw call
-    // including the trail-fade rectangle — and screen-blending black is a
-    // no-op, so the "fade to black" trail was silently doing nothing all
-    // along. Everything just piled up frame over frame with nothing ever
-    // clearing. Back to normal source-over so the fade actually fades.
+    const fontSize=13; // smaller = more columns = denser rain
+    const cols=Math.ceil(window.innerWidth/fontSize);
+    matrixDrops=new Array(cols).fill(0).map(()=>Math.random()*-window.innerHeight/fontSize);
     canvas.classList.add('on');
-    const DURATION=7200;
-    // One continuous cosine ease over the last 40% of the run, instead of
-    // three stitched-together fades (a linear glyph-alpha ramp, then a
-    // separate glyphs-off dissolve phase, then a CSS opacity transition).
-    // Each of those phase boundaries was a rate-of-fade discontinuity —
-    // exactly what reads as a "bump." A single S-curve has zero derivative
-    // at both ends, so it eases in and out smoothly with no seam.
-    const FADE_WINDOW=4200;
-    const t0=performance.now();
-    matrixStop=t0+DURATION;
-    const fontSize=16;
-    const vLanes=Math.ceil(window.innerWidth/fontSize);
-    const hLanes=Math.ceil(window.innerHeight/fontSize);
-    // Every lane picks an orientation+direction once at spawn: vertical
-    // lanes fall (down) or rise (up), horizontal lanes drift right or
-    // left. Half density on each axis so the combined field doesn't get
-    // overcrowded — four directions of full-density lanes stacked would
-    // read as a solid wall, not signal noise.
-    let streams=[];
-    for(let i=0;i<vLanes;i++){
-      if(Math.random()>0.5)continue;
-      const down=Math.random()<0.5;
-      streams.push({o:'v',lane:i,pos:down?Math.random()*-(window.innerHeight/fontSize):(window.innerHeight/fontSize)+Math.random()*10,
-        spd:(0.7+Math.random()*2.1)*(down?1:-1),active:Math.random()<0.5,vt:Math.random()<0.14});
-    }
-    for(let j=0;j<hLanes;j++){
-      if(Math.random()>0.5)continue;
-      const right=Math.random()<0.5;
-      streams.push({o:'h',lane:j,pos:right?Math.random()*-(window.innerWidth/fontSize):(window.innerWidth/fontSize)+Math.random()*10,
-        spd:(0.7+Math.random()*2.1)*(right?1:-1),active:Math.random()<0.5,vt:Math.random()<0.14});
-    }
-    const monoFont='"Share Tech Mono", monospace';
-    // Every stream carries a `vt` flag set once at spawn: ~14% render in
-    // the site's other native face, VT323 (the hero-title font), at a
-    // larger size — mixing both of the site's own typefaces instead of
-    // running the whole effect in one voice.
+    const DURATION=1960; // match siteGlitch's 28*70ms run
+    const FADE=320;      // matches #matrixRain's CSS opacity transition
+    matrixStop=performance.now()+DURATION;
+    let fading=false;
     function frame(now){
-      // Thinner trail fade = drops smear longer = denser/noisier field.
+      // Lower trail-fade alpha = older characters linger longer = thicker,
+      // more layered-looking streaks instead of a single row of glyphs.
       ctx.fillStyle='rgba(0,0,0,.08)';
       ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
-      const fadeStart=matrixStop-FADE_WINDOW;
-      // Cosine ease: 1 until fadeStart, smoothly down to 0 by matrixStop,
-      // flat at 0 after. Continuous and smooth the whole way — no seam
-      // where one fade mechanism hands off to another.
-      const fadeMult=now<=fadeStart?1:now>=matrixStop?0:
-        0.5*(1+Math.cos(Math.PI*(now-fadeStart)/FADE_WINDOW));
-      streams.forEach(s=>{
-        // Streams drop out / cut back in — reinforces "dropout" over
-        // "downpour."
-        if(Math.random()<0.006)s.active=!s.active;
-        if(!s.active){s.pos+=s.spd*.4;return;}
-        if(fadeMult>0.02){
-          const ch=MATRIX_CHARS[Math.floor(Math.random()*MATRIX_CHARS.length)];
-          let x,y;
-          if(s.o==='v'){x=s.lane*fontSize+(Math.random()-.5)*4;y=s.pos*fontSize;}
-          else{y=s.lane*fontSize+(Math.random()-.5)*4;x=s.pos*fontSize;}
-          const r=Math.random();
-          const alpha=(r<0.12?.9:r<0.16?.7:.55)*fadeMult;
-          ctx.font=s.vt?(fontSize*1.6)+'px "VT323", monospace':fontSize+'px '+monoFont;
-          ctx.fillStyle=r<0.12?`rgba(232,224,192,${alpha})`:r<0.16?`rgba(232,152,120,${alpha})`:`rgba(184,168,120,${alpha})`;
-          ctx.fillText(ch,x,y);
-        }
-        const edge=s.o==='v'?window.innerHeight/fontSize:window.innerWidth/fontSize;
-        if((s.spd>0&&s.pos>edge+2)||(s.spd<0&&s.pos<-2)){
-          if(Math.random()>0.94)s.pos=s.spd>0?-2:edge+2;
-        }
-        s.pos+=s.spd;
-      });
-      matrixStreamCache=streams;
+      ctx.font=fontSize+'px monospace';
+      for(let i=0;i<matrixDrops.length;i++){
+        const ch=MATRIX_CHARS[Math.floor(Math.random()*MATRIX_CHARS.length)];
+        const y=matrixDrops[i]*fontSize;
+        // Leading character brighter/hot, trail dimmer green — reads as
+        // motion without needing per-column trail history.
+        ctx.fillStyle=Math.random()<0.1?'rgba(232,224,192,.95)':'rgba(90,220,140,.85)';
+        ctx.fillText(ch,i*fontSize,y);
+        if(y>window.innerHeight&&Math.random()>0.975)matrixDrops[i]=0;
+        matrixDrops[i]++;
+      }
       if(now<matrixStop){
         matrixRAF=requestAnimationFrame(frame);
-      }else{
-        // Blend out into the ambient hero particle field instead of a hard
-        // cut — surviving streams hand off their current position as a
-        // real particle in hpart (same object shape drawHP expects), so
-        // the rain visually dissolves into the site's existing background
-        // motion rather than vanishing.
-        if(typeof hpart!=='undefined'){
-          matrixStreamCache.forEach(s=>{
-            if(Math.random()>0.4)return;
-            const px=s.o==='v'?s.lane*fontSize:s.pos*fontSize;
-            const py=s.o==='v'?s.pos*fontSize:s.lane*fontSize;
-            hpart.push({
-              x:((px%window.innerWidth)+window.innerWidth)%window.innerWidth,
-              y:((py%window.innerHeight)+window.innerHeight)%window.innerHeight,
-              vx:(Math.random()-.5)*.15,vy:(Math.random()-.5)*.15,
-              r:Math.random()*.8+.3,wa:Math.random()*Math.PI*2
-            });
-          });
-          if(hpart.length>320)hpart.splice(0,hpart.length-320);
-        }
+      }else if(!fading){
+        // Start the CSS opacity fade but keep animating through it — the
+        // rain used to hard-stop here, leaving one frozen frame visible
+        // for the whole 0.3s fade (reads as a stutter/pause). Extending
+        // the loop through the fade window keeps it falling the whole
+        // time it's dissolving instead.
+        fading=true;
         canvas.classList.remove('on');
+        matrixStop=now+FADE;
+        matrixRAF=requestAnimationFrame(frame);
+      }else{
         cancelAnimationFrame(matrixRAF);
-        setTimeout(()=>{ctx.clearRect(0,0,canvas.width,canvas.height);},1050);
+        ctx.clearRect(0,0,canvas.width,canvas.height);
       }
     }
     matrixRAF=requestAnimationFrame(frame);
@@ -3241,7 +3144,7 @@ var glitchTranslate, glitchCorrupt;
   setInterval(()=>{
     glitchToggle=!glitchToggle;
     if(glitchToggle)siteGlitch();else runMatrixRain();
-  },60000);
+  },120000);
 
   // Character-level corruption: randomly flip letter case and swap a few
   // letters for leetspeak-style numbers, briefly, on visible ticker spans.
