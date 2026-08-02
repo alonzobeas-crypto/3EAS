@@ -3138,14 +3138,14 @@ var glitchTranslate, glitchCorrupt;
     // along. Everything just piled up frame over frame with nothing ever
     // clearing. Back to normal source-over so the fade actually fades.
     canvas.classList.add('on');
-    const DURATION=4600;
+    const DURATION=7200;
     // One continuous cosine ease over the last 40% of the run, instead of
     // three stitched-together fades (a linear glyph-alpha ramp, then a
     // separate glyphs-off dissolve phase, then a CSS opacity transition).
     // Each of those phase boundaries was a rate-of-fade discontinuity —
     // exactly what reads as a "bump." A single S-curve has zero derivative
     // at both ends, so it eases in and out smoothly with no seam.
-    const FADE_WINDOW=1840;
+    const FADE_WINDOW=2800;
     const t0=performance.now();
     matrixStop=t0+DURATION;
     const fontSize=16;
@@ -3161,13 +3161,13 @@ var glitchTranslate, glitchCorrupt;
       if(Math.random()>0.5)continue;
       const down=Math.random()<0.5;
       streams.push({o:'v',lane:i,pos:down?Math.random()*-(window.innerHeight/fontSize):(window.innerHeight/fontSize)+Math.random()*10,
-        spd:(1.3+Math.random()*4.2)*(down?1:-1),active:Math.random()<0.5,vt:Math.random()<0.14});
+        spd:(0.7+Math.random()*2.1)*(down?1:-1),active:Math.random()<0.5,vt:Math.random()<0.14});
     }
     for(let j=0;j<hLanes;j++){
       if(Math.random()>0.5)continue;
       const right=Math.random()<0.5;
       streams.push({o:'h',lane:j,pos:right?Math.random()*-(window.innerWidth/fontSize):(window.innerWidth/fontSize)+Math.random()*10,
-        spd:(1.3+Math.random()*4.2)*(right?1:-1),active:Math.random()<0.5,vt:Math.random()<0.14});
+        spd:(0.7+Math.random()*2.1)*(right?1:-1),active:Math.random()<0.5,vt:Math.random()<0.14});
     }
     const monoFont='"Share Tech Mono", monospace';
     // Every stream carries a `vt` flag set once at spawn: ~14% render in
