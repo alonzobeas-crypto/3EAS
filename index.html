@@ -4,6 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>3EAS</title>
+<meta name="description" content="3EAS — signal &amp; sound. Surveillance gospel, cyber-spiritual Chicano futurism. Capture Don't Kill.">
+<link rel="icon" type="image/png" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/favicon-512.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="3EAS">
+<meta property="og:title" content="3EAS">
+<meta property="og:description" content="Signal &amp; sound. Surveillance gospel, cyber-spiritual Chicano futurism. Capture Don't Kill.">
+<meta property="og:image" content="https://3eascortex.com/assets/og-card.jpg">
+<meta property="og:url" content="https://3eascortex.com/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="3EAS">
+<meta name="twitter:description" content="Signal &amp; sound. Surveillance gospel, cyber-spiritual Chicano futurism.">
+<meta name="twitter:image" content="https://3eascortex.com/assets/og-card.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Courier+Prime:ital@0;1&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -40,6 +53,7 @@ body{
 @keyframes spplaypulse{0%,100%{box-shadow:0 0 0 rgba(90,200,120,0)}50%{box-shadow:0 0 16px rgba(90,200,120,.8)}}
 #sp-stop.stopped{animation:spstopglow 1.6s ease-in-out infinite}
 @keyframes spstopglow{0%,100%{box-shadow:0 0 0 rgba(168,105,90,0);border-color:var(--dim);color:var(--dim)}50%{box-shadow:0 0 16px rgba(168,105,90,.75);border-color:#a8695a;color:#a8695a}}
+.scanlines{
   position:fixed;inset:0;
   background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(216,212,200,.015) 3px,rgba(216,212,200,.015) 4px);
   pointer-events:none;z-index:800;
@@ -1627,17 +1641,31 @@ document.addEventListener('click',e=>{
   if(__touchDragged){e.preventDefault();e.stopPropagation();__touchDragged=false;}
 },{capture:true});
 
-/* ─── GRAIN ─── */
+/* ─── GRAIN ───
+   Was generating full-viewport-resolution random noise (createImageData +
+   per-pixel Math.random()) every 80ms — on a 1920×1080 screen that's ~4M+
+   random() calls, 12.5x/sec, plus a full-size ImageData allocation each
+   tick. Film grain doesn't need native resolution to read as grain, so
+   noise is generated on a small offscreen tile and scaled up with a single
+   drawImage blit instead — same look, a fraction of the CPU/GC cost. */
 const gc=document.getElementById('grain-canvas');
 const gx=gc.getContext('2d');
+gx.imageSmoothingEnabled=false; // keep the upscaled noise sharp/grainy, not blurred
+const GRAIN_TILE=110;
+const gnCanvas=document.createElement('canvas');
+gnCanvas.width=GRAIN_TILE;gnCanvas.height=GRAIN_TILE;
+const gnx=gnCanvas.getContext('2d');
+const gnId=gnx.createImageData(GRAIN_TILE,GRAIN_TILE);
 let grainOp=.04;
-function resizeGrain(){gc.width=window.innerWidth;gc.height=window.innerHeight}
+function resizeGrain(){gc.width=window.innerWidth;gc.height=window.innerHeight;gx.imageSmoothingEnabled=false}
 function drawGrain(){
   if(!grainOp){gc.style.opacity=0;return}
-  const id=gx.createImageData(gc.width,gc.height);
-  const d=id.data;
+  const d=gnId.data;
   for(let i=0;i<d.length;i+=4){const v=Math.random()*255;d[i]=d[i+1]=d[i+2]=v;d[i+3]=Math.random()*30}
-  gx.putImageData(id,0,0);gc.style.opacity=grainOp;
+  gnx.putImageData(gnId,0,0);
+  gx.clearRect(0,0,gc.width,gc.height);
+  gx.drawImage(gnCanvas,0,0,GRAIN_TILE,GRAIN_TILE,0,0,gc.width,gc.height);
+  gc.style.opacity=grainOp;
 }
 resizeGrain();setInterval(drawGrain,80);
 window.addEventListener('resize',resizeGrain);
@@ -1685,6 +1713,14 @@ function drawHW(){
   }
 }
 function drawHP(){
+  // Pull current band energies once per frame (0..1 each) instead of per
+  // particle — getByteFrequencyData is the expensive call, everything else
+  // downstream is cheap math per particle.
+  const band=spBands();
+  const wanderKick=.006+band.bass*.05;   // bass = more restless drift
+  const maxSp=.55+band.level*1.6;        // overall energy = faster ceiling
+  const rBoost=band.bass*2.6;            // bass = particle "kick" size pulse
+  const op=.6+band.treble*.4;            // treble = sparkle/opacity
   hpart.forEach(p=>{
     const dx=mx-p.x,dy=my-p.y,d=Math.sqrt(dx*dx+dy*dy);
     if(d<160&&d>0.01){
@@ -1698,15 +1734,15 @@ function drawHP(){
     // instead of noisy. This also keeps particles perpetually adrift instead
     // of decaying to a dead stop the way pure damping did.
     p.wa+=(Math.random()-.5)*.35;
-    p.vx+=Math.cos(p.wa)*.006;
-    p.vy+=Math.sin(p.wa)*.006;
+    p.vx+=Math.cos(p.wa)*wanderKick;
+    p.vy+=Math.sin(p.wa)*wanderKick;
     p.vx*=.985;p.vy*=.985;
-    const sp=Math.sqrt(p.vx*p.vx+p.vy*p.vy),maxSp=.55;
+    const sp=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
     if(sp>maxSp){p.vx=p.vx/sp*maxSp;p.vy=p.vy/sp*maxSp;}
     p.x+=p.vx;p.y+=p.vy;
     if(p.x<0)p.x=hw;if(p.x>hw)p.x=0;if(p.y<0)p.y=hh;if(p.y>hh)p.y=0;
-    hx.beginPath();hx.arc(p.x,p.y,p.r*1.9,0,Math.PI*2);
-    hx.fillStyle='rgba(200,186,140,.85)';hx.fill();
+    hx.beginPath();hx.arc(p.x,p.y,p.r*(1.9+rBoost),0,Math.PI*2);
+    hx.fillStyle=`rgba(200,186,140,${op})`;hx.fill();
   });
   for(let i=0;i<hpart.length;i++)for(let j=i+1;j<hpart.length;j++){
     const dx=hpart[i].x-hpart[j].x,dy=hpart[i].y-hpart[j].y,d=Math.sqrt(dx*dx+dy*dy);
@@ -1875,6 +1911,8 @@ function drawWavePl(){
 function togPlay(){
   if(!cur2){selT(TRACKS[0].id);return;}
   if(!cur2.src){return;}
+  initAudioReactive();
+  if(spActx&&spActx.state==='suspended')spActx.resume().catch(()=>{});
   if(audio.paused){
     spStop();
     audio.play().then(()=>{playing=true;document.getElementById('pbtn').textContent='⏸'});
@@ -2031,6 +2069,43 @@ function spSyncFlash(){
 }
 [spA,spB].forEach(a=>{['play','pause','ended'].forEach(ev=>a.addEventListener(ev,spSyncFlash))});
 let spActive=spA,spIdle=spB,spFading=false;
+
+/* ─── AUDIO-REACTIVE PARTICLES ───
+   Web Audio graph tapping the jukebox decks (spA/spB) + transmissions
+   player (audio) so the hero particle field pulses with whatever's
+   actually playing. Must be created on a user gesture (autoplay policy) —
+   hooked into spStart() below, same gesture that unlocks the decks. */
+var spActx=null,spAnalyser=null,spFreqData=null;
+function initAudioReactive(){
+  if(spActx)return;
+  try{
+    spActx=new (window.AudioContext||window.webkitAudioContext)();
+    const merge=spActx.createGain();
+    merge.gain.value=1;
+    [spA,spB,audio].forEach(el=>{
+      const src=spActx.createMediaElementSource(el);
+      src.connect(spActx.destination); // keep normal audible output
+      src.connect(merge);              // also feed the analyser
+    });
+    spAnalyser=spActx.createAnalyser();
+    spAnalyser.fftSize=256;
+    spAnalyser.smoothingTimeConstant=.82;
+    merge.connect(spAnalyser);
+    spFreqData=new Uint8Array(spAnalyser.frequencyBinCount);
+  }catch(e){/* Web Audio unsupported/blocked — particles just fall back to ambient drift */}
+}
+// Returns 0..1 band energies for the current audio frame.
+function spBands(){
+  if(!spAnalyser)return{bass:0,mid:0,treble:0,level:0};
+  spAnalyser.getByteFrequencyData(spFreqData);
+  const n=spFreqData.length,bassEnd=Math.floor(n*.12),midEnd=Math.floor(n*.5);
+  let bass=0,mid=0,treble=0;
+  for(let i=0;i<bassEnd;i++)bass+=spFreqData[i];
+  for(let i=bassEnd;i<midEnd;i++)mid+=spFreqData[i];
+  for(let i=midEnd;i<n;i++)treble+=spFreqData[i];
+  bass/=(bassEnd||1)*255;mid/=((midEnd-bassEnd)||1)*255;treble/=((n-midEnd)||1)*255;
+  return{bass,mid,treble,level:(bass+mid+treble)/3};
+}
 
 // Tiny silent WAV (44.1k mono, ~5ms) — used to "unlock" both decks under one user gesture
 const SP_SILENT='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
@@ -2320,6 +2395,8 @@ function ensureSpWatch(){
 function spStart(){
   if(spStarted)return;
   spStarted=true;
+  initAudioReactive();
+  if(spActx&&spActx.state==='suspended')spActx.resume().catch(()=>{});
   // Unlock both decks under the current user gesture, then start a random track
   spShuffle();
   spIdx=spBag[spBagPos++];
