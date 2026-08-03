@@ -1685,7 +1685,7 @@ function initHP(){
   // live each call so resizing across it (e.g. rotating a tablet) adjusts
   // correctly instead of sticking with whatever count was set at load.
   const count=window.innerWidth>768?320:170;
-  hpart=Array.from({length:count},()=>({x:Math.random()*hw,y:Math.random()*hh,vx:(Math.random()-.5)*.1125,vy:(Math.random()-.5)*.1125,r:Math.random()*.8+.3,wa:Math.random()*Math.PI*2}));
+  hpart=Array.from({length:count},()=>({x:Math.random()*hw,y:Math.random()*hh,vx:(Math.random()-.5)*.096,vy:(Math.random()-.5)*.096,r:Math.random()*.8+.3,wa:Math.random()*Math.PI*2}));
 }
 resizeHero();window.addEventListener('resize',resizeHero);
 function heroLoop(){
@@ -1717,8 +1717,8 @@ function drawHP(){
   // particle — getByteFrequencyData is the expensive call, everything else
   // downstream is cheap math per particle.
   const band=spBands();
-  const wanderKick=.0045+band.bass*.0375; // bass = more restless drift
-  const maxSp=.41+band.level*1.2;         // overall energy = faster ceiling
+  const wanderKick=.0038+band.bass*.032; // bass = more restless drift
+  const maxSp=.35+band.level*1.02;       // overall energy = faster ceiling
   const rBoost=band.bass*2.6;            // bass = particle "kick" size pulse
   const op=.6+band.treble*.4;            // treble = sparkle/opacity
   hpart.forEach(p=>{
@@ -2076,8 +2076,14 @@ let spActive=spA,spIdle=spB,spFading=false;
    actually playing. Must be created on a user gesture (autoplay policy) —
    hooked into spStart() below, same gesture that unlocks the decks. */
 var spActx=null,spAnalyser=null,spFreqData=null;
+// iOS Safari has documented breakage routing detached (non-DOM) <audio>
+// elements through createMediaElementSource — playback can go silently
+// dead while everything still runs with no console errors. Not worth the
+// risk to core jukebox functionality for a visual nicety; skip the graph
+// entirely there and let audio play through its normal untouched path.
+const IS_IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 function initAudioReactive(){
-  if(spActx)return;
+  if(spActx||IS_IOS)return;
   try{
     spActx=new (window.AudioContext||window.webkitAudioContext)();
     const merge=spActx.createGain();
