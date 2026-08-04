@@ -226,22 +226,23 @@ body{
   background:rgba(0,0,0,.96);
   overflow:hidden;display:flex;align-items:center;
   opacity:0;transition:opacity .5s;
+  will-change:transform;transform:translateZ(0);backface-visibility:hidden;
 }
 #ticker.show{opacity:1}
-.ti{display:flex;animation:tick 92s linear infinite;white-space:nowrap;animation-play-state:running}
+.ti{display:flex;animation:tick 92s linear infinite;white-space:nowrap;animation-play-state:running;will-change:transform;transform:translateZ(0);backface-visibility:hidden;-webkit-font-smoothing:antialiased}
 #ticker.slow .ti{animation-duration:230s}
 .ti span{font-family:var(--mono);font-size:17px;letter-spacing:3px;color:var(--fg);padding-right:56px}
 .ti .sep{color:var(--accent)}
-@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+@keyframes tick{from{transform:translateX(0) translateZ(0)}to{transform:translateX(-100%) translateZ(0)}}
 @keyframes flashRG{0%,100%{color:#e5342e}50%{color:#3ec84a}}
 .ti .flash-rg{animation:flashRG 1s step-end infinite;text-decoration:underline;cursor:pointer}
 @keyframes glitch-shift{
-  0%,100%{transform:translate(0,0);opacity:1}
-  92%{transform:translate(0,0);opacity:1}
-  93%{transform:translate(-2px,1px);opacity:.8;text-shadow:2px 0 var(--accent),-2px 0 #0ff}
-  94%{transform:translate(2px,-1px);opacity:1;text-shadow:-2px 0 var(--accent),2px 0 #0ff}
-  95%{transform:translate(-1px,0);opacity:.7;text-shadow:1px 0 var(--accent)}
-  96%{transform:translate(0,0);opacity:1;text-shadow:none}
+  0%,100%{transform:translate(0,0) translateZ(0);opacity:1}
+  92%{transform:translate(0,0) translateZ(0);opacity:1}
+  93%{transform:translate(-2px,1px) translateZ(0);opacity:.8;text-shadow:2px 0 var(--accent),-2px 0 #0ff}
+  94%{transform:translate(2px,-1px) translateZ(0);opacity:1;text-shadow:-2px 0 var(--accent),2px 0 #0ff}
+  95%{transform:translate(-1px,0) translateZ(0);opacity:.7;text-shadow:1px 0 var(--accent)}
+  96%{transform:translate(0,0) translateZ(0);opacity:1;text-shadow:none}
 }
 #ticker{animation:glitch-shift 6s steps(1) infinite}
 
@@ -935,47 +936,6 @@ body{
   .dispatch-list{border-right:none;border-bottom:1px solid var(--dimmer);max-height:38vh}
   .dispatch-view{padding:32px 24px}
 }
-
-/* ══════════════════════════════
-   UI SCALE — larger chrome/reading layer
-   (LAB instrument panel intentionally left compact)
-══════════════════════════════ */
-.scene-eyebrow{font-size:13px}
-.ti span{font-size:16px!important;letter-spacing:2px!important;color:var(--hot)!important}
-.st-item{font-size:13px}
-.s1-scroll{font-size:12px}
-.s1-coords{font-size:13px}
-.s1-tag,.s1-sub-text{font-size:12px}
-/* transmissions player + rows */
-.tart-ph{font-size:11px}
-.tt{font-size:15px}
-.tmeta{font-size:12px}
-.ttype{font-size:11px}
-.tdur{font-size:12px}
-.p-label{font-size:11px}
-.p-artist{font-size:12px}
-.p-times{font-size:12px}
-/* visuals */
-.vph-txt{font-size:12px}
-.vcap{font-size:11px}
-/* acquisitions */
-.ac-cat{font-size:11px}
-.ac-desc{font-size:18px}
-.ac-btn{font-size:11px}
-.ac-stat{font-size:11px}
-/* signal / manifest */
-.sb-lbl{font-size:11px}
-.sb-val{font-size:14px}
-.mani .cl{font-size:12px}
-/* access form */
-.lform-intro{font-size:12px}
-.fl{font-size:11px}
-.fok{font-size:12px}
-/* dispatch */
-.s7-rss{font-size:12px}
-.dpost-meta{font-size:11px}
-.dpost-sum{font-size:17px}
-.dtag{font-size:10px}
 
 /* ══════════════════════════════
    UI SCALE — larger chrome/reading layer
@@ -1719,8 +1679,8 @@ function drawHP(){
   // particle — getByteFrequencyData is the expensive call, everything else
   // downstream is cheap math per particle.
   const band=spBands();
-  const wanderKick=.0038+band.bass*.032; // bass = more restless drift
-  const maxSp=.35+band.level*1.02;       // overall energy = faster ceiling
+  const wanderKick=.006+band.bass*.05;   // bass = more restless drift
+  const maxSp=.55+band.level*1.6;        // overall energy = faster ceiling
   const rBoost=band.bass*2.6;            // bass = particle "kick" size pulse
   const op=.6+band.treble*.4;            // treble = sparkle/opacity
   hpart.forEach(p=>{
@@ -1931,8 +1891,25 @@ function nfy(b){if(b.classList.contains('done'))return;b.classList.add('done');b
 function requestCommission(){
   goScene(7);
   setTimeout(()=>{
-    const m=document.getElementById('fm');
-    if(m){m.value='COMMISSION REQUEST — (beats / production / guitar / ableton): ';m.focus();}
+    // The contact form was redesigned into click-to-reveal-email at some
+    // point, orphaning this function's old target (#fm, a form field that
+    // no longer exists) — it was silently no-op'ing. Reveal the email and
+    // copy the commission-request line to the clipboard instead.
+    const el=document.getElementById('emailReveal');
+    if(el&&el.onclick)revealEmail(el);
+    const line='COMMISSION REQUEST — (beats / production / guitar / ableton): ';
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(line).then(()=>{
+        const wrap=document.getElementById('emailReveal');
+        if(wrap&&!document.getElementById('commissionHint')){
+          const hint=document.createElement('div');
+          hint.id='commissionHint';
+          hint.style.cssText='margin-top:8px;font-size:9px;color:var(--dim2);letter-spacing:2px';
+          hint.textContent='▸ COMMISSION LINE COPIED — PASTE IT INTO YOUR EMAIL';
+          wrap.parentElement.appendChild(hint);
+        }
+      }).catch(()=>{});
+    }
   },800);
 }
 
@@ -1950,7 +1927,7 @@ async function loadDispatch(){
     const m=location.hash.match(/#dispatch-(.+)/i);
     if(m){const p=dispatchPosts.find(p=>p.id===m[1]);if(p)showDispatch(p.id)}
   }catch(err){
-    list.innerHTML=`<div class="dispatch-loading" style="animation:none;color:var(--dim2)">▸ NO TRANSMISSIONS<br><span style="font-size:9px;color:var(--dim2);letter-spacing:2px">(${err.message})</span></div>`;
+    list.innerHTML=`<div class="dispatch-loading" style="animation:none;color:var(--dim2)">▸ ARCHIVE EMPTY — CHECK BACK SOON</div>`;
   }
 }
 function renderDispatchList(){
@@ -3202,20 +3179,30 @@ var glitchTranslate, glitchCorrupt;
     const el=document.documentElement;
     el.style.transition='none';
     let flickers=0;
+    const TOTAL=48;        // was 28 (~2s) — now ~3.4s of active flicker
+    const TAIL_START=34;   // last 14 frames taper amplitude down to 0
     const flick=setInterval(()=>{
       flickers++;
+      // Amplitude taper over the tail — glitch intensity fades out instead
+      // of cutting from full-strength to nothing on the final frame.
+      const decay=flickers>TAIL_START?Math.max(0,1-(flickers-TAIL_START)/(TOTAL-TAIL_START)):1;
       const big=Math.random()<0.3;
-      el.style.transform=`translate(${(Math.random()-.5)*(big?40:14)}px,${(Math.random()-.5)*(big?24:10)}px) scale(${1+(Math.random()-.5)*0.04}) skewX(${(Math.random()-.5)*(big?6:2)}deg)`;
-      el.style.filter=`hue-rotate(${Math.random()*360}deg) saturate(${1+Math.random()*4}) contrast(${1+Math.random()*1.4}) invert(${Math.random()<0.15?1:0}) blur(${Math.random()<0.2?(Math.random()*3):0}px)`;
-      el.style.opacity=Math.random()<0.15?(0.5+Math.random()*0.3):1;
-      el.style.textShadow=Math.random()<0.4?`${(Math.random()-.5)*6}px 0 rgba(255,0,60,.5),${(Math.random()-.5)*6}px 0 rgba(0,255,255,.5)`:'';
-      if(flickers>28){
+      el.style.transform=`translate(${(Math.random()-.5)*(big?40:14)*decay}px,${(Math.random()-.5)*(big?24:10)*decay}px) scale(${1+(Math.random()-.5)*0.04*decay}) skewX(${(Math.random()-.5)*(big?6:2)*decay}deg)`;
+      el.style.filter=`hue-rotate(${Math.random()*360*decay}deg) saturate(${1+Math.random()*4*decay}) contrast(${1+Math.random()*1.4*decay}) invert(${Math.random()<0.15*decay?1:0}) blur(${Math.random()<0.2?(Math.random()*3*decay):0}px)`;
+      el.style.opacity=Math.random()<0.15*decay?(1-Math.random()*0.5*decay):1;
+      el.style.textShadow=Math.random()<0.4*decay?`${(Math.random()-.5)*6*decay}px 0 rgba(255,0,60,.5),${(Math.random()-.5)*6*decay}px 0 rgba(0,255,255,.5)`:'';
+      if(flickers>TOTAL){
         clearInterval(flick);
+        // Ease the final hand-off back to neutral instead of an instant
+        // snap — whatever the last flicker frame left on-screen eases out
+        // over .5s rather than cutting straight to the resting state.
+        el.style.transition='opacity .5s ease,filter .5s ease,transform .5s ease,text-shadow .5s ease';
         el.style.filter='';
         el.style.transform='';
         el.style.opacity='';
         el.style.textShadow='';
         const tv=document.getElementById('tvglitch');if(tv)tv.classList.remove('on');
+        setTimeout(()=>{el.style.transition='none';},520);
       }
     },70);
   }
@@ -3266,7 +3253,7 @@ var glitchTranslate, glitchCorrupt;
     // Randomized per-run so consecutive glitches don't feel identical —
     // duration, density, vertical/horizontal balance, speed, and how much
     // VT323 gets mixed in all vary each time this runs.
-    const DURATION=5800+Math.random()*3200; // 5.8s–9s
+    const DURATION=8200+Math.random()*3800; // 8.2s–12s (was 5.8s–9s)
     // One continuous cosine ease over the last 40% of the run, instead of
     // three stitched-together fades (a linear glyph-alpha ramp, then a
     // separate glyphs-off dissolve phase, then a CSS opacity transition).
