@@ -2143,7 +2143,7 @@ function spPlayDeck(deck,track){
   deck.currentTime=0;
   deck.volume=0;
   deck.muted=spMuted;
-  deck._lastDur=null;deck._stableSince=0;
+  deck._lastDur=null;deck._stableSince=0;deck._earlyEndRetries=0;
   deck.load();
   // Large/uncompressed files (esp. WAVs) can take a while to buffer enough
   // for real playback to start — a short timeout was mistaking "still
@@ -2328,6 +2328,23 @@ function ensureSpWatch(){
 // Safety net if a track ends without crossfade firing (very short tracks etc.)
 [spA,spB].forEach(a=>a.addEventListener('ended',()=>{
   if(a===spActive){
+    // Every SP_TRACKS entry is a real, full-length song — none run anywhere
+    // near this short. A genuine 'ended' at just 1-2s would mean the browser
+    // decided playback reached the end almost immediately after starting,
+    // which is a stream/decode hiccup misreported as 'ended' rather than a
+    // real end-of-track. Retry the same deck instead of jumping to a
+    // different song, which was producing "plays one song for a second,
+    // then starts another" — cap the retries so a track that's genuinely
+    // reduced to silence (corrupt file, etc.) doesn't hang forever.
+    if(a.currentTime<5){
+      a._earlyEndRetries=(a._earlyEndRetries||0)+1;
+      if(a._earlyEndRetries<=3){
+        a.currentTime=0;
+        a.play().catch(()=>{});
+        return;
+      }
+    }
+    a._earlyEndRetries=0;
     if(spFading){
       // A crossfade is already in flight — it owns spIdle and WILL complete
       // the swap itself; spFadeTo/spPlayDeck/spWaitForPlay each carry their
