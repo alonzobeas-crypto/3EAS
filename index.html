@@ -1383,6 +1383,16 @@ body{
         </div>
       </div>
       <div class="lform">
+        <div class="lform-intro">SUBSCRIBE — MUSIC & MERCH DROPS</div>
+        <form action="https://buttondown.com/api/emails/embed-subscribe/3EASCORTEX" method="post" target="popupwindow" onsubmit="window.open('https://buttondown.com/3EASCORTEX','popupwindow')">
+          <label class="fl" for="bd-email">EMAIL</label>
+          <input class="fi" type="email" name="email" id="bd-email" placeholder="you@domain.com" required>
+          <input type="hidden" value="1" name="embed">
+          <button class="fsub" type="submit">SUBSCRIBE →</button>
+        </form>
+
+        <div style="height:1px;background:var(--dimmer);margin:32px 0"></div>
+
         <div class="lform-intro">OPEN CHANNEL — TRANSMIT YOUR FREQUENCY</div>
         <div class="lrow" id="emailReveal" onclick="revealEmail(this)" style="cursor:pointer;margin-top:18px;user-select:text">
           <span id="emailRevealText">CLICK TO REVEAL FREQUENCY</span> <span class="larr" id="emailRevealArr">→</span>
@@ -1990,6 +2000,7 @@ const SP_TRACKS=[
   {title:'3EAS - CUBIC ZIRCONIA',src:'uploads/3EAS - Cubic Zirconia.mp3',gain:1.01},
   {title:'RITCHIE CURANDERO',src:'uploads/Ritchie Curandero.mp3',gain:2.86},
   {title:'3EAS - DRAW BLOOD FOR SPRING',src:'uploads/3EAS - Draw Blood for Spring.mp3',gain:1.36},
+  {title:"3EAS - LITTLE FAITH, IT'S IN THE DENIAL",src:"uploads/3EAS - Little Faith, It's in the Denial.mp3",gain:1.0},
 ];
 let spIdx=0,spMuted=false,spStarted=false,spUnlocked=false;
 let spBag=[],spBagPos=0;
