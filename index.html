@@ -2514,6 +2514,7 @@ var glitchTranslate, glitchCorrupt;
     'US NATIONAL DEBT: <span id="debtclock">$0</span>',
     'DOOMSDAY CLOCK: 85 SECONDS TO MIDNIGHT',
     'WORLD POPULATION: <span id="popclock">0</span>',
+    'LA COUNTY HOMELESS POPULATION: <span id="lahomelessclock">0</span>',
     'CO<sub>2</sub> EMITTED THIS YEAR: <span id="co2clock">0</span> TONS',
     'FOREST LOST THIS YEAR: <span id="forestclock">0</span> HA',
     'WATER CONSUMED THIS YEAR: <span id="waterclock">0</span>L',
@@ -3499,6 +3500,27 @@ var glitchTranslate, glitchCorrupt;
     const txt=Math.round(val).toLocaleString('en-US');
     LIVE.popclock=txt;
     ['popclock','popclock2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=txt});
+  }
+  tick();
+  setInterval(tick,1000);
+})();
+
+// LA County homeless population — seeded from LAHSA's 2026 Greater Los
+// Angeles Homeless Count (73,040 countywide; count conducted Jan 20-22 2026,
+// results released late Jul 2026), up 1.2% YoY. Unlike debt/population,
+// this figure comes from a single annual point-in-time survey, not a
+// continuously tracked process — there's no official daily rate to draw on.
+// The ~2.4/day drift here is just that YoY change spread evenly across a
+// year, purely to avoid a static number sitting dead on the ticker. Treat
+// this as a rough estimate between counts, not a real measurement.
+(function(){
+  const BASE=73040, BASE_TIME=new Date('2026-07-27T00:00:00Z').getTime();
+  const PER_MS=(73040-73040/1.012)/(365*86400000);
+  function tick(){
+    const val=BASE+(Date.now()-BASE_TIME)*PER_MS;
+    const txt=Math.round(val).toLocaleString('en-US');
+    LIVE.lahomelessclock=txt;
+    const el=document.getElementById('lahomelessclock');if(el)el.textContent=txt;
   }
   tick();
   setInterval(tick,1000);
