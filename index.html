@@ -3180,6 +3180,15 @@ var glitchTranslate, glitchCorrupt;
 
   // Occasional signal-jump glitch: skip the ticker to a random point mid-scroll
   function glitchJump(){
+    // requestAnimationFrame (used below to re-enable the animation after
+    // briefly disabling it) never fires while the tab is backgrounded —
+    // unlike setInterval, which keeps calling this function on schedule
+    // regardless. Disabling the animation here and relying on rAF to turn
+    // it back on could leave the ticker stuck on animation:none for as
+    // long as the tab stays hidden (this site's audio keeps playing in the
+    // background, so that's a common case) — skip the effect entirely
+    // while hidden rather than risk the ticker freezing.
+    if(document.hidden)return;
     const els=[document.getElementById('ti1'),document.getElementById('ti2')];
     els.forEach(el=>{
       if(!el)return;
