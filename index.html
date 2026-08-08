@@ -2531,17 +2531,27 @@ var glitchTranslate, glitchCorrupt;
     'ACTIVE CONFLICT: SAHEL'
   ];
   function shuffled(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-  // Each cycle, shuffle the FULL item list once and split it between the two
-  // lanes — so every item appears exactly once across ti1+ti2 combined, and
-  // nothing repeats (in either lane) until the whole set has played through.
-  // Previously each lane independently shuffled the entire array, so every
-  // item showed once per lane per cycle (twice total) with only a partial
-  // cooldown on the front of the list — items still surfaced twice within
-  // the same pass.
+  // Bag-shuffle over the full item pool (same pattern as the jukebox's
+  // spBag), instead of a fresh full-pool shuffle every cycle. Showing 100%
+  // of the ~128-item pool every single cycle meant every item reappeared on
+  // every reshuffle — speeding up the reshuffle interval without changing
+  // that would only make repeats feel MORE frequent, not less. Drawing a
+  // smaller rotating batch per cycle means an item doesn't resurface until
+  // the bag empties and reshuffles, spreading repeats out in real time even
+  // as cycles fire faster.
+  let tickerBag=[],tickerBagPos=0;
+  const TICKER_BATCH=64; // ~half the pool per cycle — two cycles to see everything once
+  function nextTickerBatch(pool){
+    if(tickerBagPos>=tickerBag.length){tickerBag=shuffled(pool);tickerBagPos=0;}
+    const take=Math.min(TICKER_BATCH,tickerBag.length-tickerBagPos);
+    const batch=tickerBag.slice(tickerBagPos,tickerBagPos+take);
+    tickerBagPos+=take;
+    return batch;
+  }
   function nextTickerHalves(arr){
-    const a=shuffled(arr);
-    const mid=Math.ceil(a.length/2);
-    return [a.slice(0,mid),a.slice(mid)];
+    const batch=nextTickerBatch(arr);
+    const mid=Math.ceil(batch.length/2);
+    return [batch.slice(0,mid),batch.slice(mid)];
   }
   const es={
     'SIGNAL ACTIVE':'SEÑAL ACTIVA',
@@ -3139,7 +3149,7 @@ var glitchTranslate, glitchCorrupt;
     applyLiveVals();
   }
   renderTickerCycle();
-  setInterval(renderTickerCycle,92000);
+  setInterval(renderTickerCycle,46000);
 
   // Occasional real-time glitch: briefly flip some visible phrases to a random language
   glitchTranslate=function(){
