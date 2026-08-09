@@ -179,6 +179,11 @@ body{
 }
 .tb-link:hover{color:var(--accent);background:rgba(184,168,120,.04)}
 .tb-link .n{color:var(--dim2);margin-right:5px;font-size:10px}
+.tb-support{animation:supportGlow 3.5s ease-in-out infinite}
+@keyframes supportGlow{
+  0%,100%{text-shadow:0 0 2px rgba(184,168,120,.25);background:rgba(184,168,120,0)}
+  50%{text-shadow:0 0 12px rgba(184,168,120,.9),0 0 22px rgba(184,168,120,.4);background:rgba(184,168,120,.08)}
+}
 .tb-right{
   margin-left:auto;display:flex;align-items:center;
   padding:0 18px;
@@ -1137,7 +1142,7 @@ body{
     <a href="#" class="tb-link" onclick="goScene(5);return false"><span class="n">05</span>LAB</a>
     <a href="#" class="tb-link" onclick="goScene(6);return false"><span class="n">06</span>SIGNAL</a>
     <a href="#" class="tb-link" onclick="goScene(7);return false"><span class="n">07</span>ACCESS</a>
-    <a href="https://ko-fi.com/3eascortex" target="_blank" class="tb-link" style="color:var(--accent)"><span class="n">◈</span>SUPPORT</a>
+    <a href="https://ko-fi.com/3eascortex" target="_blank" class="tb-link tb-support" style="color:var(--accent)"><span class="n">◈</span>SUPPORT</a>
   </div>
   <div class="tb-right">
     <div class="live-dot"></div>
