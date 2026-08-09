@@ -2075,18 +2075,17 @@ let spActive=spA,spIdle=spB,spFading=false;
    actually playing. Must be created on a user gesture (autoplay policy) —
    hooked into spStart() below, same gesture that unlocks the decks. */
 var spActx=null,spAnalyser=null,spFreqData=null;
-// Safari (WebKit) has documented breakage routing detached (non-DOM)
-// <audio> elements through createMediaElementSource — playback can go
-// silently dead while everything still runs with no console errors, no
-// rejected promise, nothing. This wasn't iOS-specific: it hit desktop
-// Safari on a Mac exactly the same way, since spA/spB/audio were never
-// attached to the DOM. Fixed at the source now — all three are appended
-// (invisibly, no controls attr = no layout box) to document.body right
-// where they're created, which is the documented workaround for this
-// exact bug — so the graph is safe to build on Safari too and the
-// particles react to audio the same way there as everywhere else.
+// Safari (WebKit) has repeated, hard-to-pin-down breakage routing playback
+// through createMediaElementSource: silent audio, playback stuck forever,
+// and even a live-playing track hanging the moment it gets connected —
+// each attempt to fix one symptom just surfaced the next. Reliable jukebox
+// and transmissions playback matters far more than the particle field
+// visually tracing the music, so on Safari this graph is skipped entirely
+// and playback goes through its normal, untouched path — particles just
+// fall back to ambient drift there instead of reacting to audio.
+const IS_SAFARI=/Safari/.test(navigator.userAgent)&&!/Chrome|Chromium|CriOS|FxiOS|EdgiOS|Edg\//.test(navigator.userAgent);
 function initAudioReactive(){
-  if(spActx)return;
+  if(spActx||IS_SAFARI)return;
   try{
     spActx=new (window.AudioContext||window.webkitAudioContext)();
     const merge=spActx.createGain();
