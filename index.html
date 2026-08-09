@@ -3409,9 +3409,20 @@ var glitchTranslate, glitchCorrupt;
           });
           if(hpart.length>320)hpart.splice(0,hpart.length-320);
         }
+        // The trail-fade rectangle drawn every frame accumulates to a
+        // near-fully-opaque black canvas within about a second — invisible
+        // the whole time because mix-blend-mode:screen (set by the .on
+        // class) makes black a no-op against the page underneath. But
+        // mix-blend-mode can't transition/fade like opacity can — the
+        // instant .on is removed it flips straight to normal blending, and
+        // that near-black canvas is suddenly visible for one frame before
+        // the 1s opacity fade-out gets a chance to hide it, reading as a
+        // flash/blink. Clearing the pixels at the same moment the blend
+        // mode switches (instead of ~1s later) means there's nothing left
+        // for that instant flip to expose.
         canvas.classList.remove('on');
+        ctx.clearRect(0,0,canvas.width,canvas.height);
         cancelAnimationFrame(matrixRAF);
-        setTimeout(()=>{ctx.clearRect(0,0,canvas.width,canvas.height);},1050);
       }
     }
     matrixRAF=requestAnimationFrame(frame);
