@@ -2113,13 +2113,24 @@ function spBands(){
 const SP_SILENT='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
 function spUnlock(){
   if(spUnlocked)return Promise.resolve();
-  spUnlocked=true;
   // Play the silent clip on BOTH decks within this gesture; pause immediately.
   // Subsequent .play() calls (e.g. for crossfade) will then be permitted.
+  //
+  // spUnlocked used to be set true here unconditionally, before knowing
+  // whether these play() calls actually succeeded. spStart() also runs
+  // immediately on page load (no user gesture yet), so on Safari's strict
+  // autoplay policy that very first attempt always fails -- but the flag
+  // was already marked true, so it permanently short-circuited every later
+  // call (via if(spUnlocked)return above), including ones triggered by a
+  // real click/scroll. That skipped the actual unlock step forever, which
+  // read as "jukebox never plays on Safari even after interacting with the
+  // page." Only mark it unlocked once these calls genuinely succeed.
   return Promise.all([spA,spB].map(a=>{
     a.src=SP_SILENT;
-    return a.play().then(()=>{a.pause();a.currentTime=0}).catch(()=>{});
-  }));
+    return a.play().then(()=>{a.pause();a.currentTime=0;return true}).catch(()=>false);
+  })).then(results=>{
+    if(results.every(Boolean))spUnlocked=true;
+  });
 }
 
 function spSetTitle(t){document.getElementById('sp-title').textContent=t}
