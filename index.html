@@ -2451,8 +2451,6 @@ function ensureSpWatch(){
 function spStart(){
   if(spStarted)return;
   spStarted=true;
-  initAudioReactive();
-  if(spActx&&spActx.state==='suspended')spActx.resume().catch(()=>{});
   // Unlock both decks under the current user gesture, then start a random track
   spShuffle();
   spIdx=spBag[spBagPos++];
@@ -2467,6 +2465,17 @@ function spStart(){
         armSpGestureRetry();
         return;
       }
+      // Playback just genuinely started — on Safari's strict autoplay policy
+      // that can only happen off a real user gesture. Build/resume the Web
+      // Audio graph here rather than at the top of this function, where the
+      // very first, automatic, gesture-less call (fired on page load) would
+      // otherwise create the AudioContext before any gesture ever happened.
+      // Safari can leave a context created that way permanently stuck
+      // suspended even after a later real gesture calls resume() on it —
+      // which is exactly why the particles reacted to music in Brave but
+      // never in Safari.
+      initAudioReactive();
+      if(spActx&&spActx.state==='suspended')spActx.resume().catch(()=>{});
       spFadeTo(spActive,spVol(spIdx),2);
       ensureSpWatch();
       const s1=document.getElementById('s1scroll');
