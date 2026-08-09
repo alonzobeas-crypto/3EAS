@@ -2137,10 +2137,21 @@ function spUnlock(){
   // real click/scroll. That skipped the actual unlock step forever, which
   // read as "jukebox never plays on Safari even after interacting with the
   // page." Only mark it unlocked once these calls genuinely succeed.
-  return Promise.all([spA,spB].map(a=>{
+  //
+  // play()'s returned promise is spec'd to always settle, but a hang here
+  // (seen on Safari on the very first, gesture-less call at page load) has
+  // an outsized cost: spStarted is set true BEFORE this runs and only ever
+  // reset inside this promise's continuation, so a stuck play() call locks
+  // the jukebox out of starting permanently — every later click's spStart()
+  // just no-ops on the spStarted guard, forever. Give each deck's attempt a
+  // hard deadline so this can never hang the whole jukebox.
+  return Promise.all([spA,spB].map(a=>new Promise(res=>{
+    let done=false;
+    const finish=ok=>{if(done)return;done=true;res(ok);};
     a.src=SP_SILENT;
-    return a.play().then(()=>{a.pause();a.currentTime=0;return true}).catch(()=>false);
-  })).then(results=>{
+    a.play().then(()=>{a.pause();a.currentTime=0;finish(true);}).catch(()=>finish(false));
+    setTimeout(()=>finish(false),3000);
+  }))).then(results=>{
     if(results.every(Boolean))spUnlocked=true;
   });
 }
