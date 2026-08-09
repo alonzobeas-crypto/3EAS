@@ -1555,8 +1555,8 @@ body{
   <div class="tprow">
     <label>Grain</label>
     <div class="tpopts">
-      <button class="tpopt on" onclick="setGrain(.04,this)">On</button>
-      <button class="tpopt" onclick="setGrain(0,this)">Off</button>
+      <button class="tpopt" onclick="setGrain(.04,this)">On</button>
+      <button class="tpopt on" onclick="setGrain(0,this)">Off</button>
     </div>
   </div>
 </div>
@@ -1628,7 +1628,7 @@ const gnCanvas=document.createElement('canvas');
 gnCanvas.width=GRAIN_TILE;gnCanvas.height=GRAIN_TILE;
 const gnx=gnCanvas.getContext('2d');
 const gnId=gnx.createImageData(GRAIN_TILE,GRAIN_TILE);
-let grainOp=.04;
+let grainOp=0;
 function resizeGrain(){gc.width=window.innerWidth;gc.height=window.innerHeight;gx.imageSmoothingEnabled=false}
 function drawGrain(){
   if(!grainOp){gc.style.opacity=0;return}
@@ -4075,7 +4075,7 @@ mountLab();buildMini();
 const TWEAK_DEFAULTS=/*EDITMODE-BEGIN*/{
   "fx": "combined",
   "scan": true,
-  "grain": 0.04
+  "grain": 0
 }/*EDITMODE-END*/;
 function setFX(f,b){
   hfx=f;if(f==='particles'||f==='combined')initHP();
