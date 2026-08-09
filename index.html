@@ -3428,11 +3428,11 @@ var glitchTranslate, glitchCorrupt;
     matrixRAF=requestAnimationFrame(frame);
   }
 
-  let glitchToggle=false;
-  setInterval(()=>{
-    glitchToggle=!glitchToggle;
-    if(glitchToggle)siteGlitch();else runMatrixRain();
-  },42000);
+  // Previously alternated on a single shared 42s toggle, so each effect
+  // individually fired only every 84s. Decoupled so matrix-rain can run on
+  // its own, faster cadence without also speeding up the page-shake effect.
+  setInterval(siteGlitch,84000);
+  setInterval(runMatrixRain,55000);
 
   // Character-level corruption: randomly flip letter case and swap a few
   // letters for leetspeak-style numbers, briefly, on visible ticker spans.
