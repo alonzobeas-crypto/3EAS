@@ -2072,14 +2072,18 @@ let spActive=spA,spIdle=spB,spFading=false;
    actually playing. Must be created on a user gesture (autoplay policy) —
    hooked into spStart() below, same gesture that unlocks the decks. */
 var spActx=null,spAnalyser=null,spFreqData=null;
-// iOS Safari has documented breakage routing detached (non-DOM) <audio>
-// elements through createMediaElementSource — playback can go silently
-// dead while everything still runs with no console errors. Not worth the
-// risk to core jukebox functionality for a visual nicety; skip the graph
-// entirely there and let audio play through its normal untouched path.
+// Safari (WebKit) has documented breakage routing detached (non-DOM)
+// <audio> elements through createMediaElementSource — playback can go
+// silently dead while everything still runs with no console errors, no
+// rejected promise, nothing. This isn't iOS-specific: it hits desktop
+// Safari on a Mac exactly the same way, since spA/spB are never attached
+// to the DOM. Not worth that risk to core jukebox functionality for a
+// visual nicety; skip the graph entirely on Safari (any platform) and let
+// audio play through its normal untouched path.
 const IS_IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const IS_SAFARI=IS_IOS||(/Safari/.test(navigator.userAgent)&&!/Chrome|Chromium|CriOS|FxiOS|EdgiOS|Edg\//.test(navigator.userAgent));
 function initAudioReactive(){
-  if(spActx||IS_IOS)return;
+  if(spActx||IS_SAFARI)return;
   try{
     spActx=new (window.AudioContext||window.webkitAudioContext)();
     const merge=spActx.createGain();
