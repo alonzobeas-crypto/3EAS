@@ -1793,6 +1793,9 @@ let cur2=null,playing=false,wdata=[];
 // Real audio element
 const audio=new Audio();
 audio.preload='none';
+// Kept out of layout (no controls attr = no default box anyway) but IN the
+// DOM — see the spA/spB comment near initAudioReactive() for why.
+document.body.appendChild(audio);
 
 audio.addEventListener('timeupdate',()=>{
   if(!audio.duration)return;
@@ -2033,7 +2036,7 @@ function spVol(i){return Math.min(1,SP_VOL*(SP_TRACKS[i]?.gain||1));} // per-tra
 const SP_XFADE=2.5;      // crossfade duration in seconds
 // Two audio decks so tracks blend instead of hard-cutting
 const spA=new Audio(),spB=new Audio();
-[spA,spB].forEach(a=>{a.volume=0;a.preload='metadata'});
+[spA,spB].forEach(a=>{a.volume=0;a.preload='metadata';document.body.appendChild(a)});
 // Some hosts stall mid-stream (buffer underrun) and the browser just stops
 // without firing 'ended' — audio.paused becomes true but no crossfade or
 // 'ended' handler ever runs, sounding like the song "cut off". Detect this
@@ -2075,15 +2078,15 @@ var spActx=null,spAnalyser=null,spFreqData=null;
 // Safari (WebKit) has documented breakage routing detached (non-DOM)
 // <audio> elements through createMediaElementSource — playback can go
 // silently dead while everything still runs with no console errors, no
-// rejected promise, nothing. This isn't iOS-specific: it hits desktop
-// Safari on a Mac exactly the same way, since spA/spB are never attached
-// to the DOM. Not worth that risk to core jukebox functionality for a
-// visual nicety; skip the graph entirely on Safari (any platform) and let
-// audio play through its normal untouched path.
-const IS_IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-const IS_SAFARI=IS_IOS||(/Safari/.test(navigator.userAgent)&&!/Chrome|Chromium|CriOS|FxiOS|EdgiOS|Edg\//.test(navigator.userAgent));
+// rejected promise, nothing. This wasn't iOS-specific: it hit desktop
+// Safari on a Mac exactly the same way, since spA/spB/audio were never
+// attached to the DOM. Fixed at the source now — all three are appended
+// (invisibly, no controls attr = no layout box) to document.body right
+// where they're created, which is the documented workaround for this
+// exact bug — so the graph is safe to build on Safari too and the
+// particles react to audio the same way there as everywhere else.
 function initAudioReactive(){
-  if(spActx||IS_SAFARI)return;
+  if(spActx)return;
   try{
     spActx=new (window.AudioContext||window.webkitAudioContext)();
     const merge=spActx.createGain();
