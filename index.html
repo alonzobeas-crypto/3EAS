@@ -2113,8 +2113,16 @@ function spBands(){
   return{bass,mid,treble,level:(bass+mid+treble)/3};
 }
 
-// Tiny silent WAV (44.1k mono, ~5ms) — used to "unlock" both decks under one user gesture
-const SP_SILENT='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+// Tiny silent WAV (44.1k mono, ~1ms of real zeroed PCM samples) — used to
+// "unlock" both decks under one user gesture. This MUST contain actual
+// sample data, not a zero-length data chunk: an earlier version pointed at
+// a WAV with a 0-byte data chunk, which Safari accepted for the unlock
+// play() itself but then left spA/spB in a broken state afterward — the
+// real track's later .play() would still resolve and report paused=false,
+// but no sound ever came out. The transmissions player (a separate <audio>
+// element that never touches this unlock step) never hit it, which is why
+// only the jukebox went silent on Safari while transmissions kept working.
+const SP_SILENT='data:audio/wav;base64,UklGRogAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 function spUnlock(){
   if(spUnlocked)return Promise.resolve();
   // Play the silent clip on BOTH decks within this gesture; pause immediately.
