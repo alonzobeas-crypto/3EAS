@@ -1007,7 +1007,14 @@ body{
 .tpopt:hover,.tpopt.on{border-color:var(--dim);color:var(--accent)}
 
 @media(max-width:768px){
-  .tb-links{display:none}
+  /* Full scene nav (TRANSMISSIONS..ACCESS) stays hidden on phone — the site
+     is swipe/scroll-navigated there — but SUBSCRIBE and SUPPORT are the two
+     things worth surfacing without scrolling all the way down, so keep just
+     those two visible in the topbar instead of hiding the whole row. */
+  .tb-links{display:flex}
+  .tb-link:not(.tb-support):not(.tb-subscribe){display:none}
+  .tb-support,.tb-subscribe{padding:0 10px;font-size:9px;letter-spacing:1.5px;overflow:hidden;text-overflow:ellipsis}
+  .tb-support .n,.tb-subscribe .n{display:none}
   #topnav{padding:0}
   .tb-brand{font-size:18px;padding:0 14px;letter-spacing:2px}
   .tb-right{font-size:8px;letter-spacing:1px;padding:0 12px;gap:5px}
