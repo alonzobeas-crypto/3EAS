@@ -2607,7 +2607,7 @@ var glitchTranslate, glitchCorrupt;
     '<a href="https://worldofmusic.com" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">WORLD OF MUSIC</a>',
     '<a href="https://youtu.be/V3kZwsysuqQ?is=qFyWR45vjnMyJPe3" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">RETICULUM NODE</a>'
   ];
-  function shuffled(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+  function shuffledIndices(n){const a=Array.from({length:n},(_,i)=>i);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
   // Bag-shuffle over the full item pool (same pattern as the jukebox's
   // spBag), instead of a fresh full-pool shuffle every cycle. Showing 100%
   // of the ~128-item pool every single cycle meant every item reappeared on
@@ -2616,14 +2616,36 @@ var glitchTranslate, glitchCorrupt;
   // smaller rotating batch per cycle means an item doesn't resurface until
   // the bag empties and reshuffles, spreading repeats out in real time even
   // as cycles fire faster.
+  //
+  // That guarantee only held for a single continuous page session, though —
+  // mobile browsers frequently discard/reload a backgrounded tab (switching
+  // apps, locking the phone), which restarts this whole script and throws
+  // away tickerBag/tickerBagPos, reshuffling fresh far more often than
+  // desktop ever does. Persisting the bag (as indices, not content, so it
+  // stays valid across content edits by length) in localStorage means a
+  // reload resumes the same rotation instead of restarting it, so the full
+  // pool actually plays out before anything repeats — even across the
+  // frequent reloads mobile visits involve.
+  const TICKER_BAG_KEY='tickerBagState';
   let tickerBag=[],tickerBagPos=0;
+  function saveTickerBag(){try{localStorage.setItem(TICKER_BAG_KEY,JSON.stringify({bag:tickerBag,pos:tickerBagPos}));}catch(e){}}
+  function loadTickerBag(poolLen){
+    try{
+      const s=JSON.parse(localStorage.getItem(TICKER_BAG_KEY));
+      if(s&&Array.isArray(s.bag)&&s.bag.length===poolLen&&Number.isInteger(s.pos)&&s.pos>=0&&s.pos<=poolLen){
+        tickerBag=s.bag;tickerBagPos=s.pos;
+      }
+    }catch(e){}
+  }
   const TICKER_BATCH=64; // ~half the pool per cycle — two cycles to see everything once
   function nextTickerBatch(pool){
-    if(tickerBagPos>=tickerBag.length){tickerBag=shuffled(pool);tickerBagPos=0;}
+    if(!tickerBag.length)loadTickerBag(pool.length);
+    if(tickerBagPos>=tickerBag.length||tickerBag.length!==pool.length){tickerBag=shuffledIndices(pool.length);tickerBagPos=0;}
     const take=Math.min(TICKER_BATCH,tickerBag.length-tickerBagPos);
-    const batch=tickerBag.slice(tickerBagPos,tickerBagPos+take);
+    const idxBatch=tickerBag.slice(tickerBagPos,tickerBagPos+take);
     tickerBagPos+=take;
-    return batch;
+    saveTickerBag();
+    return idxBatch.map(i=>pool[i]);
   }
   function nextTickerHalves(arr){
     const batch=nextTickerBatch(arr);
