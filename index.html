@@ -1143,7 +1143,7 @@ body{
     <a href="#" class="tb-link" onclick="goScene(5);return false"><span class="n">05</span>LAB</a>
     <a href="#" class="tb-link" onclick="goScene(6);return false"><span class="n">06</span>SIGNAL</a>
     <a href="#" class="tb-link" onclick="goScene(7);return false"><span class="n">07</span>ACCESS</a>
-    <a href="#" class="tb-link tb-subscribe" style="color:var(--accent)" onclick="goScene(7);setTimeout(()=>{const e=document.getElementById('bd-email');if(e){e.scrollIntoView({behavior:'smooth',block:'center'});e.focus({preventScroll:true});}},650);return false"><span class="n">✉</span>SUBSCRIBE</a>
+    <a href="#subscribe" class="tb-link tb-subscribe" style="color:var(--accent)" onclick="goToSubscribe();return false"><span class="n">✉</span>SUBSCRIBE</a>
     <a href="https://ko-fi.com/3eascortex" target="_blank" class="tb-link tb-support" style="color:var(--accent)"><span class="n">◈</span>SUPPORT</a>
   </div>
   <div class="tb-right">
@@ -1743,6 +1743,16 @@ const scenes=document.querySelectorAll('.scene');
 const dots=document.querySelectorAll('.vdot');
 let curScene=0;
 function goScene(n){scroll.scrollTo({top:n*window.innerHeight,behavior:'smooth'})}
+// Shared by the topnav SUBSCRIBE link and the #subscribe deep link below —
+// jumps to the ACCESS scene, then scrolls/focuses the actual email field
+// rather than leaving the visitor to hunt for it once the scene lands.
+function goToSubscribe(){
+  goScene(7);
+  setTimeout(()=>{
+    const e=document.getElementById('bd-email');
+    if(e){e.scrollIntoView({behavior:'smooth',block:'center'});e.focus({preventScroll:true});}
+  },650);
+}
 function onScroll(){
   // Find whichever scene's top is closest to (but not past) the current
   // scroll position — works even though mobile scenes have variable height
@@ -1777,6 +1787,10 @@ setTimeout(()=>{
     document.getElementById('s1stat').classList.add('vis');
     document.getElementById('s1scroll').classList.add('vis');
     scenes[0].classList.add('active');
+    // Deep link: 3eascortex.com/#subscribe jumps straight to the signup
+    // form once the scene machinery is actually ready, instead of racing
+    // the intro animation.
+    if(location.hash==='#subscribe')goToSubscribe();
   },200);
 },2200);
 
