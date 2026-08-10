@@ -2067,14 +2067,26 @@ function revealEmail(el){
 }
 function spSyncFlash(){
   const btn=document.getElementById('sp-play');
+  let anyPlaying=false;
   if(btn){
-    const anyPlaying=(!spA.paused&&!spA.ended)||(!spB.paused&&!spB.ended);
+    anyPlaying=(!spA.paused&&!spA.ended)||(!spB.paused&&!spB.ended);
     btn.classList.toggle('on',anyPlaying);
   }
   const stopBtn=document.getElementById('sp-stop');
   if(stopBtn)stopBtn.classList.toggle('stopped',!!spStopped);
+  // Mobile browsers use the Media Session API to decide whether a tab has a
+  // real, ongoing playback session worth keeping alive when the screen locks
+  // — without it, audio can get suspended the moment the display turns off.
+  // Piggybacking on this existing play/pause/ended listener keeps the
+  // reported state accurate with no extra wiring.
+  if('mediaSession' in navigator)navigator.mediaSession.playbackState=anyPlaying?'playing':'paused';
 }
 [spA,spB].forEach(a=>{['play','pause','ended'].forEach(ev=>a.addEventListener(ev,spSyncFlash))});
+if('mediaSession' in navigator){
+  navigator.mediaSession.setActionHandler('play',()=>spPlay());
+  navigator.mediaSession.setActionHandler('pause',()=>spStop());
+  navigator.mediaSession.setActionHandler('nexttrack',()=>spSkip());
+}
 let spActive=spA,spIdle=spB,spFading=false;
 
 /* ─── AUDIO-REACTIVE PARTICLES ───
@@ -2166,7 +2178,10 @@ function spUnlock(){
   });
 }
 
-function spSetTitle(t){document.getElementById('sp-title').textContent=t}
+function spSetTitle(t){
+  document.getElementById('sp-title').textContent=t;
+  if('mediaSession' in navigator)navigator.mediaSession.metadata=new MediaMetadata({title:t,artist:'3EAS',album:'3EASCORTEX'});
+}
 
 // A single check right after a play() promise settles isn't reliable proof
 // of an actual block — on a real connection (especially large WAV files off
