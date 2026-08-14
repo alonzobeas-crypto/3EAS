@@ -65,6 +65,25 @@ body{
 @keyframes tvband{0%{top:-14px}100%{top:100vh}}
 #matrixRain{position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:0;transition:opacity 1s ease}
 #matrixRain.on{opacity:1;mix-blend-mode:screen}
+/* Early-90s "hacked" blackout — solid black, not blended, so it fully
+   covers the page rather than tinting it like the effects above. Audio
+   (jukebox/transmissions) is untouched by this: it's a pure visual overlay,
+   nothing here ever calls into spA/spB/audio. */
+#hackedGlitch{
+  position:fixed;inset:0;z-index:10000;pointer-events:none;
+  background:#000;display:flex;align-items:center;justify-content:center;
+  padding:40px;box-sizing:border-box;opacity:0;transition:opacity .15s linear;
+}
+#hackedGlitch.out{transition:opacity .5s ease}
+#hackedGlitch.on{opacity:1}
+#hackedGlitchText{
+  font-family:var(--mono);color:#e5e5e5;font-size:clamp(15px,2.6vw,26px);
+  letter-spacing:2px;text-align:center;line-height:2.2;white-space:pre-wrap;
+  text-shadow:0 0 8px rgba(255,255,255,.35);animation:hackedFlicker .15s steps(1) infinite;
+}
+@keyframes hackedFlicker{0%,91%,100%{opacity:1}92%{opacity:.82}94%{opacity:1}96%{opacity:.88}}
+.hackedCursor{display:inline-block;width:.6em;height:1em;background:#e5e5e5;vertical-align:text-bottom;margin-left:2px;animation:hackedBlink .5s step-end infinite}
+@keyframes hackedBlink{0%,50%{opacity:1}50.01%,100%{opacity:0}}
 .scanbeam{
   position:fixed;left:0;width:100%;height:2px;
   background:linear-gradient(90deg,transparent,rgba(184,168,120,.05),transparent);
@@ -1112,6 +1131,7 @@ body{
 
 <div id="tvglitch"></div>
 <canvas id="matrixRain"></canvas>
+<div id="hackedGlitch"><div id="hackedGlitchText"></div></div>
 <canvas id="s1-canvas"></canvas>
 <div id="threads" aria-hidden="true">
   <div class="tech-v"></div>
@@ -3544,11 +3564,53 @@ var glitchTranslate, glitchCorrupt;
     matrixRAF=requestAnimationFrame(frame);
   }
 
+  // Early-90s "system corrupted" blackout — solid black overlay, typed-out
+  // text, no blend modes (unlike siteGlitch/runMatrixRain, which tint the
+  // real page). Deliberately never touches spA/spB/audio: the whole point
+  // is the visual reads as catastrophic while the jukebox/transmissions
+  // keep playing straight through it.
+  let hackedTimer=null;
+  function hackedScreenGlitch(){
+    const el=document.getElementById('hackedGlitch');
+    const txt=document.getElementById('hackedGlitchText');
+    if(!el||!txt)return;
+    if(hackedTimer)return; // already mid-run, don't restart on top of itself
+    const lines=['YOUR SOUL HAS JUST BEEN HACKED.','DDOS ATTACK.','SYSTEM CORRUPTED'];
+    txt.textContent='';
+    el.classList.remove('out');
+    el.classList.add('on');
+    let li=0,ci=0;
+    function typeNext(){
+      if(li>=lines.length){
+        txt.insertAdjacentHTML('beforeend','<span class="hackedCursor"></span>');
+        return;
+      }
+      if(ci===0&&li>0)txt.textContent+='\n';
+      const line=lines[li];
+      if(ci<line.length){
+        txt.textContent+=line[ci];
+        ci++;
+        hackedTimer=setTimeout(typeNext,35+Math.random()*40);
+      }else{
+        li++;ci=0;
+        hackedTimer=setTimeout(typeNext,300);
+      }
+    }
+    typeNext();
+    setTimeout(()=>{
+      el.classList.add('out');
+      el.classList.remove('on');
+      setTimeout(()=>{el.classList.remove('out');},600);
+    },15000-600);
+    setTimeout(()=>{hackedTimer=null;},15000);
+  }
+
   // Previously alternated on a single shared 42s toggle, so each effect
   // individually fired only every 84s. Decoupled so matrix-rain can run on
   // its own, faster cadence without also speeding up the page-shake effect.
   setInterval(siteGlitch,84000);
   setInterval(runMatrixRain,55000);
+  setInterval(hackedScreenGlitch,70000);
 
   // Character-level corruption: randomly flip letter case and swap a few
   // letters for leetspeak-style numbers, briefly, on visible ticker spans.
