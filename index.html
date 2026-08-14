@@ -72,10 +72,8 @@ body{
 #hackedGlitch{
   position:fixed;inset:0;z-index:10000;pointer-events:none;
   background:#000;display:flex;align-items:center;justify-content:center;
-  padding:40px;box-sizing:border-box;opacity:0;transition:opacity .15s linear;
+  padding:40px;box-sizing:border-box;opacity:0;
 }
-#hackedGlitch.out{transition:opacity .5s ease}
-#hackedGlitch.on{opacity:1}
 #hackedGlitchText{
   font-family:var(--mono);color:#e5e5e5;font-size:clamp(15px,2.6vw,26px);
   letter-spacing:2px;text-align:center;line-height:2.2;white-space:pre-wrap;
@@ -3569,17 +3567,31 @@ var glitchTranslate, glitchCorrupt;
   // real page). Deliberately never touches spA/spB/audio: the whole point
   // is the visual reads as catastrophic while the jukebox/transmissions
   // keep playing straight through it.
-  let hackedTimer=null;
+  let hackedRunning=false;
+  // Stepped, irregular opacity ramp instead of a plain CSS transition — the
+  // fade itself stutters toward the target (occasional over/undershoot)
+  // rather than gliding smoothly, so entering/leaving reads as part of the
+  // glitch instead of a clean cut.
+  function hackedFade(el,target,duration,done){
+    const start=performance.now(),from=parseFloat(el.style.opacity)||0;
+    const step=()=>{
+      const t=Math.min(1,(performance.now()-start)/duration);
+      const base=from+(target-from)*t;
+      const jitter=Math.random()<0.35?Math.random()*0.4-0.2:0;
+      el.style.opacity=Math.max(0,Math.min(1,base+jitter));
+      if(t>=1){el.style.opacity=target;done&&done();return;}
+      setTimeout(step,35+Math.random()*45);
+    };
+    step();
+  }
   function hackedScreenGlitch(){
     const el=document.getElementById('hackedGlitch');
     const txt=document.getElementById('hackedGlitchText');
-    if(!el||!txt)return;
-    if(hackedTimer)return; // already mid-run, don't restart on top of itself
+    if(!el||!txt||hackedRunning)return; // already mid-run, don't restart on top of itself
+    hackedRunning=true;
     const lines=['YOUR SOUL HAS JUST BEEN HACKED.','DNA DDOS ATTACK','SYSTEM CORRUPTED'];
     txt.textContent='';
-    el.classList.remove('out');
-    el.classList.add('on');
-    let li=0,ci=0;
+    let li=0,ci=0,typeTimer=null,flickerIv=null;
     function typeNext(){
       if(li>=lines.length){
         txt.insertAdjacentHTML('beforeend','<span class="hackedCursor"></span>');
@@ -3590,19 +3602,26 @@ var glitchTranslate, glitchCorrupt;
       if(ci<line.length){
         txt.textContent+=line[ci];
         ci++;
-        hackedTimer=setTimeout(typeNext,35+Math.random()*40);
+        typeTimer=setTimeout(typeNext,35+Math.random()*40);
       }else{
         li++;ci=0;
-        hackedTimer=setTimeout(typeNext,300);
+        typeTimer=setTimeout(typeNext,300);
       }
     }
-    typeNext();
+    hackedFade(el,1,600,()=>{
+      typeNext();
+      // Keep the blackout visibly unstable the whole time it's up, not just
+      // at the fade edges — brief opacity dips on the overlay itself, on
+      // top of the text's own continuous flicker keyframe.
+      flickerIv=setInterval(()=>{
+        el.style.opacity=Math.random()<0.25?(0.75+Math.random()*0.25).toFixed(2):1;
+      },220);
+    });
     setTimeout(()=>{
-      el.classList.add('out');
-      el.classList.remove('on');
-      setTimeout(()=>{el.classList.remove('out');},600);
+      if(flickerIv)clearInterval(flickerIv);
+      if(typeTimer)clearTimeout(typeTimer);
+      hackedFade(el,0,600,()=>{hackedRunning=false;});
     },15000-600);
-    setTimeout(()=>{hackedTimer=null;},15000);
   }
 
   // Previously alternated on a single shared 42s toggle, so each effect
