@@ -3910,13 +3910,14 @@ function fetchT(url,opts,ms){
 })();
 
 // Oil (WTI) spot price — live fetch from Stooq (free, no key), refreshed every 60s.
-// allorigins.win (the CORS proxy both paths depend on) is a known-flaky free
-// service — documented to fail roughly half the time under normal load. That
-// alone was enough to intermittently kill the oil price with no visible
-// error. Two mitigations: retry each attempt a couple times before giving up
-// (cheap, since a retry a moment later often just works), and route the
-// fallback through a DIFFERENT proxy entirely so the two paths aren't both
-// sitting behind the same single point of failure.
+// allorigins.win and corsproxy.io (the two CORS proxies this depends on) are
+// both known-flaky free services — documented to fail roughly half the time
+// under normal load, and stopped delivering a price at all at one point,
+// which is what "not showing price" traced back to: the primary and the
+// fallback happened to both be down at once, and there was nowhere left to
+// go. A third, independent path (a different proxy again, same reliable
+// Stooq CSV data source the primary already uses) means all three would
+// have to be down simultaneously for the ticker to actually go blank.
 (function(){
   function withRetry(fn,attempts){
     attempts=attempts||3;
@@ -3925,22 +3926,23 @@ function fetchT(url,opts,ms){
       return new Promise(r=>setTimeout(r,400)).then(()=>withRetry(fn,attempts-1));
     });
   }
+  function parseStooqCsv(csv){
+    const lines=csv.trim().split('\n');
+    if(lines.length<2)throw new Error('bad csv');
+    const cols=lines[1].split(',');
+    const close=parseFloat(cols[6]);
+    if(!close||isNaN(close))throw new Error('no price');
+    return close;
+  }
+  function applyPrice(p){
+    const txt=Number(p).toLocaleString('en-US',{maximumFractionDigits:2});
+    LIVE.oilclock=txt;
+    ['oilclock','oilclock2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=txt});
+  }
   function tick(){
     withRetry(()=>fetchT('https://api.allorigins.win/raw?url='+encodeURIComponent('https://stooq.com/q/l/?s=cl.f&f=sd2t2ohlcv&h&e=csv'))
-      .then(r=>r.text())
-      .then(csv=>{
-        const lines=csv.trim().split('\n');
-        if(lines.length<2)throw new Error('bad csv');
-        const cols=lines[1].split(',');
-        const close=parseFloat(cols[6]);
-        if(!close||isNaN(close))throw new Error('no price');
-        return close;
-      })
-    ).then(close=>{
-      const txt=close.toLocaleString('en-US',{maximumFractionDigits:2});
-      LIVE.oilclock=txt;
-      ['oilclock','oilclock2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=txt});
-    }).catch(()=>fallback());
+      .then(r=>r.text()).then(parseStooqCsv)
+    ).then(applyPrice).catch(()=>fallback());
   }
   function fallback(){
     withRetry(()=>fetchT('https://corsproxy.io/?url='+encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/CL=F'))
@@ -3950,11 +3952,12 @@ function fetchT(url,opts,ms){
         if(!p)throw new Error('no price');
         return p;
       })
-    ).then(p=>{
-      const txt=Number(p).toLocaleString('en-US',{maximumFractionDigits:2});
-      LIVE.oilclock=txt;
-      ['oilclock','oilclock2'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=txt});
-    }).catch(()=>{});
+    ).then(applyPrice).catch(()=>fallback2());
+  }
+  function fallback2(){
+    withRetry(()=>fetchT('https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent('https://stooq.com/q/l/?s=cl.f&f=sd2t2ohlcv&h&e=csv'))
+      .then(r=>r.text()).then(parseStooqCsv)
+    ).then(applyPrice).catch(()=>{});
   }
   tick();
   setInterval(tick,60000);
