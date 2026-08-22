@@ -3467,13 +3467,11 @@ var glitchTranslate, glitchCorrupt;
   function runMatrixRain(){
     const canvas=document.getElementById('matrixRain');
     if(!canvas)return;
-    // Now called from two places (this file's own 55s timer, and
-    // hackedScreenGlitch() directly) which can collide if a previous run is
-    // still mid-animation -- two frame() loops would then both be alive,
-    // fighting over the same shared matrixRAF/matrixStop/matrixStreamCache
-    // and racing to cancel each other's (wrong) animation frame. Cleanly
-    // end any in-flight run first so there's only ever one loop.
-    if(matrixRAF){cancelAnimationFrame(matrixRAF);matrixRAF=null;}
+    // This can now be called from two places (this file's own 55s timer,
+    // and hackedScreenGlitch() directly) and occasionally collides with a
+    // previous run still mid-animation -- deliberately left alone rather
+    // than guarded against, since the resulting overlap/blend is a look
+    // that's wanted here, not a bug to clean up.
     const ctx=canvas.getContext('2d');
     const dpr=Math.min(window.devicePixelRatio||1,2);
     canvas.width=window.innerWidth*dpr;
