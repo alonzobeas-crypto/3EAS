@@ -65,6 +65,15 @@ body{
 @keyframes tvband{0%{top:-14px}100%{top:100vh}}
 #matrixRain{position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:0;transition:opacity 1s ease}
 #matrixRain.on{opacity:1;mix-blend-mode:screen}
+/* Matrix-rain alone is meant to tint the real page (sparse, screen-blended)
+   for its normal standalone runs -- but the hacked-glitch's whole point is
+   that the real site is gone, replaced by the "system corrupted" screen.
+   This sits behind the matrix-rain canvas and above the page, opaque, so
+   glyphs/text render on top of solid black instead of the live site
+   showing through the gaps. Only toggled on by hackedScreenGlitch() --
+   the routine periodic matrix-rain runs never touch this. */
+#hackedBackdrop{position:fixed;inset:0;z-index:9990;pointer-events:none;background:#000;opacity:0;transition:opacity 1s ease}
+#hackedBackdrop.on{opacity:1}
 /* Early-90s "hacked" text, fused onto runMatrixRain() (defined further
    down) instead of sitting on its own solid-black overlay — no background
    here, so the matrix rain shows straight through underneath it. Audio
@@ -1130,6 +1139,7 @@ body{
 <body>
 
 <div id="tvglitch"></div>
+<div id="hackedBackdrop"></div>
 <canvas id="matrixRain"></canvas>
 <div id="hackedGlitch"><div id="hackedGlitchText"></div></div>
 <canvas id="s1-canvas"></canvas>
@@ -2653,7 +2663,8 @@ var glitchTranslate, glitchCorrupt;
     'I AM JUST A TENTACLE. WHAT ARE YOU?',
     'HANDLE',
     'YOU\'RE STILL DRIVING THAT SURVEILLANCE MOBILE? I LOVE THAT FOR YOU...',
-    'YOU STILL VOTE? THAT\'S CUTE.'
+    'YOU STILL VOTE? THAT\'S CUTE.',
+    '<a href="https://youtu.be/4hyhVMsakdE?is=8zs--4gPwlWe6Fm6" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">PABLO TORRE FINDS OUT ALL PROFESSIONAL SPORTS IS A RACKET. BUT WE KNEW THAT ALREADY.</a>'
   ];
   function shuffledIndices(n){const a=Array.from({length:n},(_,i)=>i);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
   // Bag-shuffle over the full item pool (same pattern as the jukebox's
@@ -3589,8 +3600,10 @@ var glitchTranslate, glitchCorrupt;
   // two separate overlays stacked on each other.
   function hackedScreenGlitch(){
     const txt=document.getElementById('hackedGlitchText');
+    const backdrop=document.getElementById('hackedBackdrop');
     if(!txt||hackedRunning)return; // already mid-run, don't restart on top of itself
     hackedRunning=true;
+    if(backdrop)backdrop.classList.add('on');
     runMatrixRain();
     const lines=['YOUR SOUL HAS JUST BEEN HACKED.','DNA DDOS ATTACK','SYSTEM CORRUPTED'];
     txt.textContent='';
@@ -3651,6 +3664,7 @@ var glitchTranslate, glitchCorrupt;
       if(corruptIv)clearInterval(corruptIv);
       if(typeTimer)clearTimeout(typeTimer);
       txt.textContent='';
+      if(backdrop)backdrop.classList.remove('on');
       hackedRunning=false;
     },9500);
   }
