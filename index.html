@@ -65,14 +65,15 @@ body{
 @keyframes tvband{0%{top:-14px}100%{top:100vh}}
 #matrixRain{position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:0;transition:opacity 1s ease}
 #matrixRain.on{opacity:1;mix-blend-mode:screen}
-/* Early-90s "hacked" blackout — solid black, not blended, so it fully
-   covers the page rather than tinting it like the effects above. Audio
-   (jukebox/transmissions) is untouched by this: it's a pure visual overlay,
-   nothing here ever calls into spA/spB/audio. */
+/* Early-90s "hacked" text, fused onto runMatrixRain() (defined further
+   down) instead of sitting on its own solid-black overlay — no background
+   here, so the matrix rain shows straight through underneath it. Audio
+   (jukebox/transmissions) is untouched by any of this: it's a pure visual
+   effect, nothing here ever calls into spA/spB/audio. */
 #hackedGlitch{
   position:fixed;inset:0;z-index:10000;pointer-events:none;
-  background:#000;display:flex;align-items:center;justify-content:center;
-  padding:40px;box-sizing:border-box;opacity:0;
+  display:flex;align-items:center;justify-content:center;
+  padding:40px;box-sizing:border-box;
 }
 #hackedGlitchText{
   font-family:var(--mono);color:var(--fg);font-size:clamp(15px,2.6vw,26px);
@@ -3577,30 +3578,21 @@ var glitchTranslate, glitchCorrupt;
   // is the visual reads as catastrophic while the jukebox/transmissions
   // keep playing straight through it.
   let hackedRunning=false;
-  // Stepped, irregular opacity ramp instead of a plain CSS transition — the
-  // fade itself stutters toward the target (occasional over/undershoot)
-  // rather than gliding smoothly, so entering/leaving reads as part of the
-  // glitch instead of a clean cut.
-  function hackedFade(el,target,duration,done){
-    const start=performance.now(),from=parseFloat(el.style.opacity)||0;
-    const step=()=>{
-      const t=Math.min(1,(performance.now()-start)/duration);
-      const base=from+(target-from)*t;
-      const jitter=Math.random()<0.35?Math.random()*0.4-0.2:0;
-      el.style.opacity=Math.max(0,Math.min(1,base+jitter));
-      if(t>=1){el.style.opacity=target;done&&done();return;}
-      setTimeout(step,35+Math.random()*45);
-    };
-    step();
-  }
+  // No separate fade in/out anymore -- this rides on top of runMatrixRain()
+  // itself (defined above) instead of its own blackout overlay. Matrix rain
+  // handles the entrance (canvas.on's own opacity transition) and the exit
+  // (its built-in fade-and-clear at the end of its randomized 8.2-12s run);
+  // the "hacked" text just appears over it and disappears on roughly the
+  // same timeline, so the two effects read as one fused moment instead of
+  // two separate overlays stacked on each other.
   function hackedScreenGlitch(){
-    const el=document.getElementById('hackedGlitch');
     const txt=document.getElementById('hackedGlitchText');
-    if(!el||!txt||hackedRunning)return; // already mid-run, don't restart on top of itself
+    if(!txt||hackedRunning)return; // already mid-run, don't restart on top of itself
     hackedRunning=true;
+    runMatrixRain();
     const lines=['YOUR SOUL HAS JUST BEEN HACKED.','DNA DDOS ATTACK','SYSTEM CORRUPTED'];
     txt.textContent='';
-    let li=0,ci=0,typeTimer=null,flickerIv=null,corruptIv=null;
+    let li=0,ci=0,typeTimer=null,corruptIv=null;
     // Each character gets its own span (data-orig holds the real letter) so
     // the corruption pass below can mutate individual characters in place
     // and revert them, instead of only being able to swap the whole line.
@@ -3627,18 +3619,15 @@ var glitchTranslate, glitchCorrupt;
         typeTimer=setTimeout(typeNext,300);
       }
     }
-    hackedFade(el,1,600,()=>{
+    // Give the rain half a second to fill the screen before text starts
+    // appearing, so the words read as emerging out of it rather than both
+    // starting at the exact same instant.
+    setTimeout(()=>{
       typeNext();
-      // Keep the blackout visibly unstable the whole time it's up, not just
-      // at the fade edges — brief opacity dips on the overlay itself, on
-      // top of the text's own continuous flicker keyframe.
-      flickerIv=setInterval(()=>{
-        el.style.opacity=Math.random()<0.25?(0.75+Math.random()*0.25).toFixed(2):1;
-      },220);
       // Same leetspeak/case-flip corruption the ticker uses (LEET map,
       // below) — a couple of already-typed letters glitch to a number or
       // flip case for a moment, then revert, on a loop for as long as the
-      // blackout is up.
+      // effect is up.
       corruptIv=setInterval(()=>{
         const spans=txt.querySelectorAll('.hc');
         if(!spans.length)return;
@@ -3652,13 +3641,16 @@ var glitchTranslate, glitchCorrupt;
           setTimeout(()=>{sp.textContent=orig;sp.classList.remove('corrupt');},150+Math.random()*150);
         }
       },180);
-    });
+    },500);
+    // Matrix rain's own duration is randomized (8.2-12s) and self-clears —
+    // clear the text a little ahead of the middle of that range so it never
+    // outlasts the rain, then let runMatrixRain's own fade finish the exit.
     setTimeout(()=>{
-      if(flickerIv)clearInterval(flickerIv);
       if(corruptIv)clearInterval(corruptIv);
       if(typeTimer)clearTimeout(typeTimer);
-      hackedFade(el,0,2800,()=>{hackedRunning=false;});
-    },15000-600);
+      txt.textContent='';
+      hackedRunning=false;
+    },9500);
   }
 
   // Previously alternated on a single shared 42s toggle, so each effect
