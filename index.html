@@ -75,12 +75,13 @@ body{
   padding:40px;box-sizing:border-box;opacity:0;
 }
 #hackedGlitchText{
-  font-family:var(--mono);color:#e5e5e5;font-size:clamp(15px,2.6vw,26px);
+  font-family:var(--mono);color:var(--fg);font-size:clamp(15px,2.6vw,26px);
   letter-spacing:2px;text-align:center;line-height:2.2;white-space:pre-wrap;
-  text-shadow:0 0 8px rgba(255,255,255,.35);animation:hackedFlicker .15s steps(1) infinite;
+  text-shadow:0 0 8px rgba(216,212,200,.35);animation:hackedFlicker .15s steps(1) infinite;
 }
 @keyframes hackedFlicker{0%,91%,100%{opacity:1}92%{opacity:.82}94%{opacity:1}96%{opacity:.88}}
-.hackedCursor{display:inline-block;width:.6em;height:1em;background:#e5e5e5;vertical-align:text-bottom;margin-left:2px;animation:hackedBlink .5s step-end infinite}
+.hackedCursor{display:inline-block;width:.6em;height:1em;background:var(--fg);vertical-align:text-bottom;margin-left:2px;animation:hackedBlink .5s step-end infinite}
+.hc.corrupt{color:var(--accent);text-shadow:2px 0 var(--accent),-2px 0 #0ff}
 @keyframes hackedBlink{0%,50%{opacity:1}50.01%,100%{opacity:0}}
 .scanbeam{
   position:fixed;left:0;width:100%;height:2px;
@@ -3597,16 +3598,26 @@ var glitchTranslate, glitchCorrupt;
     hackedRunning=true;
     const lines=['YOUR SOUL HAS JUST BEEN HACKED.','DNA DDOS ATTACK','SYSTEM CORRUPTED'];
     txt.textContent='';
-    let li=0,ci=0,typeTimer=null,flickerIv=null;
+    let li=0,ci=0,typeTimer=null,flickerIv=null,corruptIv=null;
+    // Each character gets its own span (data-orig holds the real letter) so
+    // the corruption pass below can mutate individual characters in place
+    // and revert them, instead of only being able to swap the whole line.
+    function addChar(ch){
+      const sp=document.createElement('span');
+      sp.className='hc';
+      sp.dataset.orig=ch;
+      sp.textContent=ch;
+      txt.appendChild(sp);
+    }
     function typeNext(){
       if(li>=lines.length){
         txt.insertAdjacentHTML('beforeend','<span class="hackedCursor"></span>');
         return;
       }
-      if(ci===0&&li>0)txt.textContent+='\n';
+      if(ci===0&&li>0)addChar('\n');
       const line=lines[li];
       if(ci<line.length){
-        txt.textContent+=line[ci];
+        addChar(line[ci]);
         ci++;
         typeTimer=setTimeout(typeNext,35+Math.random()*40);
       }else{
@@ -3622,9 +3633,27 @@ var glitchTranslate, glitchCorrupt;
       flickerIv=setInterval(()=>{
         el.style.opacity=Math.random()<0.25?(0.75+Math.random()*0.25).toFixed(2):1;
       },220);
+      // Same leetspeak/case-flip corruption the ticker uses (LEET map,
+      // below) — a couple of already-typed letters glitch to a number or
+      // flip case for a moment, then revert, on a loop for as long as the
+      // blackout is up.
+      corruptIv=setInterval(()=>{
+        const spans=txt.querySelectorAll('.hc');
+        if(!spans.length)return;
+        const n=1+Math.floor(Math.random()*2);
+        for(let k=0;k<n;k++){
+          const sp=spans[Math.floor(Math.random()*spans.length)];
+          const orig=sp.dataset.orig;
+          if(!/[A-Z]/.test(orig))continue;
+          sp.classList.add('corrupt');
+          sp.textContent=(LEET[orig]&&Math.random()<0.5)?LEET[orig]:(Math.random()<0.5?orig.toLowerCase():orig);
+          setTimeout(()=>{sp.textContent=orig;sp.classList.remove('corrupt');},150+Math.random()*150);
+        }
+      },180);
     });
     setTimeout(()=>{
       if(flickerIv)clearInterval(flickerIv);
+      if(corruptIv)clearInterval(corruptIv);
       if(typeTimer)clearTimeout(typeTimer);
       hackedFade(el,0,600,()=>{hackedRunning=false;});
     },15000-600);
