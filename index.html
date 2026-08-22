@@ -2706,10 +2706,28 @@ var glitchTranslate, glitchCorrupt;
     saveTickerBag();
     return idxBatch.map(i=>pool[i]);
   }
+  // ti1/ti2 are two independent tracks, both animating 0 -> -100% of their
+  // OWN width over the same 80s, sitting side by side in the flex row. That
+  // only stays seamless if the two tracks are close to the same total pixel
+  // width — splitting by item COUNT (32/32) let two halves end up wildly
+  // different widths whenever the long items happened to cluster into one
+  // half (some entries are one word, others full sentences), opening a
+  // growing/shrinking gap between them as they scroll: the "dead space" on
+  // the ticker. The font here is monospace, so character count is a direct
+  // stand-in for pixel width — greedily route each item (in its existing
+  // shuffled order, so the randomness isn't lost) to whichever half is
+  // currently shorter, instead of a blind positional split.
+  function tickerItemLen(s){return s.replace(/<[^>]*>/g,'').length;}
   function nextTickerHalves(arr){
     const batch=nextTickerBatch(arr);
-    const mid=Math.ceil(batch.length/2);
-    return [batch.slice(0,mid),batch.slice(mid)];
+    const h1=[],h2=[];
+    let len1=0,len2=0;
+    batch.forEach(item=>{
+      const L=tickerItemLen(item);
+      if(len1<=len2){h1.push(item);len1+=L;}
+      else{h2.push(item);len2+=L;}
+    });
+    return [h1,h2];
   }
   const es={
     'SIGNAL ACTIVE':'SEÑAL ACTIVA',
@@ -3449,6 +3467,13 @@ var glitchTranslate, glitchCorrupt;
   function runMatrixRain(){
     const canvas=document.getElementById('matrixRain');
     if(!canvas)return;
+    // Now called from two places (this file's own 55s timer, and
+    // hackedScreenGlitch() directly) which can collide if a previous run is
+    // still mid-animation -- two frame() loops would then both be alive,
+    // fighting over the same shared matrixRAF/matrixStop/matrixStreamCache
+    // and racing to cancel each other's (wrong) animation frame. Cleanly
+    // end any in-flight run first so there's only ever one loop.
+    if(matrixRAF){cancelAnimationFrame(matrixRAF);matrixRAF=null;}
     const ctx=canvas.getContext('2d');
     const dpr=Math.min(window.devicePixelRatio||1,2);
     canvas.width=window.innerWidth*dpr;
