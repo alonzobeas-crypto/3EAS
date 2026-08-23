@@ -92,6 +92,7 @@ body{
 @keyframes hackedFlicker{0%,91%,100%{opacity:1}92%{opacity:.82}94%{opacity:1}96%{opacity:.88}}
 .hackedCursor{display:inline-block;width:.6em;height:1em;background:var(--fg);vertical-align:text-bottom;margin-left:2px;animation:hackedBlink .5s step-end infinite}
 .hc.corrupt{color:var(--accent);text-shadow:2px 0 var(--accent),-2px 0 #0ff}
+.sp-corrupt{color:var(--accent);text-shadow:2px 0 var(--accent),-2px 0 #0ff}
 @keyframes hackedBlink{0%,50%{opacity:1}50.01%,100%{opacity:0}}
 .scanbeam{
   position:fixed;left:0;width:100%;height:2px;
@@ -2209,19 +2210,42 @@ function spUnlock(){
   });
 }
 
-// CSS text-transform:capitalize can't do this on its own -- it only forces
-// the FIRST letter of each word to uppercase, it never lowercases the rest.
-// Since SP_TRACKS titles are stored in ALL CAPS, every letter already
-// satisfied that rule, so the CSS was a complete no-op. Actually
-// transforming the text is the only way to get real title case out of an
-// all-caps source.
-function toTitleCase(s){
-  return s.replace(/\S+/g,w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase());
-}
+// Song titles glitch the same way the hacked-glitch text does (leetspeak
+// swaps / case flips on random letters, briefly, on a loop) instead of
+// title-casing them -- a separate LEET map from the one the ticker/hacked-
+// glitch code uses, since this lives in an entirely different closure and
+// can't reach that one. Each character gets its own span (data-orig holds
+// the real letter) so individual letters can be mutated and reverted in
+// place without touching the rest of the title.
+const SP_TITLE_LEET={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9'};
+let spTitleCorruptIv=null;
 function spSetTitle(t){
-  const displayT=toTitleCase(t);
-  document.getElementById('sp-title').textContent=displayT;
-  if('mediaSession' in navigator)navigator.mediaSession.metadata=new MediaMetadata({title:displayT,artist:'3EAS',album:'3EASCORTEX'});
+  const el=document.getElementById('sp-title');
+  el.textContent='';
+  t.split('').forEach(ch=>{
+    const sp=document.createElement('span');
+    sp.className='sp-tc';
+    sp.dataset.orig=ch;
+    sp.textContent=ch;
+    el.appendChild(sp);
+  });
+  if('mediaSession' in navigator)navigator.mediaSession.metadata=new MediaMetadata({title:t,artist:'3EAS',album:'3EASCORTEX'});
+  if(!spTitleCorruptIv){
+    spTitleCorruptIv=setInterval(()=>{
+      const spans=el.querySelectorAll('.sp-tc');
+      if(!spans.length)return;
+      const n=1+Math.floor(Math.random()*2);
+      for(let k=0;k<n;k++){
+        const sp=spans[Math.floor(Math.random()*spans.length)];
+        const orig=sp.dataset.orig;
+        if(!/[A-Za-z]/.test(orig))continue;
+        const up=orig.toUpperCase();
+        sp.classList.add('sp-corrupt');
+        sp.textContent=(SP_TITLE_LEET[up]&&Math.random()<0.5)?SP_TITLE_LEET[up]:(orig===up?orig.toLowerCase():up);
+        setTimeout(()=>{sp.textContent=orig;sp.classList.remove('sp-corrupt');},150+Math.random()*150);
+      }
+    },220);
+  }
 }
 
 // A single check right after a play() promise settles isn't reliable proof
