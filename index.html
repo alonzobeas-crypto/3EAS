@@ -92,6 +92,7 @@ body{
 @keyframes hackedFlicker{0%,91%,100%{opacity:1}92%{opacity:.82}94%{opacity:1}96%{opacity:.88}}
 .hackedCursor{display:inline-block;width:.6em;height:1em;background:var(--fg);vertical-align:text-bottom;margin-left:2px;animation:hackedBlink .5s step-end infinite}
 .hc.corrupt{color:var(--accent);text-shadow:2px 0 var(--accent),-2px 0 #0ff}
+.sp-corrupt{color:var(--accent);text-shadow:2px 0 var(--accent),-2px 0 #0ff}
 @keyframes hackedBlink{0%,50%{opacity:1}50.01%,100%{opacity:0}}
 .scanbeam{
   position:fixed;left:0;width:100%;height:2px;
@@ -1094,7 +1095,7 @@ body{
     background:rgba(0,0,0,.97)!important;
     border-right:none!important;
   }
-  #sp-title{color:var(--accent)!important;font-size:15px!important;font-weight:600!important;white-space:normal!important;word-break:break-word!important;text-transform:capitalize!important}
+  #sp-title{color:var(--accent)!important;font-size:15px!important;font-weight:600!important;white-space:normal!important;word-break:break-word!important}
   #site-player button{
     color:var(--accent)!important;border-color:var(--accent)!important;
     font-size:9px!important;letter-spacing:1px!important;padding:6px 8px!important;flex:0 0 auto!important;
@@ -1452,7 +1453,7 @@ body{
 <div id="site-player" style="position:fixed;bottom:38px;left:0;z-index:490;display:flex;flex-direction:column;gap:8px;padding:14px 26px;border-top:1px solid var(--dim);border-right:1px solid var(--dim);background:rgba(20,20,20,.94);font-family:var(--mono);font-size:13px;letter-spacing:3px;color:var(--dim);cursor:none;transition:opacity .3s;max-width:min(90vw,640px)">
   <div style="display:flex;align-items:center;gap:12px">
     <div id="sp-dot" style="width:8px;height:8px;background:var(--accent);animation:blink 1.3s infinite;flex-shrink:0"></div>
-    <span id="sp-title" style="color:var(--fg);font-size:14px;white-space:normal;word-break:break-word;line-height:1.4;text-transform:capitalize">STANDBY</span>
+    <span id="sp-title" style="color:var(--fg);font-size:14px;white-space:normal;word-break:break-word;line-height:1.4">STANDBY</span>
   </div>
   <div style="display:flex;align-items:center;gap:18px">
   <button id="sp-play" onclick="spPlay()" title="Play" style="background:none;border:1px solid var(--dim);color:var(--dim);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s;flex:0 0 auto" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dim)';this.style.borderColor='var(--dim)'">PLAY ▶</button>
@@ -2209,9 +2210,42 @@ function spUnlock(){
   });
 }
 
+// Song titles glitch the same way the hacked-glitch text does (leetspeak
+// swaps / case flips on random letters, briefly, on a loop) instead of
+// title-casing them -- a separate LEET map from the one the ticker/hacked-
+// glitch code uses, since this lives in an entirely different closure and
+// can't reach that one. Each character gets its own span (data-orig holds
+// the real letter) so individual letters can be mutated and reverted in
+// place without touching the rest of the title.
+const SP_TITLE_LEET={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9'};
+let spTitleCorruptIv=null;
 function spSetTitle(t){
-  document.getElementById('sp-title').textContent=t;
+  const el=document.getElementById('sp-title');
+  el.textContent='';
+  t.split('').forEach(ch=>{
+    const sp=document.createElement('span');
+    sp.className='sp-tc';
+    sp.dataset.orig=ch;
+    sp.textContent=ch;
+    el.appendChild(sp);
+  });
   if('mediaSession' in navigator)navigator.mediaSession.metadata=new MediaMetadata({title:t,artist:'3EAS',album:'3EASCORTEX'});
+  if(!spTitleCorruptIv){
+    spTitleCorruptIv=setInterval(()=>{
+      const spans=el.querySelectorAll('.sp-tc');
+      if(!spans.length)return;
+      const n=1+Math.floor(Math.random()*2);
+      for(let k=0;k<n;k++){
+        const sp=spans[Math.floor(Math.random()*spans.length)];
+        const orig=sp.dataset.orig;
+        if(!/[A-Za-z]/.test(orig))continue;
+        const up=orig.toUpperCase();
+        sp.classList.add('sp-corrupt');
+        sp.textContent=(SP_TITLE_LEET[up]&&Math.random()<0.5)?SP_TITLE_LEET[up]:(orig===up?orig.toLowerCase():up);
+        setTimeout(()=>{sp.textContent=orig;sp.classList.remove('sp-corrupt');},150+Math.random()*150);
+      }
+    },220);
+  }
 }
 
 // A single check right after a play() promise settles isn't reliable proof
