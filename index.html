@@ -2217,7 +2217,7 @@ function spUnlock(){
 // can't reach that one. Each character gets its own span (data-orig holds
 // the real letter) so individual letters can be mutated and reverted in
 // place without touching the rest of the title.
-const SP_TITLE_LEET={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9'};
+const SP_TITLE_LEET={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9',L:'1',Z:'2'};
 let spTitleCorruptIv=null;
 function spSetTitle(t){
   const el=document.getElementById('sp-title');
@@ -3766,7 +3766,7 @@ var glitchTranslate, glitchCorrupt;
 
   // Character-level corruption: randomly flip letter case and swap a few
   // letters for leetspeak-style numbers, briefly, on visible ticker spans.
-  const LEET={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9'};
+  const LEET={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9',L:'1',Z:'2'};
   glitchCorrupt=function(){
     [document.getElementById('ti1'),document.getElementById('ti2')].forEach(el=>{
       if(!el)return;
