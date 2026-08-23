@@ -2688,45 +2688,54 @@ var glitchTranslate, glitchCorrupt;
     'ENLIGHTENMENT? MORE LIKE ANNIHILATION.',
     'VIOLENCE IS A QUEST FOR IDENTITY'
   ];
-  function shuffledIndices(n){const a=Array.from({length:n},(_,i)=>i);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+  function shuffleArr(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
   // Bag-shuffle over the full item pool (same pattern as the jukebox's
   // spBag), instead of a fresh full-pool shuffle every cycle. Showing 100%
-  // of the ~128-item pool every single cycle meant every item reappeared on
-  // every reshuffle — speeding up the reshuffle interval without changing
-  // that would only make repeats feel MORE frequent, not less. Drawing a
-  // smaller rotating batch per cycle means an item doesn't resurface until
-  // the bag empties and reshuffles, spreading repeats out in real time even
-  // as cycles fire faster.
+  // of the pool every single cycle meant every item reappeared on every
+  // reshuffle — speeding up the reshuffle interval without changing that
+  // would only make repeats feel MORE frequent, not less. Drawing a smaller
+  // rotating batch per cycle means an item doesn't resurface until
+  // everything else has, spreading repeats out in real time even as cycles
+  // fire faster.
   //
-  // That guarantee only held for a single continuous page session, though —
-  // mobile browsers frequently discard/reload a backgrounded tab (switching
-  // apps, locking the phone), which restarts this whole script and throws
-  // away tickerBag/tickerBagPos, reshuffling fresh far more often than
-  // desktop ever does. Persisting the bag (as indices, not content, so it
-  // stays valid across content edits by length) in localStorage means a
-  // reload resumes the same rotation instead of restarting it, so the full
-  // pool actually plays out before anything repeats — even across the
-  // frequent reloads mobile visits involve.
-  const TICKER_BAG_KEY='tickerBagState';
-  let tickerBag=[],tickerBagPos=0;
-  function saveTickerBag(){try{localStorage.setItem(TICKER_BAG_KEY,JSON.stringify({bag:tickerBag,pos:tickerBagPos}));}catch(e){}}
-  function loadTickerBag(poolLen){
+  // That guarantee used to be tracked by INDEX into the pool array (a
+  // shuffled list of positions, persisted across reloads so mobile's
+  // frequent tab-discarding didn't reset progress). The flaw: this site's
+  // ticker content gets edited constantly, and every single addition or
+  // removal shifts every index after it — the persisted position no longer
+  // pointed at the same items, so the safety check invalidated the whole
+  // bag and reshuffled from scratch on nearly every deploy. Tracking by the
+  // item's own CONTENT instead of its position fixes that: adding a new
+  // line just means it's unseen (correctly shows up soon); removing one
+  // just quietly drops out of the seen set. Editing the ticker no longer
+  // resets everyone's progress toward "seen everything once."
+  const TICKER_SEEN_KEY='tickerSeenState';
+  let tickerSeen=new Set(),tickerSeenLoaded=false;
+  function saveTickerSeen(){try{localStorage.setItem(TICKER_SEEN_KEY,JSON.stringify(Array.from(tickerSeen)));}catch(e){}}
+  function loadTickerSeen(){
+    tickerSeenLoaded=true;
     try{
-      const s=JSON.parse(localStorage.getItem(TICKER_BAG_KEY));
-      if(s&&Array.isArray(s.bag)&&s.bag.length===poolLen&&Number.isInteger(s.pos)&&s.pos>=0&&s.pos<=poolLen){
-        tickerBag=s.bag;tickerBagPos=s.pos;
-      }
+      const arr=JSON.parse(localStorage.getItem(TICKER_SEEN_KEY));
+      if(Array.isArray(arr))tickerSeen=new Set(arr);
     }catch(e){}
   }
   const TICKER_BATCH=64; // ~half the pool per cycle — two cycles to see everything once
   function nextTickerBatch(pool){
-    if(!tickerBag.length)loadTickerBag(pool.length);
-    if(tickerBagPos>=tickerBag.length||tickerBag.length!==pool.length){tickerBag=shuffledIndices(pool.length);tickerBagPos=0;}
-    const take=Math.min(TICKER_BATCH,tickerBag.length-tickerBagPos);
-    const idxBatch=tickerBag.slice(tickerBagPos,tickerBagPos+take);
-    tickerBagPos+=take;
-    saveTickerBag();
-    return idxBatch.map(i=>pool[i]);
+    if(!tickerSeenLoaded)loadTickerSeen();
+    let unseen=pool.filter(item=>!tickerSeen.has(item));
+    if(unseen.length===0){
+      // Truly nothing left unseen — the lap is actually done. Start a
+      // fresh one. (Resetting any earlier than this — e.g. once fewer than
+      // a full batch remains — would re-show items already displayed
+      // earlier in the SAME lap, which defeats the whole guarantee. The
+      // last batch or two of a lap just runs shorter instead.)
+      tickerSeen=new Set();
+      unseen=pool.slice();
+    }
+    const batch=shuffleArr(unseen).slice(0,Math.min(TICKER_BATCH,unseen.length));
+    batch.forEach(item=>tickerSeen.add(item));
+    saveTickerSeen();
+    return batch;
   }
   // ti1/ti2 are two independent tracks, both animating 0 -> -100% of their
   // OWN width over the same 80s, sitting side by side in the flex row. That
