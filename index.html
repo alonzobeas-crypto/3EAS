@@ -1094,7 +1094,7 @@ body{
     background:rgba(0,0,0,.97)!important;
     border-right:none!important;
   }
-  #sp-title{color:var(--accent)!important;font-size:15px!important;font-weight:600!important;white-space:normal!important;word-break:break-word!important;text-transform:capitalize!important}
+  #sp-title{color:var(--accent)!important;font-size:15px!important;font-weight:600!important;white-space:normal!important;word-break:break-word!important}
   #site-player button{
     color:var(--accent)!important;border-color:var(--accent)!important;
     font-size:9px!important;letter-spacing:1px!important;padding:6px 8px!important;flex:0 0 auto!important;
@@ -1452,7 +1452,7 @@ body{
 <div id="site-player" style="position:fixed;bottom:38px;left:0;z-index:490;display:flex;flex-direction:column;gap:8px;padding:14px 26px;border-top:1px solid var(--dim);border-right:1px solid var(--dim);background:rgba(20,20,20,.94);font-family:var(--mono);font-size:13px;letter-spacing:3px;color:var(--dim);cursor:none;transition:opacity .3s;max-width:min(90vw,640px)">
   <div style="display:flex;align-items:center;gap:12px">
     <div id="sp-dot" style="width:8px;height:8px;background:var(--accent);animation:blink 1.3s infinite;flex-shrink:0"></div>
-    <span id="sp-title" style="color:var(--fg);font-size:14px;white-space:normal;word-break:break-word;line-height:1.4;text-transform:capitalize">STANDBY</span>
+    <span id="sp-title" style="color:var(--fg);font-size:14px;white-space:normal;word-break:break-word;line-height:1.4">STANDBY</span>
   </div>
   <div style="display:flex;align-items:center;gap:18px">
   <button id="sp-play" onclick="spPlay()" title="Play" style="background:none;border:1px solid var(--dim);color:var(--dim);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s;flex:0 0 auto" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--dim)';this.style.borderColor='var(--dim)'">PLAY ▶</button>
@@ -2209,9 +2209,19 @@ function spUnlock(){
   });
 }
 
+// CSS text-transform:capitalize can't do this on its own -- it only forces
+// the FIRST letter of each word to uppercase, it never lowercases the rest.
+// Since SP_TRACKS titles are stored in ALL CAPS, every letter already
+// satisfied that rule, so the CSS was a complete no-op. Actually
+// transforming the text is the only way to get real title case out of an
+// all-caps source.
+function toTitleCase(s){
+  return s.replace(/\S+/g,w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase());
+}
 function spSetTitle(t){
-  document.getElementById('sp-title').textContent=t;
-  if('mediaSession' in navigator)navigator.mediaSession.metadata=new MediaMetadata({title:t,artist:'3EAS',album:'3EASCORTEX'});
+  const displayT=toTitleCase(t);
+  document.getElementById('sp-title').textContent=displayT;
+  if('mediaSession' in navigator)navigator.mediaSession.metadata=new MediaMetadata({title:displayT,artist:'3EAS',album:'3EASCORTEX'});
 }
 
 // A single check right after a play() promise settles isn't reliable proof
