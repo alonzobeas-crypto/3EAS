@@ -4301,43 +4301,27 @@ function spToggle(){
 
 /* ─── BEAT LAB ─── */
 const PAD_KIT=[
-  // Row A — kicks/subs
-  {n:'KCK 01',s:'A.I.'},{n:'KCK 02',s:'BASICK'},{n:'SUB',s:'EXILED'},{n:'808',s:'ICE'},
-  {n:'KCK LO',s:'JMX'},{n:'BOOM',s:'RTC'},{n:'THMP',s:'RIVER'},{n:'KCK FX',s:'TRMLO'},
-  // Row B — snares/claps
-  {n:'SNR 01',s:'A.I.'},{n:'SNR 02',s:'BASICK'},{n:'CLAP',s:'EXILED'},{n:'RIM',s:'ICE'},
-  {n:'SLAP',s:'JMX'},{n:'CRACK',s:'MR.R'},{n:'SNR FX',s:'RIVER'},{n:'CLP RV',s:'TRMLO'},
-  // Row C — hats/perc
-  {n:'HAT C',s:'A.I.'},{n:'HAT O',s:'BASICK'},{n:'SHKR',s:'EXILED'},{n:'TICK',s:'ICE'},
-  {n:'PERC',s:'JMX'},{n:'BELL',s:'RTC'},{n:'CYM',s:'RIVER'},{n:'HAT FX',s:'TRMLO'},
-  // Row D — vox/chops
-  {n:'VOX 01',s:'JMX'},{n:'VOX 02',s:'MR.R'},{n:'STAB',s:'A.I.'},{n:'WORD',s:'EXILED'},
-  {n:'CHANT',s:'RTC'},{n:'WHISPR',s:'ICE'},{n:'SCREAM',s:'BASICK'},{n:'VOX FX',s:'TRMLO'},
-  // Row E — melodics
-  {n:'KEYS',s:'RTC'},{n:'BASS',s:'EXILED'},{n:'PAD',s:'A.I.'},{n:'PLUCK',s:'JMX'},
-  {n:'LEAD',s:'BASICK'},{n:'ORGAN',s:'MR.R'},{n:'STR',s:'TRMLO'},{n:'GTR',s:'RIVER'},
-  // Row F — fx/textures
-  {n:'NOISE',s:'A.I.'},{n:'STATIC',s:'ICE'},{n:'DRONE',s:'JMX'},{n:'TAPE',s:'RTC'},
-  {n:'SCAN',s:'MR.R'},{n:'GLTCH',s:'BASICK'},{n:'SWELL',s:'TRMLO'},{n:'AIR',s:'RIVER'},
-  // Row G — slices
-  {n:'CHOP 1',s:'EXILED'},{n:'CHOP 2',s:'A.I.'},{n:'CHOP 3',s:'JMX'},{n:'CHOP 4',s:'BASICK'},
-  {n:'LOOP A',s:'RTC'},{n:'LOOP B',s:'MR.R'},{n:'LOOP C',s:'ICE'},{n:'LOOP D',s:'TRMLO'},
-  // Row H — fills/risers
-  {n:'FILL 1',s:'BASICK'},{n:'FILL 2',s:'EXILED'},{n:'RISE',s:'A.I.'},{n:'IMPCT',s:'JMX'},
-  {n:'CRASH',s:'RIVER'},{n:'WHOOSH',s:'MR.R'},{n:'SWP',s:'TRMLO'},{n:'END',s:'RTC'},
+  // Row A — drums
+  {n:'KICK',s:'A.I.'},{n:'SNARE',s:'BASICK'},{n:'HAT C',s:'EXILED'},{n:'HAT O',s:'ICE'},
+  {n:'CLAP',s:'JMX'},{n:'RIM',s:'RTC'},{n:'PERC',s:'RIVER'},{n:'CYMBAL',s:'TRMLO'},
+  // Row B — bass
+  {n:'SUB',s:'A.I.'},{n:'808',s:'BASICK'},{n:'PLUCK',s:'EXILED'},{n:'SYN BS',s:'ICE'},
+  {n:'UPRGHT',s:'JMX'},{n:'FM BS',s:'MR.R'},{n:'GROWL',s:'RIVER'},{n:'DUB BS',s:'TRMLO'},
+  // Row C — synth
+  {n:'LEAD',s:'A.I.'},{n:'PAD',s:'BASICK'},{n:'ARP',s:'EXILED'},{n:'KEYS',s:'ICE'},
+  {n:'ORGAN',s:'JMX'},{n:'BELL',s:'RTC'},{n:'STAB',s:'RIVER'},{n:'DRONE',s:'TRMLO'},
+  // Row D — guitar
+  {n:'CHORD',s:'JMX'},{n:'RIFF',s:'MR.R'},{n:'PICK',s:'A.I.'},{n:'SLIDE',s:'EXILED'},
+  {n:'MUTE',s:'RTC'},{n:'STRUM',s:'ICE'},{n:'FDBK',s:'BASICK'},{n:'ACSTC',s:'TRMLO'},
 ];
-const ROW_LABELS=['KICKS','SNARES','HATS','VOX','MELODY','FX','SLICES','FILLS'];
+const ROW_LABELS=['DRUMS','BASS','SYNTH','GUITAR'];
 const PATTERN=[
-  [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], // kick
-  [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,1], // snare
-  [1,0,1,0, 1,0,1,0, 1,0,1,1, 1,0,1,0], // hat
-  [0,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,0,0], // vox
-  [1,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,0], // melody
-  [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,1,0,0], // fx
-  [0,0,1,0, 0,0,0,0, 0,1,0,0, 0,0,0,0], // slices
-  [0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0], // fills
+  [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,1,0], // drums
+  [1,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,0], // bass
+  [0,0,1,0, 0,0,0,0, 0,1,0,0, 0,0,0,0], // synth
+  [0,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,0,0], // guitar
 ];
-const PAD_VOLS=[88,72,55,68,90,42,77,60];
+const PAD_VOLS=[88,74,68,60];
 
 function buildPads(){
   const root=document.getElementById('pads');
