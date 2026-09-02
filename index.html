@@ -1049,6 +1049,7 @@ body{
   .tb-right{font-size:12px;letter-spacing:1px;padding:0 8px;gap:5px}
   a[title="Instagram"]{width:38px!important}
   a[title="Instagram"] svg{width:14px;height:14px}
+  .ti span{color:#f5efd8!important}
   .s1-main{padding:0 18px}
   /* center hero on phone, kill dead space top/bottom */
   #s1{align-items:center;justify-content:center;text-align:center;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
@@ -2755,7 +2756,8 @@ var glitchTranslate, glitchCorrupt;
     'R.I.P. TO MY PRIMO JOEY FLORES 08/30/2026. YOU HAD A SUBSTANTIAL IMPACT ON MY MUSICAL JOURNEY. THANK YOU AND REST WELL...',
     '<a href="https://youtu.be/qF9uu9bCKpo?is=InOxfJzufkcqrrxY" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">STARGATE ARGENTINA</a>',
     '<a href="https://youtube.com/@artificiallyaware?si=2xHMKgSwUhX-mn88" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">ARTIFICIALLY AWARE</a>',
-    '<a href="https://www.instagram.com/hummusquad" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">RAZA FOR GAZA</a>'
+    '<a href="https://www.instagram.com/hummusquad" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">RAZA FOR GAZA</a>',
+    'TAKE OFF YOUR MASK ALREADY'
   ];
   function shuffleArr(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
   // Bag-shuffle over the full item pool (same pattern as the jukebox's
@@ -2788,7 +2790,7 @@ var glitchTranslate, glitchCorrupt;
       if(Array.isArray(arr))tickerSeen=new Set(arr);
     }catch(e){}
   }
-  const TICKER_BATCH=64; // ~half the pool per cycle — two cycles to see everything once
+  const TICKER_BATCH=24; // smaller slice per cycle so the same items take longer to come back around
   function nextTickerBatch(pool){
     if(!tickerSeenLoaded)loadTickerSeen();
     let unseen=pool.filter(item=>!tickerSeen.has(item));
