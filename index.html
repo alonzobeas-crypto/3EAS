@@ -593,9 +593,9 @@ body{
 .tab.on{background:rgba(184,168,120,.08);color:var(--hot);text-shadow:0 0 6px rgba(232,224,192,.4)}
 .tab:hover{color:var(--accent)}
 
-/* Pad grid 8x8 */
+/* Pad grid — 4 channels x 16 samples = 64 pads */
 .pads{
-  display:grid;grid-template-columns:repeat(8,1fr);gap:6px;
+  display:grid;grid-template-columns:repeat(16,1fr);gap:5px;
   flex:1;min-height:0;
 }
 .pads.hide{display:none}
@@ -4302,18 +4302,26 @@ function spToggle(){
 
 /* ─── BEAT LAB ─── */
 const PAD_KIT=[
-  // Row A — drums
+  // Row A — drums (16)
   {n:'KICK',s:'A.I.'},{n:'SNARE',s:'BASICK'},{n:'HAT C',s:'EXILED'},{n:'HAT O',s:'ICE'},
   {n:'CLAP',s:'JMX'},{n:'RIM',s:'RTC'},{n:'PERC',s:'RIVER'},{n:'CYMBAL',s:'TRMLO'},
-  // Row B — bass
+  {n:'KICK 2',s:'MR.R'},{n:'SNR 2',s:'A.I.'},{n:'SHAKER',s:'BASICK'},{n:'TOM',s:'EXILED'},
+  {n:'808 HAT',s:'ICE'},{n:'BREAK',s:'JMX'},{n:'CRASH',s:'RTC'},{n:'STOMP',s:'RIVER'},
+  // Row B — bass (16)
   {n:'SUB',s:'A.I.'},{n:'808',s:'BASICK'},{n:'PLUCK',s:'EXILED'},{n:'SYN BS',s:'ICE'},
   {n:'UPRGHT',s:'JMX'},{n:'FM BS',s:'MR.R'},{n:'GROWL',s:'RIVER'},{n:'DUB BS',s:'TRMLO'},
-  // Row C — synth
+  {n:'REESE',s:'A.I.'},{n:'SQUARE',s:'BASICK'},{n:'808 2',s:'EXILED'},{n:'ACID BS',s:'ICE'},
+  {n:'SINE',s:'JMX'},{n:'WOBBLE',s:'MR.R'},{n:'SLAP BS',s:'RTC'},{n:'DRONE BS',s:'TRMLO'},
+  // Row C — synth (16)
   {n:'LEAD',s:'A.I.'},{n:'PAD',s:'BASICK'},{n:'ARP',s:'EXILED'},{n:'KEYS',s:'ICE'},
   {n:'ORGAN',s:'JMX'},{n:'BELL',s:'RTC'},{n:'STAB',s:'RIVER'},{n:'DRONE',s:'TRMLO'},
-  // Row D — guitar
+  {n:'PLUCK SY',s:'MR.R'},{n:'CHOIR',s:'A.I.'},{n:'BRASS',s:'BASICK'},{n:'STRINGS',s:'EXILED'},
+  {n:'FM LEAD',s:'ICE'},{n:'RHODES',s:'JMX'},{n:'SWEEP',s:'RTC'},{n:'GLASS',s:'RIVER'},
+  // Row D — guitar (16)
   {n:'CHORD',s:'JMX'},{n:'RIFF',s:'MR.R'},{n:'PICK',s:'A.I.'},{n:'SLIDE',s:'EXILED'},
   {n:'MUTE',s:'RTC'},{n:'STRUM',s:'ICE'},{n:'FDBK',s:'BASICK'},{n:'ACSTC',s:'TRMLO'},
+  {n:'POWER CH',s:'JMX'},{n:'HARMNC',s:'MR.R'},{n:'BEND',s:'A.I.'},{n:'PALM MT',s:'EXILED'},
+  {n:'TREMOLO',s:'RTC'},{n:'12STR',s:'ICE'},{n:'FUZZ',s:'BASICK'},{n:'SOLO',s:'TRMLO'},
 ];
 const ROW_LABELS=['DRUMS','BASS','SYNTH','GUITAR'];
 const PATTERN=[
@@ -4328,8 +4336,8 @@ function buildPads(){
   const root=document.getElementById('pads');
   let h='';
   PAD_KIT.forEach((p,i)=>{
-    const row=Math.floor(i/8);
-    const col=i%8;
+    const row=Math.floor(i/16);
+    const col=i%16;
     const id=String.fromCharCode(65+row)+(col+1);
     const armed=PATTERN[row]?.some(v=>v)?'armed':'';
     h+=`<div class="pad ${armed}" data-i="${i}" data-row="${row}">
