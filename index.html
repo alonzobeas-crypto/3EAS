@@ -1508,7 +1508,7 @@ body{
           <button class="tab" data-tab="seq" onclick="setTab('seq')">SEQUENCER</button>
         </div>
 
-        <!-- 8x8 PAD GRID -->
+        <!-- 4x16 PAD GRID (4 channels x 16 samples = 64 pads) -->
         <div class="pads" id="pads"></div>
 
         <!-- 8x16 SEQUENCER -->
@@ -4371,7 +4371,7 @@ function buildSeq(){
 
   const rows=document.getElementById('seqRows');
   let r='';
-  for(let row=0;row<8;row++){
+  for(let row=0;row<PATTERN.length;row++){
     r+=`<div class="seq-row" style="margin-bottom:3px">
       <div class="seq-lbl">${ROW_LABELS[row]}<span class="ms"><i></i><i></i></span></div>`;
     for(let s=0;s<16;s++){
@@ -4528,7 +4528,7 @@ function tickLab(){
   PATTERN.forEach((row,ri)=>{
     if(row[labStep]){
       // strobe one random pad in that row
-      const off=ri*8+Math.floor(Math.random()*8);
+      const off=ri*16+Math.floor(Math.random()*16);
       const pad=document.querySelector(`.pad[data-i="${off}"]`);
       pad?.classList.add('hit');
       setTimeout(()=>pad?.classList.remove('hit'),120);
