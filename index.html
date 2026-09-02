@@ -2789,7 +2789,7 @@ var glitchTranslate, glitchCorrupt;
       if(Array.isArray(arr))tickerSeen=new Set(arr);
     }catch(e){}
   }
-  const TICKER_BATCH=64; // ~half the pool per cycle — two cycles to see everything once
+  const TICKER_BATCH=24; // smaller slice per cycle so the same items take longer to come back around
   function nextTickerBatch(pool){
     if(!tickerSeenLoaded)loadTickerSeen();
     let unseen=pool.filter(item=>!tickerSeen.has(item));
