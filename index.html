@@ -2794,6 +2794,14 @@ var glitchTranslate, glitchCorrupt;
     }catch(e){}
   }
   const TICKER_BATCH=24; // smaller slice per cycle so the same items take longer to come back around
+  // The scroll runs at a fixed px/sec rate (same content, same duration),
+  // so a wide desktop window just takes longer to watch a given phrase
+  // cross it than a narrow phone screen does — same speed, reads as
+  // "slower." Trim the duration on wider viewports to compensate. Every
+  // place that needs to match the CSS animation's actual duration (the
+  // render-cycle interval, the mid-scroll jump glitch) reads this same
+  // constant instead of a hardcoded 80, so they can't drift out of sync.
+  const TICKER_DUR=window.innerWidth>900?62:80;
   function nextTickerBatch(pool){
     if(!tickerSeenLoaded)loadTickerSeen();
     let unseen=pool.filter(item=>!tickerSeen.has(item));
@@ -3374,7 +3382,9 @@ var glitchTranslate, glitchCorrupt;
   }
 
   function render(id,arr){
-    document.getElementById(id).innerHTML=arr.map(t=>`<span>${t}</span>`).join(' <span class="sep">\u25c8</span> ')+' <span class="sep">\u25c8</span>';
+    const el=document.getElementById(id);
+    el.style.animationDuration=TICKER_DUR+'s';
+    el.innerHTML=arr.map(t=>`<span>${t}</span>`).join(' <span class="sep">\u25c8</span> ')+' <span class="sep">\u25c8</span>';
   }
   // Plain (non-glitching) translation swap — each pass, translatable phrases
   // have a chance to render in a random language (Spanish/Russian/Portuguese/
@@ -3438,15 +3448,16 @@ var glitchTranslate, glitchCorrupt;
     applyLiveVals();
   }
   renderTickerCycle();
-  // Must match .ti's animation-duration (80s). A previous version fired this
-  // twice per scroll loop (46s vs the CSS's 92s) to reshuffle content more
+  // Must match TICKER_DUR (render() sets the actual per-track animation
+  // duration to match). A previous version fired this twice per scroll loop
+  // to reshuffle content more
   // often — but swapping ti1/ti2's innerHTML mid-scroll changes their width,
   // and the CSS transform is percentage-based, so the animation's current
   // translateX% suddenly meant a different pixel offset the instant content
   // changed — a visible jump/stutter mid-scroll, read as the ticker
   // "stopping." Firing only once per loop keeps every swap at the moment
   // the animation naturally resets to 0%, where there's nothing to jump.
-  setInterval(renderTickerCycle,80000);
+  setInterval(renderTickerCycle,TICKER_DUR*1000);
 
   // Occasional real-time glitch: briefly flip some visible phrases to a random language
   glitchTranslate=function(){
@@ -3481,7 +3492,7 @@ var glitchTranslate, glitchCorrupt;
     const els=[document.getElementById('ti1'),document.getElementById('ti2')];
     els.forEach(el=>{
       if(!el)return;
-      const dur=80; // must match .ti animation-duration
+      const dur=TICKER_DUR;
       const jumpTo=-(Math.random()*dur);
       el.style.animation='none';
       // A synchronous getBoundingClientRect() forces a reflow on desktop
