@@ -1,3 +1,12 @@
 {
-  "posts": []
+  "posts": [
+    {
+      "id": "1",
+      "date": "2026-09-02",
+      "title": "YOU HAVE RECEIVED THE SIGNAL",
+      "summary": "Gratitude to subscribers and supporters. New music, merch, digital assets, music videos, and live/online concerts coming soon.",
+      "body": "<p>You have received the signal. If you have subscribed and supported, I just want to send my gratitude.</p><p>New music, merch, digital assets, music videos, live and online concerts will be coming very soon. I've been holding a stockpile of musical content for 20 years and it is beginning to trickle out into the simulation.</p><p>Have a beautiful day.</p>",
+      "tags": ["UPDATE"]
+    }
+  ]
 }

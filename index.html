@@ -506,32 +506,6 @@ body{
   padding:24px 44px 60px;position:relative;
 }
 
-/* Coming-soon overlay over Beat Lab */
-.lab-cs{
-  position:absolute;inset:24px 44px 60px;z-index:50;
-  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;
-  pointer-events:none;
-}
-.lab-cs::before{
-  content:'';position:absolute;inset:0;
-  background:rgba(0,0,0,.78);
-  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
-}
-.lab-cs-inner{
-  position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:14px;
-  padding:36px 56px;border:1px solid var(--accent);
-  background:rgba(0,0,0,.55);
-}
-.lab-cs-tag{font-family:var(--mono);font-size:10px;letter-spacing:5px;color:var(--dim2);text-transform:uppercase}
-.lab-cs-title{
-  font-family:var(--vt);font-size:clamp(56px,9vw,120px);letter-spacing:6px;color:var(--hot);
-  text-shadow:0 0 24px rgba(232,224,192,.25);line-height:1;
-  animation:glitch 7s infinite;
-}
-.lab-cs-sub{font-family:var(--mono);font-size:12px;letter-spacing:4px;color:var(--accent);text-transform:uppercase}
-.lab-cs-rule{width:200px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
-.lab-cs-note{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--dim2);text-transform:uppercase;margin-top:4px}
-
 .dev{
   position:relative;width:100%;max-width:1600px;
   background:linear-gradient(180deg,#16140f 0%,#0e0c09 100%);
@@ -1104,13 +1078,6 @@ body{
   #site-player>div{flex-wrap:wrap!important}
   #sp-dot{width:7px!important;height:7px!important;flex-shrink:0}
 
-  /* beat lab: hide oversized instrument (it's in CALIBRATING state) & fit the card */
-  #sLab .dev-wrap{display:none!important}
-  .lab-cs{inset:16px 6px 12px!important;position:absolute!important}
-  .lab-cs-inner{padding:6px 8px!important}
-  .lab-cs-title{font-size:44px!important;letter-spacing:2px!important}
-  .lab-cs-sub{font-size:10px!important}
-  .lab-cs-note{font-size:9px!important;text-align:center}
   #sLab .lab-eyebrow{flex-direction:column;gap:1px;padding:8px 12px 3px}
   #sLab .lab-eyebrow h2{font-size:40px!important}
   #sLab .lab-eyebrow .lab-meta{text-align:left}
@@ -1374,15 +1341,6 @@ body{
       </div>
     </div>
     <div class="dev-wrap" id="devWrap"></div>
-    <div class="lab-cs" aria-hidden="true">
-      <div class="lab-cs-inner">
-        <span class="lab-cs-tag">// SOURCE SIGNAL // STATUS</span>
-        <div class="lab-cs-title">CALIBRATING</div>
-        <div class="lab-cs-rule"></div>
-        <span class="lab-cs-sub">BEAT LAB · IN CALIBRATION</span>
-        <span class="lab-cs-note">SAMPLE PACK + INTERACTIVE LAB — SIGNAL PENDING</span>
-      </div>
-    </div>
     <div class="scene-counter">06 / 08</div>
   </section>
 
