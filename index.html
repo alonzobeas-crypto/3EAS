@@ -694,7 +694,8 @@ body{
   background:var(--accent);transform-origin:50% 23px;
   box-shadow:0 0 4px var(--accent);
 }
-.knob-dial.t-bpm::after{transform:translateX(-50%) rotate(35deg)}
+.knob-dial.t-bpm::after{transform:translateX(-50%) rotate(var(--ang,35deg))}
+.knob-dial.t-bpm{cursor:none}
 .knob-dial.t-vol::after{transform:translateX(-50%) rotate(-15deg)}
 .knob-dial.t-swing::after{transform:translateX(-50%) rotate(-110deg)}
 .knob-dial.t-fx::after{transform:translateX(-50%) rotate(60deg)}
@@ -1524,9 +1525,9 @@ body{
           <div class="rail-title">// CONTROL</div>
           <div class="knobs">
             <div class="knob">
-              <div class="knob-dial t-bpm"><div class="knob-ticks"></div></div>
+              <div class="knob-dial t-bpm" id="bpmDial" title="Drag up/down to change tempo"><div class="knob-ticks"></div></div>
               <div class="knob-cap">TEMPO</div>
-              <div class="knob-val">120</div>
+              <div class="knob-val" id="bpmVal">120</div>
             </div>
             <div class="knob">
               <div class="knob-dial t-vol"><div class="knob-ticks"></div></div>
@@ -4453,6 +4454,59 @@ function buildMini(){
 }
 
 let labStep=6,labOpen=false,labTimer=null;
+let LAB_BPM=120;
+const LAB_BPM_MIN=60,LAB_BPM_MAX=200;
+function setBpm(v){
+  LAB_BPM=Math.max(LAB_BPM_MIN,Math.min(LAB_BPM_MAX,Math.round(v)));
+  const lcd=document.getElementById('lcdBpm');
+  if(lcd)lcd.innerHTML=LAB_BPM+'<span class="un">BPM</span>';
+  const val=document.getElementById('bpmVal');
+  if(val)val.textContent=LAB_BPM;
+  const dial=document.getElementById('bpmDial');
+  if(dial){
+    // sweep the knob pointer across ~270° for the full 60-200 BPM range
+    const pct=(LAB_BPM-LAB_BPM_MIN)/(LAB_BPM_MAX-LAB_BPM_MIN);
+    dial.style.setProperty('--ang',(-135+pct*270)+'deg');
+  }
+  // tickLab's interval is a fixed-feel visual step clock, not real audio
+  // scheduling — scale it proportionally around the 120bpm/260ms baseline
+  // so the pad/sequencer animation actually speeds up or slows down with
+  // the knob instead of the knob just being a label.
+  if(labOpen){
+    clearInterval(labTimer);
+    labTimer=setInterval(tickLab,260*(120/LAB_BPM));
+  }
+}
+function setupTempoKnob(){
+  const dial=document.getElementById('bpmDial');
+  if(!dial)return;
+  let dragging=false,startY=0,startBpm=120;
+  const onMove=e=>{
+    if(!dragging)return;
+    const y=(e.touches?e.touches[0].clientY:e.clientY);
+    // drag up = faster, drag down = slower — 2px per BPM
+    setBpm(startBpm+(startY-y)/2);
+  };
+  const onUp=()=>{
+    dragging=false;
+    document.removeEventListener('mousemove',onMove);
+    document.removeEventListener('mouseup',onUp);
+    document.removeEventListener('touchmove',onMove);
+    document.removeEventListener('touchend',onUp);
+  };
+  const onDown=e=>{
+    dragging=true;
+    startY=(e.touches?e.touches[0].clientY:e.clientY);
+    startBpm=LAB_BPM;
+    document.addEventListener('mousemove',onMove);
+    document.addEventListener('mouseup',onUp);
+    document.addEventListener('touchmove',onMove,{passive:true});
+    document.addEventListener('touchend',onUp);
+    e.preventDefault();
+  };
+  dial.addEventListener('mousedown',onDown);
+  dial.addEventListener('touchstart',onDown,{passive:false});
+}
 function tickLab(){
   if(!labOpen)return;
   labStep=(labStep+1)%16;
@@ -4500,8 +4554,9 @@ function mountLab(){
   if(!wrap||!tpl||wrap.children.length)return;
   wrap.appendChild(tpl.content.cloneNode(true));
   buildPads();buildSeq();buildPadList();buildArrangement();
+  setupTempoKnob();
   labOpen=true;
-  if(!labTimer)labTimer=setInterval(tickLab,260);
+  setBpm(LAB_BPM);
 }
 function openLab(){goScene(4)}
 function setPrice(v,btn){
