@@ -2801,7 +2801,7 @@ var glitchTranslate, glitchCorrupt;
   // place that needs to match the CSS animation's actual duration (the
   // render-cycle interval, the mid-scroll jump glitch) reads this same
   // constant instead of a hardcoded 80, so they can't drift out of sync.
-  const TICKER_DUR=window.innerWidth>900?62:80;
+  const TICKER_DUR=window.innerWidth>900?42:80;
   function nextTickerBatch(pool){
     if(!tickerSeenLoaded)loadTickerSeen();
     let unseen=pool.filter(item=>!tickerSeen.has(item));
