@@ -506,6 +506,32 @@ body{
   padding:24px 44px 60px;position:relative;
 }
 
+/* Coming-soon overlay over Beat Lab — lighter tint, no blur, so the actual
+   instrument panel reads through in the background instead of being hidden. */
+.lab-cs{
+  position:absolute;inset:24px 44px 60px;z-index:50;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;
+  pointer-events:none;
+}
+.lab-cs::before{
+  content:'';position:absolute;inset:0;
+  background:rgba(0,0,0,.45);
+}
+.lab-cs-inner{
+  position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:14px;
+  padding:36px 56px;border:1px solid var(--accent);
+  background:rgba(0,0,0,.65);
+}
+.lab-cs-tag{font-family:var(--mono);font-size:10px;letter-spacing:5px;color:var(--dim2);text-transform:uppercase}
+.lab-cs-title{
+  font-family:var(--vt);font-size:clamp(56px,9vw,120px);letter-spacing:6px;color:var(--hot);
+  text-shadow:0 0 24px rgba(232,224,192,.25);line-height:1;
+  animation:glitch 7s infinite;
+}
+.lab-cs-sub{font-family:var(--mono);font-size:12px;letter-spacing:4px;color:var(--accent);text-transform:uppercase}
+.lab-cs-rule{width:200px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.lab-cs-note{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--dim2);text-transform:uppercase;margin-top:4px}
+
 .dev{
   position:relative;width:100%;max-width:1600px;
   background:linear-gradient(180deg,#16140f 0%,#0e0c09 100%);
@@ -1103,6 +1129,11 @@ body{
   #sLab .lab-eyebrow{flex-direction:column;gap:1px;padding:8px 12px 3px}
   #sLab .lab-eyebrow h2{font-size:40px!important}
   #sLab .lab-eyebrow .lab-meta{text-align:left}
+  .lab-cs{inset:16px 6px 12px!important}
+  .lab-cs-inner{padding:6px 8px!important}
+  .lab-cs-title{font-size:44px!important;letter-spacing:2px!important}
+  .lab-cs-sub{font-size:10px!important}
+  .lab-cs-note{font-size:9px!important;text-align:center}
 
   /* Beat Lab instrument panel: the 8-col pad grid and 16-step sequencer are
      built for a wide desktop panel — on a narrow phone they'd shrink to
@@ -1382,12 +1413,21 @@ body{
         <h2>BEAT LAB</h2>
       </div>
       <div class="lab-meta">
-        64 PADS // 16 STEPS // 8 TRACKS<br>
+        64 PADS // 16 STEPS // 4 TRACKS<br>
         STATUS: <span class="v">IN DEVELOPMENT</span> &nbsp;//&nbsp; PAYMENT: <span class="v">PWYW</span><br>
         SAMPLES: <span class="v">3EAS ARCHIVE</span>
       </div>
     </div>
     <div class="dev-wrap" id="devWrap"></div>
+    <div class="lab-cs" aria-hidden="true">
+      <div class="lab-cs-inner">
+        <span class="lab-cs-tag">// SOURCE SIGNAL // STATUS</span>
+        <div class="lab-cs-title">CALIBRATING</div>
+        <div class="lab-cs-rule"></div>
+        <span class="lab-cs-sub">BEAT LAB · IN CALIBRATION</span>
+        <span class="lab-cs-note">SAMPLE PACK + INTERACTIVE LAB — SIGNAL PENDING</span>
+      </div>
+    </div>
     <div class="scene-counter">06 / 08</div>
   </section>
 
@@ -1508,7 +1548,7 @@ body{
           <button class="tab" data-tab="seq" onclick="setTab('seq')">SEQUENCER</button>
         </div>
 
-        <!-- 8x8 PAD GRID -->
+        <!-- 4x16 PAD GRID (4 channels x 16 samples = 64 pads) -->
         <div class="pads" id="pads"></div>
 
         <!-- 8x16 SEQUENCER -->
@@ -4371,7 +4411,7 @@ function buildSeq(){
 
   const rows=document.getElementById('seqRows');
   let r='';
-  for(let row=0;row<8;row++){
+  for(let row=0;row<PATTERN.length;row++){
     r+=`<div class="seq-row" style="margin-bottom:3px">
       <div class="seq-lbl">${ROW_LABELS[row]}<span class="ms"><i></i><i></i></span></div>`;
     for(let s=0;s<16;s++){
@@ -4528,7 +4568,7 @@ function tickLab(){
   PATTERN.forEach((row,ri)=>{
     if(row[labStep]){
       // strobe one random pad in that row
-      const off=ri*8+Math.floor(Math.random()*8);
+      const off=ri*16+Math.floor(Math.random()*16);
       const pad=document.querySelector(`.pad[data-i="${off}"]`);
       pad?.classList.add('hit');
       setTimeout(()=>pad?.classList.remove('hit'),120);
