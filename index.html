@@ -3895,12 +3895,7 @@ var glitchTranslate, glitchCorrupt;
       if(!el)return;
       const spans=Array.from(el.children).filter(c=>c.tagName==='SPAN'&&!c.classList.contains('sep'));
       spans.forEach(sp=>{
-        if(sp.querySelector('a')){
-          const a=sp.querySelector('a');
-          a.style.textShadow='2px 0 var(--accent),-2px 0 #0ff';
-          setTimeout(()=>{a.style.textShadow='';},2200);
-          return;
-        }
+        if(sp.querySelector('a'))return; // links never glitch — only plain text
         if(sp.querySelector('span'))return; // skip items with a nested live-clock span
         if(Math.random()>0.2)return;
         const orig=sp.textContent;
@@ -4250,36 +4245,21 @@ function fetchT(url,opts,ms){
   setInterval(tick,1000);
 })();
 
-// Hover on a ticker link: slow the scroll and intensify the glitch.
+// Hover on a ticker link: just slow the scroll down so it's easier to
+// click — no glitch/corrupt effect on hover anymore, it made links hard to
+// target and click reliably.
 (function(){
   const ticker=document.getElementById('ticker');
   if(!ticker)return;
-  let hoverGlitchTimer=null;
   ticker.addEventListener('mouseover',e=>{
     const a=e.target.closest('a');
     if(!a)return;
     ticker.classList.add('slow');
-    // The flash-rg link (Ko-fi "SUPPORT THE SIGNAL") already has its own
-    // red/green flash animation — stacking the corrupt/glitch pulse on top
-    // of that made it hard to even click. Only run the extra glitch on
-    // regular ticker links.
-    if(a.classList.contains('flash-rg'))return;
-    if(!hoverGlitchTimer){
-      const pulse=()=>{
-        a.style.textShadow=`${(Math.random()-.5)*2}px 0 var(--accent),${(Math.random()-.5)*2}px 0 #0ff`;
-        glitchCorrupt();
-        if(Math.random()<0.08)glitchTranslate();
-      };
-      pulse();
-      hoverGlitchTimer=setInterval(pulse,1100);
-    }
   });
   ticker.addEventListener('mouseout',e=>{
     if(!e.target.closest('a'))return;
     if(ticker.querySelector('a:hover'))return;
     ticker.classList.remove('slow');
-    clearInterval(hoverGlitchTimer);
-    hoverGlitchTimer=null;
   });
 })();
 
