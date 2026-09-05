@@ -264,7 +264,7 @@ body{
   will-change:transform;transform:translateZ(0);backface-visibility:hidden;
 }
 #ticker.show{opacity:1}
-.ti{display:flex;animation:tick 80s linear infinite;white-space:nowrap;animation-play-state:running;will-change:transform;transform:translateZ(0);backface-visibility:hidden}
+.ti{display:flex;animation:tick var(--tdur,80s) linear infinite;white-space:nowrap;animation-play-state:running;will-change:transform;transform:translateZ(0);backface-visibility:hidden}
 #ticker.slow .ti{animation-duration:230s}
 .ti span{font-family:var(--mono);font-size:17px;letter-spacing:3px;color:var(--fg);padding-right:56px}
 .ti .sep{color:var(--accent)}
@@ -2816,7 +2816,11 @@ var glitchTranslate, glitchCorrupt;
     "ALEX JONES RIPPED OFF BILL COOPER'S SHTICK AND LOOK WHERE THAT GOT HIM. TRUMP CUCK.",
     'L.A. CAN-CELLED US',
     'ALL THIS RAZA NEEDS TO GET THEIR HEADS OUT OF THEIR ASSES.',
-    'NO ONE IS ANYTHING ANYMORE'
+    'NO ONE IS ANYTHING ANYMORE',
+    "WHAT A.I. CANDIDATE WILL YOU VOTE FOR? DOES IT HAVE TO BE PRO ABORTION? DOES IT HAVE TO BE A CHRISTIAN FUNDAMENTALIST? TELL ME, I'M CURIOUS. CUZ IT'S COMING...",
+    "WHO'S PROPPING UP ANDREW CALLAGHAN??",
+    'THE NATIVE COMMUNITY IN L.A. ARE LARGELY CLOUT CHASERS.',
+    'TRANSPLANT AFTER TRANSPLANT. THEY ALL EVENTUALLY GO BACK TO THEIR FARM.'
   ];
   function shuffleArr(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
   // Bag-shuffle over the full item pool (same pattern as the jukebox's
@@ -3439,7 +3443,7 @@ var glitchTranslate, glitchCorrupt;
 
   function render(id,arr){
     const el=document.getElementById(id);
-    el.style.animationDuration=TICKER_DUR+'s';
+    el.style.setProperty('--tdur',TICKER_DUR+'s');
     el.innerHTML=arr.map(t=>`<span>${t}</span>`).join(' <span class="sep">\u25c8</span> ')+' <span class="sep">\u25c8</span>';
   }
   // Plain (non-glitching) translation swap — each pass, translatable phrases
@@ -3554,7 +3558,13 @@ var glitchTranslate, glitchCorrupt;
       // standard cross-browser-safe way to force a CSS animation restart.
       requestAnimationFrame(()=>{
         requestAnimationFrame(()=>{
-          el.style.animation=`tick ${dur}s linear infinite`;
+          // Clear the inline override (not re-assert a literal duration)
+          // so whatever the stylesheet cascade currently says wins — the
+          // base var(--tdur) duration, or the 230s hover-slow rule if a
+          // ticker link is being hovered right now. Hardcoding `dur` here
+          // used to silently fight the hover-slow effect the same way the
+          // old inline animationDuration in render() did.
+          el.style.animation='';
           el.style.animationDelay=jumpTo+'s';
         });
       });
