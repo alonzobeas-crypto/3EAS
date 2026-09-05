@@ -4245,25 +4245,18 @@ function fetchT(url,opts,ms){
   setInterval(tick,1000);
 })();
 
-// Hover on a ticker link: just slow the scroll down so it's easier to
-// click — no glitch/corrupt effect on hover anymore, it made links hard to
-// target and click reliably.
+// Hovering the ticker at all: pause its ambient glitch-shift animation (no
+// glitching while hovering, period) and slow the scroll down on a link so
+// it's easier to click.
 (function(){
   const ticker=document.getElementById('ticker');
   if(!ticker)return;
   ticker.addEventListener('mouseover',e=>{
-    const a=e.target.closest('a');
-    if(!a)return;
-    ticker.classList.add('slow');
-    // #ticker has its own ambient glitch-shift animation running at all
-    // times (independent of hover) — pause it while a link is being
-    // hovered so links never visibly glitch, without touching the effect
-    // for the rest of the ticker.
     ticker.style.animationPlayState='paused';
+    if(e.target.closest('a'))ticker.classList.add('slow');
   });
   ticker.addEventListener('mouseout',e=>{
-    if(!e.target.closest('a'))return;
-    if(ticker.querySelector('a:hover'))return;
+    if(ticker.matches(':hover'))return;
     ticker.classList.remove('slow');
     ticker.style.animationPlayState='';
   });
