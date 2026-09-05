@@ -1710,7 +1710,14 @@ document.addEventListener('touchmove',e=>{
   if(Math.abs(t.clientX-__touchStartX)>10||Math.abs(t.clientY-__touchStartY)>10)__touchDragged=true;
 },{passive:true});
 document.addEventListener('click',e=>{
-  if(__touchDragged){e.preventDefault();e.stopPropagation();__touchDragged=false;}
+  const dragged=__touchDragged;
+  __touchDragged=false;
+  // The ticker's text is always actively scrolling under your finger, so a
+  // normal tap on a ticker link easily crosses the 10px threshold above and
+  // gets misread as a drag — silently blocking the click. Ticker links
+  // don't have the "accidental track switch" problem this exists for, so
+  // always let them through.
+  if(dragged&&!e.target.closest('#ticker a')){e.preventDefault();e.stopPropagation();}
 },{capture:true});
 
 /* ─── GRAIN ───
