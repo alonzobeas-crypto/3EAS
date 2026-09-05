@@ -4259,6 +4259,11 @@ function fetchT(url,opts,ms){
     const a=e.target.closest('a');
     if(!a)return;
     ticker.classList.add('slow');
+    // The flash-rg link (Ko-fi "SUPPORT THE SIGNAL") already has its own
+    // red/green flash animation — stacking the corrupt/glitch pulse on top
+    // of that made it hard to even click. Only run the extra glitch on
+    // regular ticker links.
+    if(a.classList.contains('flash-rg'))return;
     if(!hoverGlitchTimer){
       const pulse=()=>{
         a.style.textShadow=`${(Math.random()-.5)*2}px 0 var(--accent),${(Math.random()-.5)*2}px 0 #0ff`;
