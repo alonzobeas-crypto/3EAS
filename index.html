@@ -4255,11 +4255,17 @@ function fetchT(url,opts,ms){
     const a=e.target.closest('a');
     if(!a)return;
     ticker.classList.add('slow');
+    // #ticker has its own ambient glitch-shift animation running at all
+    // times (independent of hover) — pause it while a link is being
+    // hovered so links never visibly glitch, without touching the effect
+    // for the rest of the ticker.
+    ticker.style.animationPlayState='paused';
   });
   ticker.addEventListener('mouseout',e=>{
     if(!e.target.closest('a'))return;
     if(ticker.querySelector('a:hover'))return;
     ticker.classList.remove('slow');
+    ticker.style.animationPlayState='';
   });
 })();
 
