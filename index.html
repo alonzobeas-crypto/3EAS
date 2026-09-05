@@ -3569,13 +3569,19 @@ var glitchTranslate, glitchCorrupt;
     glitchTranslate();
     glitchCorrupt();
   }
-  // Offset from the content-reshuffle timer (now 80s, started a few lines
-  // below this) — same period, different phase, so the text swap and the
+  // Offset from the content-reshuffle timer (renderTickerCycle, driven by
+  // TICKER_DUR) — same period, different phase, so the text swap and the
   // jump-glitch never land in the same instant. Without this stagger they
   // fire together every cycle: content replaces AND the scroll animation
   // resets at once, reading as one jarring double-hit instead of two
-  // separate, spread-out glitch beats.
-  setTimeout(()=>{glitchJump();setInterval(glitchJump,80000);},20000);
+  // separate, spread-out glitch beats. This used to be hardcoded to 80s,
+  // which fell out of sync once TICKER_DUR sped the desktop ticker up to
+  // 42s — a glitch jump landing mid-cycle picks a fresh RANDOM offset into
+  // the animation regardless of how far the current loop has already
+  // played, so a stale, out-of-phase timer could rewind the scroll into
+  // content the viewer had just seen seconds earlier, reading as the same
+  // line playing several times in a short stretch.
+  setTimeout(()=>{glitchJump();setInterval(glitchJump,TICKER_DUR*1000);},TICKER_DUR*250);
 
   // Full-site glitch: every 2 minutes, distort the whole page for ~2s.
   function siteGlitch(){
