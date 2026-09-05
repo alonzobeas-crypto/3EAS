@@ -3895,13 +3895,7 @@ var glitchTranslate, glitchCorrupt;
       if(!el)return;
       const spans=Array.from(el.children).filter(c=>c.tagName==='SPAN'&&!c.classList.contains('sep'));
       spans.forEach(sp=>{
-        if(sp.querySelector('a')){
-          const a=sp.querySelector('a');
-          if(a.classList.contains('flash-rg'))return; // already has its own red/green flash
-          a.style.textShadow='2px 0 var(--accent),-2px 0 #0ff';
-          setTimeout(()=>{a.style.textShadow='';},2200);
-          return;
-        }
+        if(sp.querySelector('a'))return; // links never glitch — only plain text
         if(sp.querySelector('span'))return; // skip items with a nested live-clock span
         if(Math.random()>0.2)return;
         const orig=sp.textContent;
