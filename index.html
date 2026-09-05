@@ -3902,12 +3902,12 @@ var glitchTranslate, glitchCorrupt;
           return;
         }
         if(sp.querySelector('span'))return; // skip items with a nested live-clock span
-        if(Math.random()>0.4)return;
+        if(Math.random()>0.2)return;
         const orig=sp.textContent;
         const chars=orig.split('');
         for(let i=0;i<chars.length;i++){
           const c=chars[i];
-          if(/[a-zA-Z]/.test(c)&&Math.random()<0.18){
+          if(/[a-zA-Z]/.test(c)&&Math.random()<0.1){
             const up=c.toUpperCase();
             if(LEET[up]&&Math.random()<0.5){chars[i]=LEET[up];}
             else{chars[i]=(c===up)?c.toLowerCase():up;}
@@ -4259,14 +4259,19 @@ function fetchT(url,opts,ms){
     const a=e.target.closest('a');
     if(!a)return;
     ticker.classList.add('slow');
+    // The flash-rg link (Ko-fi "SUPPORT THE SIGNAL") already has its own
+    // red/green flash animation — stacking the corrupt/glitch pulse on top
+    // of that made it hard to even click. Only run the extra glitch on
+    // regular ticker links.
+    if(a.classList.contains('flash-rg'))return;
     if(!hoverGlitchTimer){
       const pulse=()=>{
-        a.style.textShadow=`${(Math.random()-.5)*3}px 0 var(--accent),${(Math.random()-.5)*3}px 0 #0ff`;
+        a.style.textShadow=`${(Math.random()-.5)*2}px 0 var(--accent),${(Math.random()-.5)*2}px 0 #0ff`;
         glitchCorrupt();
-        if(Math.random()<0.25)glitchTranslate();
+        if(Math.random()<0.08)glitchTranslate();
       };
       pulse();
-      hoverGlitchTimer=setInterval(pulse,600);
+      hoverGlitchTimer=setInterval(pulse,1100);
     }
   });
   ticker.addEventListener('mouseout',e=>{
