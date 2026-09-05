@@ -3897,6 +3897,7 @@ var glitchTranslate, glitchCorrupt;
       spans.forEach(sp=>{
         if(sp.querySelector('a')){
           const a=sp.querySelector('a');
+          if(a.classList.contains('flash-rg'))return; // already has its own red/green flash
           a.style.textShadow='2px 0 var(--accent),-2px 0 #0ff';
           setTimeout(()=>{a.style.textShadow='';},2200);
           return;
