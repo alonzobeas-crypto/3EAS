@@ -1892,6 +1892,7 @@ let cur2=null,playing=false,wdata=[];
 
 // Real audio element
 const audio=new Audio();
+audio.crossOrigin='anonymous';
 audio.preload='none';
 // Kept out of layout (no controls attr = no default box anyway) but IN the
 // DOM — see the spA/spB comment near initAudioReactive() for why.
@@ -2138,7 +2139,7 @@ function spVol(i){return Math.min(1,SP_VOL*(SP_TRACKS[i]?.gain||1));} // per-tra
 const SP_XFADE=2.5;      // crossfade duration in seconds
 // Two audio decks so tracks blend instead of hard-cutting
 const spA=new Audio(),spB=new Audio();
-[spA,spB].forEach(a=>{a.volume=0;a.preload='metadata';document.body.appendChild(a)});
+[spA,spB].forEach(a=>{a.crossOrigin='anonymous';a.volume=0;a.preload='metadata';document.body.appendChild(a)});
 // Some hosts stall mid-stream (buffer underrun) and the browser just stops
 // without firing 'ended' — audio.paused becomes true but no crossfade or
 // 'ended' handler ever runs, sounding like the song "cut off". Detect this
