@@ -4305,15 +4305,21 @@ function fetchT(url,opts,ms){
 // sequence was the thing failing to register on ticker links — slowing/
 // stopping the scroll, excluding links from the glitch, fixing the touch-
 // drag suppression. Still reported as unreliable, specifically on the
-// flash-rg link. Stop relying on that sequence entirely for it: open it
-// the instant the pointer goes down, using the target captured at that
-// exact moment, instead of waiting for a matched mouseup/click on what
-// might by then be a re-rendered, replaced element.
+// flash-rg link. Stop relying on that sequence entirely for it: fire the
+// instant the pointer goes down, using the target captured at that exact
+// moment, instead of waiting for a matched mouseup/click on what might by
+// then be a re-rendered, replaced element. Trigger it via the anchor's own
+// native .click() rather than window.open() — window.open() called from a
+// pointerdown (not a "real" click) is exactly the kind of gesture some
+// browsers' popup blockers silently swallow, which could explain the fix
+// not actually taking effect. a.click() uses the browser's own trusted
+// click-and-navigate path for that element, honoring its target/rel
+// attributes, and isn't subject to that popup-blocker distinction.
 document.getElementById('ticker')?.addEventListener('pointerdown',e=>{
   const a=e.target.closest('a.flash-rg');
   if(!a)return;
   e.preventDefault();
-  window.open(a.href,'_blank','noopener');
+  a.click();
 });
 
 // Hovering a ticker LINK: no glitch at all, and slow the scroll down so
