@@ -2869,6 +2869,7 @@ var glitchTranslate, glitchCorrupt;
   // render-cycle interval, the mid-scroll jump glitch) reads this same
   // constant instead of a hardcoded 80, so they can't drift out of sync.
   const TICKER_DUR=window.innerWidth>900?42:80;
+  window.TICKER_DUR=TICKER_DUR; // the separate hover-handler IIFE further down needs this too
   function nextTickerBatch(pool){
     if(!tickerSeenLoaded)loadTickerSeen();
     let unseen=pool.filter(item=>!tickerSeen.has(item));
@@ -4265,6 +4266,7 @@ function fetchT(url,opts,ms){
 (function(){
   const ticker=document.getElementById('ticker');
   if(!ticker)return;
+  const HOVER_SLOW_DUR=200; // much slower while hovering a link, not a full stop
   let hoverPulseTimer=null;
   function startPulse(){
     if(hoverPulseTimer)return;
@@ -4286,26 +4288,24 @@ function fetchT(url,opts,ms){
       // the whole hover, reading as the ticker "disappearing." animation:
       // none fully removes it, snapping back to the neutral resting state.
       ticker.style.animation='none';
-      // Actually STOP the scroll (not just slow it to a 230s crawl) while a
-      // link is hovered — the link was still technically a moving target
-      // during the old slow-crawl, which is a plausible reason clicks kept
-      // missing. .ti's own "tick" animation is a plain linear transform
-      // (no discrete/transient keyframes like glitch-shift has), so pausing
-      // it mid-flight is safe — it just freezes in place, no jump or flash.
-      if(t1)t1.style.animationPlayState='paused';
-      if(t2)t2.style.animationPlayState='paused';
+      // Slow the scroll way down (not a full stop) while a link is
+      // hovered — set via the same --tdur custom property render() already
+      // uses, so it can't fight the base speed the way an inline
+      // animation-duration once did.
+      if(t1)t1.style.setProperty('--tdur',HOVER_SLOW_DUR+'s');
+      if(t2)t2.style.setProperty('--tdur',HOVER_SLOW_DUR+'s');
       stopPulse();
     }else{
       ticker.style.animation='';
-      if(t1)t1.style.animationPlayState='';
-      if(t2)t2.style.animationPlayState='';
+      if(t1)t1.style.setProperty('--tdur',TICKER_DUR+'s');
+      if(t2)t2.style.setProperty('--tdur',TICKER_DUR+'s');
       startPulse();
     }
   });
   ticker.addEventListener('mouseout',e=>{
     if(ticker.matches(':hover'))return;
-    if(t1)t1.style.animationPlayState='';
-    if(t2)t2.style.animationPlayState='';
+    if(t1)t1.style.setProperty('--tdur',TICKER_DUR+'s');
+    if(t2)t2.style.setProperty('--tdur',TICKER_DUR+'s');
     ticker.style.animation='';
     stopPulse();
   });
