@@ -2831,6 +2831,12 @@ var glitchTranslate, glitchCorrupt;
     'DIVIDE AND CONQUER. DO YOU GET IT?'
   ];
   function shuffleArr(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+  // A random ~30% of the pool is picked once, at load, to never letter-
+  // corrupt — they always show clean, all-caps, no matter how many times
+  // they come back around. Not tied to any category (RIP lines, links,
+  // etc. can land in either group) — just a fixed random split so some
+  // statements consistently read clean and others consistently glitch.
+  const GLITCH_EXEMPT=new Set(shuffleArr(items).slice(0,Math.round(items.length*0.3)));
   // Bag-shuffle over the full item pool (same pattern as the jukebox's
   // spBag), instead of a fresh full-pool shuffle every cycle. Showing 100%
   // of the pool every single cycle meant every item reappeared on every
@@ -2899,17 +2905,36 @@ var glitchTranslate, glitchCorrupt;
   // stand-in for pixel width — greedily route each item (in its existing
   // shuffled order, so the randomness isn't lost) to whichever half is
   // currently shorter, instead of a blind positional split.
-  function tickerItemLen(s){return s.replace(/<[^>]*>/g,'').length;}
+  function tickerItemLen(s){
+    const clean=s.replace(/<[^>]*>/g,'');
+    // Live-value items render their placeholder ('--') at balance time but
+    // fill in a real, usually much longer, value moments later — e.g. "BTC:
+    // $--" vs "BTC: $123,456". Balancing against the short placeholder let
+    // the two halves drift apart in real rendered width once the values
+    // populated. Assume a generously long value for anything with a live
+    // clock span so the split accounts for it up front.
+    if(/id="[a-z]+clock2?"/.test(s))return clean.length+10;
+    return clean.length;
+  }
   function nextTickerHalves(arr){
     const batch=nextTickerBatch(arr);
+    // Greedily assigning in shuffled order (whichever item comes up next
+    // goes to whichever half is currently shorter) is order-dependent and
+    // can still leave a sizable gap — e.g. several long items landing early
+    // in the shuffle before any short ones show up to balance them out.
+    // Sorting longest-first before the same greedy assignment is the
+    // standard fix for greedy bin-balancing: the biggest, most
+    // gap-causing items get placed first while both halves are still
+    // empty and free to absorb them evenly.
+    const sorted=batch.slice().sort((a,b)=>tickerItemLen(b)-tickerItemLen(a));
     const h1=[],h2=[];
     let len1=0,len2=0;
-    batch.forEach(item=>{
+    sorted.forEach(item=>{
       const L=tickerItemLen(item);
       if(len1<=len2){h1.push(item);len1+=L;}
       else{h2.push(item);len2+=L;}
     });
-    return [h1,h2];
+    return [shuffleArr(h1),shuffleArr(h2)];
   }
   const es={
     'SIGNAL ACTIVE':'SEÑAL ACTIVA',
@@ -3444,10 +3469,12 @@ var glitchTranslate, glitchCorrupt;
   const langs=[es,ru,pt,zh,ja,ar,nah,hi,ur,ko,hy,nv,lkt];
   // Weighted so English stays most common, Spanish a close second, others rare.
   function pickLang(){
-    const r=Math.random();
-    if(r<0.55)return es;
-    const rest=[ru,pt,zh,ja,ar,nah,hi,ur,ko,hy,nv,lkt];
-    return rest[Math.floor(Math.random()*rest.length)];
+    // Used to be 55% Spanish, the rest split across the other 12 languages
+    // — heavily lopsided. Flat/uniform pick across all of them instead, so
+    // any given translation flash is just as likely to land on Russian,
+    // Lakota, or Urdu as it is Spanish.
+    const all=[es,ru,pt,zh,ja,ar,nah,hi,ur,ko,hy,nv,lkt];
+    return all[Math.floor(Math.random()*all.length)];
   }
 
   function render(id,arr){
@@ -3906,6 +3933,7 @@ var glitchTranslate, glitchCorrupt;
       spans.forEach(sp=>{
         if(sp.querySelector('a'))return; // links never glitch — only plain text
         if(sp.querySelector('span'))return; // skip items with a nested live-clock span
+        if(GLITCH_EXEMPT.has(sp.textContent))return; // this one always stays clean
         if(Math.random()>0.35)return;
         const orig=sp.textContent;
         // Re-roll the corruption on an interval instead of swapping once and
