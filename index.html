@@ -1710,7 +1710,14 @@ document.addEventListener('touchmove',e=>{
   if(Math.abs(t.clientX-__touchStartX)>10||Math.abs(t.clientY-__touchStartY)>10)__touchDragged=true;
 },{passive:true});
 document.addEventListener('click',e=>{
-  if(__touchDragged){e.preventDefault();e.stopPropagation();__touchDragged=false;}
+  const dragged=__touchDragged;
+  __touchDragged=false;
+  // The ticker's text is always actively scrolling under your finger, so a
+  // normal tap on a ticker link easily crosses the 10px threshold above and
+  // gets misread as a drag — silently blocking the click. Ticker links
+  // don't have the "accidental track switch" problem this exists for, so
+  // always let them through.
+  if(dragged&&!e.target.closest('#ticker a')){e.preventDefault();e.stopPropagation();}
 },{capture:true});
 
 /* ─── GRAIN ───
@@ -3897,12 +3904,12 @@ var glitchTranslate, glitchCorrupt;
       spans.forEach(sp=>{
         if(sp.querySelector('a'))return; // links never glitch — only plain text
         if(sp.querySelector('span'))return; // skip items with a nested live-clock span
-        if(Math.random()>0.2)return;
+        if(Math.random()>0.5)return;
         const orig=sp.textContent;
         const chars=orig.split('');
         for(let i=0;i<chars.length;i++){
           const c=chars[i];
-          if(/[a-zA-Z]/.test(c)&&Math.random()<0.1){
+          if(/[a-zA-Z]/.test(c)&&Math.random()<0.22){
             const up=c.toUpperCase();
             if(LEET[up]&&Math.random()<0.5){chars[i]=LEET[up];}
             else{chars[i]=(c===up)?c.toLowerCase():up;}
@@ -4245,20 +4252,26 @@ function fetchT(url,opts,ms){
   setInterval(tick,1000);
 })();
 
-// Hovering the ticker at all: pause its ambient glitch-shift animation (no
+// Hovering the ticker at all: stop its ambient glitch-shift animation (no
 // glitching while hovering, period) and slow the scroll down on a link so
 // it's easier to click.
 (function(){
   const ticker=document.getElementById('ticker');
   if(!ticker)return;
   ticker.addEventListener('mouseover',e=>{
-    ticker.style.animationPlayState='paused';
+    // animation:none (not animationPlayState:paused) — pausing freezes the
+    // animation at whatever instant it's paused, including the brief
+    // mid-cycle keyframes where the whole ticker dips opacity and shifts
+    // position. Landing a hover during that window froze it there for the
+    // whole hover, reading as the ticker "disappearing." animation:none
+    // fully removes it, snapping back to the neutral resting state instead.
+    ticker.style.animation='none';
     if(e.target.closest('a'))ticker.classList.add('slow');
   });
   ticker.addEventListener('mouseout',e=>{
     if(ticker.matches(':hover'))return;
     ticker.classList.remove('slow');
-    ticker.style.animationPlayState='';
+    ticker.style.animation='';
   });
 })();
 
