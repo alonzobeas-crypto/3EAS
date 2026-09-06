@@ -3904,12 +3904,12 @@ var glitchTranslate, glitchCorrupt;
       spans.forEach(sp=>{
         if(sp.querySelector('a'))return; // links never glitch — only plain text
         if(sp.querySelector('span'))return; // skip items with a nested live-clock span
-        if(Math.random()>0.2)return;
+        if(Math.random()>0.5)return;
         const orig=sp.textContent;
         const chars=orig.split('');
         for(let i=0;i<chars.length;i++){
           const c=chars[i];
-          if(/[a-zA-Z]/.test(c)&&Math.random()<0.1){
+          if(/[a-zA-Z]/.test(c)&&Math.random()<0.22){
             const up=c.toUpperCase();
             if(LEET[up]&&Math.random()<0.5){chars[i]=LEET[up];}
             else{chars[i]=(c===up)?c.toLowerCase():up;}
