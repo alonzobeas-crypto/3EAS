@@ -2846,7 +2846,10 @@ var glitchTranslate, glitchCorrupt;
     'WITKOFF AND KUSHNER IN MOSCOW TRYING TO END THE RUSSIA-UKRAINE WAR.',
     'MILEI ESCALATES FALKLANDS DISPUTE WITH BRITAIN OVER OFFSHORE OIL.',
     'NEPAL RESCUERS PULL TWO WORKERS ALIVE FROM A TUNNEL, 9 DAYS AFTER THE FLOODS.',
-    'THE "BLUE" STATUE AT THE KENNEDY CENTER WAS JUST DISMANTLED AFTER 7 YEARS.'
+    'THE "BLUE" STATUE AT THE KENNEDY CENTER WAS JUST DISMANTLED AFTER 7 YEARS.',
+    'U.S. DEPT OF WAR RELEASES 2026 UAP FILES: THERMAL VIDEO OF "BLACK-HOT" ANOMALIES.',
+    'A WITNESS OUT WEST REPORTED THREE SEPARATE UFO SIGHTINGS IN ONE NIGHT. ONE HOVERED 500 FEET ABOVE THEIR CAR.',
+    'MUFON LOGGED THOUSANDS OF UAP REPORTS IN 2026 ALONE.'
   ];
   function shuffleArr(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
   // A random ~30% of the pool is picked once, at load, to never letter-
@@ -4333,19 +4336,19 @@ function fetchT(url,opts,ms){
 // Every fix so far assumed the browser's native mousedown->mouseup->click
 // sequence was the thing failing to register on ticker links — slowing/
 // stopping the scroll, excluding links from the glitch, fixing the touch-
-// drag suppression. Still reported as unreliable, specifically on the
-// flash-rg link. Stop relying on that sequence entirely for it: fire the
-// instant the pointer goes down, using the target captured at that exact
-// moment, instead of waiting for a matched mouseup/click on what might by
-// then be a re-rendered, replaced element. Trigger it via the anchor's own
-// native .click() rather than window.open() — window.open() called from a
-// pointerdown (not a "real" click) is exactly the kind of gesture some
-// browsers' popup blockers silently swallow, which could explain the fix
-// not actually taking effect. a.click() uses the browser's own trusted
-// click-and-navigate path for that element, honoring its target/rel
-// attributes, and isn't subject to that popup-blocker distinction.
+// drag suppression. Still reported as unreliable — and not just on the
+// flash-rg link, on ticker links generally, so this now covers ALL of
+// them (was scoped to a.flash-rg only). Stop relying on that sequence
+// entirely: fire the instant the pointer goes down, using the target
+// captured at that exact moment, instead of waiting for a matched
+// mouseup/click on what might by then be a re-rendered, replaced element.
+// Trigger it via the anchor's own native .click() rather than window.
+// open() — window.open() called from a pointerdown (not a "real" click)
+// is exactly the kind of gesture some browsers' popup blockers silently
+// swallow. a.click() uses the browser's own trusted click-and-navigate
+// path for that element, honoring its target/rel attributes.
 document.getElementById('ticker')?.addEventListener('pointerdown',e=>{
-  const a=e.target.closest('a.flash-rg');
+  const a=e.target.closest('a');
   if(!a)return;
   e.preventDefault();
   a.click();
