@@ -3906,18 +3906,25 @@ var glitchTranslate, glitchCorrupt;
         if(sp.querySelector('span'))return; // skip items with a nested live-clock span
         if(Math.random()>0.35)return;
         const orig=sp.textContent;
-        const chars=orig.split('');
-        for(let i=0;i<chars.length;i++){
-          const c=chars[i];
-          if(/[a-zA-Z]/.test(c)&&Math.random()<0.14){
-            const up=c.toUpperCase();
-            if(LEET[up]&&Math.random()<0.5){chars[i]=LEET[up];}
-            else{chars[i]=(c===up)?c.toLowerCase():up;}
+        // Re-roll the corruption on an interval instead of swapping once and
+        // holding it static for 2.2s — the corrupted characters should keep
+        // shifting/flickering the whole time, not freeze into one look.
+        const corruptOnce=()=>{
+          const chars=orig.split('');
+          for(let i=0;i<chars.length;i++){
+            const c=chars[i];
+            if(/[a-zA-Z]/.test(c)&&Math.random()<0.14){
+              const up=c.toUpperCase();
+              if(LEET[up]&&Math.random()<0.5){chars[i]=LEET[up];}
+              else{chars[i]=(c===up)?c.toLowerCase():up;}
+            }
           }
-        }
-        sp.textContent=chars.join('');
+          sp.textContent=chars.join('');
+        };
+        corruptOnce();
         sp.style.textShadow='2px 0 var(--accent),-2px 0 #0ff';
-        setTimeout(()=>{sp.textContent=orig;sp.style.textShadow='';},2200);
+        const flicker=setInterval(corruptOnce,130);
+        setTimeout(()=>{clearInterval(flicker);sp.textContent=orig;sp.style.textShadow='';},2200);
       });
     });
   };
