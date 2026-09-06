@@ -3469,10 +3469,12 @@ var glitchTranslate, glitchCorrupt;
   const langs=[es,ru,pt,zh,ja,ar,nah,hi,ur,ko,hy,nv,lkt];
   // Weighted so English stays most common, Spanish a close second, others rare.
   function pickLang(){
-    const r=Math.random();
-    if(r<0.55)return es;
-    const rest=[ru,pt,zh,ja,ar,nah,hi,ur,ko,hy,nv,lkt];
-    return rest[Math.floor(Math.random()*rest.length)];
+    // Used to be 55% Spanish, the rest split across the other 12 languages
+    // — heavily lopsided. Flat/uniform pick across all of them instead, so
+    // any given translation flash is just as likely to land on Russian,
+    // Lakota, or Urdu as it is Spanish.
+    const all=[es,ru,pt,zh,ja,ar,nah,hi,ur,ko,hy,nv,lkt];
+    return all[Math.floor(Math.random()*all.length)];
   }
 
   function render(id,arr){
