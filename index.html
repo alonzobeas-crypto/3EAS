@@ -2911,7 +2911,10 @@ var glitchTranslate, glitchCorrupt;
       if(Array.isArray(arr))tickerSeen=new Set(arr);
     }catch(e){}
   }
-  const TICKER_BATCH=24; // smaller slice per cycle so the same items take longer to come back around
+  // A fixed batch size every cycle was mechanically predictable — same
+  // number of items, same rough rhythm, every single time. Rolling a fresh
+  // random size each cycle (still small, 14-26) adds real variability to
+  // what shows up and how much of it, on top of the existing full shuffle.
   // The scroll runs at a fixed px/sec rate (same content, same duration),
   // so a wide desktop window just takes longer to watch a given phrase
   // cross it than a narrow phone screen does — same speed, reads as
@@ -2933,7 +2936,8 @@ var glitchTranslate, glitchCorrupt;
       tickerSeen=new Set();
       unseen=pool.slice();
     }
-    const batch=shuffleArr(unseen).slice(0,Math.min(TICKER_BATCH,unseen.length));
+    const batchSize=14+Math.floor(Math.random()*13); // 14-26, re-rolled every cycle
+    const batch=shuffleArr(unseen).slice(0,Math.min(batchSize,unseen.length));
     batch.forEach(item=>tickerSeen.add(item));
     saveTickerSeen();
     return batch;
