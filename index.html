@@ -4252,20 +4252,26 @@ function fetchT(url,opts,ms){
   setInterval(tick,1000);
 })();
 
-// Hovering the ticker at all: pause its ambient glitch-shift animation (no
+// Hovering the ticker at all: stop its ambient glitch-shift animation (no
 // glitching while hovering, period) and slow the scroll down on a link so
 // it's easier to click.
 (function(){
   const ticker=document.getElementById('ticker');
   if(!ticker)return;
   ticker.addEventListener('mouseover',e=>{
-    ticker.style.animationPlayState='paused';
+    // animation:none (not animationPlayState:paused) — pausing freezes the
+    // animation at whatever instant it's paused, including the brief
+    // mid-cycle keyframes where the whole ticker dips opacity and shifts
+    // position. Landing a hover during that window froze it there for the
+    // whole hover, reading as the ticker "disappearing." animation:none
+    // fully removes it, snapping back to the neutral resting state instead.
+    ticker.style.animation='none';
     if(e.target.closest('a'))ticker.classList.add('slow');
   });
   ticker.addEventListener('mouseout',e=>{
     if(ticker.matches(':hover'))return;
     ticker.classList.remove('slow');
-    ticker.style.animationPlayState='';
+    ticker.style.animation='';
   });
 })();
 
