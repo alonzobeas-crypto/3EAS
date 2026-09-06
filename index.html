@@ -2905,17 +2905,36 @@ var glitchTranslate, glitchCorrupt;
   // stand-in for pixel width — greedily route each item (in its existing
   // shuffled order, so the randomness isn't lost) to whichever half is
   // currently shorter, instead of a blind positional split.
-  function tickerItemLen(s){return s.replace(/<[^>]*>/g,'').length;}
+  function tickerItemLen(s){
+    const clean=s.replace(/<[^>]*>/g,'');
+    // Live-value items render their placeholder ('--') at balance time but
+    // fill in a real, usually much longer, value moments later — e.g. "BTC:
+    // $--" vs "BTC: $123,456". Balancing against the short placeholder let
+    // the two halves drift apart in real rendered width once the values
+    // populated. Assume a generously long value for anything with a live
+    // clock span so the split accounts for it up front.
+    if(/id="[a-z]+clock2?"/.test(s))return clean.length+10;
+    return clean.length;
+  }
   function nextTickerHalves(arr){
     const batch=nextTickerBatch(arr);
+    // Greedily assigning in shuffled order (whichever item comes up next
+    // goes to whichever half is currently shorter) is order-dependent and
+    // can still leave a sizable gap — e.g. several long items landing early
+    // in the shuffle before any short ones show up to balance them out.
+    // Sorting longest-first before the same greedy assignment is the
+    // standard fix for greedy bin-balancing: the biggest, most
+    // gap-causing items get placed first while both halves are still
+    // empty and free to absorb them evenly.
+    const sorted=batch.slice().sort((a,b)=>tickerItemLen(b)-tickerItemLen(a));
     const h1=[],h2=[];
     let len1=0,len2=0;
-    batch.forEach(item=>{
+    sorted.forEach(item=>{
       const L=tickerItemLen(item);
       if(len1<=len2){h1.push(item);len1+=L;}
       else{h2.push(item);len2+=L;}
     });
-    return [h1,h2];
+    return [shuffleArr(h1),shuffleArr(h2)];
   }
   const es={
     'SIGNAL ACTIVE':'SEÑAL ACTIVA',
