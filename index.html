@@ -2920,6 +2920,17 @@ var glitchTranslate, glitchCorrupt;
   // stand-in for pixel width — greedily route each item (in its existing
   // shuffled order, so the randomness isn't lost) to whichever half is
   // currently shorter, instead of a blind positional split.
+  // Every rendered item costs real pixel width beyond its own text: each
+  // <span> carries a fixed 56px padding-right, plus the ' ◈ ' separator
+  // between items — roughly 7 characters' worth at this font/letter-
+  // spacing, and that cost scales with ITEM COUNT, not character count.
+  // Balancing purely by text length (the actual root cause of the
+  // recurring dead-space gap) let one half end up with meaningfully more
+  // items than the other even when their total TEXT length matched — all
+  // of that per-item padding/separator overhead was invisible to the
+  // balance. Folding a fixed per-item cost into the same length units used
+  // for balancing accounts for it.
+  const TICKER_ITEM_OVERHEAD=7;
   function tickerItemLen(s){
     const clean=s.replace(/<[^>]*>/g,'');
     // Live-value items render their placeholder ('--') at balance time but
@@ -2928,8 +2939,8 @@ var glitchTranslate, glitchCorrupt;
     // the two halves drift apart in real rendered width once the values
     // populated. Assume a generously long value for anything with a live
     // clock span so the split accounts for it up front.
-    if(/id="[a-z]+clock2?"/.test(s))return clean.length+10;
-    return clean.length;
+    const base=/id="[a-z]+clock2?"/.test(s)?clean.length+10:clean.length;
+    return base+TICKER_ITEM_OVERHEAD;
   }
   function nextTickerHalves(arr){
     const batch=nextTickerBatch(arr);
@@ -3646,7 +3657,19 @@ var glitchTranslate, glitchCorrupt;
 
   // Full-site glitch: every 2 minutes, distort the whole page for ~2s.
   function siteGlitch(){
-    const el=document.documentElement;
+    // Was transforming document.documentElement (<html>) — the instant ANY
+    // ancestor gets a transform, every position:fixed descendant stops
+    // being positioned relative to the real viewport and switches to being
+    // relative to that transformed ancestor instead. #ticker is
+    // position:fixed, so for the ~3.4s this effect ran, the ticker's real
+    // rendered width silently drifted away from window.innerWidth — which
+    // is exactly what the two-track width balancing assumes stays true.
+    // That's the actual, recurring root cause of the dead-space gap
+    // "when the glitch approaches," not the balancing math itself.
+    // #ticker is a DOM sibling of #scroll (the main content wrapper), not
+    // a descendant of it, so transforming #scroll instead leaves the
+    // ticker completely outside the affected subtree.
+    const el=document.getElementById('scroll')||document.documentElement;
     el.style.transition='none';
     let flickers=0;
     const TOTAL=48;        // was 28 (~2s) — now ~3.4s of active flicker
