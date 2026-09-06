@@ -265,7 +265,6 @@ body{
 }
 #ticker.show{opacity:1}
 .ti{display:flex;animation:tick var(--tdur,80s) linear infinite;white-space:nowrap;animation-play-state:running;will-change:transform;transform:translateZ(0);backface-visibility:hidden}
-#ticker.slow .ti{animation-duration:230s}
 .ti span{font-family:var(--mono);font-size:17px;letter-spacing:3px;color:var(--fg);padding-right:56px}
 .ti .sep{color:var(--accent)}
 @keyframes tick{from{transform:translateX(0) translateZ(0)}to{transform:translateX(-100%) translateZ(0)}}
@@ -3905,12 +3904,12 @@ var glitchTranslate, glitchCorrupt;
       spans.forEach(sp=>{
         if(sp.querySelector('a'))return; // links never glitch — only plain text
         if(sp.querySelector('span'))return; // skip items with a nested live-clock span
-        if(Math.random()>0.5)return;
+        if(Math.random()>0.35)return;
         const orig=sp.textContent;
         const chars=orig.split('');
         for(let i=0;i<chars.length;i++){
           const c=chars[i];
-          if(/[a-zA-Z]/.test(c)&&Math.random()<0.22){
+          if(/[a-zA-Z]/.test(c)&&Math.random()<0.14){
             const up=c.toUpperCase();
             if(LEET[up]&&Math.random()<0.5){chars[i]=LEET[up];}
             else{chars[i]=(c===up)?c.toLowerCase():up;}
@@ -4270,6 +4269,7 @@ function fetchT(url,opts,ms){
     clearInterval(hoverPulseTimer);
     hoverPulseTimer=null;
   }
+  const t1=document.getElementById('ti1'),t2=document.getElementById('ti2');
   ticker.addEventListener('mouseover',e=>{
     if(e.target.closest('a')){
       // animation:none (not animationPlayState:paused) — pausing freezes
@@ -4279,17 +4279,26 @@ function fetchT(url,opts,ms){
       // the whole hover, reading as the ticker "disappearing." animation:
       // none fully removes it, snapping back to the neutral resting state.
       ticker.style.animation='none';
-      ticker.classList.add('slow');
+      // Actually STOP the scroll (not just slow it to a 230s crawl) while a
+      // link is hovered — the link was still technically a moving target
+      // during the old slow-crawl, which is a plausible reason clicks kept
+      // missing. .ti's own "tick" animation is a plain linear transform
+      // (no discrete/transient keyframes like glitch-shift has), so pausing
+      // it mid-flight is safe — it just freezes in place, no jump or flash.
+      if(t1)t1.style.animationPlayState='paused';
+      if(t2)t2.style.animationPlayState='paused';
       stopPulse();
     }else{
       ticker.style.animation='';
-      ticker.classList.remove('slow');
+      if(t1)t1.style.animationPlayState='';
+      if(t2)t2.style.animationPlayState='';
       startPulse();
     }
   });
   ticker.addEventListener('mouseout',e=>{
     if(ticker.matches(':hover'))return;
-    ticker.classList.remove('slow');
+    if(t1)t1.style.animationPlayState='';
+    if(t2)t2.style.animationPlayState='';
     ticker.style.animation='';
     stopPulse();
   });
