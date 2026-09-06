@@ -4252,26 +4252,45 @@ function fetchT(url,opts,ms){
   setInterval(tick,1000);
 })();
 
-// Hovering the ticker at all: stop its ambient glitch-shift animation (no
-// glitching while hovering, period) and slow the scroll down on a link so
-// it's easier to click.
+// Hovering a ticker LINK: no glitch at all, and slow the scroll down so
+// it's easier to click. Hovering plain (non-link) ticker text: the
+// opposite — actively trigger the corrupt/glitch pulse while hovering it.
 (function(){
   const ticker=document.getElementById('ticker');
   if(!ticker)return;
+  let hoverPulseTimer=null;
+  function startPulse(){
+    if(hoverPulseTimer)return;
+    const pulse=()=>{glitchCorrupt();if(Math.random()<0.3)glitchTranslate();};
+    pulse();
+    hoverPulseTimer=setInterval(pulse,700);
+  }
+  function stopPulse(){
+    clearInterval(hoverPulseTimer);
+    hoverPulseTimer=null;
+  }
   ticker.addEventListener('mouseover',e=>{
-    // animation:none (not animationPlayState:paused) — pausing freezes the
-    // animation at whatever instant it's paused, including the brief
-    // mid-cycle keyframes where the whole ticker dips opacity and shifts
-    // position. Landing a hover during that window froze it there for the
-    // whole hover, reading as the ticker "disappearing." animation:none
-    // fully removes it, snapping back to the neutral resting state instead.
-    ticker.style.animation='none';
-    if(e.target.closest('a'))ticker.classList.add('slow');
+    if(e.target.closest('a')){
+      // animation:none (not animationPlayState:paused) — pausing freezes
+      // the animation at whatever instant it's paused, including the brief
+      // mid-cycle keyframes where the whole ticker dips opacity and shifts
+      // position. Landing a hover during that window froze it there for
+      // the whole hover, reading as the ticker "disappearing." animation:
+      // none fully removes it, snapping back to the neutral resting state.
+      ticker.style.animation='none';
+      ticker.classList.add('slow');
+      stopPulse();
+    }else{
+      ticker.style.animation='';
+      ticker.classList.remove('slow');
+      startPulse();
+    }
   });
   ticker.addEventListener('mouseout',e=>{
     if(ticker.matches(':hover'))return;
     ticker.classList.remove('slow');
     ticker.style.animation='';
+    stopPulse();
   });
 })();
 
