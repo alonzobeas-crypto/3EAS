@@ -3657,7 +3657,19 @@ var glitchTranslate, glitchCorrupt;
 
   // Full-site glitch: every 2 minutes, distort the whole page for ~2s.
   function siteGlitch(){
-    const el=document.documentElement;
+    // Was transforming document.documentElement (<html>) — the instant ANY
+    // ancestor gets a transform, every position:fixed descendant stops
+    // being positioned relative to the real viewport and switches to being
+    // relative to that transformed ancestor instead. #ticker is
+    // position:fixed, so for the ~3.4s this effect ran, the ticker's real
+    // rendered width silently drifted away from window.innerWidth — which
+    // is exactly what the two-track width balancing assumes stays true.
+    // That's the actual, recurring root cause of the dead-space gap
+    // "when the glitch approaches," not the balancing math itself.
+    // #ticker is a DOM sibling of #scroll (the main content wrapper), not
+    // a descendant of it, so transforming #scroll instead leaves the
+    // ticker completely outside the affected subtree.
+    const el=document.getElementById('scroll')||document.documentElement;
     el.style.transition='none';
     let flickers=0;
     const TOTAL=48;        // was 28 (~2s) — now ~3.4s of active flicker
