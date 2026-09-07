@@ -3321,6 +3321,54 @@ var glitchTranslate, glitchCorrupt;
     'STATUS: TRANSMITTING':'IY\u00c1: \u010ea\u017euha un'
   };
 
+  const gr={
+    'SIGNAL ACTIVE':'\u03a3\u0397\u039c\u0391 \u0395\u039d\u0395\u03a1\u0393\u039f',
+    "CAPTURE DON'T KILL":'\u03a3\u03a5\u039b\u039b\u0391\u0392\u0395, \u039c\u0397\u039d \u03a3\u039a\u039f\u03a4\u03a9\u039d\u0395\u0399\u03a3',
+    'YOU HAVE RECEIVED THE SIGNAL':'\u0395\u039b\u0391\u0392\u0395\u03a3 \u03a4\u039f \u03a3\u0397\u039c\u0391',
+    'THEY ARE JUST A RITUAL':'\u0395\u0399\u039d\u0391\u0399 \u0391\u03a0\u039b\u0391 \u039c\u0399\u0391 \u03a4\u0395\u039b\u0395\u03a4\u039f\u03a5\u03a1\u0393\u0399\u0391',
+    'AMERICA IS ONLY AN EXPERIMENT':'\u0397 \u0391\u039c\u0395\u03a1\u0399\u039a\u0397 \u0395\u0399\u039d\u0391\u0399 \u039c\u039f\u039d\u039f \u0395\u039d\u0391 \u03a0\u0395\u0399\u03a1\u0391\u039c\u0391',
+    'NEW MUSIC COMING SOON':'\u039d\u0395\u0391 \u039c\u039f\u03a5\u03a3\u0399\u039a\u0397 \u03a3\u03a5\u039d\u03a4\u039f\u039c\u0391',
+    'DO YOU SMELL THE GRAPHENE?':'\u039c\u03a5\u03a1\u0399\u0396\u0395\u0399\u03a3 \u03a4\u039f \u0393\u03a1\u0391\u03a6\u0395\u039d\u0399\u039f;',
+    'ARE YOU HUNGRY?':'\u03a0\u0395\u0399\u039d\u0391\u03a3;',
+    "DON'T OBEY":'\u039c\u0397\u039d \u03a5\u03a0\u0391\u039a\u039f\u03a5\u03a3',
+    'WORSHIP THE MUSIC, NOT THE MAN':'\u039b\u0391\u03a4\u03a1\u0395\u03a8\u0395 \u03a4\u0397 \u039c\u039f\u03a5\u03a3\u0399\u039a\u0397, \u039f\u03a7\u0399 \u03a4\u039f\u039d \u0391\u039d\u0398\u03a1\u03a9\u03a0\u039f',
+    'SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE':'\u03a3\u03a4\u0397\u03a1\u0399\u039e\u0395 \u03a4\u039f \u03a3\u0397\u039c\u0391, \u0392\u039f\u0397\u0398\u0397\u03a3\u0395 \u039d\u0391 \u039c\u0395\u0399\u039d\u0395\u0399 \u0396\u03a9\u039d\u03a4\u0391\u039d\u0397 \u0397 \u039c\u0395\u03a4\u0391\u0394\u039f\u03a3\u0397',
+    'STOP ATTENDING RITUALS':'\u03a3\u03a4\u0391\u039c\u0391\u03a4\u0391 \u039d\u0391 \u03a0\u0391\u03a1\u0395\u03a5\u03a1\u0399\u03a3\u039a\u0395\u03a3\u0391\u0399 \u03a3\u0395 \u03a4\u0395\u039b\u0395\u03a4\u039f\u03a5\u03a1\u0393\u0399\u0395\u03a3',
+    'CAN YOU PAY THE RENT?':'\u039c\u03a0\u039f\u03a1\u0395\u0399\u03a3 \u039d\u0391 \u03a0\u039b\u0397\u03a1\u03a9\u03a3\u0395\u0399\u03a3 \u03a4\u039f \u0395\u039d\u039f\u0399\u039a\u0399\u039f;',
+    'ARE YOU CON(CERN)ED?':'\u0391\u039d\u0397\u03a3\u03a5\u03a7\u0395\u0399\u03a3;',
+    'PSYOP AFTER PSYOP':'\u03a8\u03a5\u03a7\u039f\u039b\u039f\u0393\u0399\u039a\u0397 \u0395\u03a0\u0399\u03a7\u0395\u0399\u03a1\u0397\u03a3\u0397 \u039c\u0395\u03a4\u0391 \u0391\u03a0\u039f \u03a8\u03a5\u03a7\u039f\u039b\u039f\u0393\u0399\u039a\u0397 \u0395\u03a0\u0399\u03a7\u0395\u0399\u03a1\u0397\u03a3\u0397',
+    'DISCLOSURE?':'\u0391\u03a0\u039f\u039a\u0391\u039b\u03a5\u03a8\u0397;',
+    'GROW FOOD':'\u039a\u0391\u039b\u039b\u0399\u0395\u03a1\u0393\u0397\u03a3\u0395 \u03a6\u0391\u0393\u0397\u03a4\u039f',
+    'YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?':'\u03a0\u039b\u0397\u03a1\u03a9\u039d\u0395\u0399\u03a3 \u0393\u0399\u0391 \u03a4\u0399\u03a3 \u03a0\u03a5\u039b\u0395\u03a3 \u03a4\u039f\u03a5\u03a3. \u03a3\u03a9\u03a3\u03a4\u0391 PEGASUS;',
+    'ARE YOU ADDICTED TO FEAR?':'\u0395\u0399\u03a3\u0391\u0399 \u0395\u0398\u0399\u03a3\u039c\u0395\u039d\u039f\u03a3 \u03a3\u03a4\u039f\u039d \u03a6\u039f\u0392\u039f;',
+    "DON'T INGEST THE D.A.R.P.A. TECH":'\u039c\u0397\u039d \u039a\u0391\u03a4\u0391\u03a0\u0399\u039d\u0395\u0399\u03a3 \u03a4\u0397\u039d \u03a4\u0395\u03a7\u039d\u039f\u039b\u039f\u0393\u0399\u0391 D.A.R.P.A.',
+    'STATUS: TRANSMITTING':'\u039a\u0391\u03a4\u0391\u03a3\u03a4\u0391\u03a3\u0397: \u039c\u0395\u03a4\u0391\u0394\u0399\u0394\u0395\u03a4\u0391\u0399'
+  };
+
+  const fa={
+    'SIGNAL ACTIVE':'\u0633\u06cc\u06af\u0646\u0627\u0644 \u0641\u0639\u0627\u0644 \u0627\u0633\u062a',
+    "CAPTURE DON'T KILL":'\u062f\u0633\u062a\u06af\u06cc\u0631 \u06a9\u0646\u060c \u0646\u06a9\u0634',
+    'YOU HAVE RECEIVED THE SIGNAL':'\u0634\u0645\u0627 \u0633\u06cc\u06af\u0646\u0627\u0644 \u0631\u0627 \u062f\u0631\u06cc\u0627\u0641\u062a \u06a9\u0631\u062f\u06cc\u062f',
+    'THEY ARE JUST A RITUAL':'\u0622\u0646\u200c\u0647\u0627 \u0641\u0642\u0637 \u06cc\u06a9 \u0622\u06cc\u06cc\u0646 \u0647\u0633\u062a\u0646\u062f',
+    'AMERICA IS ONLY AN EXPERIMENT':'\u0622\u0645\u0631\u06cc\u06a9\u0627 \u0641\u0642\u0637 \u06cc\u06a9 \u0622\u0632\u0645\u0627\u06cc\u0634 \u0627\u0633\u062a',
+    'NEW MUSIC COMING SOON':'\u0645\u0648\u0633\u06cc\u0642\u06cc \u062c\u062f\u06cc\u062f \u0628\u0647\u200c\u0632\u0648\u062f\u06cc \u0645\u06cc\u200c\u0622\u06cc\u062f',
+    'DO YOU SMELL THE GRAPHENE?':'\u0628\u0648\u06cc \u06af\u0631\u0627\u0641\u0646 \u0631\u0627 \u062d\u0633 \u0645\u06cc\u200c\u06a9\u0646\u06cc\u061f',
+    'ARE YOU HUNGRY?':'\u06af\u0631\u0633\u0646\u0647\u200c\u0627\u06cc\u061f',
+    "DON'T OBEY":'\u0627\u0637\u0627\u0639\u062a \u0646\u06a9\u0646',
+    'WORSHIP THE MUSIC, NOT THE MAN':'\u0645\u0648\u0633\u06cc\u0642\u06cc \u0631\u0627 \u0628\u067e\u0631\u0633\u062a\u060c \u0646\u0647 \u0627\u0646\u0633\u0627\u0646 \u0631\u0627',
+    'SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE':'\u0627\u0632 \u0633\u06cc\u06af\u0646\u0627\u0644 \u062d\u0645\u0627\u06cc\u062a \u06a9\u0646\u060c \u06a9\u0645\u06a9 \u06a9\u0646 \u067e\u062e\u0634 \u0632\u0646\u062f\u0647 \u0628\u0645\u0627\u0646\u062f',
+    'STOP ATTENDING RITUALS':'\u062f\u06cc\u06af\u0631 \u062f\u0631 \u0622\u06cc\u06cc\u0646\u200c\u0647\u0627 \u0634\u0631\u06a9\u062a \u0646\u06a9\u0646',
+    'CAN YOU PAY THE RENT?':'\u0645\u06cc\u200c\u062a\u0648\u0627\u0646\u06cc \u0627\u062c\u0627\u0631\u0647 \u0631\u0627 \u0628\u067e\u0631\u062f\u0627\u0632\u06cc\u061f',
+    'ARE YOU CON(CERN)ED?':'\u0646\u06af\u0631\u0627\u0646\u06cc\u061f',
+    'PSYOP AFTER PSYOP':'\u0639\u0645\u0644\u06cc\u0627\u062a \u0631\u0648\u0627\u0646\u06cc \u067e\u0634\u062a \u0633\u0631 \u0639\u0645\u0644\u06cc\u0627\u062a \u0631\u0648\u0627\u0646\u06cc',
+    'DISCLOSURE?':'\u0627\u0641\u0634\u0627\u06af\u0631\u06cc\u061f',
+    'GROW FOOD':'\u063a\u0630\u0627 \u0628\u06a9\u0627\u0631',
+    'YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?':'\u062f\u0627\u0631\u06cc \u0628\u0631\u0627\u06cc \u062f\u0631\u06af\u0627\u0647\u200c\u0647\u0627\u06cc \u0622\u0646\u0647\u0627 \u067e\u0648\u0644 \u0645\u06cc\u200c\u062f\u0647\u06cc. \u062f\u0631\u0633\u062a\u0647\u060c \u067e\u06af\u0627\u0633\u0648\u0633\u061f',
+    'ARE YOU ADDICTED TO FEAR?':'\u0628\u0647 \u062a\u0631\u0633 \u0645\u0639\u062a\u0627\u062f \u0634\u062f\u0647\u200c\u0627\u06cc\u061f',
+    "DON'T INGEST THE D.A.R.P.A. TECH":'\u0641\u0646\u0627\u0648\u0631\u06cc \u062f\u0627\u0631\u067e\u0627 \u0631\u0627 \u0648\u0627\u0631\u062f \u0628\u062f\u0646\u062a \u0646\u06a9\u0646',
+    'STATUS: TRANSMITTING':'\u0648\u0636\u0639\u06cc\u062a: \u062f\u0631 \u062d\u0627\u0644 \u067e\u062e\u0634'
+  };
+
   // Extra labels: satellites/doomsday/pentagon/protest phrases + dynamic
   // counter labels + conflict-list prefix, merged into each language dict.
   const extra={
@@ -3518,11 +3566,41 @@ var glitchTranslate, glitchCorrupt;
       NET:'Internet iyus\u2019a:',
       PHONE:'T\u0113l\u0113phone o\u017eupi anpetu:',
       DEPORT:'ICE tona ognaka:'
+    },
+    gr:{
+      SATELLITES:'ΔΟΡΥΦΟΡΟΙ ΣΕ ΤΡΟΧΙΑ ΓΥΡΩ ΑΠΟ ΤΗ ΓΗ: ~16.000 ΕΝΕΡΓΟΙ',
+      DOOMSDAY:'ΡΟΛΟΪ ΤΗΣ ΑΠΟΚΑΛΥΨΗΣ: 85 ΔΕΥΤΕΡΟΛΕΠΤΑ ΩΣ ΤΑ ΜΕΣΑΝΥΧΤΑ',
+      PENT25:'ΠΡΟΫΠΟΛΟΓΙΣΜΟΣ ΠΕΝΤΑΓΩΝΟΥ 2026: $1.045 ΤΡΙΣΕΚΑΤΟΜΜΥΡΙΑ',
+      PENT24:'ΠΡΟΫΠΟΛΟΓΙΣΜΟΣ ΠΕΝΤΑΓΩΝΟΥ 2025: $831.5 ΔΙΣΕΚΑΤΟΜΜΥΡΙΑ',
+      CONFLICT:'ΕΝΕΡΓΗ ΣΥΓΚΡΟΥΣΗ:',
+      DEBT:'ΕΘΝΙΚΟ ΧΡΕΟΣ ΗΠΑ:',
+      POP:'ΠΑΓΚΟΣΜΙΟΣ ΠΛΗΘΥΣΜΟΣ:',
+      CO2:'CO2 ΠΟΥ ΕΚΠΕΜΦΘΗΚΕ ΦΕΤΟΣ:',
+      FOREST:'ΔΑΣΟΣ ΠΟΥ ΧΑΘΗΚΕ ΦΕΤΟΣ:',
+      WATER:'ΝΕΡΟ ΠΟΥ ΚΑΤΑΝΑΛΩΘΗΚΕ ΦΕΤΟΣ:',
+      NET:'ΧΡΗΣΤΕΣ ΙΝΤΕΡΝΕΤ ΠΑΓΚΟΣΜΙΩΣ:',
+      PHONE:'ΚΙΝΗΤΑ ΠΟΥ ΠΩΛΗΘΗΚΑΝ ΣΗΜΕΡΑ:',
+      DEPORT:'ΣΥΝΟΛΟ ΑΠΕΛΑΣΕΩΝ ICE:'
+    },
+    fa:{
+      SATELLITES:'ماهواره‌های در مدار زمین: حدود ۱۶,۰۰۰ فعال',
+      DOOMSDAY:'ساعت روز رستاخیز: ۸۵ ثانیه تا نیمه‌شب',
+      PENT25:'بودجه پنتاگون ۲۰۲۶: ۱.۰۴۵ تریلیون دلار',
+      PENT24:'بودجه پنتاگون ۲۰۲۵: ۸۳۱.۵ میلیارد دلار',
+      CONFLICT:'درگیری فعال:',
+      DEBT:'بدهی ملی آمریکا:',
+      POP:'جمعیت جهان:',
+      CO2:'CO2 منتشر شده امسال:',
+      FOREST:'جنگل از دست رفته امسال:',
+      WATER:'آب مصرف شده امسال:',
+      NET:'کاربران اینترنت در جهان:',
+      PHONE:'تلفن‌های فروخته شده امروز:',
+      DEPORT:'مجموع اخراج‌های ICE:'
     }
   };
   Object.assign(es,{'¡YA BASTA!':'¡YA BASTA!'});
-  [es,ru,pt,zh,ja,ar,nah,hi,ur,ko,hy,nv,lkt].forEach((dict,i)=>{
-    const key=['es','ru','pt','zh','ja','ar','nah','hi','ur','ko','hy','nv','lkt'][i];
+  [es,ru,pt,zh,ja,ar,nah,hi,ur,ko,hy,nv,lkt,gr,fa].forEach((dict,i)=>{
+    const key=['es','ru','pt','zh','ja','ar','nah','hi','ur','ko','hy','nv','lkt','gr','fa'][i];
     Object.assign(dict,{
       'SATELLITES ORBITING EARTH: ~16,000 ACTIVE':extra[key].SATELLITES,
       'DOOMSDAY CLOCK: 85 SECONDS TO MIDNIGHT':extra[key].DOOMSDAY,
@@ -3533,14 +3611,14 @@ var glitchTranslate, glitchCorrupt;
     dict.__labels={debt:extra[key].DEBT,pop:extra[key].POP,co2:extra[key].CO2,forest:extra[key].FOREST,water:extra[key].WATER,net:extra[key].NET,phone:extra[key].PHONE,deport:extra[key].DEPORT};
   });
 
-  const langs=[es,ru,pt,zh,ja,ar,nah,hi,ur,ko,hy,nv,lkt];
+  const langs=[es,ru,pt,zh,ja,ar,nah,hi,ur,ko,hy,nv,lkt,gr,fa];
   // Weighted so English stays most common, Spanish a close second, others rare.
   function pickLang(){
-    // Used to be 55% Spanish, the rest split across the other 12 languages
+    // Used to be 55% Spanish, the rest split across the other languages
     // — heavily lopsided. Flat/uniform pick across all of them instead, so
     // any given translation flash is just as likely to land on Russian,
-    // Lakota, or Urdu as it is Spanish.
-    const all=[es,ru,pt,zh,ja,ar,nah,hi,ur,ko,hy,nv,lkt];
+    // Lakota, Greek, Persian, or Urdu as it is Spanish.
+    const all=[es,ru,pt,zh,ja,ar,nah,hi,ur,ko,hy,nv,lkt,gr,fa];
     return all[Math.floor(Math.random()*all.length)];
   }
 
