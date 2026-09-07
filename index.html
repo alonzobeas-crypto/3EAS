@@ -3647,6 +3647,9 @@ var glitchTranslate, glitchCorrupt;
     evictclock:'evict',evictclock2:'evict'
   };
   function translateItem(t,dict){
+    // Links stay in English always — never translate ticker anchors,
+    // regardless of what a dict key happens to match.
+    if(/<a[\s>]/i.test(t))return t;
     if(dict[t]!==undefined)return dict[t];
     const cm=t.match(/^ACTIVE CONFLICT: (.+)$/);
     if(cm&&dict.__conflict)return dict.__conflict+' '+cm[1];
