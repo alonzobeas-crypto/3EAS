@@ -4090,6 +4090,9 @@ var glitchTranslate, glitchCorrupt;
   // Character-level corruption: randomly flip letter case and swap a few
   // letters for leetspeak-style numbers, briefly, on visible ticker spans.
   const LEET={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9',L:'1',Z:'2'};
+  // Turned/mirrored lookalike glyphs for the occasional "backwards letter" flicker.
+  const BACKWARDS={A:'∀',C:'Ɔ',E:'Ǝ',F:'Ⅎ',G:'⅁',K:'ʞ',L:'Ꞁ',N:'ᴎ',R:'Я',S:'Ƨ',Y:'⅄'};
+  const GLITCH_SYMBOLS=['$','€','£','¥','%','&','#','@','*','§','†','‡','¤','∆','ø'];
   glitchCorrupt=function(){
     [document.getElementById('ti1'),document.getElementById('ti2')].forEach(el=>{
       if(!el)return;
@@ -4109,7 +4112,10 @@ var glitchTranslate, glitchCorrupt;
             const c=chars[i];
             if(/[a-zA-Z]/.test(c)&&Math.random()<0.14){
               const up=c.toUpperCase();
-              if(LEET[up]&&Math.random()<0.5){chars[i]=LEET[up];}
+              const roll=Math.random();
+              if(roll<0.35&&LEET[up]){chars[i]=LEET[up];}
+              else if(roll<0.55&&BACKWARDS[up]){chars[i]=BACKWARDS[up];}
+              else if(roll<0.7){chars[i]=GLITCH_SYMBOLS[Math.floor(Math.random()*GLITCH_SYMBOLS.length)];}
               else{chars[i]=(c===up)?c.toLowerCase():up;}
             }
           }
