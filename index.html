@@ -4113,9 +4113,9 @@ var glitchTranslate, glitchCorrupt;
             if(/[a-zA-Z]/.test(c)&&Math.random()<0.14){
               const up=c.toUpperCase();
               const roll=Math.random();
-              if(roll<0.35&&LEET[up]){chars[i]=LEET[up];}
-              else if(roll<0.55&&BACKWARDS[up]){chars[i]=BACKWARDS[up];}
-              else if(roll<0.7){chars[i]=GLITCH_SYMBOLS[Math.floor(Math.random()*GLITCH_SYMBOLS.length)];}
+              if(roll<0.5&&LEET[up]){chars[i]=LEET[up];}
+              else if(roll<0.6&&BACKWARDS[up]){chars[i]=BACKWARDS[up];}
+              else if(roll<0.65){chars[i]=GLITCH_SYMBOLS[Math.floor(Math.random()*GLITCH_SYMBOLS.length)];}
               else{chars[i]=(c===up)?c.toLowerCase():up;}
             }
           }
