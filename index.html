@@ -1180,10 +1180,39 @@ body{
   .p-label{margin-bottom:2px!important}
   .sig-dots{margin-bottom:4px!important}
 }
+
+#signal-glitch-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+#signal-glitch-canvas.sg-active {
+  opacity: 1;
+}
+#signal-glitch-canvas.sg-cutting {
+  animation: sg-cut 0.14s steps(2, end);
+}
+@keyframes sg-cut {
+  0%   { clip-path: inset(0 0 0 0); transform: translate(0,0); }
+  20%  { clip-path: inset(10% 0 40% 0); transform: translate(-6px,0); }
+  40%  { clip-path: inset(60% 0 5% 0); transform: translate(5px,0); }
+  60%  { clip-path: inset(20% 0 55% 0); transform: translate(-3px,0); }
+  80%  { clip-path: inset(0 0 70% 0); transform: translate(4px,0); }
+  100% { clip-path: inset(0 0 0 0); transform: translate(0,0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #signal-glitch-canvas.sg-cutting { animation: none; }
+}
 </style>
 </head>
 <body>
 
+<canvas id="signal-glitch-canvas"></canvas>
 <div id="tvglitch"></div>
 <div id="hackedBackdrop"></div>
 <canvas id="matrixRain"></canvas>
@@ -2327,10 +2356,18 @@ function spBuildTitleGlitch(t){
     }
   },0);
 }
+let sgLastTitle=null;
 function spSetTitle(t){
   document.getElementById('sp-title').textContent=t;
   if('mediaSession' in navigator)navigator.mediaSession.metadata=new MediaMetadata({title:t,artist:'3EAS',album:'3EASCORTEX'});
   spBuildTitleGlitch(t);
+  // Fire the signal-glitch effect on real track changes only — skip the
+  // interim "TrackA ⇢ TrackB" crossfade title and redundant re-sets of the
+  // same title.
+  if(!t.includes('⇢')&&t!==sgLastTitle){
+    sgLastTitle=t;
+    window.triggerSignalGlitch?.();
+  }
 }
 
 // A single check right after a play() promise settles isn't reliable proof
@@ -4910,6 +4947,369 @@ window.addEventListener('message',e=>{
   if(e.data?.type==='__deactivate_edit_mode')document.getElementById('tp').classList.remove('vis');
 });
 window.parent.postMessage({type:'__edit_mode_available'},'*');
+</script>
+
+<script>
+(function () {
+  // Real 3EAS catalog — track/session/release names, drawn from the
+  // jukebox playlist plus core site identifiers.
+  const PARTICLE_LABELS = [
+    "3EASCORTEX",
+    "SIGNAL ACTIVE",
+    "CAPTURE DONT KILL",
+    "3EAS-001",
+    "EXILED / MARCOS",
+    "RITCHIE CURANDERO",
+    "MR ROBOT INTRO",
+    "GATEWAY PROCESS",
+    "PAJARITOS PARA TI",
+    "RIVER VIPER",
+    "CRAVINGS 2012",
+    "A MOMENT BY RITA",
+    "BASICK WAR DANCE",
+    "BAZANTAR / HANCOCK",
+    "JORDAN MAXWELL FOOTSIES",
+    "MALCOLM X / LIBS",
+    "DIVESTA",
+    "A.I. BABY",
+    "WOMEN AND CHILDREN",
+    "ICE COLD MURDER",
+    "CUBIC ZIRCONIA",
+    "DRAW BLOOD FOR SPRING",
+    "LITTLE FAITH",
+    "HEDGES 2026",
+    "I DONT HAVE A SHADOW ANYMORE",
+    "LATE NIGHT CALLS",
+    "CANT SMELL YOU",
+    "JULY 18 2026",
+    "ICE COLD FEAR",
+    "AHS - PALESTINE",
+  ];
+
+  const canvas = document.getElementById('signal-glitch-canvas');
+  const ctx = canvas.getContext('2d');
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 3EAS palette: hot pink + pale teal + cream, terminal/broadcast feel
+  const COLORS = ['#ff3d8a', '#9fe3d6', '#f4f1ea'];
+
+  let W, H, dpr;
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = canvas.width = window.innerWidth * dpr;
+    H = canvas.height = window.innerHeight * dpr;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function particleCount() {
+    return window.innerWidth < 640 ? 90 : window.innerWidth < 1200 ? 200 : 340;
+  }
+
+  // ---- background grid overlay (thin, drifting, low-opacity) ----
+  function drawGrid(t) {
+    const spacing = 40 * dpr;
+    const drift = Math.sin(t * 0.00015) * 6 * dpr;
+    ctx.strokeStyle = COLORS[1];
+    ctx.globalAlpha = 0.08;
+    ctx.lineWidth = 1;
+    for (let x = -spacing; x < W + spacing; x += spacing) {
+      ctx.beginPath();
+      ctx.moveTo(x + drift, 0);
+      ctx.lineTo(x - drift, H);
+      ctx.stroke();
+    }
+    for (let y = -spacing; y < H + spacing; y += spacing) {
+      ctx.beginPath();
+      ctx.moveTo(0, y + drift * 0.5);
+      ctx.lineTo(W, y - drift * 0.5);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ---- noise/static streak burst ----
+  function drawNoiseBurst(intensity) {
+    const lines = Math.floor(380 * intensity);
+    ctx.strokeStyle = '#ffffff';
+    for (let i = 0; i < lines; i++) {
+      const x = Math.random() * W;
+      const y = Math.random() * H;
+      const len = (10 + Math.random() * 60) * dpr;
+      ctx.globalAlpha = Math.random() * 0.5 * intensity;
+      ctx.lineWidth = Math.random() < 0.1 ? 2 * dpr : 1;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + (Math.random() - 0.5) * 4 * dpr, y + len);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  class Particle {
+    constructor() {
+      this.reset();
+      this.label = PARTICLE_LABELS[Math.floor(Math.random() * PARTICLE_LABELS.length)];
+      this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+      this.showLabel = Math.random() < 0.12;
+    }
+    reset() {
+      this.x = Math.random() * W;
+      this.y = Math.random() * H;
+      const speed = (0.15 + Math.random() * 0.5) * dpr;
+      const angle = Math.random() * Math.PI * 2;
+      this.vx = Math.cos(angle) * speed;
+      this.vy = Math.sin(angle) * speed;
+      this.r = (1 + Math.random() * 1.8) * dpr;
+    }
+    step(t) {
+      this.vx += (Math.random() - 0.5) * 0.05 * dpr;
+      this.vy += (Math.random() - 0.5) * 0.05 * dpr;
+      this.vx *= 0.995; this.vy *= 0.995;
+      this.x += this.vx; this.y += this.vy;
+      if (this.x < 0 || this.x > W) this.vx *= -1;
+      if (this.y < 0 || this.y > H) this.vy *= -1;
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.fillStyle = '#f4f1ea';
+      ctx.globalAlpha = 0.7;
+      ctx.arc(this.x, this.y, this.r * 0.7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = this.color;
+      ctx.globalAlpha = 0.5;
+      ctx.lineWidth = 0.75 * dpr;
+      ctx.stroke();
+      if (this.showLabel) {
+        ctx.globalAlpha = 0.55;
+        ctx.font = `${10 * dpr}px monospace`;
+        ctx.fillStyle = this.color;
+        ctx.fillText(this.label, this.x + 6 * dpr, this.y + 3 * dpr);
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  let particles = [];
+  let rafId = null;
+  let holdTimeout = null;
+  let frame = 0;
+
+  const CONNECT_DIST = 190;
+  const CODE_CHARS = '01SIGNAL3EASCORTEX{}<>/*'.split('');
+
+  function drawCodeLine(ax, ay, bx, by, seed) {
+    const dx = bx - ax, dy = by - ay;
+    const dist = Math.hypot(dx, dy);
+    const steps = Math.max(2, Math.floor(dist / (9 * dpr)));
+    ctx.font = `${8 * dpr}px monospace`;
+    ctx.fillStyle = COLORS[0];
+    for (let i = 0; i < steps; i++) {
+      const tt = i / steps;
+      const x = ax + dx * tt;
+      const y = ay + dy * tt;
+      const ch = CODE_CHARS[(seed + i + Math.floor(frame / 6)) % CODE_CHARS.length];
+      ctx.globalAlpha = 0.35 + 0.25 * Math.sin(frame * 0.05 + i);
+      ctx.fillText(ch, x, y);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawDnaLine(ax, ay, bx, by) {
+    const dx = bx - ax, dy = by - ay;
+    const dist = Math.hypot(dx, dy);
+    const nx = -dy / dist, ny = dx / dist;
+    const segs = Math.max(6, Math.floor(dist / (5 * dpr)));
+    const amp = 4 * dpr;
+    ctx.lineWidth = 1 * dpr;
+    ctx.strokeStyle = COLORS[1];
+    ctx.globalAlpha = 0.5;
+    for (let strand = 0; strand < 2; strand++) {
+      ctx.beginPath();
+      for (let i = 0; i <= segs; i++) {
+        const tt = i / segs;
+        const wave = Math.sin(tt * Math.PI * 4 + (strand ? Math.PI : 0) + frame * 0.08) * amp;
+        const x = ax + dx * tt + nx * wave;
+        const y = ay + dy * tt + ny * wave;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 0.3;
+    for (let i = 1; i < segs; i += 3) {
+      const tt = i / segs;
+      const wave = Math.sin(tt * Math.PI * 4 + frame * 0.08) * amp;
+      const wave2 = Math.sin(tt * Math.PI * 4 + Math.PI + frame * 0.08) * amp;
+      const x1 = ax + dx * tt + nx * wave, y1 = ay + dy * tt + ny * wave;
+      const x2 = ax + dx * tt + nx * wave2, y2 = ay + dy * tt + ny * wave2;
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawFabricLine(ax, ay, bx, by) {
+    const dx = bx - ax, dy = by - ay;
+    const dist = Math.hypot(dx, dy);
+    const nx = -dy / dist, ny = dx / dist;
+    const weave = 3 * dpr;
+    ctx.lineWidth = 1.4 * dpr;
+    ctx.strokeStyle = COLORS[2];
+    ctx.globalAlpha = 0.4;
+    ctx.setLineDash([5 * dpr, 4 * dpr]);
+    ctx.lineDashOffset = -frame * 0.4;
+    ctx.beginPath();
+    ctx.moveTo(ax + nx * weave, ay + ny * weave);
+    ctx.lineTo(bx + nx * weave, by + ny * weave);
+    ctx.stroke();
+    ctx.lineDashOffset = frame * 0.4 + 20;
+    ctx.beginPath();
+    ctx.moveTo(ax - nx * weave, ay - ny * weave);
+    ctx.lineTo(bx - nx * weave, by - ny * weave);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
+  }
+
+  // ---- Spatial grid: buckets particles by cell so the connection/collision
+  // passes only compare nearby pairs instead of every possible pair
+  // (340 particles was ~57k distance checks/frame at O(n^2)). Cell size
+  // equals the connection distance, so any two particles within range of
+  // each other are guaranteed to land in the same cell or an adjacent one —
+  // the 5-offset "half neighborhood" below (self + 4 forward directions)
+  // visits every such pair exactly once. ----
+  function buildGrid(cellSize) {
+    const grid = new Map();
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      const key = Math.floor(p.x / cellSize) + ',' + Math.floor(p.y / cellSize);
+      let bucket = grid.get(key);
+      if (!bucket) { bucket = []; grid.set(key, bucket); }
+      bucket.push(i);
+    }
+    return grid;
+  }
+  const GRID_NEIGHBOR_OFFSETS = [[0, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
+  function forEachNearbyPair(grid, cb) {
+    grid.forEach((bucket, key) => {
+      const commaIdx = key.indexOf(',');
+      const cx = Number(key.slice(0, commaIdx)), cy = Number(key.slice(commaIdx + 1));
+      for (const [dx, dy] of GRID_NEIGHBOR_OFFSETS) {
+        const nBucket = grid.get((cx + dx) + ',' + (cy + dy));
+        if (!nBucket) continue;
+        if (dx === 0 && dy === 0) {
+          for (let a = 0; a < bucket.length; a++) {
+            for (let b = a + 1; b < bucket.length; b++) cb(bucket[a], bucket[b]);
+          }
+        } else {
+          for (let a = 0; a < bucket.length; a++) {
+            for (let b = 0; b < nBucket.length; b++) cb(bucket[a], nBucket[b]);
+          }
+        }
+      }
+    });
+  }
+
+  function drawConnections(grid, maxDist) {
+    forEachNearbyPair(grid, (i, j) => {
+      const a = particles[i], b = particles[j];
+      const dist = Math.hypot(b.x - a.x, b.y - a.y);
+      if (dist < maxDist) {
+        const material = (i + j) % 3;
+        if (material === 0) drawCodeLine(a.x, a.y, b.x, b.y, i + j);
+        else if (material === 1) drawDnaLine(a.x, a.y, b.x, b.y);
+        else drawFabricLine(a.x, a.y, b.x, b.y);
+      }
+    });
+  }
+
+  function softCollide(grid) {
+    forEachNearbyPair(grid, (i, j) => {
+      const a = particles[i], b = particles[j];
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const dist = Math.hypot(dx, dy);
+      const minDist = (a.r + b.r) * 6;
+      if (dist < minDist && dist > 0) {
+        const push = (minDist - dist) / minDist * 0.02;
+        a.vx -= dx * push; a.vy -= dy * push;
+        b.vx += dx * push; b.vy += dy * push;
+      }
+    });
+  }
+
+  function loop(t) {
+    ctx.clearRect(0, 0, W, H);
+    frame++;
+    drawGrid(t);
+    particles.forEach(p => p.step(t));
+    const maxDist = CONNECT_DIST * dpr;
+    const grid = buildGrid(maxDist);
+    drawConnections(grid, maxDist);
+    particles.forEach(p => p.draw());
+    softCollide(grid);
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function glitchCut(cb) {
+    canvas.classList.add('sg-cutting');
+    if (!prefersReduced) {
+      let n = 0;
+      const burst = setInterval(() => {
+        ctx.clearRect(0, 0, W, H);
+        drawNoiseBurst(1 - n / 4);
+        n++;
+        if (n > 4) clearInterval(burst);
+      }, 28);
+    }
+    setTimeout(() => {
+      canvas.classList.remove('sg-cutting');
+      if (cb) cb();
+    }, 140);
+  }
+
+  function startSignal() {
+    particles = Array.from({ length: particleCount() }, () => new Particle());
+    canvas.classList.add('sg-active');
+    glitchCut(() => {
+      if (prefersReduced) {
+        // static single-frame flicker instead of continuous physics
+        ctx.clearRect(0, 0, W, H);
+        const maxDist = CONNECT_DIST * dpr;
+        const grid = buildGrid(maxDist);
+        drawConnections(grid, maxDist);
+        particles.forEach(p => p.draw());
+      } else {
+        rafId = requestAnimationFrame(loop);
+      }
+    });
+
+    const holdMs = 3000 + Math.random() * 2000;
+    holdTimeout = setTimeout(stopSignal, holdMs);
+  }
+
+  function stopSignal() {
+    glitchCut(() => {
+      canvas.classList.remove('sg-active');
+      cancelAnimationFrame(rafId);
+      ctx.clearRect(0, 0, W, H);
+    });
+  }
+
+  function scheduleNext() {
+    const delay = 14000 + Math.random() * 8000;
+    setTimeout(() => {
+      startSignal();
+      scheduleNext();
+    }, delay);
+  }
+
+  // expose for manual triggering — wired to jukebox track changes in
+  // spSetTitle() above, in addition to this auto-interval
+  window.triggerSignalGlitch = startSignal;
+
+  scheduleNext();
+})();
 </script>
 </body>
 </html>
