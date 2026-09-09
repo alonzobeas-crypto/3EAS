@@ -5327,7 +5327,10 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   }
 
   function scheduleNext() {
-    const delay = 14000 + Math.random() * 8000;
+    // TESTING: fixed 60s interval while this gets checked live — revert to
+    // the randomized 14-22s window (or whatever cadence is settled on)
+    // once testing wraps.
+    const delay = 60000;
     setTimeout(() => {
       startSignal();
       scheduleNext();
