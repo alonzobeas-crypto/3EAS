@@ -4994,7 +4994,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   // accent gold, fg cream, dim khaki for the three structural line/particle
   // colors, plus the ticker's own link-red and corruption-glitch cyan
   // reserved for the chromatic strand material below.
-  const COLORS = ['#b8a878', '#d8d4c8', '#8c8478'];
+  const COLORS = ['#b8a878', '#8c8478', '#4a4640'];
   const SIGNAL_RED = '#a8695a';
   const SIGNAL_BLUE = '#0ff';
 
@@ -5079,8 +5079,8 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     }
     draw() {
       ctx.beginPath();
-      ctx.fillStyle = '#d8d4c8';
-      ctx.globalAlpha = 0.7;
+      ctx.fillStyle = '#4a4640';
+      ctx.globalAlpha = 0.5;
       ctx.arc(this.x, this.y, this.r * 0.7, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = this.color;
