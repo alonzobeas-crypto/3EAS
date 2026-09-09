@@ -4994,7 +4994,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   // accent gold, fg cream, dim khaki for the three structural line/particle
   // colors, plus the ticker's own link-red and corruption-glitch cyan
   // reserved for the chromatic strand material below.
-  const COLORS = ['#b8a878', '#8c8478', '#4a4640'];
+  const COLORS = ['#c9b878', '#b8a878', '#8c7f56'];
   const SIGNAL_RED = '#a8695a';
   const SIGNAL_BLUE = '#0ff';
 
@@ -5010,7 +5010,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   window.addEventListener('resize', resize);
 
   function particleCount() {
-    return window.innerWidth < 640 ? 90 : window.innerWidth < 1200 ? 200 : 340;
+    return window.innerWidth < 640 ? 65 : window.innerWidth < 1200 ? 140 : 240;
   }
 
   // ---- background grid overlay (thin, drifting, low-opacity) ----
@@ -5102,7 +5102,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   let holdTimeout = null;
   let frame = 0;
 
-  const CONNECT_DIST = 190;
+  const CONNECT_DIST = 155;
   const CODE_CHARS = '01SIGNAL3EASCORTEX{}<>/*'.split('');
 
   function drawCodeLine(ax, ay, bx, by, seed) {
