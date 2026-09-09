@@ -4994,7 +4994,11 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   // accent gold, fg cream, dim khaki for the three structural line/particle
   // colors, plus the ticker's own link-red and corruption-glitch cyan
   // reserved for the chromatic strand material below.
-  const COLORS = ['#c9b878', '#b8a878', '#8c7f56'];
+  // COLORS[0] matches the hero canvas's own particle dots (rgb(200,186,140))
+  // and COLORS[1] matches its connection lines (rgb(184,168,120), the site's
+  // --accent) exactly, so this field reads as the same species of particle
+  // as the one already ambient on the page, not a separate system.
+  const COLORS = ['#c8ba8c', '#b8a878', '#8c7f56'];
   const SIGNAL_RED = '#a8695a';
   const SIGNAL_BLUE = '#0ff';
 
@@ -5078,15 +5082,15 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
       if (this.y < 0 || this.y > H) this.vy *= -1;
     }
     draw() {
+      // Plain solid-filled dot, same rendering approach as the hero canvas's
+      // ambient particles (no separate dark core + ring), so this field
+      // reads as a continuation of that existing particle system.
       ctx.beginPath();
-      ctx.fillStyle = '#4a4640';
-      ctx.globalAlpha = 0.5;
-      ctx.arc(this.x, this.y, this.r * 0.7, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.globalAlpha = 0.75;
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = this.color;
-      ctx.globalAlpha = 0.5;
-      ctx.lineWidth = 0.75 * dpr;
-      ctx.stroke();
+      ctx.globalAlpha = 1;
       if (this.showLabel) {
         ctx.globalAlpha = 0.55;
         ctx.font = `${10 * dpr}px monospace`;
