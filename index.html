@@ -4990,8 +4990,13 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   const ctx = canvas.getContext('2d');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // 3EAS palette: hot pink + pale teal + cream, terminal/broadcast feel
-  const COLORS = ['#ff3d8a', '#9fe3d6', '#f4f1ea'];
+  // Pulled straight from the site's own palette instead of an invented one:
+  // accent gold, fg cream, dim khaki for the three structural line/particle
+  // colors, plus the ticker's own link-red and corruption-glitch cyan
+  // reserved for the chromatic strand material below.
+  const COLORS = ['#b8a878', '#d8d4c8', '#8c8478'];
+  const SIGNAL_RED = '#a8695a';
+  const SIGNAL_BLUE = '#0ff';
 
   let W, H, dpr;
   function resize() {
@@ -5074,7 +5079,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     }
     draw() {
       ctx.beginPath();
-      ctx.fillStyle = '#f4f1ea';
+      ctx.fillStyle = '#d8d4c8';
       ctx.globalAlpha = 0.7;
       ctx.arc(this.x, this.y, this.r * 0.7, 0, Math.PI * 2);
       ctx.fill();
@@ -5172,6 +5177,30 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     ctx.globalAlpha = 1;
   }
 
+  // A fourth connection material: the same red/cyan split the ticker uses
+  // on its own corrupted text (text-shadow offset in --accent's companion
+  // red plus #0ff), rendered here as two colored strands either side of the
+  // true line instead of a text-shadow.
+  function drawChromaticLine(ax, ay, bx, by) {
+    const dx = bx - ax, dy = by - ay;
+    const dist = Math.hypot(dx, dy);
+    const nx = -dy / dist, ny = dx / dist;
+    const off = (2 + Math.sin(frame * 0.15 + ax * 0.01) * 1.5) * dpr;
+    ctx.lineWidth = 1 * dpr;
+    ctx.globalAlpha = 0.55;
+    ctx.strokeStyle = SIGNAL_RED;
+    ctx.beginPath();
+    ctx.moveTo(ax + nx * off, ay + ny * off);
+    ctx.lineTo(bx + nx * off, by + ny * off);
+    ctx.stroke();
+    ctx.strokeStyle = SIGNAL_BLUE;
+    ctx.beginPath();
+    ctx.moveTo(ax - nx * off, ay - ny * off);
+    ctx.lineTo(bx - nx * off, by - ny * off);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
   // ---- Spatial grid: buckets particles by cell so the connection/collision
   // passes only compare nearby pairs instead of every possible pair
   // (340 particles was ~57k distance checks/frame at O(n^2)). Cell size
@@ -5216,10 +5245,11 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
       const a = particles[i], b = particles[j];
       const dist = Math.hypot(b.x - a.x, b.y - a.y);
       if (dist < maxDist) {
-        const material = (i + j) % 3;
+        const material = (i + j) % 4;
         if (material === 0) drawCodeLine(a.x, a.y, b.x, b.y, i + j);
         else if (material === 1) drawDnaLine(a.x, a.y, b.x, b.y);
-        else drawFabricLine(a.x, a.y, b.x, b.y);
+        else if (material === 2) drawFabricLine(a.x, a.y, b.x, b.y);
+        else drawChromaticLine(a.x, a.y, b.x, b.y);
       }
     });
   }
