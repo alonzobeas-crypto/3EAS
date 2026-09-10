@@ -5281,6 +5281,64 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     });
   }
 
+  // Reach out to the site's own pre-existing hero-canvas particle field
+  // (hpart/hw/hh — top-level `let` bindings in the page's main <script>,
+  // which classic <script> tags share via one global lexical scope, so
+  // they're readable here by name with no wiring needed). Occasionally
+  // arcs a jagged lightning bolt from a glitch particle to a nearby hero
+  // particle — a thunderstorm-style strike linking the two fields rather
+  // than two separate systems sitting on top of each other. `typeof`
+  // guards make this a no-op instead of a crash if that field is ever
+  // renamed or absent.
+  function drawLightningBolt(x1, y1, x2, y2) {
+    const segs = 6;
+    const dx = x2 - x1, dy = y2 - y1;
+    const nx = -dy, ny = dx;
+    const len = Math.hypot(nx, ny) || 1;
+    let px = x1, py = y1;
+    ctx.lineWidth = 1.1 * dpr;
+    ctx.strokeStyle = SIGNAL_BLUE;
+    ctx.globalAlpha = 0.6;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    for (let i = 1; i < segs; i++) {
+      const tt = i / segs;
+      const spread = (1 - Math.abs(tt - 0.5) * 1.6) * 16 * dpr;
+      const jitter = (Math.random() - 0.5) * spread;
+      const x = x1 + dx * tt + (nx / len) * jitter;
+      const y = y1 + dy * tt + (ny / len) * jitter;
+      ctx.lineTo(x, y);
+      px = x; py = y;
+    }
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    // bright white core so it reads as an electric strike, not just a line
+    ctx.globalAlpha = 0.85;
+    ctx.lineWidth = 0.5 * dpr;
+    ctx.strokeStyle = '#ffffff';
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+  function drawStormLinks() {
+    if (typeof hpart === 'undefined' || !hpart.length || !particles.length) return;
+    const maxDist = 240 * dpr;
+    const strikeChance = 0.4;
+    const strikes = Math.random() < strikeChance ? 1 + Math.floor(Math.random() * 2) : 0;
+    for (let s = 0; s < strikes; s++) {
+      const gp = particles[Math.floor(Math.random() * particles.length)];
+      let best = null, bestD = maxDist;
+      // Sample a handful of hero particles rather than scanning all of
+      // them every strike — plenty for a nearest-ish pick at this scale.
+      for (let k = 0; k < 14; k++) {
+        const hp = hpart[Math.floor(Math.random() * hpart.length)];
+        const hx2 = hp.x * dpr, hy2 = hp.y * dpr;
+        const d = Math.hypot(hx2 - gp.x, hy2 - gp.y);
+        if (d < bestD) { bestD = d; best = { x: hx2, y: hy2 }; }
+      }
+      if (best) drawLightningBolt(gp.x, gp.y, best.x, best.y);
+    }
+  }
+
   function loop(t) {
     ctx.clearRect(0, 0, W, H);
     frame++;
@@ -5291,6 +5349,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     drawConnections(grid, maxDist);
     particles.forEach(p => p.draw());
     softCollide(grid);
+    drawStormLinks();
     rafId = requestAnimationFrame(loop);
   }
 
@@ -5322,6 +5381,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
         const grid = buildGrid(maxDist);
         drawConnections(grid, maxDist);
         particles.forEach(p => p.draw());
+        drawStormLinks();
       } else {
         rafId = requestAnimationFrame(loop);
       }
