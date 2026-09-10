@@ -1209,6 +1209,23 @@ body{
 @media (prefers-reduced-motion: reduce) {
   #signal-glitch-canvas.sg-cutting { animation: none; }
 }
+#signal-glitch-canvas.sg-cutting-hard {
+  animation: sg-cut-hard 0.24s steps(3, end);
+}
+@keyframes sg-cut-hard {
+  0%   { clip-path: inset(0 0 0 0); transform: translate(0,0) skewX(0); filter: none; }
+  10%  { clip-path: inset(5% 0 55% 0); transform: translate(-14px,0) skewX(4deg); filter: invert(1); }
+  22%  { clip-path: inset(65% 0 2% 0); transform: translate(12px,0) skewX(-3deg); filter: none; }
+  35%  { clip-path: inset(15% 0 60% 0); transform: translate(-9px,2px) skewX(2deg); }
+  48%  { clip-path: inset(0 0 75% 0); transform: translate(10px,-2px) skewX(-4deg); filter: invert(1); }
+  60%  { clip-path: inset(70% 0 0 0); transform: translate(-6px,0) skewX(1deg); filter: none; }
+  75%  { clip-path: inset(30% 0 40% 0); transform: translate(8px,0) skewX(-2deg); }
+  90%  { clip-path: inset(0 0 10% 0); transform: translate(-3px,0) skewX(0); }
+  100% { clip-path: inset(0 0 0 0); transform: translate(0,0) skewX(0); filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #signal-glitch-canvas.sg-cutting-hard { animation: none; }
+}
 </style>
 </head>
 <body>
@@ -5117,62 +5134,226 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   let holdTimeout = null;
   let frame = 0;
 
-  // ---- All-Seeing Eye formation: partway through a glitch's hold, the
-  // particle field snaps into an Eye-of-Providence layout (triangle, eye,
-  // pupil, radiating rays) instead of drifting freely, holds there briefly,
-  // then dissolves back into normal motion. Points are distributed
-  // proportionally across the shape's parts so however many particles
-  // exist (it varies by viewport width), the shape stays legible. ----
+  // ---- All-Seeing Eye formation: a completely separate glitch event from
+  // the regular scattered/connected particle field — its own trigger, its
+  // own schedule, its own start/stop cycle (see startEyeSignal below).
+  // When it fires, particles snap straight into an Eye-of-Providence layout
+  // (triangle, eye, pupil, radiating rays) and hold there for the whole
+  // cycle. Points are distributed proportionally across the shape's parts
+  // so however many particles exist (it varies by viewport width), the
+  // shape stays legible. ----
   let eyeFormActive = false;
-  let eyeFormTimer1 = null, eyeFormTimer2 = null;
-  function clearEyeFormTimers() {
-    if (eyeFormTimer1) { clearTimeout(eyeFormTimer1); eyeFormTimer1 = null; }
-    if (eyeFormTimer2) { clearTimeout(eyeFormTimer2); eyeFormTimer2 = null; }
+  // Shared by both glitch types so they never run on top of each other —
+  // whichever one is active just holds this until it fully glitches out.
+  let glitchBusy = false;
+  // Matches a reference image exactly: cream lids/dashed-ring/diamond-
+  // frame, gold solid-ring/dashed-ring/spokes/center-dot — no red anywhere.
+  const EYE_GOLD = '#c8ba8c';
+  const EYE_CREAM = '#d8d4c8';
+  function diamondEdgePoint(halfDiag, segT4) {
+    const seg = Math.floor(segT4), t = segT4 - seg;
+    const corners = [[0, -halfDiag], [halfDiag, 0], [0, halfDiag], [-halfDiag, 0]];
+    const a = corners[seg], b = corners[(seg + 1) % 4];
+    return { x: a[0] + (b[0] - a[0]) * t, y: a[1] + (b[1] - a[1]) * t };
   }
   function buildEyeShapePoints(n) {
-    const pts = [];
-    const triApex = { x: 0, y: -1.15 }, triR = { x: 1.15, y: 0.78 }, triL = { x: -1.15, y: 0.78 };
-    const triEdges = [[triApex, triR], [triR, triL], [triL, triApex]];
-    const nTri = Math.round(n * 0.24);
-    for (let i = 0; i < nTri; i++) {
-      const edge = triEdges[i % 3];
-      const t = (Math.floor(i / 3) + 0.5) / Math.ceil(nTri / 3);
-      pts.push({ x: edge[0].x + (edge[1].x - edge[0].x) * t, y: edge[0].y + (edge[1].y - edge[0].y) * t });
-    }
-    const eyeCy = 0.05;
-    const nLid = Math.round(n * 0.36);
+    const pts = [], meta = [];
+    const nLid = Math.round(n * 0.22);
     for (let i = 0; i < nLid; i++) {
-      const half = 0.85, x = -half + (2 * half * i) / Math.max(1, nLid - 1);
+      const x = -1 + (2 * i) / Math.max(1, nLid - 1);
       const upper = i % 2 === 0;
-      const w = Math.sin(Math.PI * (x / half + 1) / 2);
-      const y = (upper ? 0.42 : -0.24) * w + eyeCy;
-      pts.push({ x, y });
+      const w = Math.sin(Math.PI * (x + 1) / 2);
+      const y = (upper ? 0.73 : -0.73) * w;
+      pts.push({ x, y }); meta.push(EYE_CREAM);
     }
-    const nPupil = Math.round(n * 0.20);
-    for (let i = 0; i < nPupil; i++) {
-      const a = (i / nPupil) * Math.PI * 2;
-      pts.push({ x: Math.cos(a) * 0.17, y: Math.sin(a) * 0.17 + eyeCy });
+    const irisStart = pts.length;
+    const nOuterRing = Math.round(n * 0.12);
+    for (let i = 0; i < nOuterRing; i++) {
+      const a = (i / nOuterRing) * Math.PI * 2;
+      pts.push({ x: Math.cos(a) * 0.41, y: Math.sin(a) * 0.41 }); meta.push(EYE_GOLD);
     }
-    const nRays = Math.max(0, n - pts.length);
-    const rayCount = 10;
-    for (let i = 0; i < nRays; i++) {
-      const rayIdx = i % rayCount;
-      const angle = (rayIdx / rayCount) * Math.PI * 2;
-      const along = 0.3 + 0.5 * ((Math.floor(i / rayCount) + 1) / Math.max(1, Math.ceil(nRays / rayCount)));
-      const baseR = 1.3;
-      pts.push({ x: Math.cos(angle) * (baseR + along * 0.5), y: Math.sin(angle) * (baseR + along * 0.5) * 0.85 });
+    const nMidRing = Math.round(n * 0.12);
+    for (let i = 0; i < nMidRing; i++) {
+      const a = (i / nMidRing) * Math.PI * 2;
+      pts.push({ x: Math.cos(a) * 0.31, y: Math.sin(a) * 0.31 }); meta.push(EYE_CREAM);
     }
-    return pts.slice(0, n);
+    const nInnerRing = Math.round(n * 0.12);
+    for (let i = 0; i < nInnerRing; i++) {
+      const a = (i / nInnerRing) * Math.PI * 2;
+      pts.push({ x: Math.cos(a) * 0.2, y: Math.sin(a) * 0.2 }); meta.push(EYE_GOLD);
+    }
+    const nCross = Math.round(n * 0.12);
+    const dirs8 = [[0, -1], [0, 1], [-1, 0], [1, 0], [-0.7071, -0.7071], [0.7071, 0.7071], [-0.7071, 0.7071], [0.7071, -0.7071]];
+    for (let i = 0; i < nCross; i++) {
+      const dir = dirs8[i % 8];
+      const t = (Math.floor(i / 8) + 0.5) / Math.ceil(nCross / 8);
+      const r = 0.2 + t * (0.41 - 0.2);
+      pts.push({ x: dir[0] * r, y: dir[1] * r }); meta.push(EYE_GOLD);
+    }
+    const pupilStart = pts.length;
+    const nDiamond = Math.round(n * 0.22);
+    const dOuter = 0.107, dInner = 0.053, levels = 3;
+    const perLevel = Math.round(nDiamond / levels);
+    let didx = 0;
+    for (let lvl = 0; lvl < levels && didx < nDiamond; lvl++) {
+      const s = dInner + (dOuter - dInner) * (lvl / Math.max(1, levels - 1));
+      for (let i = 0; i < perLevel && didx < nDiamond; i++, didx++) {
+        const pt = diamondEdgePoint(s, (i / perLevel) * 4);
+        pts.push(pt); meta.push(EYE_CREAM);
+      }
+    }
+    const nCenter = Math.max(0, n - pts.length);
+    for (let i = 0; i < nCenter; i++) {
+      const a = i * 2.4;
+      pts.push({ x: Math.cos(a) * 0.02, y: Math.sin(a) * 0.02 }); meta.push(EYE_GOLD);
+    }
+    return { pts: pts.slice(0, n), meta: meta.slice(0, n), irisStart, pupilStart };
+  }
+  // Advances every frame while the eye is held, so the iris (rings +
+  // crosshair spokes) keeps circling the eye center instead of sitting
+  // static once formed — see loop() below, where it's applied. The lids
+  // and pupil stay fixed; only the iris mechanism rotates.
+  let eyeSpinAngle = 0;
+  // The particle/connection system alone (sparse points + incidental
+  // nearby-connections) never reliably reads as a clean eye — it's a
+  // scattered cloud, not a drawn shape. This draws the actual eye with
+  // real canvas paths (guaranteed legible regardless of particle count or
+  // luck), and the particles/connections layer their circuit-glitch
+  // texture on top of it instead of being the only thing implying it.
+  function drawEyeShape() {
+    const scale = Math.min(W, H) * 0.34;
+    const cx = W / 2, cy = H / 2;
+    ctx.save();
+    ctx.translate(cx, cy);
+
+    // Double-line vesica bezel (thick outline + a slightly inset second
+    // line), sharp pointed corners left/right.
+    [1, 0.955].forEach((mul, idx) => {
+      ctx.strokeStyle = EYE_CREAM;
+      ctx.lineWidth = (idx === 0 ? 2.2 : 1) * dpr;
+      ctx.globalAlpha = idx === 0 ? 0.95 : 0.5;
+      ctx.beginPath();
+      ctx.moveTo(-scale * mul, 0);
+      ctx.quadraticCurveTo(0, -0.73 * scale * mul, scale * mul, 0);
+      ctx.quadraticCurveTo(0, 0.73 * scale * mul, -scale * mul, 0);
+      ctx.closePath();
+      ctx.stroke();
+    });
+
+    ctx.save();
+    ctx.rotate(eyeSpinAngle);
+
+    // A dense pack of concentric iris rings — the reference's instrument-
+    // panel look comes from many close rings, not a handful of spaced-out
+    // ones. Alternating gold/cream, thicker every third ring.
+    const ringCount = 16, rMin = 0.15, rMax = 0.42;
+    for (let r = 0; r < ringCount; r++) {
+      const frac = r / (ringCount - 1);
+      const radius = (rMin + frac * (rMax - rMin)) * scale;
+      ctx.strokeStyle = r % 2 === 0 ? EYE_GOLD : EYE_CREAM;
+      ctx.globalAlpha = 0.2 + 0.35 * (1 - Math.abs(frac - 0.5) * 1.3);
+      ctx.lineWidth = (r % 4 === 0 ? 1.3 : 0.6) * dpr;
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // Clock-face radial ticks — long ones every 4th, short ones between —
+    // matching the reference's dense protractor-like ring.
+    const tickCount = 32;
+    ctx.lineWidth = 0.8 * dpr;
+    for (let i = 0; i < tickCount; i++) {
+      const ang = (i / tickCount) * Math.PI * 2;
+      const long = i % 4 === 0;
+      const rInner = rMin * scale;
+      const rOuter = (long ? rMax : rMin + (rMax - rMin) * 0.6) * scale;
+      ctx.strokeStyle = long ? EYE_GOLD : EYE_CREAM;
+      ctx.globalAlpha = long ? 0.5 : 0.28;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(ang) * rInner, Math.sin(ang) * rInner);
+      ctx.lineTo(Math.cos(ang) * rOuter, Math.sin(ang) * rOuter);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Pupil: axis-aligned nested pixel-squares (matches the reference —
+    // not a rotated diamond), plus a tiny solid center square.
+    ctx.globalAlpha = 0.95;
+    ctx.strokeStyle = EYE_CREAM;
+    ctx.lineWidth = 1.8 * dpr;
+    const outerHalf = 0.1 * scale;
+    ctx.strokeRect(-outerHalf, -outerHalf, outerHalf * 2, outerHalf * 2);
+    ctx.lineWidth = 1 * dpr;
+    ctx.globalAlpha = 0.55;
+    const innerHalf = 0.05 * scale;
+    ctx.strokeRect(-innerHalf, -innerHalf, innerHalf * 2, innerHalf * 2);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = EYE_GOLD;
+    const dotHalf = 0.016 * scale;
+    ctx.fillRect(-dotHalf, -dotHalf, dotHalf * 2, dotHalf * 2);
+
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+  // The reference's dominant feature: an elaborate PCB-trace sunburst
+  // radiating out from the eye — right-angle bends with small via/node
+  // markers, not a plain crosshair. Drawn as its own pass since it extends
+  // well past the eye's own bounding scale.
+  function drawCircuitTraces() {
+    const scale = Math.min(W, H) * 0.34;
+    const cx = W / 2, cy = H / 2;
+    const rayCount = 20;
+    ctx.lineWidth = 1 * dpr;
+    for (let i = 0; i < rayCount; i++) {
+      const angle = (i / rayCount) * Math.PI * 2 + eyeSpinAngle * 0.1;
+      const startR = 0.48 * scale;
+      let x = cx + Math.cos(angle) * startR;
+      let y = cy + Math.sin(angle) * startR;
+      ctx.strokeStyle = EYE_GOLD;
+      ctx.globalAlpha = 0.32;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      const seg1 = (0.35 + (i % 3) * 0.12) * scale;
+      x += Math.cos(angle) * seg1;
+      y += Math.sin(angle) * seg1;
+      ctx.lineTo(x, y);
+      const bendAngle = angle + (i % 2 === 0 ? Math.PI / 2 : -Math.PI / 2);
+      const seg2 = (0.14 + (i % 4) * 0.08) * scale;
+      const x2 = x + Math.cos(bendAngle) * seg2;
+      const y2 = y + Math.sin(bendAngle) * seg2;
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.globalAlpha = 0.6;
+      ctx.fillStyle = EYE_GOLD;
+      ctx.beginPath(); ctx.arc(x, y, 1.8 * dpr, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x2, y2, 2.4 * dpr, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
   }
   function triggerEyeFormation() {
     if (!particles.length) return;
-    const pts = buildEyeShapePoints(particles.length);
+    // Only most of the field forms the eye — the rest stay unassigned and
+    // keep wandering normally, so the eye reads as a focused motif amid a
+    // loosely connected node field rather than consuming every particle.
+    const eyeCount = Math.round(particles.length * 0.88);
+    const { pts, meta, irisStart, pupilStart } = buildEyeShapePoints(eyeCount);
     const scale = Math.min(W, H) * 0.34;
     const cx = W / 2, cy = H / 2;
+    eyeSpinAngle = 0;
     particles.forEach((p, i) => {
+      if (i >= eyeCount) return;
       const pt = pts[i] || pts[i % pts.length];
+      const m = meta[i] || meta[i % meta.length];
       p.tx = cx + pt.x * scale;
       p.ty = cy + pt.y * scale;
+      p.color = m;
+      if (i >= irisStart && i < pupilStart) {
+        p.isIris = true;
+        p.irisAngle = Math.atan2(pt.y, pt.x);
+        p.irisR = Math.hypot(pt.x, pt.y) * scale;
+      } else {
+        p.isIris = false;
+      }
     });
     eyeFormActive = true;
   }
@@ -5330,7 +5511,9 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
       const a = particles[i], b = particles[j];
       const dist = Math.hypot(b.x - a.x, b.y - a.y);
       if (dist < maxDist) {
-        const material = (i + j) % 4;
+        // No red/blue chromatic strand during the eye glitch — the
+        // reference look is gold/cream only.
+        const material = eyeFormActive ? (i + j) % 3 : (i + j) % 4;
         if (material === 0) drawCodeLine(a.x, a.y, b.x, b.y, i + j);
         else if (material === 1) drawDnaLine(a.x, a.y, b.x, b.y);
         else if (material === 2) drawFabricLine(a.x, a.y, b.x, b.y);
@@ -5415,6 +5598,18 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     ctx.clearRect(0, 0, W, H);
     frame++;
     drawGrid(t);
+    if (eyeFormActive) {
+      eyeSpinAngle += 0.012;
+      const cx = W / 2, cy = H / 2;
+      particles.forEach(p => {
+        if (p.isIris) {
+          p.tx = cx + Math.cos(p.irisAngle + eyeSpinAngle) * p.irisR;
+          p.ty = cy + Math.sin(p.irisAngle + eyeSpinAngle) * p.irisR;
+        }
+      });
+      drawCircuitTraces();
+      drawEyeShape();
+    }
     particles.forEach(p => p.step(t));
     const maxDist = CONNECT_DIST * dpr;
     const grid = buildGrid(maxDist);
@@ -5442,17 +5637,47 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     }, 140);
   }
 
+  // A much more violent cut, used only for the eye glitch — longer/denser
+  // noise burst, red/blue RGB-split streaks cut into it, and a couple of
+  // full-screen invert flashes on top of the harsher shake/skew keyframes.
+  function glitchCutHard(cb) {
+    canvas.classList.add('sg-cutting-hard');
+    if (!prefersReduced) {
+      let n = 0;
+      const burst = setInterval(() => {
+        ctx.clearRect(0, 0, W, H);
+        drawNoiseBurst(1 - n / 8);
+        if (n % 2 === 0) {
+          ctx.strokeStyle = n % 4 === 0 ? SIGNAL_RED : SIGNAL_BLUE;
+          ctx.globalAlpha = 0.5;
+          for (let k = 0; k < 30; k++) {
+            const y = Math.random() * H;
+            ctx.lineWidth = Math.random() < 0.15 ? 3 * dpr : 1;
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(W, y + (Math.random() - 0.5) * 20 * dpr);
+            ctx.stroke();
+          }
+          ctx.globalAlpha = 1;
+        }
+        n++;
+        if (n > 8) clearInterval(burst);
+      }, 26);
+    }
+    setTimeout(() => {
+      canvas.classList.remove('sg-cutting-hard');
+      if (cb) cb();
+    }, 240);
+  }
+
   function startSignal() {
-    clearEyeFormTimers();
+    if (glitchBusy) return;
+    glitchBusy = true;
     eyeFormActive = false;
     particles = Array.from({ length: particleCount() }, () => new Particle());
     canvas.classList.add('sg-active');
     glitchCut(() => {
       if (prefersReduced) {
-        // Static single frame: snap straight into the formed eye instead
-        // of a scattered field, since there's no animation to pop it in.
-        triggerEyeFormation();
-        particles.forEach(p => { if (p.tx !== undefined) { p.x = p.tx; p.y = p.ty; } });
         ctx.clearRect(0, 0, W, H);
         const maxDist = CONNECT_DIST * dpr;
         const grid = buildGrid(maxDist);
@@ -5461,24 +5686,19 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
         drawStormLinks();
       } else {
         rafId = requestAnimationFrame(loop);
-        // Let the field drift chaotically for a beat first, then pop into
-        // the eye, hold it briefly, then dissolve back before the cut out.
-        eyeFormTimer1 = setTimeout(triggerEyeFormation, 900 + Math.random() * 300);
-        eyeFormTimer2 = setTimeout(releaseEyeFormation, 2600 + Math.random() * 300);
       }
     });
 
-    const holdMs = 3400 + Math.random() * 2000;
+    const holdMs = 3000 + Math.random() * 2000;
     holdTimeout = setTimeout(stopSignal, holdMs);
   }
 
   function stopSignal() {
-    clearEyeFormTimers();
-    eyeFormActive = false;
     glitchCut(() => {
       canvas.classList.remove('sg-active');
       cancelAnimationFrame(rafId);
       ctx.clearRect(0, 0, W, H);
+      glitchBusy = false;
     });
   }
 
@@ -5493,11 +5713,67 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     }, delay);
   }
 
+  // ---- All-Seeing Eye glitch: a completely separate event from the
+  // regular signal glitch above — its own trigger, its own schedule, and
+  // its own start/stop cycle. Particles pop straight into the eye shape as
+  // soon as the cut resolves and hold there for the whole cycle, instead
+  // of the regular glitch's scattered/wandering field. glitchBusy keeps
+  // the two from ever overlapping on the shared canvas. ----
+  function startEyeSignal() {
+    if (glitchBusy) return;
+    glitchBusy = true;
+    particles = Array.from({ length: particleCount() }, () => new Particle());
+    canvas.classList.add('sg-active');
+    glitchCutHard(() => {
+      triggerEyeFormation();
+      if (prefersReduced) {
+        // Static single frame: snap straight to the formed positions since
+        // there's no animation loop to ease into them.
+        particles.forEach(p => { if (p.tx !== undefined) { p.x = p.tx; p.y = p.ty; } });
+        ctx.clearRect(0, 0, W, H);
+        drawCircuitTraces();
+        drawEyeShape();
+        const maxDist = CONNECT_DIST * dpr;
+        const grid = buildGrid(maxDist);
+        drawConnections(grid, maxDist);
+        particles.forEach(p => p.draw());
+        drawStormLinks();
+      } else {
+        rafId = requestAnimationFrame(loop);
+      }
+    });
+
+    const holdMs = 2600 + Math.random() * 1400;
+    holdTimeout = setTimeout(stopEyeSignal, holdMs);
+  }
+
+  function stopEyeSignal() {
+    eyeFormActive = false;
+    glitchCutHard(() => {
+      canvas.classList.remove('sg-active');
+      cancelAnimationFrame(rafId);
+      ctx.clearRect(0, 0, W, H);
+      glitchBusy = false;
+    });
+  }
+
+  function scheduleNextEye() {
+    // TESTING: separate interval from the regular glitch's 30s, offset so
+    // they don't tend to fall on the exact same tick.
+    const delay = 45000;
+    setTimeout(() => {
+      startEyeSignal();
+      scheduleNextEye();
+    }, delay);
+  }
+
   // expose for manual triggering — wired to jukebox track changes in
   // spSetTitle() above, in addition to this auto-interval
   window.triggerSignalGlitch = startSignal;
+  window.triggerEyeGlitch = startEyeSignal;
 
   scheduleNext();
+  scheduleNextEye();
 })();
 </script>
 </body>
