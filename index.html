@@ -5133,14 +5133,14 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     const pts = [];
     const triApex = { x: 0, y: -1.15 }, triR = { x: 1.15, y: 0.78 }, triL = { x: -1.15, y: 0.78 };
     const triEdges = [[triApex, triR], [triR, triL], [triL, triApex]];
-    const nTri = Math.round(n * 0.32);
+    const nTri = Math.round(n * 0.24);
     for (let i = 0; i < nTri; i++) {
       const edge = triEdges[i % 3];
       const t = (Math.floor(i / 3) + 0.5) / Math.ceil(nTri / 3);
       pts.push({ x: edge[0].x + (edge[1].x - edge[0].x) * t, y: edge[0].y + (edge[1].y - edge[0].y) * t });
     }
     const eyeCy = 0.05;
-    const nLid = Math.round(n * 0.26);
+    const nLid = Math.round(n * 0.36);
     for (let i = 0; i < nLid; i++) {
       const half = 0.85, x = -half + (2 * half * i) / Math.max(1, nLid - 1);
       const upper = i % 2 === 0;
@@ -5148,7 +5148,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
       const y = (upper ? 0.42 : -0.24) * w + eyeCy;
       pts.push({ x, y });
     }
-    const nPupil = Math.round(n * 0.14);
+    const nPupil = Math.round(n * 0.20);
     for (let i = 0; i < nPupil; i++) {
       const a = (i / nPupil) * Math.PI * 2;
       pts.push({ x: Math.cos(a) * 0.17, y: Math.sin(a) * 0.17 + eyeCy });
