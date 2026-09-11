@@ -1930,6 +1930,27 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowUp'||e.key==='PageUp')goScene(Math.max(curScene-1,0));
 });
 
+// The eye sigil's own reveal cycle: previously a pure CSS keyframe loop
+// with a fixed interval and fixed hold, so every reappearance was
+// identical. Driven from JS instead so both pieces can be randomized —
+// and because the inner glitch layers (eyeGlitchR/C, eyeSlice, etc.) keep
+// looping continuously in the background the whole time (only this
+// container's opacity toggles), each reveal lands on a different,
+// un-synced phase of those loops instead of always showing the same
+// moment. This one runs on page load as part of the intro sequence below
+// (it's the hero reveal, not an unexpected glitch), unlike the
+// auto-glitches further down the script that wait for a first gesture.
+function showEyeSigil(){
+  const el = document.getElementById('s1eye');
+  if (!el) return;
+  el.classList.add('vis');
+  setTimeout(() => { el.classList.remove('vis'); }, 10000);
+}
+function scheduleEyeSigil(){
+  const delay = 50000 + Math.random() * 20000; // ~once a minute, jittered
+  setTimeout(() => { showEyeSigil(); scheduleEyeSigil(); }, delay);
+}
+
 /* ─── INTRO ─── */
 setTimeout(()=>{
   document.getElementById('intro').classList.add('out');
@@ -4159,27 +4180,6 @@ var glitchTranslate, glitchCorrupt;
       if(backdrop)backdrop.classList.remove('on');
       hackedRunning=false;
     },9500);
-  }
-
-  // The eye sigil's own reveal cycle: previously a pure CSS keyframe loop
-  // with a fixed interval and fixed hold, so every reappearance was
-  // identical. Driven from JS instead so both pieces can be randomized —
-  // and because the inner glitch layers (eyeGlitchR/C, eyeSlice, etc.) keep
-  // looping continuously in the background the whole time (only this
-  // container's opacity toggles), each reveal lands on a different,
-  // un-synced phase of those loops instead of always showing the same
-  // moment. Unlike the auto-glitches below, this one *does* run on page
-  // load — it's the hero reveal, part of the intro sequence, not an
-  // unexpected glitch.
-  function showEyeSigil(){
-    const el = document.getElementById('s1eye');
-    if (!el) return;
-    el.classList.add('vis');
-    setTimeout(() => { el.classList.remove('vis'); }, 10000);
-  }
-  function scheduleEyeSigil(){
-    const delay = 50000 + Math.random() * 20000; // ~once a minute, jittered
-    setTimeout(() => { showEyeSigil(); scheduleEyeSigil(); }, delay);
   }
 
   // Previously alternated on a single shared 42s toggle, so each effect
