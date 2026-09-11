@@ -305,8 +305,8 @@ body{
 @keyframes eyeCycle{0%{opacity:0}10%{opacity:1}72.5%{opacity:1}83%{opacity:0}100%{opacity:0}}
 .s1-eye i{position:absolute;top:50%;left:50%;width:min(88vw,1400px);aspect-ratio:2576/1242;transform:translate(-50%,-50%);background:url('uploads/eye-sigil.jpg') center/contain no-repeat;mix-blend-mode:screen;animation:eyeBreathe 11s ease-in-out infinite}
 .s1-eye i.e-base{opacity:.34;filter:contrast(1.15) saturate(.85);animation:eyeBreathe 11s ease-in-out infinite,eyeSlice 2.9s steps(1,end) infinite}
-.s1-eye i.e-r{opacity:0;filter:sepia(1) hue-rotate(-42deg) saturate(6) contrast(1.3);animation:eyeBreathe 11s ease-in-out infinite,eyeGlitchR 1.9s steps(1,end) infinite}
-.s1-eye i.e-c{opacity:0;filter:sepia(1) hue-rotate(140deg) saturate(4) contrast(1.3);animation:eyeBreathe 11s ease-in-out infinite,eyeGlitchC 2.3s steps(1,end) infinite}
+.s1-eye i.e-r{opacity:0;filter:sepia(1) hue-rotate(-18deg) saturate(1.6) contrast(1.15);animation:eyeBreathe 11s ease-in-out infinite,eyeGlitchR 1.9s steps(1,end) infinite}
+.s1-eye i.e-c{opacity:0;filter:sepia(1) hue-rotate(90deg) saturate(1.4) contrast(1.15);animation:eyeBreathe 11s ease-in-out infinite,eyeGlitchC 2.3s steps(1,end) infinite}
 .s1-eye::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.5) 0px,rgba(0,0,0,.5) 1px,transparent 1px,transparent 4px);opacity:.55;animation:eyeScan 2.6s linear infinite}
 @keyframes eyeBreathe{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.035)}}
 @keyframes eyeScan{0%{background-position-y:0}100%{background-position-y:80px}}
@@ -4160,9 +4160,24 @@ var glitchTranslate, glitchCorrupt;
   // Previously alternated on a single shared 42s toggle, so each effect
   // individually fired only every 84s. Decoupled so matrix-rain can run on
   // its own, faster cadence without also speeding up the page-shake effect.
-  setInterval(siteGlitch,84000);
-  setInterval(runMatrixRain,55000);
-  setInterval(hackedScreenGlitch,140000);
+  // None of this starts on page load — a visitor who never interacts should
+  // never see a glitch. The whole family (site-wide shake, matrix rain,
+  // hacked-screen takeover, and the separate SIGNAL GLITCH canvas below)
+  // arms on the same first real gesture the jukebox itself waits for.
+  function armAutoGlitches(){
+    document.removeEventListener('click',armAutoGlitches);
+    document.removeEventListener('keydown',armAutoGlitches);
+    document.removeEventListener('touchstart',armAutoGlitches);
+    document.getElementById('scroll').removeEventListener('scroll',armAutoGlitches);
+    setInterval(siteGlitch,84000);
+    setInterval(runMatrixRain,55000);
+    setInterval(hackedScreenGlitch,140000);
+    if(typeof window.__armSignalGlitch==='function')window.__armSignalGlitch();
+  }
+  document.addEventListener('click',armAutoGlitches,{once:true});
+  document.addEventListener('keydown',armAutoGlitches,{once:true});
+  document.addEventListener('touchstart',armAutoGlitches,{once:true});
+  document.getElementById('scroll').addEventListener('scroll',armAutoGlitches,{once:true});
 
   // Character-level corruption: randomly flip letter case and swap a few
   // letters for leetspeak-style numbers, briefly, on visible ticker spans.
@@ -5144,7 +5159,25 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   let holdTimeout = null;
   let frame = 0;
 
-  const CONNECT_DIST = 200;
+  let currentConnectDist = 200;
+  // Re-rolled at the start of every glitch occurrence so the mix of line
+  // styles (and how dense the web of connections reads) isn't the same
+  // fixed 25/25/25/25 split every single time.
+  let materialBias = [1, 1, 1, 1];
+  function pickMaterial(i, j) {
+    // Stable per-pair pseudo-random value in [0,1) — same two particles
+    // always resolve to the same style for the whole occurrence (no
+    // frame-to-frame flicker), but which style that is shifts run to run
+    // because materialBias itself is re-rolled per occurrence.
+    const h = Math.abs(Math.sin(i * 12.9898 + j * 78.233 + 1) * 43758.5453) % 1;
+    const total = materialBias[0] + materialBias[1] + materialBias[2] + materialBias[3];
+    let r = h * total;
+    for (let m = 0; m < 4; m++) {
+      if (r < materialBias[m]) return m;
+      r -= materialBias[m];
+    }
+    return 3;
+  }
   const CODE_CHARS = '01SIGNAL3EASCORTEX{}<>/*'.split('');
 
   function drawCodeLine(ax, ay, bx, by, seed) {
@@ -5294,7 +5327,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
       const a = particles[i], b = particles[j];
       const dist = Math.hypot(b.x - a.x, b.y - a.y);
       if (dist < maxDist) {
-        const material = (i + j) % 4;
+        const material = pickMaterial(i, j);
         if (material === 0) drawCodeLine(a.x, a.y, b.x, b.y, i + j);
         else if (material === 1) drawDnaLine(a.x, a.y, b.x, b.y);
         else if (material === 2) drawFabricLine(a.x, a.y, b.x, b.y);
@@ -5380,7 +5413,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     frame++;
     drawGrid(t);
     particles.forEach(p => p.step(t));
-    const maxDist = CONNECT_DIST * dpr;
+    const maxDist = currentConnectDist * dpr;
     const grid = buildGrid(maxDist);
     drawConnections(grid, maxDist);
     particles.forEach(p => p.draw());
@@ -5407,12 +5440,17 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   }
 
   function startSignal() {
+    // Re-roll the occurrence's character before anything else spawns, so
+    // this run's line-style mix and connection density differ from the
+    // last one instead of the field always reading the same way.
+    materialBias = [0.3 + Math.random() * 1.5, 0.3 + Math.random() * 1.5, 0.3 + Math.random() * 1.5, 0.3 + Math.random() * 1.5];
+    currentConnectDist = 140 + Math.random() * 120;
     particles = Array.from({ length: particleCount() }, () => new Particle());
     canvas.classList.add('sg-active');
     glitchCut(() => {
       if (prefersReduced) {
         ctx.clearRect(0, 0, W, H);
-        const maxDist = CONNECT_DIST * dpr;
+        const maxDist = currentConnectDist * dpr;
         const grid = buildGrid(maxDist);
         drawConnections(grid, maxDist);
         particles.forEach(p => p.draw());
@@ -5422,7 +5460,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
       }
     });
 
-    const holdMs = 3000 + Math.random() * 2000;
+    const holdMs = 2400 + Math.random() * 3600;
     holdTimeout = setTimeout(stopSignal, holdMs);
   }
 
@@ -5435,10 +5473,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   }
 
   function scheduleNext() {
-    // TESTING: fixed 30s interval while this gets checked live — revert to
-    // the randomized 14-22s window (or whatever cadence is settled on)
-    // once testing wraps.
-    const delay = 30000;
+    const delay = 14000 + Math.random() * 8000;
     setTimeout(() => {
       startSignal();
       scheduleNext();
@@ -5449,7 +5484,9 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   // spSetTitle() above, in addition to this auto-interval
   window.triggerSignalGlitch = startSignal;
 
-  scheduleNext();
+  // Doesn't start on page load — armed by the same first-gesture gate (in
+  // the main script) that arms the other auto-glitches and the jukebox.
+  window.__armSignalGlitch = scheduleNext;
 })();
 </script>
 </body>
