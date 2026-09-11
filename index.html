@@ -300,6 +300,22 @@ body{
 .tech-bracket-bl{position:absolute;left:8%;bottom:20%;width:120px;height:80px;border:1px solid rgba(184,168,120,.07);border-top:none;border-right:none;pointer-events:none}
 .tech-hazard{position:absolute;bottom:8%;left:4%;width:64px;height:18px;background:repeating-linear-gradient(-45deg,rgba(184,168,120,.12) 0px,rgba(184,168,120,.12) 6px,transparent 6px,transparent 12px);pointer-events:none}
 
+.s1-eye{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;opacity:0}
+.s1-eye.vis{animation:eyeCycle 24s linear 1.2s infinite}
+@keyframes eyeCycle{0%{opacity:0}10%{opacity:1}72.5%{opacity:1}83%{opacity:0}100%{opacity:0}}
+.s1-eye i{position:absolute;top:50%;left:50%;width:min(92vh,760px);aspect-ratio:848/1264;transform:translate(-50%,-50%);background:url('uploads/IMG_8268.jpeg') center/contain no-repeat;mix-blend-mode:screen;animation:eyeBreathe 11s ease-in-out infinite}
+.s1-eye i.e-base{opacity:.34;filter:contrast(1.15) saturate(.85);animation:eyeBreathe 11s ease-in-out infinite,eyeSlice 2.9s steps(1,end) infinite}
+.s1-eye i.e-r{opacity:0;filter:sepia(1) hue-rotate(-42deg) saturate(6) contrast(1.3);animation:eyeBreathe 11s ease-in-out infinite,eyeGlitchR 1.9s steps(1,end) infinite}
+.s1-eye i.e-c{opacity:0;filter:sepia(1) hue-rotate(140deg) saturate(4) contrast(1.3);animation:eyeBreathe 11s ease-in-out infinite,eyeGlitchC 2.3s steps(1,end) infinite}
+.s1-eye::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.5) 0px,rgba(0,0,0,.5) 1px,transparent 1px,transparent 4px);opacity:.55;animation:eyeScan 2.6s linear infinite}
+@keyframes eyeBreathe{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.035)}}
+@keyframes eyeScan{0%{background-position-y:0}100%{background-position-y:80px}}
+@keyframes eyeGlitchR{0%{opacity:.34;clip-path:polygon(0 18%,100% 18%,100% 27%,0 27%);transform:translate(calc(-50% + 7px),-50%)}14%{opacity:.42;clip-path:polygon(0 44%,100% 44%,100% 51%,0 51%);transform:translate(calc(-50% - 9px),-50%)}28%{opacity:.26;clip-path:polygon(0 62%,100% 62%,100% 74%,0 74%);transform:translate(calc(-50% + 12px),-50%)}42%{opacity:.5;clip-path:polygon(0 6%,100% 6%,100% 14%,0 14%);transform:translate(calc(-50% - 5px),-50%)}56%{opacity:.3;clip-path:polygon(0 79%,100% 79%,100% 88%,0 88%);transform:translate(calc(-50% + 4px),-50%)}70%{opacity:.45;clip-path:polygon(0 33%,100% 33%,100% 43%,0 43%);transform:translate(calc(-50% - 11px),-50%)}84%{opacity:.22;clip-path:polygon(0 52%,100% 52%,100% 59%,0 59%);transform:translate(calc(-50% + 8px),-50%)}100%{opacity:.34;clip-path:polygon(0 18%,100% 18%,100% 27%,0 27%);transform:translate(calc(-50% + 7px),-50%)}}
+@keyframes eyeGlitchC{0%{opacity:.3;clip-path:polygon(0 28%,100% 28%,100% 37%,0 37%);transform:translate(calc(-50% - 8px),-50%)}13%{opacity:.4;clip-path:polygon(0 68%,100% 68%,100% 77%,0 77%);transform:translate(calc(-50% + 10px),-50%)}26%{opacity:.24;clip-path:polygon(0 11%,100% 11%,100% 20%,0 20%);transform:translate(calc(-50% - 13px),-50%)}39%{opacity:.44;clip-path:polygon(0 47%,100% 47%,100% 56%,0 56%);transform:translate(calc(-50% + 6px),-50%)}52%{opacity:.2;clip-path:polygon(0 84%,100% 84%,100% 93%,0 93%);transform:translate(calc(-50% - 4px),-50%)}65%{opacity:.38;clip-path:polygon(0 38%,100% 38%,100% 46%,0 46%);transform:translate(calc(-50% + 14px),-50%)}78%{opacity:.28;clip-path:polygon(0 57%,100% 57%,100% 66%,0 66%);transform:translate(calc(-50% - 7px),-50%)}91%{opacity:.42;clip-path:polygon(0 21%,100% 21%,100% 30%,0 30%);transform:translate(calc(-50% + 3px),-50%)}100%{opacity:.3;clip-path:polygon(0 28%,100% 28%,100% 37%,0 37%);transform:translate(calc(-50% - 8px),-50%)}}
+@keyframes eyeSlice{0%,100%{clip-path:none;transform:translate(-50%,-50%)}12%{clip-path:polygon(0 0,100% 0,100% 40%,0 40%,0 42%,100% 42%,100% 100%,0 100%);transform:translate(calc(-50% + 3px),-50%)}13%{clip-path:none;transform:translate(-50%,-50%)}37%{clip-path:polygon(0 0,100% 0,100% 63%,0 63%,0 66%,100% 66%,100% 100%,0 100%);transform:translate(calc(-50% - 4px),-50%)}38.5%{clip-path:none;transform:translate(-50%,-50%)}61%{clip-path:polygon(0 0,100% 0,100% 22%,0 22%,0 25%,100% 25%,100% 100%,0 100%);transform:translate(calc(-50% + 5px),-50%)}62%{clip-path:none;transform:translate(-50%,-50%)}86%{clip-path:polygon(0 0,100% 0,100% 78%,0 78%,0 81%,100% 81%,100% 100%,0 100%);transform:translate(calc(-50% - 2px),-50%)}87%{clip-path:none;transform:translate(-50%,-50%)}}
+@media (max-width:860px){.s1-eye i{width:min(70vh,420px)}.s1-eye i.e-base{opacity:.22}}
+@media (prefers-reduced-motion:reduce){.s1-eye i{animation:none!important}.s1-eye::after{animation:none}}
+
 .s1-coords{
   position:absolute;top:52px;left:60px;z-index:10;
   font-family:var(--mono);font-size:12px;letter-spacing:5px;color:var(--dim2);
@@ -1316,6 +1332,7 @@ body{
     <div class="tech-cross tc-top"></div><div class="tech-cross tc-mid"></div><div class="tech-cross tc-bot"></div>
     <div class="tech-bracket-tr"></div><div class="tech-bracket-br"></div>
     <div class="tech-hazard"></div>
+    <div class="s1-eye" id="s1eye"><i class="e-base"></i><i class="e-r"></i><i class="e-c"></i></div>
     <div class="s1-coords">SYS// 3EAS-001 // LINCOLN HEIGHTS, NELA // 34.0590°N 118.2321°W // ▮</div>
     <div class="s1-main" style="padding:0 60px;position:relative;z-index:10">
       <div class="s1-title" id="hw1" data-txt="3EAS">3EAS</div>
@@ -1918,6 +1935,7 @@ setTimeout(()=>{
   document.getElementById('ticker').classList.add('show');
   setTimeout(()=>{
     document.querySelector('.s1-coords').classList.add('vis');
+    document.getElementById('s1eye').classList.add('vis');
     document.getElementById('hw1').classList.add('vis');
     document.getElementById('s1sub').classList.add('vis');
     document.getElementById('s1stat').classList.add('vis');
@@ -5094,14 +5112,6 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
       this.r = (1 + Math.random() * 1.8) * dpr;
     }
     step(t) {
-      if (eyeFormActive && this.tx !== undefined) {
-        // Fast ease toward the assigned eye-shape target instead of normal
-        // wander physics — this is what makes the shape "pop in" quickly
-        // rather than drift together.
-        this.x += (this.tx - this.x) * 0.3;
-        this.y += (this.ty - this.y) * 0.3;
-        return;
-      }
       this.vx += (Math.random() - 0.5) * 0.05 * dpr;
       this.vy += (Math.random() - 0.5) * 0.05 * dpr;
       this.vx *= 0.995; this.vy *= 0.995;
@@ -5133,233 +5143,6 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   let rafId = null;
   let holdTimeout = null;
   let frame = 0;
-
-  // ---- All-Seeing Eye formation: a completely separate glitch event from
-  // the regular scattered/connected particle field — its own trigger, its
-  // own schedule, its own start/stop cycle (see startEyeSignal below).
-  // When it fires, particles snap straight into an Eye-of-Providence layout
-  // (triangle, eye, pupil, radiating rays) and hold there for the whole
-  // cycle. Points are distributed proportionally across the shape's parts
-  // so however many particles exist (it varies by viewport width), the
-  // shape stays legible. ----
-  let eyeFormActive = false;
-  // Shared by both glitch types so they never run on top of each other —
-  // whichever one is active just holds this until it fully glitches out.
-  let glitchBusy = false;
-  // Matches a reference image exactly: cream lids/dashed-ring/diamond-
-  // frame, gold solid-ring/dashed-ring/spokes/center-dot — no red anywhere.
-  const EYE_GOLD = '#c8ba8c';
-  const EYE_CREAM = '#d8d4c8';
-  function diamondEdgePoint(halfDiag, segT4) {
-    const seg = Math.floor(segT4), t = segT4 - seg;
-    const corners = [[0, -halfDiag], [halfDiag, 0], [0, halfDiag], [-halfDiag, 0]];
-    const a = corners[seg], b = corners[(seg + 1) % 4];
-    return { x: a[0] + (b[0] - a[0]) * t, y: a[1] + (b[1] - a[1]) * t };
-  }
-  function buildEyeShapePoints(n) {
-    const pts = [], meta = [];
-    const nLid = Math.round(n * 0.22);
-    for (let i = 0; i < nLid; i++) {
-      const x = -1 + (2 * i) / Math.max(1, nLid - 1);
-      const upper = i % 2 === 0;
-      const w = Math.sin(Math.PI * (x + 1) / 2);
-      const y = (upper ? 0.73 : -0.73) * w;
-      pts.push({ x, y }); meta.push(EYE_CREAM);
-    }
-    const irisStart = pts.length;
-    const nOuterRing = Math.round(n * 0.12);
-    for (let i = 0; i < nOuterRing; i++) {
-      const a = (i / nOuterRing) * Math.PI * 2;
-      pts.push({ x: Math.cos(a) * 0.41, y: Math.sin(a) * 0.41 }); meta.push(EYE_GOLD);
-    }
-    const nMidRing = Math.round(n * 0.12);
-    for (let i = 0; i < nMidRing; i++) {
-      const a = (i / nMidRing) * Math.PI * 2;
-      pts.push({ x: Math.cos(a) * 0.31, y: Math.sin(a) * 0.31 }); meta.push(EYE_CREAM);
-    }
-    const nInnerRing = Math.round(n * 0.12);
-    for (let i = 0; i < nInnerRing; i++) {
-      const a = (i / nInnerRing) * Math.PI * 2;
-      pts.push({ x: Math.cos(a) * 0.2, y: Math.sin(a) * 0.2 }); meta.push(EYE_GOLD);
-    }
-    const nCross = Math.round(n * 0.12);
-    const dirs8 = [[0, -1], [0, 1], [-1, 0], [1, 0], [-0.7071, -0.7071], [0.7071, 0.7071], [-0.7071, 0.7071], [0.7071, -0.7071]];
-    for (let i = 0; i < nCross; i++) {
-      const dir = dirs8[i % 8];
-      const t = (Math.floor(i / 8) + 0.5) / Math.ceil(nCross / 8);
-      const r = 0.2 + t * (0.41 - 0.2);
-      pts.push({ x: dir[0] * r, y: dir[1] * r }); meta.push(EYE_GOLD);
-    }
-    const pupilStart = pts.length;
-    const nDiamond = Math.round(n * 0.22);
-    const dOuter = 0.107, dInner = 0.053, levels = 3;
-    const perLevel = Math.round(nDiamond / levels);
-    let didx = 0;
-    for (let lvl = 0; lvl < levels && didx < nDiamond; lvl++) {
-      const s = dInner + (dOuter - dInner) * (lvl / Math.max(1, levels - 1));
-      for (let i = 0; i < perLevel && didx < nDiamond; i++, didx++) {
-        const pt = diamondEdgePoint(s, (i / perLevel) * 4);
-        pts.push(pt); meta.push(EYE_CREAM);
-      }
-    }
-    const nCenter = Math.max(0, n - pts.length);
-    for (let i = 0; i < nCenter; i++) {
-      const a = i * 2.4;
-      pts.push({ x: Math.cos(a) * 0.02, y: Math.sin(a) * 0.02 }); meta.push(EYE_GOLD);
-    }
-    return { pts: pts.slice(0, n), meta: meta.slice(0, n), irisStart, pupilStart };
-  }
-  // Advances every frame while the eye is held, so the iris (rings +
-  // crosshair spokes) keeps circling the eye center instead of sitting
-  // static once formed — see loop() below, where it's applied. The lids
-  // and pupil stay fixed; only the iris mechanism rotates.
-  let eyeSpinAngle = 0;
-  // The particle/connection system alone (sparse points + incidental
-  // nearby-connections) never reliably reads as a clean eye — it's a
-  // scattered cloud, not a drawn shape. This draws the actual eye with
-  // real canvas paths (guaranteed legible regardless of particle count or
-  // luck), and the particles/connections layer their circuit-glitch
-  // texture on top of it instead of being the only thing implying it.
-  function drawEyeShape() {
-    const scale = Math.min(W, H) * 0.34;
-    const cx = W / 2, cy = H / 2;
-    ctx.save();
-    ctx.translate(cx, cy);
-
-    // Double-line vesica bezel (thick outline + a slightly inset second
-    // line), sharp pointed corners left/right.
-    [1, 0.955].forEach((mul, idx) => {
-      ctx.strokeStyle = EYE_CREAM;
-      ctx.lineWidth = (idx === 0 ? 2.2 : 1) * dpr;
-      ctx.globalAlpha = idx === 0 ? 0.95 : 0.5;
-      ctx.beginPath();
-      ctx.moveTo(-scale * mul, 0);
-      ctx.quadraticCurveTo(0, -0.73 * scale * mul, scale * mul, 0);
-      ctx.quadraticCurveTo(0, 0.73 * scale * mul, -scale * mul, 0);
-      ctx.closePath();
-      ctx.stroke();
-    });
-
-    ctx.save();
-    ctx.rotate(eyeSpinAngle);
-
-    // A dense pack of concentric iris rings — the reference's instrument-
-    // panel look comes from many close rings, not a handful of spaced-out
-    // ones. Alternating gold/cream, thicker every third ring.
-    const ringCount = 16, rMin = 0.15, rMax = 0.42;
-    for (let r = 0; r < ringCount; r++) {
-      const frac = r / (ringCount - 1);
-      const radius = (rMin + frac * (rMax - rMin)) * scale;
-      ctx.strokeStyle = r % 2 === 0 ? EYE_GOLD : EYE_CREAM;
-      ctx.globalAlpha = 0.2 + 0.35 * (1 - Math.abs(frac - 0.5) * 1.3);
-      ctx.lineWidth = (r % 4 === 0 ? 1.3 : 0.6) * dpr;
-      ctx.beginPath();
-      ctx.arc(0, 0, radius, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-
-    // Clock-face radial ticks — long ones every 4th, short ones between —
-    // matching the reference's dense protractor-like ring.
-    const tickCount = 32;
-    ctx.lineWidth = 0.8 * dpr;
-    for (let i = 0; i < tickCount; i++) {
-      const ang = (i / tickCount) * Math.PI * 2;
-      const long = i % 4 === 0;
-      const rInner = rMin * scale;
-      const rOuter = (long ? rMax : rMin + (rMax - rMin) * 0.6) * scale;
-      ctx.strokeStyle = long ? EYE_GOLD : EYE_CREAM;
-      ctx.globalAlpha = long ? 0.5 : 0.28;
-      ctx.beginPath();
-      ctx.moveTo(Math.cos(ang) * rInner, Math.sin(ang) * rInner);
-      ctx.lineTo(Math.cos(ang) * rOuter, Math.sin(ang) * rOuter);
-      ctx.stroke();
-    }
-    ctx.restore();
-
-    // Pupil: axis-aligned nested pixel-squares (matches the reference —
-    // not a rotated diamond), plus a tiny solid center square.
-    ctx.globalAlpha = 0.95;
-    ctx.strokeStyle = EYE_CREAM;
-    ctx.lineWidth = 1.8 * dpr;
-    const outerHalf = 0.1 * scale;
-    ctx.strokeRect(-outerHalf, -outerHalf, outerHalf * 2, outerHalf * 2);
-    ctx.lineWidth = 1 * dpr;
-    ctx.globalAlpha = 0.55;
-    const innerHalf = 0.05 * scale;
-    ctx.strokeRect(-innerHalf, -innerHalf, innerHalf * 2, innerHalf * 2);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = EYE_GOLD;
-    const dotHalf = 0.016 * scale;
-    ctx.fillRect(-dotHalf, -dotHalf, dotHalf * 2, dotHalf * 2);
-
-    ctx.restore();
-    ctx.globalAlpha = 1;
-  }
-  // The reference's dominant feature: an elaborate PCB-trace sunburst
-  // radiating out from the eye — right-angle bends with small via/node
-  // markers, not a plain crosshair. Drawn as its own pass since it extends
-  // well past the eye's own bounding scale.
-  function drawCircuitTraces() {
-    const scale = Math.min(W, H) * 0.34;
-    const cx = W / 2, cy = H / 2;
-    const rayCount = 20;
-    ctx.lineWidth = 1 * dpr;
-    for (let i = 0; i < rayCount; i++) {
-      const angle = (i / rayCount) * Math.PI * 2 + eyeSpinAngle * 0.1;
-      const startR = 0.48 * scale;
-      let x = cx + Math.cos(angle) * startR;
-      let y = cy + Math.sin(angle) * startR;
-      ctx.strokeStyle = EYE_GOLD;
-      ctx.globalAlpha = 0.32;
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      const seg1 = (0.35 + (i % 3) * 0.12) * scale;
-      x += Math.cos(angle) * seg1;
-      y += Math.sin(angle) * seg1;
-      ctx.lineTo(x, y);
-      const bendAngle = angle + (i % 2 === 0 ? Math.PI / 2 : -Math.PI / 2);
-      const seg2 = (0.14 + (i % 4) * 0.08) * scale;
-      const x2 = x + Math.cos(bendAngle) * seg2;
-      const y2 = y + Math.sin(bendAngle) * seg2;
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-      ctx.globalAlpha = 0.6;
-      ctx.fillStyle = EYE_GOLD;
-      ctx.beginPath(); ctx.arc(x, y, 1.8 * dpr, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(x2, y2, 2.4 * dpr, 0, Math.PI * 2); ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-  }
-  function triggerEyeFormation() {
-    if (!particles.length) return;
-    // Only most of the field forms the eye — the rest stay unassigned and
-    // keep wandering normally, so the eye reads as a focused motif amid a
-    // loosely connected node field rather than consuming every particle.
-    const eyeCount = Math.round(particles.length * 0.88);
-    const { pts, meta, irisStart, pupilStart } = buildEyeShapePoints(eyeCount);
-    const scale = Math.min(W, H) * 0.34;
-    const cx = W / 2, cy = H / 2;
-    eyeSpinAngle = 0;
-    particles.forEach((p, i) => {
-      if (i >= eyeCount) return;
-      const pt = pts[i] || pts[i % pts.length];
-      const m = meta[i] || meta[i % meta.length];
-      p.tx = cx + pt.x * scale;
-      p.ty = cy + pt.y * scale;
-      p.color = m;
-      if (i >= irisStart && i < pupilStart) {
-        p.isIris = true;
-        p.irisAngle = Math.atan2(pt.y, pt.x);
-        p.irisR = Math.hypot(pt.x, pt.y) * scale;
-      } else {
-        p.isIris = false;
-      }
-    });
-    eyeFormActive = true;
-  }
-  function releaseEyeFormation() {
-    eyeFormActive = false;
-  }
 
   const CONNECT_DIST = 200;
   const CODE_CHARS = '01SIGNAL3EASCORTEX{}<>/*'.split('');
@@ -5511,9 +5294,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
       const a = particles[i], b = particles[j];
       const dist = Math.hypot(b.x - a.x, b.y - a.y);
       if (dist < maxDist) {
-        // No red/blue chromatic strand during the eye glitch — the
-        // reference look is gold/cream only.
-        const material = eyeFormActive ? (i + j) % 3 : (i + j) % 4;
+        const material = (i + j) % 4;
         if (material === 0) drawCodeLine(a.x, a.y, b.x, b.y, i + j);
         else if (material === 1) drawDnaLine(a.x, a.y, b.x, b.y);
         else if (material === 2) drawFabricLine(a.x, a.y, b.x, b.y);
@@ -5598,18 +5379,6 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     ctx.clearRect(0, 0, W, H);
     frame++;
     drawGrid(t);
-    if (eyeFormActive) {
-      eyeSpinAngle += 0.012;
-      const cx = W / 2, cy = H / 2;
-      particles.forEach(p => {
-        if (p.isIris) {
-          p.tx = cx + Math.cos(p.irisAngle + eyeSpinAngle) * p.irisR;
-          p.ty = cy + Math.sin(p.irisAngle + eyeSpinAngle) * p.irisR;
-        }
-      });
-      drawCircuitTraces();
-      drawEyeShape();
-    }
     particles.forEach(p => p.step(t));
     const maxDist = CONNECT_DIST * dpr;
     const grid = buildGrid(maxDist);
@@ -5637,43 +5406,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     }, 140);
   }
 
-  // A much more violent cut, used only for the eye glitch — longer/denser
-  // noise burst, red/blue RGB-split streaks cut into it, and a couple of
-  // full-screen invert flashes on top of the harsher shake/skew keyframes.
-  function glitchCutHard(cb) {
-    canvas.classList.add('sg-cutting-hard');
-    if (!prefersReduced) {
-      let n = 0;
-      const burst = setInterval(() => {
-        ctx.clearRect(0, 0, W, H);
-        drawNoiseBurst(1 - n / 8);
-        if (n % 2 === 0) {
-          ctx.strokeStyle = n % 4 === 0 ? SIGNAL_RED : SIGNAL_BLUE;
-          ctx.globalAlpha = 0.5;
-          for (let k = 0; k < 30; k++) {
-            const y = Math.random() * H;
-            ctx.lineWidth = Math.random() < 0.15 ? 3 * dpr : 1;
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(W, y + (Math.random() - 0.5) * 20 * dpr);
-            ctx.stroke();
-          }
-          ctx.globalAlpha = 1;
-        }
-        n++;
-        if (n > 8) clearInterval(burst);
-      }, 26);
-    }
-    setTimeout(() => {
-      canvas.classList.remove('sg-cutting-hard');
-      if (cb) cb();
-    }, 240);
-  }
-
   function startSignal() {
-    if (glitchBusy) return;
-    glitchBusy = true;
-    eyeFormActive = false;
     particles = Array.from({ length: particleCount() }, () => new Particle());
     canvas.classList.add('sg-active');
     glitchCut(() => {
@@ -5698,7 +5431,6 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
       canvas.classList.remove('sg-active');
       cancelAnimationFrame(rafId);
       ctx.clearRect(0, 0, W, H);
-      glitchBusy = false;
     });
   }
 
@@ -5713,67 +5445,11 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     }, delay);
   }
 
-  // ---- All-Seeing Eye glitch: a completely separate event from the
-  // regular signal glitch above — its own trigger, its own schedule, and
-  // its own start/stop cycle. Particles pop straight into the eye shape as
-  // soon as the cut resolves and hold there for the whole cycle, instead
-  // of the regular glitch's scattered/wandering field. glitchBusy keeps
-  // the two from ever overlapping on the shared canvas. ----
-  function startEyeSignal() {
-    if (glitchBusy) return;
-    glitchBusy = true;
-    particles = Array.from({ length: particleCount() }, () => new Particle());
-    canvas.classList.add('sg-active');
-    glitchCutHard(() => {
-      triggerEyeFormation();
-      if (prefersReduced) {
-        // Static single frame: snap straight to the formed positions since
-        // there's no animation loop to ease into them.
-        particles.forEach(p => { if (p.tx !== undefined) { p.x = p.tx; p.y = p.ty; } });
-        ctx.clearRect(0, 0, W, H);
-        drawCircuitTraces();
-        drawEyeShape();
-        const maxDist = CONNECT_DIST * dpr;
-        const grid = buildGrid(maxDist);
-        drawConnections(grid, maxDist);
-        particles.forEach(p => p.draw());
-        drawStormLinks();
-      } else {
-        rafId = requestAnimationFrame(loop);
-      }
-    });
-
-    const holdMs = 2600 + Math.random() * 1400;
-    holdTimeout = setTimeout(stopEyeSignal, holdMs);
-  }
-
-  function stopEyeSignal() {
-    eyeFormActive = false;
-    glitchCutHard(() => {
-      canvas.classList.remove('sg-active');
-      cancelAnimationFrame(rafId);
-      ctx.clearRect(0, 0, W, H);
-      glitchBusy = false;
-    });
-  }
-
-  function scheduleNextEye() {
-    // TESTING: separate interval from the regular glitch's 30s, offset so
-    // they don't tend to fall on the exact same tick.
-    const delay = 45000;
-    setTimeout(() => {
-      startEyeSignal();
-      scheduleNextEye();
-    }, delay);
-  }
-
   // expose for manual triggering — wired to jukebox track changes in
   // spSetTitle() above, in addition to this auto-interval
   window.triggerSignalGlitch = startSignal;
-  window.triggerEyeGlitch = startEyeSignal;
 
   scheduleNext();
-  scheduleNextEye();
 })();
 </script>
 </body>
