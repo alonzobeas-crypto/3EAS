@@ -300,9 +300,8 @@ body{
 .tech-bracket-bl{position:absolute;left:8%;bottom:20%;width:120px;height:80px;border:1px solid rgba(184,168,120,.07);border-top:none;border-right:none;pointer-events:none}
 .tech-hazard{position:absolute;bottom:8%;left:4%;width:64px;height:18px;background:repeating-linear-gradient(-45deg,rgba(184,168,120,.12) 0px,rgba(184,168,120,.12) 6px,transparent 6px,transparent 12px);pointer-events:none}
 
-.s1-eye{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;opacity:0}
-.s1-eye.vis{animation:eyeCycle 24s linear 1.2s infinite}
-@keyframes eyeCycle{0%{opacity:0}2%{opacity:1}18.75%{opacity:1}21%{opacity:0}100%{opacity:0}}
+.s1-eye{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;opacity:0;transition:opacity .6s ease}
+.s1-eye.vis{opacity:1}
 .s1-eye i{position:absolute;top:50%;left:50%;width:96%;height:96%;transform:translate(-50%,-50%);background:url('uploads/eye-sigil.jpg');background-size:cover;background-repeat:no-repeat;mix-blend-mode:screen;animation:eyeBreathe 11s ease-in-out infinite,eyeLook 9s ease-in-out infinite}
 .s1-eye i.e-base{opacity:.34;filter:contrast(1.15) saturate(.85);animation:eyeBreathe 11s ease-in-out infinite,eyeLook 9s ease-in-out infinite,eyeSlice 1.8s steps(1,end) infinite,eyeFlicker 5.3s steps(1,end) infinite}
 .s1-eye i.e-r{opacity:0;filter:sepia(1) hue-rotate(-18deg) saturate(1.6) contrast(1.15);animation:eyeBreathe 11s ease-in-out infinite,eyeLook 9s ease-in-out infinite,eyeGlitchR 1.3s steps(1,end) infinite}
@@ -1939,7 +1938,8 @@ setTimeout(()=>{
   document.getElementById('ticker').classList.add('show');
   setTimeout(()=>{
     document.querySelector('.s1-coords').classList.add('vis');
-    document.getElementById('s1eye').classList.add('vis');
+    showEyeSigil();
+    scheduleEyeSigil();
     document.getElementById('hw1').classList.add('vis');
     document.getElementById('s1sub').classList.add('vis');
     document.getElementById('s1stat').classList.add('vis');
@@ -4159,6 +4159,27 @@ var glitchTranslate, glitchCorrupt;
       if(backdrop)backdrop.classList.remove('on');
       hackedRunning=false;
     },9500);
+  }
+
+  // The eye sigil's own reveal cycle: previously a pure CSS keyframe loop
+  // with a fixed interval and fixed hold, so every reappearance was
+  // identical. Driven from JS instead so both pieces can be randomized —
+  // and because the inner glitch layers (eyeGlitchR/C, eyeSlice, etc.) keep
+  // looping continuously in the background the whole time (only this
+  // container's opacity toggles), each reveal lands on a different,
+  // un-synced phase of those loops instead of always showing the same
+  // moment. Unlike the auto-glitches below, this one *does* run on page
+  // load — it's the hero reveal, part of the intro sequence, not an
+  // unexpected glitch.
+  function showEyeSigil(){
+    const el = document.getElementById('s1eye');
+    if (!el) return;
+    el.classList.add('vis');
+    setTimeout(() => { el.classList.remove('vis'); }, 10000);
+  }
+  function scheduleEyeSigil(){
+    const delay = 50000 + Math.random() * 20000; // ~once a minute, jittered
+    setTimeout(() => { showEyeSigil(); scheduleEyeSigil(); }, delay);
   }
 
   // Previously alternated on a single shared 42s toggle, so each effect
