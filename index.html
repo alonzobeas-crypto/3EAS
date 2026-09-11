@@ -300,6 +300,22 @@ body{
 .tech-bracket-bl{position:absolute;left:8%;bottom:20%;width:120px;height:80px;border:1px solid rgba(184,168,120,.07);border-top:none;border-right:none;pointer-events:none}
 .tech-hazard{position:absolute;bottom:8%;left:4%;width:64px;height:18px;background:repeating-linear-gradient(-45deg,rgba(184,168,120,.12) 0px,rgba(184,168,120,.12) 6px,transparent 6px,transparent 12px);pointer-events:none}
 
+.s1-eye{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;opacity:0}
+.s1-eye.vis{animation:eyeCycle 24s linear 1.2s infinite}
+@keyframes eyeCycle{0%{opacity:0}10%{opacity:1}72.5%{opacity:1}83%{opacity:0}100%{opacity:0}}
+.s1-eye i{position:absolute;top:50%;left:50%;width:min(92vh,760px);aspect-ratio:848/1264;transform:translate(-50%,-50%);background:url('uploads/IMG_8268.jpeg') center/contain no-repeat;mix-blend-mode:screen;animation:eyeBreathe 11s ease-in-out infinite}
+.s1-eye i.e-base{opacity:.34;filter:contrast(1.15) saturate(.85);animation:eyeBreathe 11s ease-in-out infinite,eyeSlice 2.9s steps(1,end) infinite}
+.s1-eye i.e-r{opacity:0;filter:sepia(1) hue-rotate(-42deg) saturate(6) contrast(1.3);animation:eyeBreathe 11s ease-in-out infinite,eyeGlitchR 1.9s steps(1,end) infinite}
+.s1-eye i.e-c{opacity:0;filter:sepia(1) hue-rotate(140deg) saturate(4) contrast(1.3);animation:eyeBreathe 11s ease-in-out infinite,eyeGlitchC 2.3s steps(1,end) infinite}
+.s1-eye::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.5) 0px,rgba(0,0,0,.5) 1px,transparent 1px,transparent 4px);opacity:.55;animation:eyeScan 2.6s linear infinite}
+@keyframes eyeBreathe{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.035)}}
+@keyframes eyeScan{0%{background-position-y:0}100%{background-position-y:80px}}
+@keyframes eyeGlitchR{0%{opacity:.34;clip-path:polygon(0 18%,100% 18%,100% 27%,0 27%);transform:translate(calc(-50% + 7px),-50%)}14%{opacity:.42;clip-path:polygon(0 44%,100% 44%,100% 51%,0 51%);transform:translate(calc(-50% - 9px),-50%)}28%{opacity:.26;clip-path:polygon(0 62%,100% 62%,100% 74%,0 74%);transform:translate(calc(-50% + 12px),-50%)}42%{opacity:.5;clip-path:polygon(0 6%,100% 6%,100% 14%,0 14%);transform:translate(calc(-50% - 5px),-50%)}56%{opacity:.3;clip-path:polygon(0 79%,100% 79%,100% 88%,0 88%);transform:translate(calc(-50% + 4px),-50%)}70%{opacity:.45;clip-path:polygon(0 33%,100% 33%,100% 43%,0 43%);transform:translate(calc(-50% - 11px),-50%)}84%{opacity:.22;clip-path:polygon(0 52%,100% 52%,100% 59%,0 59%);transform:translate(calc(-50% + 8px),-50%)}100%{opacity:.34;clip-path:polygon(0 18%,100% 18%,100% 27%,0 27%);transform:translate(calc(-50% + 7px),-50%)}}
+@keyframes eyeGlitchC{0%{opacity:.3;clip-path:polygon(0 28%,100% 28%,100% 37%,0 37%);transform:translate(calc(-50% - 8px),-50%)}13%{opacity:.4;clip-path:polygon(0 68%,100% 68%,100% 77%,0 77%);transform:translate(calc(-50% + 10px),-50%)}26%{opacity:.24;clip-path:polygon(0 11%,100% 11%,100% 20%,0 20%);transform:translate(calc(-50% - 13px),-50%)}39%{opacity:.44;clip-path:polygon(0 47%,100% 47%,100% 56%,0 56%);transform:translate(calc(-50% + 6px),-50%)}52%{opacity:.2;clip-path:polygon(0 84%,100% 84%,100% 93%,0 93%);transform:translate(calc(-50% - 4px),-50%)}65%{opacity:.38;clip-path:polygon(0 38%,100% 38%,100% 46%,0 46%);transform:translate(calc(-50% + 14px),-50%)}78%{opacity:.28;clip-path:polygon(0 57%,100% 57%,100% 66%,0 66%);transform:translate(calc(-50% - 7px),-50%)}91%{opacity:.42;clip-path:polygon(0 21%,100% 21%,100% 30%,0 30%);transform:translate(calc(-50% + 3px),-50%)}100%{opacity:.3;clip-path:polygon(0 28%,100% 28%,100% 37%,0 37%);transform:translate(calc(-50% - 8px),-50%)}}
+@keyframes eyeSlice{0%,100%{clip-path:none;transform:translate(-50%,-50%)}12%{clip-path:polygon(0 0,100% 0,100% 40%,0 40%,0 42%,100% 42%,100% 100%,0 100%);transform:translate(calc(-50% + 3px),-50%)}13%{clip-path:none;transform:translate(-50%,-50%)}37%{clip-path:polygon(0 0,100% 0,100% 63%,0 63%,0 66%,100% 66%,100% 100%,0 100%);transform:translate(calc(-50% - 4px),-50%)}38.5%{clip-path:none;transform:translate(-50%,-50%)}61%{clip-path:polygon(0 0,100% 0,100% 22%,0 22%,0 25%,100% 25%,100% 100%,0 100%);transform:translate(calc(-50% + 5px),-50%)}62%{clip-path:none;transform:translate(-50%,-50%)}86%{clip-path:polygon(0 0,100% 0,100% 78%,0 78%,0 81%,100% 81%,100% 100%,0 100%);transform:translate(calc(-50% - 2px),-50%)}87%{clip-path:none;transform:translate(-50%,-50%)}}
+@media (max-width:860px){.s1-eye i{width:min(70vh,420px)}.s1-eye i.e-base{opacity:.22}}
+@media (prefers-reduced-motion:reduce){.s1-eye i{animation:none!important}.s1-eye::after{animation:none}}
+
 .s1-coords{
   position:absolute;top:52px;left:60px;z-index:10;
   font-family:var(--mono);font-size:12px;letter-spacing:5px;color:var(--dim2);
@@ -1209,6 +1225,23 @@ body{
 @media (prefers-reduced-motion: reduce) {
   #signal-glitch-canvas.sg-cutting { animation: none; }
 }
+#signal-glitch-canvas.sg-cutting-hard {
+  animation: sg-cut-hard 0.24s steps(3, end);
+}
+@keyframes sg-cut-hard {
+  0%   { clip-path: inset(0 0 0 0); transform: translate(0,0) skewX(0); filter: none; }
+  10%  { clip-path: inset(5% 0 55% 0); transform: translate(-14px,0) skewX(4deg); filter: invert(1); }
+  22%  { clip-path: inset(65% 0 2% 0); transform: translate(12px,0) skewX(-3deg); filter: none; }
+  35%  { clip-path: inset(15% 0 60% 0); transform: translate(-9px,2px) skewX(2deg); }
+  48%  { clip-path: inset(0 0 75% 0); transform: translate(10px,-2px) skewX(-4deg); filter: invert(1); }
+  60%  { clip-path: inset(70% 0 0 0); transform: translate(-6px,0) skewX(1deg); filter: none; }
+  75%  { clip-path: inset(30% 0 40% 0); transform: translate(8px,0) skewX(-2deg); }
+  90%  { clip-path: inset(0 0 10% 0); transform: translate(-3px,0) skewX(0); }
+  100% { clip-path: inset(0 0 0 0); transform: translate(0,0) skewX(0); filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #signal-glitch-canvas.sg-cutting-hard { animation: none; }
+}
 </style>
 </head>
 <body>
@@ -1299,6 +1332,7 @@ body{
     <div class="tech-cross tc-top"></div><div class="tech-cross tc-mid"></div><div class="tech-cross tc-bot"></div>
     <div class="tech-bracket-tr"></div><div class="tech-bracket-br"></div>
     <div class="tech-hazard"></div>
+    <div class="s1-eye" id="s1eye"><i class="e-base"></i><i class="e-r"></i><i class="e-c"></i></div>
     <div class="s1-coords">SYS// 3EAS-001 // LINCOLN HEIGHTS, NELA // 34.0590°N 118.2321°W // ▮</div>
     <div class="s1-main" style="padding:0 60px;position:relative;z-index:10">
       <div class="s1-title" id="hw1" data-txt="3EAS">3EAS</div>
@@ -1901,6 +1935,7 @@ setTimeout(()=>{
   document.getElementById('ticker').classList.add('show');
   setTimeout(()=>{
     document.querySelector('.s1-coords').classList.add('vis');
+    document.getElementById('s1eye').classList.add('vis');
     document.getElementById('hw1').classList.add('vis');
     document.getElementById('s1sub').classList.add('vis');
     document.getElementById('s1stat').classList.add('vis');
@@ -5077,14 +5112,6 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
       this.r = (1 + Math.random() * 1.8) * dpr;
     }
     step(t) {
-      if (eyeFormActive && this.tx !== undefined) {
-        // Fast ease toward the assigned eye-shape target instead of normal
-        // wander physics — this is what makes the shape "pop in" quickly
-        // rather than drift together.
-        this.x += (this.tx - this.x) * 0.3;
-        this.y += (this.ty - this.y) * 0.3;
-        return;
-      }
       this.vx += (Math.random() - 0.5) * 0.05 * dpr;
       this.vy += (Math.random() - 0.5) * 0.05 * dpr;
       this.vx *= 0.995; this.vy *= 0.995;
@@ -5116,69 +5143,6 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   let rafId = null;
   let holdTimeout = null;
   let frame = 0;
-
-  // ---- All-Seeing Eye formation: partway through a glitch's hold, the
-  // particle field snaps into an Eye-of-Providence layout (triangle, eye,
-  // pupil, radiating rays) instead of drifting freely, holds there briefly,
-  // then dissolves back into normal motion. Points are distributed
-  // proportionally across the shape's parts so however many particles
-  // exist (it varies by viewport width), the shape stays legible. ----
-  let eyeFormActive = false;
-  let eyeFormTimer1 = null, eyeFormTimer2 = null;
-  function clearEyeFormTimers() {
-    if (eyeFormTimer1) { clearTimeout(eyeFormTimer1); eyeFormTimer1 = null; }
-    if (eyeFormTimer2) { clearTimeout(eyeFormTimer2); eyeFormTimer2 = null; }
-  }
-  function buildEyeShapePoints(n) {
-    const pts = [];
-    const triApex = { x: 0, y: -1.15 }, triR = { x: 1.15, y: 0.78 }, triL = { x: -1.15, y: 0.78 };
-    const triEdges = [[triApex, triR], [triR, triL], [triL, triApex]];
-    const nTri = Math.round(n * 0.24);
-    for (let i = 0; i < nTri; i++) {
-      const edge = triEdges[i % 3];
-      const t = (Math.floor(i / 3) + 0.5) / Math.ceil(nTri / 3);
-      pts.push({ x: edge[0].x + (edge[1].x - edge[0].x) * t, y: edge[0].y + (edge[1].y - edge[0].y) * t });
-    }
-    const eyeCy = 0.05;
-    const nLid = Math.round(n * 0.36);
-    for (let i = 0; i < nLid; i++) {
-      const half = 0.85, x = -half + (2 * half * i) / Math.max(1, nLid - 1);
-      const upper = i % 2 === 0;
-      const w = Math.sin(Math.PI * (x / half + 1) / 2);
-      const y = (upper ? 0.42 : -0.24) * w + eyeCy;
-      pts.push({ x, y });
-    }
-    const nPupil = Math.round(n * 0.20);
-    for (let i = 0; i < nPupil; i++) {
-      const a = (i / nPupil) * Math.PI * 2;
-      pts.push({ x: Math.cos(a) * 0.17, y: Math.sin(a) * 0.17 + eyeCy });
-    }
-    const nRays = Math.max(0, n - pts.length);
-    const rayCount = 10;
-    for (let i = 0; i < nRays; i++) {
-      const rayIdx = i % rayCount;
-      const angle = (rayIdx / rayCount) * Math.PI * 2;
-      const along = 0.3 + 0.5 * ((Math.floor(i / rayCount) + 1) / Math.max(1, Math.ceil(nRays / rayCount)));
-      const baseR = 1.3;
-      pts.push({ x: Math.cos(angle) * (baseR + along * 0.5), y: Math.sin(angle) * (baseR + along * 0.5) * 0.85 });
-    }
-    return pts.slice(0, n);
-  }
-  function triggerEyeFormation() {
-    if (!particles.length) return;
-    const pts = buildEyeShapePoints(particles.length);
-    const scale = Math.min(W, H) * 0.34;
-    const cx = W / 2, cy = H / 2;
-    particles.forEach((p, i) => {
-      const pt = pts[i] || pts[i % pts.length];
-      p.tx = cx + pt.x * scale;
-      p.ty = cy + pt.y * scale;
-    });
-    eyeFormActive = true;
-  }
-  function releaseEyeFormation() {
-    eyeFormActive = false;
-  }
 
   const CONNECT_DIST = 200;
   const CODE_CHARS = '01SIGNAL3EASCORTEX{}<>/*'.split('');
@@ -5443,16 +5407,10 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   }
 
   function startSignal() {
-    clearEyeFormTimers();
-    eyeFormActive = false;
     particles = Array.from({ length: particleCount() }, () => new Particle());
     canvas.classList.add('sg-active');
     glitchCut(() => {
       if (prefersReduced) {
-        // Static single frame: snap straight into the formed eye instead
-        // of a scattered field, since there's no animation to pop it in.
-        triggerEyeFormation();
-        particles.forEach(p => { if (p.tx !== undefined) { p.x = p.tx; p.y = p.ty; } });
         ctx.clearRect(0, 0, W, H);
         const maxDist = CONNECT_DIST * dpr;
         const grid = buildGrid(maxDist);
@@ -5461,20 +5419,14 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
         drawStormLinks();
       } else {
         rafId = requestAnimationFrame(loop);
-        // Let the field drift chaotically for a beat first, then pop into
-        // the eye, hold it briefly, then dissolve back before the cut out.
-        eyeFormTimer1 = setTimeout(triggerEyeFormation, 900 + Math.random() * 300);
-        eyeFormTimer2 = setTimeout(releaseEyeFormation, 2600 + Math.random() * 300);
       }
     });
 
-    const holdMs = 3400 + Math.random() * 2000;
+    const holdMs = 3000 + Math.random() * 2000;
     holdTimeout = setTimeout(stopSignal, holdMs);
   }
 
   function stopSignal() {
-    clearEyeFormTimers();
-    eyeFormActive = false;
     glitchCut(() => {
       canvas.classList.remove('sg-active');
       cancelAnimationFrame(rafId);
