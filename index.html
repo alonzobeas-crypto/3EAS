@@ -2751,7 +2751,9 @@ function spStart(){
 }
 // Occasionally flash the main hero title to "CASAS" for a brief moment,
 // timed to land during the glitch cycle's own distortion beat so it reads
-// as part of the effect rather than a jarring text swap.
+// as part of the effect rather than a jarring text swap. Doesn't start on
+// page load -- armed by the visitor's first gesture, same as the rest of
+// the auto-glitch family (see armAutoGlitches further down the script).
 (function(){
   const hw=document.getElementById('hw1');
   if(!hw)return;
@@ -2771,7 +2773,7 @@ function spStart(){
       scheduleFlash();
     },delay);
   }
-  scheduleFlash();
+  window.__armTitleFlash=scheduleFlash;
 })();
 function armSpGestureRetry(){
   document.removeEventListener('click',spStart);
@@ -4200,6 +4202,7 @@ var glitchTranslate, glitchCorrupt;
     setInterval(hackedScreenGlitch,140000);
     scheduleEyeSigil();
     if(typeof window.__armSignalGlitch==='function')window.__armSignalGlitch();
+    if(typeof window.__armTitleFlash==='function')window.__armTitleFlash();
   }
   document.addEventListener('click',armAutoGlitches,{once:true});
   document.addEventListener('keydown',armAutoGlitches,{once:true});
