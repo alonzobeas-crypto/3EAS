@@ -1941,10 +1941,10 @@ function showEyeSigil(){
   const el = document.getElementById('s1eye');
   if (!el) return;
   el.classList.add('vis');
-  setTimeout(() => { el.classList.remove('vis'); }, 10000);
+  setTimeout(() => { el.classList.remove('vis'); }, 7000);
 }
 function scheduleEyeSigil(){
-  const delay = 50000 + Math.random() * 20000; // ~once a minute, jittered
+  const delay = 110000 + Math.random() * 20000; // ~every 2 minutes, jittered
   setTimeout(() => { showEyeSigil(); scheduleEyeSigil(); }, delay);
 }
 
