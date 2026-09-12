@@ -5420,9 +5420,16 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   }
   // Bolts persist for a handful of frames (fading out) instead of a single
   // redrawn-fresh-every-frame flash, so a strike actually reads as holding
-  // for a beat rather than flickering for 1/60th of a second.
+  // for a beat rather than flickering for 1/60th of a second. Full
+  // brightness for the hold window, then a long, slow linear fade for the
+  // rest of the lifetime rather than fading from the very first frame.
   let stormBolts = [];
-  const STORM_BOLT_LIFE = 10;
+  const STORM_BOLT_LIFE = 18;
+  const STORM_BOLT_HOLD = 6;
+  function boltAlpha(life) {
+    if (life > STORM_BOLT_LIFE - STORM_BOLT_HOLD) return 1;
+    return Math.max(0, life / (STORM_BOLT_LIFE - STORM_BOLT_HOLD));
+  }
   function drawStormLinks() {
     if (typeof hpart === 'undefined' || !hpart.length || !particles.length) return;
     const maxDist = 280 * dpr;
@@ -5443,7 +5450,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     }
     for (let i = stormBolts.length - 1; i >= 0; i--) {
       const b = stormBolts[i];
-      drawLightningBolt(b.pts, b.life / STORM_BOLT_LIFE);
+      drawLightningBolt(b.pts, boltAlpha(b.life));
       b.life--;
       if (b.life <= 0) stormBolts.splice(i, 1);
     }
