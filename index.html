@@ -300,11 +300,11 @@ body{
 .tech-bracket-bl{position:absolute;left:8%;bottom:20%;width:120px;height:80px;border:1px solid rgba(184,168,120,.07);border-top:none;border-right:none;pointer-events:none}
 .tech-hazard{position:absolute;bottom:8%;left:4%;width:64px;height:18px;background:repeating-linear-gradient(-45deg,rgba(184,168,120,.12) 0px,rgba(184,168,120,.12) 6px,transparent 6px,transparent 12px);pointer-events:none}
 
-.s1-eye{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;opacity:0;transition:opacity .6s ease}
+.s1-eye{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 1.4s ease}
 .s1-eye.vis{opacity:1}
 .s1-eye video{position:absolute;top:50%;left:50%;width:100%;height:100%;object-fit:cover;transform:translate(-50%,-50%);mix-blend-mode:screen;opacity:.8;animation:eyeBreathe 11s ease-in-out infinite}
-.s1-eye video.v-r{opacity:.16;filter:grayscale(1) sepia(1) hue-rotate(-50deg) saturate(4);animation:eyeBreathe 11s ease-in-out infinite,eyeChromaR 2.4s steps(1,end) infinite}
-.s1-eye video.v-b{opacity:.16;filter:grayscale(1) sepia(1) hue-rotate(180deg) saturate(4);animation:eyeBreathe 11s ease-in-out infinite,eyeChromaB 2.1s steps(1,end) infinite}
+.s1-eye video.v-r{filter:grayscale(1) sepia(1) hue-rotate(-50deg) saturate(4);animation:eyeBreathe 11s ease-in-out infinite,eyeChromaR 1.6s ease-in-out infinite}
+.s1-eye video.v-b{filter:grayscale(1) sepia(1) hue-rotate(180deg) saturate(4);animation:eyeBreathe 11s ease-in-out infinite,eyeChromaB 1.9s ease-in-out infinite}
 .s1-eye::before{content:'';position:absolute;top:50%;left:50%;width:min(26vw,420px);aspect-ratio:1;transform:translate(-50%,-50%) rotate(0deg);border-radius:50%;background:conic-gradient(from 0deg,transparent 0deg,rgba(232,201,138,.5) 25deg,transparent 70deg,transparent 180deg,rgba(232,201,138,.35) 205deg,transparent 250deg,transparent 360deg);mix-blend-mode:screen;animation:eyeRingSpin 6s linear infinite}
 .s1-eye::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.5) 0px,rgba(0,0,0,.5) 1px,transparent 1px,transparent 4px);opacity:.55;animation:eyeScan 2.6s linear infinite}
 .s1-ring2{position:absolute;top:50%;left:50%;width:min(40vw,620px);aspect-ratio:1;transform:translate(-50%,-50%) rotate(0deg);border-radius:50%;background:conic-gradient(from 90deg,transparent 0deg,rgba(232,201,138,.35) 20deg,transparent 55deg,transparent 160deg,rgba(232,201,138,.3) 190deg,transparent 230deg,transparent 300deg,rgba(232,201,138,.25) 330deg,transparent 360deg);mix-blend-mode:screen;animation:eyeRingSpin2 9s linear infinite}
@@ -313,8 +313,8 @@ body{
 @keyframes eyeRingSpin{0%{transform:translate(-50%,-50%) rotate(0deg) scale(1)}50%{transform:translate(-50%,-50%) rotate(180deg) scale(1.15)}100%{transform:translate(-50%,-50%) rotate(360deg) scale(1)}}
 @keyframes eyeRingSpin2{0%{transform:translate(-50%,-50%) rotate(360deg) scale(1)}50%{transform:translate(-50%,-50%) rotate(180deg) scale(.92)}100%{transform:translate(-50%,-50%) rotate(0deg) scale(1)}}
 @keyframes eyeScan{0%{background-position-y:0}100%{background-position-y:80px}}
-@keyframes eyeChromaR{0%,100%{transform:translate(calc(-50% + 3px),-50%)}25%{transform:translate(calc(-50% + 5px),-50%)}50%{transform:translate(calc(-50% + 2px),-50%)}75%{transform:translate(calc(-50% + 4px),-50%)}}
-@keyframes eyeChromaB{0%,100%{transform:translate(calc(-50% - 3px),-50%)}25%{transform:translate(calc(-50% - 2px),-50%)}50%{transform:translate(calc(-50% - 5px),-50%)}75%{transform:translate(calc(-50% - 3px),-50%)}}
+@keyframes eyeChromaR{0%,100%{opacity:.08}30%{opacity:.5}70%{opacity:.1}}
+@keyframes eyeChromaB{0%,100%{opacity:.1}55%{opacity:.45}85%{opacity:.08}}
 @media (max-width:860px){.s1-eye::before{width:min(30vw,220px)}.s1-ring2{width:min(46vw,320px)}.s1-ring3{width:min(18vw,130px)}}
 @media (prefers-reduced-motion:reduce){.s1-eye video{animation:none!important}.s1-eye::after,.s1-eye::before,.s1-ring2,.s1-ring3{animation:none}}
 
