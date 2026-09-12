@@ -1945,7 +1945,7 @@ function showEyeSigil(){
   setTimeout(() => { el.classList.remove('vis'); }, 7000);
 }
 function scheduleEyeSigil(){
-  const delay = 110000 + Math.random() * 20000; // ~every 2 minutes, jittered
+  const delay = 50000 + Math.random() * 20000; // ~every minute, jittered
   setTimeout(() => { showEyeSigil(); scheduleEyeSigil(); }, delay);
 }
 
