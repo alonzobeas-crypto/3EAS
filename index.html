@@ -4187,10 +4187,14 @@ var glitchTranslate, glitchCorrupt;
   // and the separate SIGNAL GLITCH canvas below) arms on the same first
   // real gesture the jukebox itself waits for.
   function armAutoGlitches(){
+    // A scroll event can fire on load with no real interaction behind it
+    // (browser scroll-position restoration, a layout reflow, a mobile
+    // toolbar collapsing) -- that's not a gesture, so it's deliberately
+    // left out of this list; click/keydown/touchstart all require an
+    // actual, deliberate interaction to ever fire.
     document.removeEventListener('click',armAutoGlitches);
     document.removeEventListener('keydown',armAutoGlitches);
     document.removeEventListener('touchstart',armAutoGlitches);
-    document.getElementById('scroll').removeEventListener('scroll',armAutoGlitches);
     setInterval(siteGlitch,84000);
     setInterval(runMatrixRain,55000);
     setInterval(hackedScreenGlitch,140000);
@@ -4200,7 +4204,6 @@ var glitchTranslate, glitchCorrupt;
   document.addEventListener('click',armAutoGlitches,{once:true});
   document.addEventListener('keydown',armAutoGlitches,{once:true});
   document.addEventListener('touchstart',armAutoGlitches,{once:true});
-  document.getElementById('scroll').addEventListener('scroll',armAutoGlitches,{once:true});
 
   // Character-level corruption: randomly flip letter case and swap a few
   // letters for leetspeak-style numbers, briefly, on visible ticker spans.
