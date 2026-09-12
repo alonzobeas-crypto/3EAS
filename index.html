@@ -1933,10 +1933,11 @@ document.addEventListener('keydown',e=>{
 // fixed hold, then hides it, on a randomized cadence so it doesn't repeat
 // on a fixed schedule. The video itself keeps playing continuously in the
 // background regardless (only this container's opacity toggles), so each
-// reveal lands on a different point in its loop. This one runs on page
-// load as part of the intro sequence below (it's the hero reveal, not an
-// unexpected glitch), unlike the auto-glitches further down the script
-// that wait for a first gesture.
+// reveal lands on a different point in its loop. Like the rest of the
+// auto-glitch family further down the script, this doesn't start on page
+// load -- it's armed by the visitor's first gesture (see armAutoGlitches),
+// so the very first thing a visitor sees is just "3EAS" and the ambient
+// particle field, nothing glitching yet.
 function showEyeSigil(){
   const el = document.getElementById('s1eye');
   if (!el) return;
@@ -1956,8 +1957,6 @@ setTimeout(()=>{
   document.getElementById('ticker').classList.add('show');
   setTimeout(()=>{
     document.querySelector('.s1-coords').classList.add('vis');
-    showEyeSigil();
-    scheduleEyeSigil();
     document.getElementById('hw1').classList.add('vis');
     document.getElementById('s1sub').classList.add('vis');
     document.getElementById('s1stat').classList.add('vis');
@@ -4183,9 +4182,10 @@ var glitchTranslate, glitchCorrupt;
   // individually fired only every 84s. Decoupled so matrix-rain can run on
   // its own, faster cadence without also speeding up the page-shake effect.
   // None of this starts on page load — a visitor who never interacts should
-  // never see a glitch. The whole family (site-wide shake, matrix rain,
-  // hacked-screen takeover, and the separate SIGNAL GLITCH canvas below)
-  // arms on the same first real gesture the jukebox itself waits for.
+  // never see a glitch, including the eye reveal itself. The whole family
+  // (site-wide shake, matrix rain, hacked-screen takeover, the eye sigil,
+  // and the separate SIGNAL GLITCH canvas below) arms on the same first
+  // real gesture the jukebox itself waits for.
   function armAutoGlitches(){
     document.removeEventListener('click',armAutoGlitches);
     document.removeEventListener('keydown',armAutoGlitches);
@@ -4194,6 +4194,7 @@ var glitchTranslate, glitchCorrupt;
     setInterval(siteGlitch,84000);
     setInterval(runMatrixRain,55000);
     setInterval(hackedScreenGlitch,140000);
+    scheduleEyeSigil();
     if(typeof window.__armSignalGlitch==='function')window.__armSignalGlitch();
   }
   document.addEventListener('click',armAutoGlitches,{once:true});
