@@ -2081,7 +2081,7 @@ function showEyeSigil(){
   setTimeout(() => { el.classList.remove('vis'); dreamScanEye.stop(); s1OverlayBusy = false; }, 7000);
 }
 function scheduleEyeSigil(){
-  const delay = 20000; // TESTING: every 20s for quick reference -- revert to the ~1min jittered cadence once reviewed
+  const delay = 30000; // TESTING: every 30s for quick reference -- revert to the ~1min jittered cadence once reviewed
   setTimeout(() => { showEyeSigil(); scheduleEyeSigil(); }, delay);
 }
 
@@ -2127,7 +2127,7 @@ function showVideo2(){
   setTimeout(() => { el.classList.remove('vis'); dreamScanVideo2.stop(); stopFaceStutter(); s1OverlayBusy = false; }, 10000);
 }
 function scheduleVideo2(){
-  const delay = 20000; // TESTING: every 20s for quick reference -- revert to the ~90-120s jittered cadence once reviewed
+  const delay = 30000; // TESTING: every 30s for quick reference -- revert to the ~90-120s jittered cadence once reviewed
   setTimeout(() => { showVideo2(); scheduleVideo2(); }, delay);
 }
 
