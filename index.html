@@ -326,6 +326,16 @@ body{
 .s1-video2.vis{opacity:1}
 .s1-video2 video{position:absolute;top:50%;left:50%;width:100%;height:100%;object-fit:cover;transform:translate(-50%,-50%);opacity:.95}
 
+/* DREAM SCAN -- layered on top of the eye and second video overlay, not
+   replacing either. See initDreamScan() further down the script. */
+.dreamscan-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:screen;animation:dreamScanBreathe 7s ease-in-out infinite}
+.dreamscan-canvas::after{content:'';position:absolute;inset:0;height:80px;background:linear-gradient(to bottom,transparent,rgba(232,224,192,.35),transparent);animation:dreamScanSweep 5s linear infinite;mix-blend-mode:screen}
+.dreamscan-canvas.tick{animation:dreamScanBreathe 7s ease-in-out infinite,dreamScanTick .15s steps(2,end)}
+@keyframes dreamScanBreathe{0%,100%{filter:blur(0)}50%{filter:blur(2.5px)}}
+@keyframes dreamScanSweep{0%{transform:translateY(-80px)}100%{transform:translateY(100vh)}}
+@keyframes dreamScanTick{0%{opacity:1}50%{opacity:.4;filter:contrast(1.8) brightness(1.4)}100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.dreamscan-canvas,.dreamscan-canvas::after{animation:none}}
+
 .s1-coords{
   position:absolute;top:52px;left:60px;z-index:10;
   font-family:var(--mono);font-size:12px;letter-spacing:5px;color:var(--dim2);
@@ -1342,8 +1352,8 @@ body{
     <div class="tech-cross tc-top"></div><div class="tech-cross tc-mid"></div><div class="tech-cross tc-bot"></div>
     <div class="tech-bracket-tr"></div><div class="tech-bracket-br"></div>
     <div class="tech-hazard"></div>
-    <div class="s1-eye" id="s1eye"><video src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><video class="v-r" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><video class="v-b" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><div class="s1-ring2"></div><div class="s1-ring3"></div></div>
-    <div class="s1-video2" id="s1video2"><video src="uploads/hero-overlay.mp4" muted playsinline preload="auto"></video></div>
+    <div class="s1-eye" id="s1eye"><video id="eye-src" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><video class="v-r" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><video class="v-b" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><div class="s1-ring2"></div><div class="s1-ring3"></div><canvas class="dreamscan-canvas" id="dreamscan-eye"></canvas></div>
+    <div class="s1-video2" id="s1video2"><video id="video2-src" src="uploads/hero-overlay.mp4" muted playsinline preload="auto"></video><canvas class="dreamscan-canvas" id="dreamscan-video2"></canvas></div>
     <div class="s1-coords">SYS// 3EAS-001 // LINCOLN HEIGHTS, NELA // 34.0590°N 118.2321°W // ▮</div>
     <div class="s1-main" style="padding:0 60px;position:relative;z-index:10">
       <div class="s1-title" id="hw1" data-txt="3EAS">3EAS</div>
@@ -1947,11 +1957,118 @@ document.addEventListener('keydown',e=>{
 // load -- it's armed by the visitor's first gesture (see armAutoGlitches),
 // so the very first thing a visitor sees is just "3EAS" and the ambient
 // particle field, nothing glitching yet.
+/* ═══ DREAM SCAN ═══
+   Layered on top of the eye and second video overlay, not replacing
+   either. Composites the same source video through its own canvas:
+   desaturate + remap to cream/gold via canvas `filter` (GPU, no
+   per-pixel color loop), a sparse particle overlay weighted toward
+   motion (sampled on a 40x30 offscreen canvas -- same low-res-then-blit
+   strategy the grain effect already uses, not a full-res pixel loop),
+   a cheap trailing/afterimage (a low-opacity fill instead of a hard
+   clear, so no stored frame history is needed), plus a CSS-driven
+   breathing blur and sweeping scan bar (cheap, GPU-composited, not
+   canvas-drawn). Occasional glitch ticks are a brief CSS class toggle.
+   Namespaced dreamScan/initDreamScan so nothing here can collide with
+   the particle/glitch/grain systems already in this file. */
+const dreamScanReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function initDreamScan(video, canvas){
+  const ctx = canvas.getContext('2d');
+  const DIFF_W = 40, DIFF_H = 30;
+  const diffCanvas = document.createElement('canvas');
+  diffCanvas.width = DIFF_W; diffCanvas.height = DIFF_H;
+  const diffCtx = diffCanvas.getContext('2d');
+  let prevFrame = null;
+  const motionMap = new Float32Array(DIFF_W * DIFF_H);
+  let nodes = [];
+
+  function resize(){ canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+  function initNodes(){
+    nodes = Array.from({ length: 46 }, () => ({
+      x: Math.random(), y: Math.random(),
+      vx: (Math.random() - .5) * .0006, vy: (Math.random() - .5) * .0006, r: 1 + Math.random() * 1.6,
+    }));
+  }
+  resize(); initNodes();
+  window.addEventListener('resize', resize);
+
+  function sampleMotion(){
+    diffCtx.drawImage(video, 0, 0, DIFF_W, DIFF_H);
+    const frame = diffCtx.getImageData(0, 0, DIFF_W, DIFF_H).data;
+    if (prevFrame){
+      for (let i = 0, p = 0; i < frame.length; i += 4, p++){
+        const d = Math.abs(frame[i]-prevFrame[i]) + Math.abs(frame[i+1]-prevFrame[i+1]) + Math.abs(frame[i+2]-prevFrame[i+2]);
+        motionMap[p] = motionMap[p] * .85 + Math.min(1, d / 90) * .15;
+      }
+    }
+    prevFrame = frame;
+  }
+  function motionAt(nx, ny){
+    const gx = Math.min(DIFF_W-1, (nx*DIFF_W)|0), gy = Math.min(DIFF_H-1, (ny*DIFF_H)|0);
+    return motionMap[gy*DIFF_W+gx] || 0;
+  }
+
+  let raf = null, frame = 0, tickTimer = null;
+  function loop(){
+    const w = canvas.width, h = canvas.height;
+    if (frame++ % 3 === 0) sampleMotion();
+
+    ctx.fillStyle = 'rgba(0,0,0,.16)'; ctx.fillRect(0, 0, w, h); // trail via partial clear, not stored frames
+
+    ctx.save();
+    ctx.filter = 'grayscale(1) sepia(1) saturate(1.6) brightness(1.1)';
+    ctx.globalAlpha = .4; ctx.globalCompositeOperation = 'screen';
+    ctx.drawImage(video, 0, 0, w, h);
+    ctx.restore();
+
+    nodes.forEach(n => {
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0 || n.x > 1) n.vx *= -1;
+      if (n.y < 0 || n.y > 1) n.vy *= -1;
+      const m = motionAt(n.x, n.y);
+      if (Math.random() > .25 + m * .6) return; // sparser where nothing's moving
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(232,224,192,${.15 + m*.5})`;
+      ctx.arc(n.x*w, n.y*h, n.r + m*2, 0, Math.PI*2); ctx.fill();
+    });
+    raf = requestAnimationFrame(loop);
+  }
+
+  function scheduleTicks(){
+    tickTimer = setInterval(() => {
+      if (Math.random() < .15){
+        canvas.classList.add('tick');
+        setTimeout(() => canvas.classList.remove('tick'), 150);
+      }
+    }, 2000);
+  }
+
+  function start(){
+    resize();
+    if (dreamScanReduced){ // static fallback, no animation
+      ctx.filter = 'grayscale(1) sepia(1) saturate(1.6)'; ctx.globalAlpha = .5;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      return;
+    }
+    if (!raf) raf = requestAnimationFrame(loop);
+    if (!tickTimer) scheduleTicks();
+  }
+  function stop(){
+    if (raf){ cancelAnimationFrame(raf); raf = null; }
+    if (tickTimer){ clearInterval(tickTimer); tickTimer = null; }
+    canvas.classList.remove('tick');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  return { start, stop };
+}
+const dreamScanEye = initDreamScan(document.getElementById('eye-src'), document.getElementById('dreamscan-eye'));
+const dreamScanVideo2 = initDreamScan(document.getElementById('video2-src'), document.getElementById('dreamscan-video2'));
+
 function showEyeSigil(){
   const el = document.getElementById('s1eye');
   if (!el) return;
   el.classList.add('vis');
-  setTimeout(() => { el.classList.remove('vis'); }, 7000);
+  dreamScanEye.start();
+  setTimeout(() => { el.classList.remove('vis'); dreamScanEye.stop(); }, 7000);
 }
 function scheduleEyeSigil(){
   const delay = 20000; // TESTING: every 20s for quick reference -- revert to the ~1min jittered cadence once reviewed
@@ -1972,8 +2089,9 @@ function showVideo2(){
   el.classList.add('vis');
   v.currentTime = 0;
   v.play().catch(() => {});
+  dreamScanVideo2.start();
   if (typeof window.triggerSignalGlitch === 'function') window.triggerSignalGlitch();
-  setTimeout(() => { el.classList.remove('vis'); }, 10000);
+  setTimeout(() => { el.classList.remove('vis'); dreamScanVideo2.stop(); }, 10000);
 }
 function scheduleVideo2(){
   const delay = 20000; // TESTING: every 20s for quick reference -- revert to the ~90-120s jittered cadence once reviewed
