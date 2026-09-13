@@ -318,6 +318,14 @@ body{
 @media (max-width:860px){.s1-eye::before{width:min(30vw,220px)}.s1-ring2{width:min(46vw,320px)}.s1-ring3{width:min(18vw,130px)}}
 @media (prefers-reduced-motion:reduce){.s1-eye video{animation:none!important}.s1-eye::after,.s1-eye::before,.s1-ring2,.s1-ring3{animation:none}}
 
+/* Second, independent hero overlay -- its own video, its own timer, no
+   relation to the eye sigil beyond sharing the hero. Shown plainly (no
+   screen-blend wash) at high opacity since the footage itself, not a
+   blended aura, is the point here. */
+.s1-video2{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 1.4s ease}
+.s1-video2.vis{opacity:1}
+.s1-video2 video{position:absolute;top:50%;left:50%;width:100%;height:100%;object-fit:cover;transform:translate(-50%,-50%);opacity:.95}
+
 .s1-coords{
   position:absolute;top:52px;left:60px;z-index:10;
   font-family:var(--mono);font-size:12px;letter-spacing:5px;color:var(--dim2);
@@ -1335,6 +1343,7 @@ body{
     <div class="tech-bracket-tr"></div><div class="tech-bracket-br"></div>
     <div class="tech-hazard"></div>
     <div class="s1-eye" id="s1eye"><video src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><video class="v-r" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><video class="v-b" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><div class="s1-ring2"></div><div class="s1-ring3"></div></div>
+    <div class="s1-video2" id="s1video2"><video src="uploads/hero-overlay.mp4" muted playsinline preload="auto"></video></div>
     <div class="s1-coords">SYS// 3EAS-001 // LINCOLN HEIGHTS, NELA // 34.0590°N 118.2321°W // ▮</div>
     <div class="s1-main" style="padding:0 60px;position:relative;z-index:10">
       <div class="s1-title" id="hw1" data-txt="3EAS">3EAS</div>
@@ -1947,6 +1956,28 @@ function showEyeSigil(){
 function scheduleEyeSigil(){
   const delay = 50000 + Math.random() * 20000; // ~every minute, jittered
   setTimeout(() => { showEyeSigil(); scheduleEyeSigil(); }, delay);
+}
+
+// Second hero overlay: its own 10s clip, played once from the start on
+// each reveal (not looped in the background like the eye) since the ask
+// was to show this exact footage for its own natural length. Fires the
+// SIGNAL GLITCH's canvas + lightning at the same moment it appears --
+// that's the "link with particles" -- rather than drawing its own
+// separate connector system for a one-shot effect. Also gated on the
+// visitor's first gesture, same as everything else in this family.
+function showVideo2(){
+  const el = document.getElementById('s1video2');
+  const v = el && el.querySelector('video');
+  if (!el || !v) return;
+  el.classList.add('vis');
+  v.currentTime = 0;
+  v.play().catch(() => {});
+  if (typeof window.triggerSignalGlitch === 'function') window.triggerSignalGlitch();
+  setTimeout(() => { el.classList.remove('vis'); }, 10000);
+}
+function scheduleVideo2(){
+  const delay = 90000 + Math.random() * 30000; // ~every 1.5-2 minutes, jittered
+  setTimeout(() => { showVideo2(); scheduleVideo2(); }, delay);
 }
 
 /* ─── INTRO ─── */
@@ -4211,6 +4242,7 @@ var glitchTranslate, glitchCorrupt;
     setInterval(runMatrixRain,55000);
     setInterval(hackedScreenGlitch,140000);
     scheduleEyeSigil();
+    scheduleVideo2();
     if(typeof window.__armSignalGlitch==='function')window.__armSignalGlitch();
     if(typeof window.__armTitleFlash==='function')window.__armTitleFlash();
   }
