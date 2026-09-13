@@ -322,8 +322,8 @@ body{
    relation to the eye sigil beyond sharing the hero. Shown plainly (no
    screen-blend wash) at high opacity since the footage itself, not a
    blended aura, is the point here. */
-.s1-video2{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 1.4s ease}
-.s1-video2.vis{opacity:1}
+.s1-video2{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 2.6s ease}
+.s1-video2.vis{opacity:1;transition:opacity .3s ease}
 .s1-video2 video{position:absolute;top:50%;left:50%;width:100%;height:100%;object-fit:cover;transform:translate(-50%,-50%);opacity:.95}
 .s1-video2 video.stutter{animation:faceStutterSnap .13s steps(1,end)}
 @keyframes faceStutterSnap{0%{opacity:.95;transform:translate(-50%,-50%)}25%{opacity:.1;transform:translate(calc(-50% + 7px),calc(-50% - 4px)) scaleY(1.03)}26%{opacity:.85}55%{opacity:.15;transform:translate(calc(-50% - 6px),-50%) scaleX(1.02)}56%{opacity:.9;transform:translate(-50%,-50%)}100%{opacity:.95;transform:translate(-50%,-50%)}}
@@ -2104,23 +2104,27 @@ function stopFaceStutter(){
 // Second hero overlay: its own 10s clip, played once from the start on
 // each reveal (not looped in the background like the eye) since the ask
 // was to show this exact footage for its own natural length. Fires the
-// SIGNAL GLITCH's canvas + lightning at the same moment it appears --
-// that's the "link with particles" -- rather than drawing its own
-// separate connector system for a one-shot effect. Also gated on the
-// visitor's first gesture, same as everything else in this family.
+// visitor's first gesture, same as everything else in this family. Kept
+// isolated from every other glitch system (see faceGlitchActive) rather
+// than layered with them.
+let faceGlitchActive = false;
 function showVideo2(){
   const el = document.getElementById('s1video2');
   const v = el && el.querySelector('video');
   if (!el || !v) return;
   if (s1OverlayBusy){ setTimeout(() => showVideo2(), 1500); return; }
   s1OverlayBusy = true;
+  faceGlitchActive = true;
+  window.__faceGlitchActive = true;
   el.classList.add('vis');
   v.currentTime = 0;
   v.play().catch(() => {});
   dreamScanVideo2.start();
   startFaceStutter(v);
-  if (typeof window.triggerSignalGlitch === 'function') window.triggerSignalGlitch();
-  setTimeout(() => { el.classList.remove('vis'); dreamScanVideo2.stop(); stopFaceStutter(); s1OverlayBusy = false; }, 10000);
+  setTimeout(() => {
+    el.classList.remove('vis'); dreamScanVideo2.stop(); stopFaceStutter();
+    s1OverlayBusy = false; faceGlitchActive = false; window.__faceGlitchActive = false;
+  }, 10000);
 }
 
 // One shared scheduler for both -- each cycle randomly picks eye or face
@@ -4079,6 +4083,7 @@ var glitchTranslate, glitchCorrupt;
 
   // Full-site glitch: every 2 minutes, distort the whole page for ~2s.
   function siteGlitch(){
+    if (faceGlitchActive) return; // don't layer onto the face reveal
     // Was transforming document.documentElement (<html>) — the instant ANY
     // ancestor gets a transform, every position:fixed descendant stops
     // being positioned relative to the real viewport and switches to being
@@ -4149,6 +4154,7 @@ var glitchTranslate, glitchCorrupt;
   let matrixRAF=null,matrixStop=0,matrixStreamCache=[];
   const MATRIX_CHARS='アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ◈°';
   function runMatrixRain(){
+    if(faceGlitchActive)return; // don't layer onto the face reveal
     const canvas=document.getElementById('matrixRain');
     if(!canvas)return;
     // This can now be called from two places (this file's own 55s timer,
@@ -4306,6 +4312,7 @@ var glitchTranslate, glitchCorrupt;
   // same timeline, so the two effects read as one fused moment instead of
   // two separate overlays stacked on each other.
   function hackedScreenGlitch(){
+    if(faceGlitchActive)return; // don't layer onto the face reveal
     const txt=document.getElementById('hackedGlitchText');
     const backdrop=document.getElementById('hackedBackdrop');
     if(!txt||hackedRunning)return; // already mid-run, don't restart on top of itself
@@ -5684,6 +5691,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   }
 
   function startSignal() {
+    if (window.__faceGlitchActive) return; // don't layer onto the face reveal
     // Re-roll the occurrence's character before anything else spawns, so
     // this run's line-style mix and connection density differ from the
     // last one instead of the field always reading the same way.
