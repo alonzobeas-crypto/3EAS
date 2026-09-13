@@ -2369,6 +2369,7 @@ loadDispatch();
 (function(){
   const dpLEET={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9',L:'1',Z:'2'};
   const dpBACKWARDS={A:'∀',C:'Ɔ',E:'Ǝ',F:'Ⅎ',G:'⅁',K:'ʞ',L:'Ꞁ',N:'ᴎ',R:'Я',S:'Ƨ',Y:'⅄'};
+  const dpHOMO={A:'А',B:'В',C:'С',D:'Ꭰ',E:'Е',H:'Н',I:'І',J:'Ј',K:'К',M:'М',N:'Ν',O:'О',P:'Р',S:'Ѕ',T:'Т',V:'Ѵ',X:'Х',Y:'Υ',Z:'Ζ'};
   const dpSYMBOLS=['`','~','!','@','#','$','%','^','&','*','(',')','-','_','=','+','[',']','{','}','\\','|',';',':','\'','"',',','.','<','>','/','?'];
   const dpReduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const dpBusy=new WeakSet();
@@ -2384,9 +2385,10 @@ loadDispatch();
         if(/[a-zA-Z]/.test(c)&&Math.random()<0.14){
           const up=c.toUpperCase();
           const roll=Math.random();
-          if(roll<0.5&&dpLEET[up])chars[i]=dpLEET[up];
-          else if(roll<0.6&&dpBACKWARDS[up])chars[i]=dpBACKWARDS[up];
-          else if(roll<0.65)chars[i]=dpSYMBOLS[Math.floor(Math.random()*dpSYMBOLS.length)];
+          if(roll<0.35&&dpLEET[up])chars[i]=dpLEET[up];
+          else if(roll<0.65&&dpHOMO[up])chars[i]=dpHOMO[up];
+          else if(roll<0.75&&dpBACKWARDS[up])chars[i]=dpBACKWARDS[up];
+          else if(roll<0.8)chars[i]=dpSYMBOLS[Math.floor(Math.random()*dpSYMBOLS.length)];
           else chars[i]=(c===up)?c.toLowerCase():up;
         }
       }
@@ -2443,6 +2445,7 @@ loadDispatch();
 (function(){
   const hgLEET={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9',L:'1',Z:'2'};
   const hgBACKWARDS={A:'∀',C:'Ɔ',E:'Ǝ',F:'Ⅎ',G:'⅁',K:'ʞ',L:'Ꞁ',N:'ᴎ',R:'Я',S:'Ƨ',Y:'⅄'};
+  const hgHOMO={A:'А',B:'В',C:'С',D:'Ꭰ',E:'Е',H:'Н',I:'І',J:'Ј',K:'К',M:'М',N:'Ν',O:'О',P:'Р',S:'Ѕ',T:'Т',V:'Ѵ',X:'Х',Y:'Υ',Z:'Ζ'};
   const hgSYMBOLS=['`','~','!','@','#','$','%','^','&','*','(',')','-','_','=','+','[',']','{','}','\\','|',';',':','\'','"',',','.','<','>','/','?'];
   const hgReduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const hgSelectors=['#s2 .scene-title','#s3 .scene-title','#s4 .scene-title','#s7 .scene-title','#sLab .lab-cs-title','#s5 .scene-title','#s6 .scene-title'];
@@ -2459,9 +2462,10 @@ loadDispatch();
         if(/[a-zA-Z]/.test(c)&&Math.random()<0.14){
           const up=c.toUpperCase();
           const roll=Math.random();
-          if(roll<0.5&&hgLEET[up])chars[i]=hgLEET[up];
-          else if(roll<0.6&&hgBACKWARDS[up])chars[i]=hgBACKWARDS[up];
-          else if(roll<0.65)chars[i]=hgSYMBOLS[Math.floor(Math.random()*hgSYMBOLS.length)];
+          if(roll<0.35&&hgLEET[up])chars[i]=hgLEET[up];
+          else if(roll<0.65&&hgHOMO[up])chars[i]=hgHOMO[up];
+          else if(roll<0.75&&hgBACKWARDS[up])chars[i]=hgBACKWARDS[up];
+          else if(roll<0.8)chars[i]=hgSYMBOLS[Math.floor(Math.random()*hgSYMBOLS.length)];
           else chars[i]=(c===up)?c.toLowerCase():up;
         }
       }
@@ -4541,6 +4545,9 @@ var glitchTranslate, glitchCorrupt;
   const LEET={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9',L:'1',Z:'2'};
   // Turned/mirrored lookalike glyphs for the occasional "backwards letter" flicker.
   const BACKWARDS={A:'∀',C:'Ɔ',E:'Ǝ',F:'Ⅎ',G:'⅁',K:'ʞ',L:'Ꞁ',N:'ᴎ',R:'Я',S:'Ƨ',Y:'⅄'};
+  // Cyrillic/Greek/Cherokee homoglyphs -- real letters from other scripts
+  // that read as near-identical Latin lookalikes.
+  const HOMOGLYPH={A:'А',B:'В',C:'С',D:'Ꭰ',E:'Е',H:'Н',I:'І',J:'Ј',K:'К',M:'М',N:'Ν',O:'О',P:'Р',S:'Ѕ',T:'Т',V:'Ѵ',X:'Х',Y:'Υ',Z:'Ζ'};
   const GLITCH_SYMBOLS=['`','~','!','@','#','$','%','^','&','*','(',')','-','_','=','+','[',']','{','}','\\','|',';',':','\'','"',',','.','<','>','/','?'];
   glitchCorrupt=function(){
     [document.getElementById('ti1'),document.getElementById('ti2')].forEach(el=>{
@@ -4562,9 +4569,10 @@ var glitchTranslate, glitchCorrupt;
             if(/[a-zA-Z]/.test(c)&&Math.random()<0.14){
               const up=c.toUpperCase();
               const roll=Math.random();
-              if(roll<0.5&&LEET[up]){chars[i]=LEET[up];}
-              else if(roll<0.6&&BACKWARDS[up]){chars[i]=BACKWARDS[up];}
-              else if(roll<0.65){chars[i]=GLITCH_SYMBOLS[Math.floor(Math.random()*GLITCH_SYMBOLS.length)];}
+              if(roll<0.35&&LEET[up]){chars[i]=LEET[up];}
+              else if(roll<0.65&&HOMOGLYPH[up]){chars[i]=HOMOGLYPH[up];}
+              else if(roll<0.75&&BACKWARDS[up]){chars[i]=BACKWARDS[up];}
+              else if(roll<0.8){chars[i]=GLITCH_SYMBOLS[Math.floor(Math.random()*GLITCH_SYMBOLS.length)];}
               else{chars[i]=(c===up)?c.toLowerCase():up;}
             }
           }
