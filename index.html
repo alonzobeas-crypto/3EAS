@@ -2080,10 +2080,6 @@ function showEyeSigil(){
   dreamScanEye.start();
   setTimeout(() => { el.classList.remove('vis'); dreamScanEye.stop(); s1OverlayBusy = false; }, 7000);
 }
-function scheduleEyeSigil(){
-  const delay = 30000; // TESTING: every 30s for quick reference -- revert to the ~1min jittered cadence once reviewed
-  setTimeout(() => { showEyeSigil(); scheduleEyeSigil(); }, delay);
-}
 
 // Breaks up the face video's playback with hard stutter/freeze snaps so
 // it reads as glitched footage rather than smooth, lifelike motion.
@@ -2126,9 +2122,16 @@ function showVideo2(){
   if (typeof window.triggerSignalGlitch === 'function') window.triggerSignalGlitch();
   setTimeout(() => { el.classList.remove('vis'); dreamScanVideo2.stop(); stopFaceStutter(); s1OverlayBusy = false; }, 10000);
 }
-function scheduleVideo2(){
-  const delay = 30000; // TESTING: every 30s for quick reference -- revert to the ~90-120s jittered cadence once reviewed
-  setTimeout(() => { showVideo2(); scheduleVideo2(); }, delay);
+
+// One shared scheduler for both -- each cycle randomly picks eye or face
+// (never both) and fires roughly every 2 minutes, jittered so it doesn't
+// read as a metronome.
+function scheduleGlitchPair(){
+  const delay = 100000 + Math.random()*40000; // ~1m40s-2m20s, centered on 2min
+  setTimeout(() => {
+    if (Math.random() < .5) showEyeSigil(); else showVideo2();
+    scheduleGlitchPair();
+  }, delay);
 }
 
 /* ─── INTRO ─── */
@@ -4393,8 +4396,7 @@ var glitchTranslate, glitchCorrupt;
     setInterval(siteGlitch,84000);
     setInterval(runMatrixRain,55000);
     setInterval(hackedScreenGlitch,140000);
-    scheduleEyeSigil();
-    scheduleVideo2();
+    scheduleGlitchPair();
     if(typeof window.__armSignalGlitch==='function')window.__armSignalGlitch();
     if(typeof window.__armTitleFlash==='function')window.__armTitleFlash();
   }
