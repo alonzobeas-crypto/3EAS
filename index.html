@@ -2362,6 +2362,79 @@ function showDispatch(id){
 }
 loadDispatch();
 
+// Live text-corruption glitch on whatever DISPATCH content is currently
+// rendered -- same technique as the ticker's glitchCorrupt (leet/backwards/
+// symbol substitution + RGB text-shadow, re-rolled for ~2.2s then reverted),
+// just applied to the dispatch list/detail text instead of ticker spans.
+(function(){
+  const dpLEET={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9',L:'1',Z:'2'};
+  const dpBACKWARDS={A:'∀',C:'Ɔ',E:'Ǝ',F:'Ⅎ',G:'⅁',K:'ʞ',L:'Ꞁ',N:'ᴎ',R:'Я',S:'Ƨ',Y:'⅄'};
+  const dpSYMBOLS=['`','~','!','@','#','$','%','^','&','*','(',')','-','_','=','+','[',']','{','}','\\','|',';',':','\'','"',',','.','<','>','/','?'];
+  const dpReduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function dpCorruptNode(node){
+    const orig=node.textContent;
+    if(!orig||!orig.trim())return;
+    const corruptOnce=()=>{
+      const chars=orig.split('');
+      for(let i=0;i<chars.length;i++){
+        const c=chars[i];
+        if(/[a-zA-Z]/.test(c)&&Math.random()<0.14){
+          const up=c.toUpperCase();
+          const roll=Math.random();
+          if(roll<0.5&&dpLEET[up])chars[i]=dpLEET[up];
+          else if(roll<0.6&&dpBACKWARDS[up])chars[i]=dpBACKWARDS[up];
+          else if(roll<0.65)chars[i]=dpSYMBOLS[Math.floor(Math.random()*dpSYMBOLS.length)];
+          else chars[i]=(c===up)?c.toLowerCase():up;
+        }
+      }
+      node.textContent=chars.join('');
+    };
+    corruptOnce();
+    const parent=node.parentElement;
+    if(parent)parent.style.textShadow='2px 0 var(--accent),-2px 0 #0ff';
+    const flicker=setInterval(corruptOnce,130);
+    setTimeout(()=>{clearInterval(flicker);node.textContent=orig;if(parent)parent.style.textShadow='';},2200);
+  }
+
+  function dpTextNodesIn(el){
+    const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,{
+      acceptNode(n){
+        if(!n.textContent.trim())return NodeFilter.FILTER_REJECT;
+        // Reject only an inline link *within* this container (e.g. a citation
+        // link inside .dview-body) -- not an outer <a> the container itself
+        // happens to sit inside (the whole .dpost-row list item is a link).
+        for(let p=n.parentElement;p&&p!==el;p=p.parentElement){
+          if(p.tagName==='A')return NodeFilter.FILTER_REJECT;
+        }
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const nodes=[];
+    let n;
+    while(n=walker.nextNode())nodes.push(n);
+    return nodes;
+  }
+
+  function dpGlitchTick(){
+    if(dpReduced||document.hidden)return;
+    const scene=document.getElementById('s7');
+    if(!scene)return;
+    const rect=scene.getBoundingClientRect();
+    if(rect.bottom<0||rect.top>window.innerHeight)return; // only while DISPATCH is on screen
+    const targets=[
+      ...document.querySelectorAll('#dispatchList .dpost-tt, #dispatchList .dpost-sum'),
+      ...document.querySelectorAll('#dispatchView .dview-title, #dispatchView .dview-body')
+    ];
+    if(!targets.length)return;
+    const el=targets[Math.floor(Math.random()*targets.length)];
+    const nodes=dpTextNodesIn(el);
+    if(!nodes.length)return;
+    dpCorruptNode(nodes[Math.floor(Math.random()*nodes.length)]);
+  }
+  setInterval(dpGlitchTick,1800+Math.random()*1200);
+})();
+
 /* ─── SITE PLAYLIST ─── */
 const SP_TRACKS=[
   {title:'AHS - PALESTINE',src:'uploads/AHS-Palestine-ABAI1.wav',gain:2.14},
