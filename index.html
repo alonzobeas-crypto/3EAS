@@ -325,6 +325,9 @@ body{
 .s1-video2{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 1.4s ease}
 .s1-video2.vis{opacity:1}
 .s1-video2 video{position:absolute;top:50%;left:50%;width:100%;height:100%;object-fit:cover;transform:translate(-50%,-50%);opacity:.95}
+.s1-video2 video.stutter{animation:faceStutterSnap .13s steps(1,end)}
+@keyframes faceStutterSnap{0%{opacity:.95;transform:translate(-50%,-50%)}25%{opacity:.1;transform:translate(calc(-50% + 7px),calc(-50% - 4px)) scaleY(1.03)}26%{opacity:.85}55%{opacity:.15;transform:translate(calc(-50% - 6px),-50%) scaleX(1.02)}56%{opacity:.9;transform:translate(-50%,-50%)}100%{opacity:.95;transform:translate(-50%,-50%)}}
+@media (prefers-reduced-motion:reduce){.s1-video2 video.stutter{animation:none}}
 
 /* DREAM SCAN -- layered on top of the eye and second video overlay, not
    replacing either. See initDreamScan() further down the script. */
@@ -2077,6 +2080,26 @@ function scheduleEyeSigil(){
   setTimeout(() => { showEyeSigil(); scheduleEyeSigil(); }, delay);
 }
 
+// Breaks up the face video's playback with hard stutter/freeze snaps so
+// it reads as glitched footage rather than smooth, lifelike motion.
+let faceStutterTimer = null;
+function startFaceStutter(v){
+  if (dreamScanReduced) return;
+  const fire = () => {
+    v.classList.add('stutter');
+    if (Math.random() < .6){
+      const held = v.currentTime;
+      v.pause();
+      setTimeout(() => { v.currentTime = held; v.play().catch(() => {}); }, 40 + Math.random()*90);
+    }
+    setTimeout(() => v.classList.remove('stutter'), 130);
+  };
+  faceStutterTimer = setInterval(fire, 350 + Math.random()*450);
+}
+function stopFaceStutter(){
+  if (faceStutterTimer){ clearInterval(faceStutterTimer); faceStutterTimer = null; }
+}
+
 // Second hero overlay: its own 10s clip, played once from the start on
 // each reveal (not looped in the background like the eye) since the ask
 // was to show this exact footage for its own natural length. Fires the
@@ -2092,8 +2115,9 @@ function showVideo2(){
   v.currentTime = 0;
   v.play().catch(() => {});
   dreamScanVideo2.start();
+  startFaceStutter(v);
   if (typeof window.triggerSignalGlitch === 'function') window.triggerSignalGlitch();
-  setTimeout(() => { el.classList.remove('vis'); dreamScanVideo2.stop(); }, 10000);
+  setTimeout(() => { el.classList.remove('vis'); dreamScanVideo2.stop(); stopFaceStutter(); }, 10000);
 }
 function scheduleVideo2(){
   const delay = 20000; // TESTING: every 20s for quick reference -- revert to the ~90-120s jittered cadence once reviewed
