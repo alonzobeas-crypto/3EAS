@@ -2503,6 +2503,7 @@ loadDispatch();
   let hwTimer=null,hwOrig=null;
 
   function hwCorruptOnce(el){
+    if(el.classList.contains('degrade'))return; // CASAS flash in progress -- don't stomp it
     const chars=hwOrig.split('');
     for(let i=0;i<chars.length;i++){
       const c=chars[i];
