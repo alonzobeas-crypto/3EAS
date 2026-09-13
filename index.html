@@ -1954,7 +1954,7 @@ function showEyeSigil(){
   setTimeout(() => { el.classList.remove('vis'); }, 7000);
 }
 function scheduleEyeSigil(){
-  const delay = 50000 + Math.random() * 20000; // ~every minute, jittered
+  const delay = 20000; // TESTING: every 20s for quick reference -- revert to the ~1min jittered cadence once reviewed
   setTimeout(() => { showEyeSigil(); scheduleEyeSigil(); }, delay);
 }
 
@@ -1976,7 +1976,7 @@ function showVideo2(){
   setTimeout(() => { el.classList.remove('vis'); }, 10000);
 }
 function scheduleVideo2(){
-  const delay = 90000 + Math.random() * 30000; // ~every 1.5-2 minutes, jittered
+  const delay = 20000; // TESTING: every 20s for quick reference -- revert to the ~90-120s jittered cadence once reviewed
   setTimeout(() => { showVideo2(); scheduleVideo2(); }, delay);
 }
 
