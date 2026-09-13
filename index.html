@@ -2068,12 +2068,17 @@ function initDreamScan(video, canvas){
 const dreamScanEye = initDreamScan(document.getElementById('eye-src'), document.getElementById('dreamscan-eye'));
 const dreamScanVideo2 = initDreamScan(document.getElementById('video2-src'), document.getElementById('dreamscan-video2'));
 
+// Eye and face never show at once -- whichever fires while the other is
+// up just retries shortly after instead of stacking on top of it.
+let s1OverlayBusy = false;
 function showEyeSigil(){
   const el = document.getElementById('s1eye');
   if (!el) return;
+  if (s1OverlayBusy){ setTimeout(showEyeSigil, 1500); return; }
+  s1OverlayBusy = true;
   el.classList.add('vis');
   dreamScanEye.start();
-  setTimeout(() => { el.classList.remove('vis'); dreamScanEye.stop(); }, 7000);
+  setTimeout(() => { el.classList.remove('vis'); dreamScanEye.stop(); s1OverlayBusy = false; }, 7000);
 }
 function scheduleEyeSigil(){
   const delay = 20000; // TESTING: every 20s for quick reference -- revert to the ~1min jittered cadence once reviewed
@@ -2111,13 +2116,15 @@ function showVideo2(){
   const el = document.getElementById('s1video2');
   const v = el && el.querySelector('video');
   if (!el || !v) return;
+  if (s1OverlayBusy){ setTimeout(() => showVideo2(), 1500); return; }
+  s1OverlayBusy = true;
   el.classList.add('vis');
   v.currentTime = 0;
   v.play().catch(() => {});
   dreamScanVideo2.start();
   startFaceStutter(v);
   if (typeof window.triggerSignalGlitch === 'function') window.triggerSignalGlitch();
-  setTimeout(() => { el.classList.remove('vis'); dreamScanVideo2.stop(); stopFaceStutter(); }, 10000);
+  setTimeout(() => { el.classList.remove('vis'); dreamScanVideo2.stop(); stopFaceStutter(); s1OverlayBusy = false; }, 10000);
 }
 function scheduleVideo2(){
   const delay = 20000; // TESTING: every 20s for quick reference -- revert to the ~90-120s jittered cadence once reviewed
