@@ -2491,6 +2491,56 @@ loadDispatch();
   setInterval(hgTick,1800+Math.random()*1200);
 })();
 
+// Same live corruption glitch on the hero "3EAS" title, but hover-triggered
+// instead of on a timer -- fires once per mouseenter, ignored while a cycle
+// is already running.
+(function(){
+  const hwLEET={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9',L:'1',Z:'2'};
+  const hwBACKWARDS={A:'∀',C:'Ɔ',E:'Ǝ',F:'Ⅎ',G:'⅁',K:'ʞ',L:'Ꞁ',N:'ᴎ',R:'Я',S:'Ƨ',Y:'⅄'};
+  const hwHOMO={A:'А',B:'В',C:'С',D:'Ꭰ',E:'Е',H:'Н',I:'І',J:'Ј',K:'К',M:'М',N:'Ν',O:'О',P:'Р',S:'Ѕ',T:'Т',V:'Ѵ',X:'Х',Y:'Υ',Z:'Ζ'};
+  const hwSYMBOLS=['`','~','!','@','#','$','%','^','&','*','(',')','-','_','=','+','[',']','{','}','\\','|',';',':','\'','"',',','.','<','>','/','?'];
+  const hwReduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let hwBusy=false;
+
+  function hwCorrupt(el){
+    if(hwBusy)return;
+    const orig=el.textContent;
+    if(!orig||!orig.trim())return;
+    hwBusy=true;
+    const corruptOnce=()=>{
+      const chars=orig.split('');
+      for(let i=0;i<chars.length;i++){
+        const c=chars[i];
+        if(/[a-zA-Z]/.test(c)&&Math.random()<0.14){
+          const up=c.toUpperCase();
+          const roll=Math.random();
+          if(roll<0.35&&hwLEET[up])chars[i]=hwLEET[up];
+          else if(roll<0.65&&hwHOMO[up])chars[i]=hwHOMO[up];
+          else if(roll<0.75&&hwBACKWARDS[up])chars[i]=hwBACKWARDS[up];
+          else if(roll<0.8)chars[i]=hwSYMBOLS[Math.floor(Math.random()*hwSYMBOLS.length)];
+          else chars[i]=(c===up)?c.toLowerCase():up;
+        }
+      }
+      const next=chars.join('');
+      el.textContent=next;
+      el.setAttribute('data-txt',next); // keep the ::before/::after RGB-split ghosts in sync
+    };
+    corruptOnce();
+    el.style.textShadow='2px 0 var(--accent),-2px 0 #0ff';
+    const flicker=setInterval(corruptOnce,130);
+    setTimeout(()=>{
+      clearInterval(flicker);
+      el.textContent=orig;
+      el.setAttribute('data-txt',orig);
+      el.style.textShadow='';
+      hwBusy=false;
+    },2200);
+  }
+
+  const hw1=document.getElementById('hw1');
+  if(hw1&&!hwReduced)hw1.addEventListener('mouseenter',()=>hwCorrupt(hw1));
+})();
+
 /* ─── SITE PLAYLIST ─── */
 const SP_TRACKS=[
   {title:'AHS - PALESTINE',src:'uploads/AHS-Palestine-ABAI1.wav',gain:2.14},
