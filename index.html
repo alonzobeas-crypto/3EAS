@@ -2015,8 +2015,8 @@ function initDreamScan(video, canvas){
     ctx.fillStyle = 'rgba(0,0,0,.09)'; ctx.fillRect(0, 0, w, h); // trail via partial clear, not stored frames -- slower fade = more visible trail
 
     ctx.save();
-    ctx.filter = 'grayscale(1) sepia(1) saturate(2.4) contrast(1.3) brightness(1.3)';
-    ctx.globalAlpha = .75; ctx.globalCompositeOperation = 'screen';
+    ctx.filter = 'grayscale(1) sepia(1) saturate(1.15)';
+    ctx.globalAlpha = .5; ctx.globalCompositeOperation = 'screen';
     ctx.drawImage(video, 0, 0, w, h);
     ctx.restore();
 
@@ -2047,7 +2047,7 @@ function initDreamScan(video, canvas){
   function start(){
     resize();
     if (dreamScanReduced){ // static fallback, no animation
-      ctx.filter = 'grayscale(1) sepia(1) saturate(1.6)'; ctx.globalAlpha = .5;
+      ctx.filter = 'grayscale(1) sepia(1) saturate(1.1)'; ctx.globalAlpha = .4;
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       return;
     }
