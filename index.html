@@ -1532,6 +1532,10 @@ function onScroll(){
   drawWavePl();
 }
 scroll.addEventListener('scroll',onScroll,{passive:true});
+// Exposed so the auto-glitch family (this script and the separately-scoped
+// SIGNAL GLITCH script) can check "is the visitor currently looking at Beat
+// Lab" before firing anything disruptive there.
+window.__onBeatLab=()=>document.getElementById('sLab')?.classList.contains('active')||false;
 document.addEventListener('keydown',e=>{
   if(e.key==='ArrowDown'||e.key==='PageDown')goScene(Math.min(curScene+1,scenes.length-1));
   if(e.key==='ArrowUp'||e.key==='PageUp')goScene(Math.max(curScene-1,0));
@@ -3862,6 +3866,7 @@ var glitchTranslate, glitchCorrupt;
   // Full-site glitch: every 2 minutes, distort the whole page for ~2s.
   function siteGlitch(){
     if (faceGlitchActive) return; // don't layer onto the face reveal
+    if (window.__onBeatLab && window.__onBeatLab()) return; // don't disrupt Beat Lab while it's in use
     // Was transforming document.documentElement (<html>) — the instant ANY
     // ancestor gets a transform, every position:fixed descendant stops
     // being positioned relative to the real viewport and switches to being
@@ -3933,6 +3938,7 @@ var glitchTranslate, glitchCorrupt;
   const MATRIX_CHARS='アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ◈°';
   function runMatrixRain(){
     if(faceGlitchActive)return; // don't layer onto the face reveal
+    if(window.__onBeatLab&&window.__onBeatLab())return; // don't disrupt Beat Lab while it's in use
     const canvas=document.getElementById('matrixRain');
     if(!canvas)return;
     // This can now be called from two places (this file's own 55s timer,
@@ -4091,6 +4097,7 @@ var glitchTranslate, glitchCorrupt;
   // two separate overlays stacked on each other.
   function hackedScreenGlitch(){
     if(faceGlitchActive)return; // don't layer onto the face reveal
+    if(window.__onBeatLab&&window.__onBeatLab())return; // don't disrupt Beat Lab while it's in use
     const txt=document.getElementById('hackedGlitchText');
     const backdrop=document.getElementById('hackedBackdrop');
     if(!txt||hackedRunning)return; // already mid-run, don't restart on top of itself
@@ -5473,6 +5480,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
 
   function startSignal() {
     if (window.__faceGlitchActive) return; // don't layer onto the face reveal
+    if (window.__onBeatLab && window.__onBeatLab()) return; // don't disrupt Beat Lab while it's in use
     // Re-roll the occurrence's character before anything else spawns, so
     // this run's line-style mix and connection density differ from the
     // last one instead of the field always reading the same way.
