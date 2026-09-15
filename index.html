@@ -2542,8 +2542,11 @@ loadDispatch();
 
   const hw1=document.getElementById('hw1');
   if(hw1&&!hwReduced){
-    hw1.addEventListener('mouseenter',()=>hwStart(hw1));
-    hw1.addEventListener('mouseleave',()=>hwStop(hw1));
+    // pointerenter/leave filtered to real mice only -- touch taps can fire
+    // mouseenter with no matching mouseleave until a later, unrelated tap,
+    // which left this stuck permanently glitching on mobile.
+    hw1.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')hwStart(hw1);});
+    hw1.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')hwStop(hw1);});
   }
 })();
 
