@@ -2503,6 +2503,7 @@ loadDispatch();
   let hwTimer=null,hwOrig=null;
 
   function hwCorruptOnce(el){
+    if(el.classList.contains('degrade'))return; // CASAS flash in progress -- don't stomp it
     const chars=hwOrig.split('');
     for(let i=0;i<chars.length;i++){
       const c=chars[i];
@@ -2541,8 +2542,11 @@ loadDispatch();
 
   const hw1=document.getElementById('hw1');
   if(hw1&&!hwReduced){
-    hw1.addEventListener('mouseenter',()=>hwStart(hw1));
-    hw1.addEventListener('mouseleave',()=>hwStop(hw1));
+    // pointerenter/leave filtered to real mice only -- touch taps can fire
+    // mouseenter with no matching mouseleave until a later, unrelated tap,
+    // which left this stuck permanently glitching on mobile.
+    hw1.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')hwStart(hw1);});
+    hw1.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')hwStop(hw1);});
   }
 })();
 
@@ -3283,6 +3287,7 @@ var glitchTranslate, glitchCorrupt;
     'DO YOU LEARN YOUR THEOLOGY FROM TIKTOK VIDEOS??',
     '9/11 WAS A GOOD OLE FASHIONED HEIST.',
     'WE HAVE REVEALED OURSELVES. AND NOW THEY ARE WATCHING.',
+    '<a href="https://youtu.be/wn9pQb4ukBo?is=ekCE-KSiNB79_Efn" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">DON\'T DISRESPECT THE COMEDY CZAR</a>',
     'HOW LONG DID YOU HAVE TO DOOM SCROLL TO BECOME A GURU?',
     'HOW LONG HAVE YOU BEEN SELLING SPIRITUALITY FOR A LIVING?',
     'ENLIGHTENMENT? MORE LIKE ANNIHILATION.',
