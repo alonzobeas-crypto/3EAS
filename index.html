@@ -544,6 +544,48 @@ body{
   padding:24px 44px 60px;position:relative;
 }
 
+/* Coming-soon overlay over Beat Lab -- shown to everyone by default;
+   an access code hides it (see the gating IIFE further down the script). */
+.lab-cs{
+  position:absolute;inset:24px 44px 60px;z-index:50;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;
+}
+.lab-cs::before{
+  content:'';position:absolute;inset:0;
+  background:rgba(0,0,0,.94);
+}
+.lab-cs-inner{
+  position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:14px;
+  padding:36px 56px;border:1px solid var(--accent);
+  background:rgba(0,0,0,.65);
+}
+.lab-cs-tag{font-family:var(--mono);font-size:10px;letter-spacing:5px;color:var(--dim2);text-transform:uppercase}
+.lab-cs-title{
+  font-family:var(--vt);font-size:clamp(56px,9vw,120px);letter-spacing:6px;color:var(--hot);
+  text-shadow:0 0 24px rgba(232,224,192,.25);line-height:1;
+  animation:glitch 7s infinite;
+}
+.lab-cs-sub{font-family:var(--mono);font-size:12px;letter-spacing:4px;color:var(--accent);text-transform:uppercase}
+.lab-cs-rule{width:200px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.lab-cs-note{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--dim2);text-transform:uppercase;margin-top:4px}
+.lab-cs-access{
+  margin-top:10px;font-family:var(--mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  background:none;border:1px solid var(--dim);color:var(--dim2);padding:6px 14px;cursor:none;transition:all .15s;
+}
+.lab-cs-access:hover{border-color:var(--accent);color:var(--accent)}
+.lab-cs-unlock{display:flex;gap:8px;align-items:center}
+.lab-cs-unlock input{
+  font-family:var(--mono);font-size:12px;letter-spacing:3px;text-transform:uppercase;
+  background:rgba(0,0,0,.6);border:1px solid var(--dim);color:var(--fg);padding:8px 10px;width:140px;text-align:center;
+}
+.lab-cs-unlock input:focus{outline:none;border-color:var(--accent)}
+.lab-cs-unlock button{
+  font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  background:none;border:1px solid var(--accent);color:var(--accent);padding:8px 14px;cursor:none;transition:all .15s;
+}
+.lab-cs-unlock button:hover{background:rgba(184,168,120,.12);color:var(--hot)}
+.lab-cs-err{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:#a8695a;text-transform:uppercase}
+
 .bl{width:100%;max-width:1100px;margin:auto;display:flex;flex-direction:column;gap:18px}
 .bl-transport{
   display:flex;align-items:center;gap:20px;flex-wrap:wrap;
@@ -813,6 +855,11 @@ body{
   #sLab .lab-eyebrow{flex-direction:column;gap:1px;padding:8px 12px 3px}
   #sLab .lab-eyebrow h2{font-size:40px!important}
   #sLab .lab-eyebrow .lab-meta{text-align:left}
+  .lab-cs{inset:16px 6px 12px!important}
+  .lab-cs-inner{padding:6px 8px!important}
+  .lab-cs-title{font-size:44px!important;letter-spacing:2px!important}
+  .lab-cs-sub{font-size:10px!important}
+  .lab-cs-note{font-size:9px!important;text-align:center}
   /* let content-tall scenes grow & scroll instead of clipping (full bio, etc.) */
   #scroll{scroll-snap-type:none!important}
   .scene{height:auto;min-height:0;overflow:visible;scroll-snap-align:none!important}
@@ -1116,11 +1163,26 @@ body{
       </div>
       <div class="lab-meta">
         8 TRACKS // 16 STEPS<br>
-        STATUS: <span class="v">PHASE 1 — LIVE</span><br>
-        SOUND: <span class="v">PLACEHOLDER CLICK</span>
+        STATUS: <span class="v">IN CALIBRATION</span><br>
+        SAMPLES: <span class="v">3EAS ARCHIVE</span>
       </div>
     </div>
     <div class="dev-wrap" id="devWrap"></div>
+    <div class="lab-cs" id="labCs">
+      <div class="lab-cs-inner">
+        <span class="lab-cs-tag">// SOURCE SIGNAL // STATUS</span>
+        <div class="lab-cs-title">CALIBRATING</div>
+        <div class="lab-cs-rule"></div>
+        <span class="lab-cs-sub">BEAT LAB · IN CALIBRATION</span>
+        <span class="lab-cs-note">SAMPLE PACK + INTERACTIVE LAB — SIGNAL PENDING</span>
+        <button class="lab-cs-access" id="labCsAccessBtn">ACCESS CODE</button>
+        <div class="lab-cs-unlock" id="labCsUnlock" hidden>
+          <input type="password" id="labCsCode" placeholder="CODE" autocomplete="off" spellcheck="false">
+          <button id="labCsSubmit">ENTER</button>
+        </div>
+        <span class="lab-cs-err" id="labCsErr" hidden>INVALID CODE</span>
+      </div>
+    </div>
     <div class="scene-counter">06 / 08</div>
   </section>
 
@@ -4766,6 +4828,50 @@ function spToggle(){
     });
   }
   initBeatLab();
+})();
+
+// Beat Lab access gate -- everyone sees the "CALIBRATING" overlay by
+// default; entering the right code hides it, remembered on that
+// browser via localStorage. NOTE: this is a visual convenience gate,
+// not real security -- the Beat Lab's HTML/JS still ships in this same
+// page to every visitor (there's no server here to actually withhold
+// it from anyone), so a visitor who reads the page source or this
+// script can find both the code and the sequencer regardless. It just
+// keeps casual visitors from stumbling onto it.
+(function(){
+  const LAB_CODE='3EASLAB'; // change this string to change the access code
+  const KEY='bl_unlocked_v1';
+  const isUnlocked=()=>localStorage.getItem(KEY)==='1';
+  function applyState(){
+    const cs=document.getElementById('labCs');
+    if(cs)cs.style.display=isUnlocked()?'none':'';
+  }
+  function wire(){
+    const btn=document.getElementById('labCsAccessBtn');
+    const box=document.getElementById('labCsUnlock');
+    const input=document.getElementById('labCsCode');
+    const submit=document.getElementById('labCsSubmit');
+    const err=document.getElementById('labCsErr');
+    if(!btn)return;
+    btn.addEventListener('click',()=>{
+      box.hidden=!box.hidden;
+      if(!box.hidden)input.focus();
+    });
+    function tryCode(){
+      if(input.value===LAB_CODE){
+        try{localStorage.setItem(KEY,'1');}catch(e){}
+        applyState();
+      }else{
+        err.hidden=false;
+        input.value='';
+        setTimeout(()=>err.hidden=true,2000);
+      }
+    }
+    submit.addEventListener('click',tryCode);
+    input.addEventListener('keydown',e=>{if(e.key==='Enter')tryCode();});
+  }
+  wire();
+  applyState();
 })();
 
 /* ─── TWEAKS ─── */
