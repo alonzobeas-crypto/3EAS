@@ -526,6 +526,11 @@ body{
   padding:0;display:flex;flex-direction:column;
   background:radial-gradient(ellipse at center,#0a0908 0%,#000 80%);
 }
+/* Only scrollable once unlocked (see the access-gate script) -- the
+   overlay is position:absolute within #sLab, so if this scrolled while
+   locked, the overlay would scroll away and expose the real panel
+   underneath to a visitor who hasn't entered the code. */
+#sLab.bl-scrollable{overflow-y:auto}
 #sLab .lab-eyebrow{
   padding:46px 44px 18px;border-bottom:1px solid var(--dimmer);
   display:flex;align-items:baseline;justify-content:space-between;gap:24px;flex-shrink:0;
@@ -540,7 +545,7 @@ body{
   z-index:0;
 }
 #sLab .dev-wrap{
-  flex:1;min-height:0;display:flex;align-items:stretch;justify-content:center;
+  flex:0 0 auto;display:flex;align-items:stretch;justify-content:center;
   padding:24px 44px 60px;position:relative;
 }
 
@@ -4950,6 +4955,8 @@ function spToggleCollapse(){
   function applyState(){
     const cs=document.getElementById('labCs');
     if(cs)cs.style.display=isUnlocked()?'none':'';
+    const sLab=document.getElementById('sLab');
+    if(sLab)sLab.classList.toggle('bl-scrollable',isUnlocked());
   }
   function wire(){
     const btn=document.getElementById('labCsAccessBtn');
