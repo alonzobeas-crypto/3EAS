@@ -544,395 +544,41 @@ body{
   padding:24px 44px 60px;position:relative;
 }
 
-/* Coming-soon overlay over Beat Lab — lighter tint, no blur, so the actual
-   instrument panel reads through in the background instead of being hidden. */
-.lab-cs{
-  position:absolute;inset:24px 44px 60px;z-index:50;
-  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;
-  pointer-events:none;
+.bl{width:100%;max-width:1100px;margin:auto;display:flex;flex-direction:column;gap:18px}
+.bl-transport{
+  display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+  padding:14px 18px;border:1px solid var(--dimmer);background:rgba(0,0,0,.5);
 }
-.lab-cs::before{
-  content:'';position:absolute;inset:0;
-  background:rgba(0,0,0,.94);
+.bl-btn{
+  font-family:var(--mono);font-size:12px;letter-spacing:3px;text-transform:uppercase;
+  background:none;border:1px solid var(--dim);color:var(--dim2);padding:10px 20px;
+  cursor:none;transition:all .15s;
 }
-.lab-cs-inner{
-  position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:14px;
-  padding:36px 56px;border:1px solid var(--accent);
-  background:rgba(0,0,0,.65);
+.bl-btn:hover{border-color:var(--accent);color:var(--accent)}
+.bl-btn.bl-play.on{border-color:var(--accent);color:var(--hot);background:rgba(184,168,120,.12);box-shadow:0 0 12px rgba(184,168,120,.2)}
+.bl-btn.bl-stop:hover{border-color:#a8695a;color:#a8695a}
+.bl-bpm{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--dim2);text-transform:uppercase;margin-left:auto}
+.bl-bpm input[type=range]{width:160px;accent-color:var(--accent)}
+.bl-bpm-val{color:var(--hot);font-family:var(--vt);font-size:20px;min-width:2.4em;text-align:right}
+.bl-grid{
+  display:flex;flex-direction:column;gap:4px;
+  border:1px solid var(--dimmer);background:rgba(0,0,0,.4);padding:14px;
+  overflow-x:auto;
 }
-.lab-cs-tag{font-family:var(--mono);font-size:10px;letter-spacing:5px;color:var(--dim2);text-transform:uppercase}
-.lab-cs-title{
-  font-family:var(--vt);font-size:clamp(56px,9vw,120px);letter-spacing:6px;color:var(--hot);
-  text-shadow:0 0 24px rgba(232,224,192,.25);line-height:1;
-  animation:glitch 7s infinite;
+.bl-row{display:grid;grid-template-columns:80px repeat(16,1fr);gap:3px;align-items:center;min-width:640px}
+.bl-row-label{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--dim2);text-transform:uppercase;white-space:nowrap}
+.bl-cell{
+  aspect-ratio:1;background:rgba(74,70,64,.15);border:1px solid rgba(74,70,64,.4);
+  cursor:none;padding:0;min-width:22px;
 }
-.lab-cs-sub{font-family:var(--mono);font-size:12px;letter-spacing:4px;color:var(--accent);text-transform:uppercase}
-.lab-cs-rule{width:200px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
-.lab-cs-note{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--dim2);text-transform:uppercase;margin-top:4px}
-
-.dev{
-  position:relative;width:100%;max-width:1600px;
-  background:linear-gradient(180deg,#16140f 0%,#0e0c09 100%);
-  border:1px solid var(--border-mid);
-  box-shadow:0 0 80px rgba(184,168,120,.06),inset 0 0 0 1px rgba(184,168,120,.04),0 40px 80px rgba(0,0,0,.7);
-  display:grid;grid-template-rows:auto auto 1fr auto;
-  font-family:var(--mono);
-  overflow:hidden;
-}
-.dev::after{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.18) 2px,rgba(0,0,0,.18) 3px);
-  mix-blend-mode:multiply;opacity:.4;
-}
-
-/* Device top bar — chrome */
-.dev-top{
-  display:flex;align-items:center;
-  border-bottom:1px solid var(--dimmer);
-  background:linear-gradient(180deg,rgba(184,168,120,.04),transparent);
-  height:44px;flex-shrink:0;
-}
-.dev-brand{
-  font-family:var(--vt);font-size:22px;letter-spacing:4px;color:var(--hot);
-  padding:0 22px;border-right:1px solid var(--dimmer);
-  height:100%;display:flex;align-items:center;
-  text-shadow:0 0 8px rgba(232,224,192,.3);
-}
-.dev-mod{
-  font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--dim2);
-  padding:0 18px;border-right:1px solid var(--dimmer);
-  height:100%;display:flex;align-items:center;gap:10px;
-}
-.dev-mod .pwr{
-  display:inline-block;width:6px;height:6px;background:var(--accent);
-  box-shadow:0 0 8px var(--accent);animation:blink 1.6s infinite;
-}
-.dev-screws{display:flex;gap:14px;padding:0 14px;margin-left:auto;height:100%;align-items:center}
-.dev-screws i{display:block;width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#3a362d,#0a0908);border:1px solid #1a1813;position:relative}
-.dev-screws i::after{content:'';position:absolute;inset:30%;border-top:1px solid rgba(0,0,0,.7);transform:rotate(28deg)}
-.dev-x{
-  font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--dim2);
-  background:none;border:none;border-left:1px solid var(--dimmer);
-  padding:0 22px;height:100%;cursor:none;transition:color .15s,background .15s;
-}
-.dev-x:hover{color:var(--hot);background:rgba(184,168,120,.05)}
-
-/* LCD strip */
-.lcd{
-  display:grid;grid-template-columns:1fr 1fr 1fr 1fr;
-  border-bottom:1px solid var(--dimmer);
-  background:linear-gradient(180deg,#0a1410 0%,#050a08 100%);
-  position:relative;
-}
-.lcd::before{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.4) 2px,rgba(0,0,0,.4) 3px);
-}
-.lcd-cell{padding:12px 18px;border-right:1px solid rgba(184,168,120,.08);position:relative;z-index:1}
-.lcd-cell:last-child{border-right:none}
-.lcd-lbl{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:rgba(184,168,120,.4);text-transform:uppercase;margin-bottom:4px}
-.lcd-val{font-family:var(--vt);font-size:24px;letter-spacing:2px;color:#cfb87c;text-shadow:0 0 8px rgba(207,184,124,.5),0 0 2px rgba(207,184,124,.8);line-height:1}
-.lcd-val.sm{font-size:16px}
-.lcd-val .un{font-size:13px;letter-spacing:2px;color:rgba(207,184,124,.5);margin-left:4px}
-
-/* Main work area: tabs + grid + side rail */
-.dev-body{
-  display:grid;grid-template-columns:1fr 280px;
-  min-height:0;overflow:hidden;
-}
-.dev-main{
-  padding:20px 22px;display:flex;flex-direction:column;gap:14px;
-  border-right:1px solid var(--dimmer);min-height:0;
-  background:radial-gradient(ellipse at center,rgba(184,168,120,.02) 0%,transparent 70%);
-}
-.tabs{
-  display:flex;gap:1px;background:var(--dimmer);
-  border:1px solid var(--dimmer);align-self:start;
-}
-.tab{
-  font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;
-  color:var(--dim2);padding:8px 16px;background:rgba(0,0,0,.6);border:none;cursor:none;
-  transition:all .15s;
-}
-.tab.on{background:rgba(184,168,120,.08);color:var(--hot);text-shadow:0 0 6px rgba(232,224,192,.4)}
-.tab:hover{color:var(--accent)}
-
-/* Pad grid — 4 channels x 16 samples = 64 pads */
-.pads{
-  display:grid;grid-template-columns:repeat(16,1fr);gap:5px;
-  flex:1;min-height:0;
-}
-.pads.hide{display:none}
-.pad{
-  position:relative;aspect-ratio:1;
-  background:linear-gradient(180deg,#1a1814 0%,#0c0b08 100%);
-  border:1px solid var(--border-mid);
-  display:flex;flex-direction:column;justify-content:space-between;
-  padding:6px 7px;cursor:none;transition:all .08s;
-  overflow:hidden;
-}
-.pad::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(circle at 50% 30%,rgba(232,224,192,0) 0%,rgba(232,224,192,0) 40%,transparent 70%);
-  transition:background .15s;pointer-events:none;
-}
-.pad:hover::before{background:radial-gradient(circle at 50% 30%,rgba(232,224,192,.08) 0%,transparent 60%)}
-.pad.hit{
-  background:linear-gradient(180deg,rgba(232,224,192,.4) 0%,rgba(184,168,120,.2) 100%);
-  border-color:var(--hot);
-  box-shadow:0 0 14px rgba(232,224,192,.5),inset 0 0 12px rgba(232,224,192,.3);
-}
-.pad.hit::before{background:radial-gradient(circle at 50% 30%,rgba(255,250,220,.4) 0%,transparent 60%)}
-.pad.empty{opacity:.5}
-.pad-led{
-  width:4px;height:4px;border-radius:50%;
-  background:rgba(74,70,64,.6);align-self:flex-end;
-  transition:all .1s;
-}
-.pad.armed .pad-led{background:var(--accent);box-shadow:0 0 4px var(--accent)}
-.pad.hit .pad-led{background:var(--hot);box-shadow:0 0 8px var(--hot)}
-.pad-id{font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--dim2)}
-.pad-name{font-family:var(--mono);font-size:9px;letter-spacing:.5px;color:var(--dim2);text-transform:uppercase;line-height:1.15;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
-.pad.armed .pad-name{color:var(--accent)}
-.pad.hit .pad-name{color:var(--hot);text-shadow:0 0 6px rgba(232,224,192,.5)}
-.pad.empty .pad-name{color:var(--dim2)}
-
-/* Sequencer */
-.seq{display:none;flex-direction:column;gap:4px;flex:1;min-height:0}
-.seq.show{display:flex}
-.seq-head{
-  display:grid;grid-template-columns:90px repeat(16,1fr);gap:3px;
-  font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--dim2);
-  padding:0 0 4px;
-}
-.seq-head span{text-align:center;padding:2px 0}
-.seq-head span.beat{color:var(--accent)}
-.seq-row{display:grid;grid-template-columns:90px repeat(16,1fr);gap:3px;align-items:center}
-.seq-lbl{
-  font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--dim2);
-  padding:6px 8px;border:1px solid var(--dimmer);background:rgba(0,0,0,.4);
-  text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;
-}
-.seq-lbl .ms{font-size:8px;color:var(--dim2);letter-spacing:1px;display:flex;gap:3px}
-.seq-lbl .ms i{display:inline-block;width:5px;height:5px;border:1px solid var(--dimmer);cursor:none}
-.seq-cell{
-  aspect-ratio:1;background:rgba(74,70,64,.12);border:1px solid var(--border);
-  cursor:none;transition:all .08s;position:relative;
-}
-.seq-cell:hover{background:rgba(184,168,120,.1);border-color:var(--accent)}
-.seq-cell.on{
-  background:linear-gradient(180deg,rgba(184,168,120,.55) 0%,rgba(184,168,120,.25) 100%);
-  border-color:var(--hot);box-shadow:inset 0 0 6px rgba(232,224,192,.4);
-}
-.seq-cell.beat::after{
-  content:'';position:absolute;inset:-1px;border:1px solid var(--hot);
-  box-shadow:0 0 10px rgba(232,224,192,.6);pointer-events:none;
-}
-.seq-cell.on.beat{
-  background:linear-gradient(180deg,rgba(232,224,192,.85) 0%,rgba(184,168,120,.5) 100%);
-  box-shadow:0 0 14px rgba(232,224,192,.7),inset 0 0 8px rgba(255,250,220,.5);
-}
-
-/* Side rail */
-.rail{
-  padding:20px 22px;display:flex;flex-direction:column;gap:18px;
-  background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.7));
-  overflow-y:auto;-ms-overflow-style:none;scrollbar-width:none;
-}
-.rail::-webkit-scrollbar{display:none}
-.rail-section{border-bottom:1px solid var(--dimmer);padding-bottom:18px}
-.rail-section:last-child{border-bottom:none}
-.rail-title{font-family:var(--mono);font-size:9px;letter-spacing:4px;color:var(--dim2);text-transform:uppercase;margin-bottom:12px}
-
-/* Knob style */
-.knobs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.knob{display:flex;flex-direction:column;align-items:center;gap:8px}
-.knob-dial{
-  width:62px;height:62px;border-radius:50%;
-  background:radial-gradient(circle at 35% 30%,#3a362d 0%,#1a1813 60%,#0a0908 100%);
-  border:1px solid var(--border-mid);position:relative;
-  box-shadow:inset 0 2px 4px rgba(255,255,255,.05),0 4px 8px rgba(0,0,0,.5),0 0 12px rgba(184,168,120,.05);
-}
-.knob-dial::after{
-  content:'';position:absolute;left:50%;top:8px;width:1px;height:18px;
-  background:var(--accent);transform-origin:50% 23px;
-  box-shadow:0 0 4px var(--accent);
-}
-.knob-dial.t-bpm::after{transform:translateX(-50%) rotate(var(--ang,35deg))}
-.knob-dial.t-bpm{cursor:none}
-.knob-dial.t-vol::after{transform:translateX(-50%) rotate(-15deg)}
-.knob-dial.t-swing::after{transform:translateX(-50%) rotate(-110deg)}
-.knob-dial.t-fx::after{transform:translateX(-50%) rotate(60deg)}
-.knob-ticks{
-  position:absolute;inset:-6px;border-radius:50%;
-  background:
-    conic-gradient(from -135deg,
-      transparent 0deg,
-      rgba(184,168,120,.25) 0deg,rgba(184,168,120,.25) 1deg,
-      transparent 1deg,transparent 30deg,
-      rgba(184,168,120,.25) 30deg,rgba(184,168,120,.25) 31deg,
-      transparent 31deg,transparent 60deg,
-      rgba(184,168,120,.25) 60deg,rgba(184,168,120,.25) 61deg,
-      transparent 61deg,transparent 90deg,
-      rgba(184,168,120,.25) 90deg,rgba(184,168,120,.25) 91deg,
-      transparent 91deg,transparent 120deg,
-      rgba(184,168,120,.25) 120deg,rgba(184,168,120,.25) 121deg,
-      transparent 121deg,transparent 150deg,
-      rgba(184,168,120,.25) 150deg,rgba(184,168,120,.25) 151deg,
-      transparent 151deg,transparent 180deg,
-      rgba(184,168,120,.25) 180deg,rgba(184,168,120,.25) 181deg,
-      transparent 181deg,transparent 210deg,
-      rgba(184,168,120,.25) 210deg,rgba(184,168,120,.25) 211deg,
-      transparent 211deg,transparent 240deg,
-      rgba(184,168,120,.25) 240deg,rgba(184,168,120,.25) 241deg,
-      transparent 241deg,transparent 270deg,
-      rgba(184,168,120,.25) 270deg,rgba(184,168,120,.25) 271deg,
-      transparent 271deg
-    );
-  -webkit-mask:radial-gradient(circle,transparent 32px,black 33px,black 36px,transparent 37px);
-          mask:radial-gradient(circle,transparent 32px,black 33px,black 36px,transparent 37px);
-  pointer-events:none;
-}
-.knob-cap{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--dim2);text-transform:uppercase}
-.knob-val{font-family:var(--vt);font-size:18px;color:var(--accent);letter-spacing:1px;line-height:1}
-
-/* Slider — vol per pad list */
-.padlist{display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto;-ms-overflow-style:none;scrollbar-width:none}
-.padlist::-webkit-scrollbar{display:none}
-.padlist-row{display:grid;grid-template-columns:48px 1fr 32px;gap:8px;align-items:center;font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--dim2);text-transform:uppercase}
-.padlist-row .vol{
-  height:4px;background:rgba(74,70,64,.4);position:relative;cursor:none;
-}
-.padlist-row .vol i{
-  position:absolute;left:0;top:0;bottom:0;
-  background:linear-gradient(90deg,rgba(184,168,120,.3),var(--accent));
-  box-shadow:0 0 6px rgba(184,168,120,.4);
-}
-.padlist-row .v{font-family:var(--vt);font-size:14px;color:var(--accent);text-align:right}
-
-/* Transport */
-.transport{display:flex;gap:6px}
-.tbtn{
-  flex:1;font-family:var(--mono);font-size:12px;letter-spacing:2px;
-  background:linear-gradient(180deg,#1a1814,#0c0b08);
-  border:1px solid var(--border-mid);color:var(--dim2);
-  padding:10px 8px;cursor:none;transition:all .15s;
-  display:flex;align-items:center;justify-content:center;gap:5px;
-}
-.tbtn:hover{color:var(--accent);border-color:var(--accent);background:linear-gradient(180deg,#2a2620,#16140f)}
-.tbtn.on{color:var(--hot);border-color:var(--hot);background:linear-gradient(180deg,rgba(232,224,192,.2),rgba(184,168,120,.05));text-shadow:0 0 6px rgba(232,224,192,.5)}
-.tbtn .ic{width:8px;height:8px;display:inline-block}
-.tbtn .ic.play{border-left:8px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent;width:0}
-.tbtn .ic.stop{background:currentColor}
-.tbtn .ic.rec{border-radius:50%;background:#cc3a3a;box-shadow:0 0 8px #cc3a3a}
-
-/* VU meter */
-.vu{display:flex;flex-direction:column;gap:4px;font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--dim2)}
-.vu-row{display:grid;grid-template-columns:24px 1fr;gap:6px;align-items:center}
-.vu-bar{display:flex;gap:1px;height:8px}
-.vu-bar i{flex:1;background:rgba(74,70,64,.35);transition:background .15s}
-.vu-bar i.lit{background:var(--accent);box-shadow:0 0 4px var(--accent)}
-.vu-bar i.peak{background:#cc3a3a;box-shadow:0 0 6px #cc3a3a}
-
-.pattern-row{display:flex;align-items:baseline;gap:6px}
-.pattern-row .px{color:#cfb87c;text-shadow:0 0 8px rgba(207,184,124,.5)}
-.artist-in{
-  background:none;border:none;outline:none;
-  font-family:var(--vt);font-size:16px;letter-spacing:1px;
-  color:#cfb87c;text-shadow:0 0 8px rgba(207,184,124,.5),0 0 2px rgba(207,184,124,.8);
-  border-bottom:1px dashed rgba(207,184,124,.35);
-  padding:1px 2px;width:140px;text-transform:uppercase;
-  caret-color:var(--hot);
-}
-.artist-in::placeholder{color:rgba(207,184,124,.35);text-shadow:none}
-.artist-in:focus{border-bottom-color:rgba(207,184,124,.7)}
-
-/* Arrangement view — a basic song-structure timeline under the grid.
-   Blocks cycle A / B / FILL / off on click; purely visual/planning for now,
-   same fidelity as the pad grid and sequencer until the real audio engine
-   lands. */
-.arr-wrap{padding:16px 22px;border-top:1px solid var(--dimmer);background:rgba(0,0,0,.3)}
-.arr-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
-.arr-title{font-family:var(--mono);font-size:9px;letter-spacing:4px;color:var(--dim2);text-transform:uppercase}
-.arr-hint{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--dim2);text-transform:uppercase}
-.arr-track{display:grid;grid-template-columns:repeat(16,1fr);gap:4px}
-.arr-block{
-  aspect-ratio:2/1;background:rgba(74,70,64,.12);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--dim2);
-  cursor:none;transition:all .1s;text-transform:uppercase;
-}
-.arr-block:hover{border-color:var(--accent)}
-.arr-block.a{background:linear-gradient(180deg,rgba(184,168,120,.35),rgba(184,168,120,.12));border-color:var(--accent);color:var(--hot)}
-.arr-block.b{background:linear-gradient(180deg,rgba(168,105,90,.3),rgba(168,105,90,.1));border-color:#a8695a;color:#d8a898}
-.arr-block.fill{background:linear-gradient(180deg,rgba(232,224,192,.4),rgba(184,168,120,.15));border-color:var(--hot);color:var(--hot);text-shadow:0 0 6px rgba(232,224,192,.5)}
-.arr-block.off{opacity:.35}
-
-/* Bottom checkout strip */
-.dev-bot{
-  display:grid;grid-template-columns:1fr auto auto;gap:0;align-items:stretch;
-  border-top:1px solid var(--dimmer);
-  background:linear-gradient(0deg,rgba(184,168,120,.04),transparent);
-  flex-shrink:0;
-}
-.bot-info{padding:14px 22px;display:flex;flex-direction:column;gap:4px;border-right:1px solid var(--dimmer)}
-.bot-eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:4px;color:var(--dim2);text-transform:uppercase}
-.bot-title{font-family:var(--vt);font-size:18px;color:var(--fg);letter-spacing:2px;line-height:1}
-.bot-sub{font-family:var(--mono);font-size:10px;color:var(--dim2);letter-spacing:2px;margin-top:2px}
-.bot-pwyw{
-  display:flex;align-items:center;gap:8px;padding:0 22px;
-  border-right:1px solid var(--dimmer);
-}
-.pwyw-lbl{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--dim2);text-transform:uppercase}
-.pwyw-input{
-  display:flex;align-items:baseline;border:1px solid var(--border-mid);
-  background:rgba(0,0,0,.5);padding:6px 10px;
-}
-.pwyw-input span{font-family:var(--vt);font-size:20px;color:var(--accent);letter-spacing:1px;margin-right:4px}
-.pwyw-input input{
-  background:none;border:none;outline:none;width:60px;
-  font-family:var(--vt);font-size:22px;color:var(--hot);
-  letter-spacing:1px;
-}
-.pwyw-presets{display:flex;gap:3px}
-.preset{
-  font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--dim2);
-  border:1px solid var(--dimmer);background:rgba(0,0,0,.4);
-  padding:4px 8px;cursor:none;transition:all .15s;
-}
-.preset:hover,.preset.on{color:var(--hot);border-color:var(--accent);background:rgba(184,168,120,.08)}
-.bot-checkout{
-  display:flex;align-items:center;gap:14px;padding:14px 26px;
-  font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--bg);
-  background:var(--fg);cursor:none;border:none;text-transform:uppercase;
-  transition:all .2s;
-}
-.bot-checkout:hover{background:var(--hot);box-shadow:0 0 24px rgba(232,224,192,.3)}
-.bot-checkout .stripe-mark{
-  font-family:var(--mono);font-size:9px;letter-spacing:1px;color:rgba(0,0,0,.5);
-  border-left:1px solid rgba(0,0,0,.2);padding-left:12px;
-}
-.bot-checkout .arr{font-family:var(--vt);font-size:18px;}
-
-/* Step playhead light strip in sequencer */
-.seq-playhead{
-  display:grid;grid-template-columns:90px repeat(16,1fr);gap:3px;
-  margin-top:4px;
-}
-.seq-ph-cell{
-  height:3px;background:rgba(74,70,64,.2);border-radius:0;
-}
-.seq-ph-cell.act{background:var(--hot);box-shadow:0 0 8px var(--hot)}
-
-@media(max-width:900px){
-  .dev-body{grid-template-columns:1fr}
-  .rail{border-top:1px solid var(--dimmer)}
-  .lcd{grid-template-columns:1fr 1fr}
-  .lcd-cell:nth-child(2){border-right:none}
-  .dev-bot{grid-template-columns:1fr;}
-  .bot-pwyw{border-right:none;border-top:1px solid var(--dimmer);padding:14px 22px}
-  .bot-info{border-right:none}
-  .bot-checkout{justify-content:center}
+.bl-cell.beat{border-color:rgba(184,168,120,.3)}
+.bl-cell:hover{border-color:var(--accent)}
+.bl-cell.on{background:rgba(184,168,120,.5);border-color:var(--accent);box-shadow:inset 0 0 6px rgba(232,224,192,.4)}
+.bl-cell.playing{border-color:var(--hot)}
+.bl-cell.on.playing{background:var(--hot);box-shadow:0 0 10px var(--hot)}
+@media(max-width:760px){
+  .bl-row{grid-template-columns:56px repeat(16,1fr);min-width:0}
+  .bl-row-label{font-size:8px}
 }
 
 /* ══════════════════════════════
@@ -1167,37 +813,6 @@ body{
   #sLab .lab-eyebrow{flex-direction:column;gap:1px;padding:8px 12px 3px}
   #sLab .lab-eyebrow h2{font-size:40px!important}
   #sLab .lab-eyebrow .lab-meta{text-align:left}
-  .lab-cs{inset:16px 6px 12px!important}
-  .lab-cs-inner{padding:6px 8px!important}
-  .lab-cs-title{font-size:44px!important;letter-spacing:2px!important}
-  .lab-cs-sub{font-size:10px!important}
-  .lab-cs-note{font-size:9px!important;text-align:center}
-
-  /* Beat Lab instrument panel: the 8-col pad grid and 16-step sequencer are
-     built for a wide desktop panel — on a narrow phone they'd shrink to
-     illegible/untappable slivers. Reflow the pad grid to 4 columns (still
-     all 64 pads, just taller) and let the sequencer keep comfortable
-     fixed-size cells with horizontal scroll instead of crushing 16 columns
-     into no space. */
-  #sLab .dev-wrap{padding:10px 6px 24px}
-  .dev-top{height:auto;flex-wrap:wrap}
-  .dev-brand{font-size:16px;padding:6px 10px;border-right:none}
-  .dev-mod{font-size:8px;letter-spacing:2px;padding:0 10px;border-right:none}
-  .dev-screws{display:none}
-  .dev-x{padding:6px 12px;font-size:10px;border-left:none;margin-left:auto}
-  .lcd-cell{padding:8px 10px}
-  .lcd-val{font-size:18px}
-  .dev-main{padding:12px 10px}
-  .pads{grid-template-columns:repeat(4,1fr);gap:4px}
-  .pad{padding:4px 5px}
-  .pad-name{font-size:8px}
-  .seq{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .seq-head,.seq-row{grid-template-columns:60px repeat(16,38px);min-width:668px;gap:2px}
-  .rail{padding:14px 12px}
-  .dev-bot{overflow-x:auto}
-  .arr-wrap{padding:12px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .arr-track{grid-template-columns:repeat(16,38px);min-width:632px;gap:3px}
-
   /* let content-tall scenes grow & scroll instead of clipping (full bio, etc.) */
   #scroll{scroll-snap-type:none!important}
   .scene{height:auto;min-height:0;overflow:visible;scroll-snap-align:none!important}
@@ -1500,21 +1115,12 @@ body{
         <h2>BEAT LAB</h2>
       </div>
       <div class="lab-meta">
-        64 PADS // 16 STEPS // 4 TRACKS<br>
-        STATUS: <span class="v">IN DEVELOPMENT</span> &nbsp;//&nbsp; PAYMENT: <span class="v">PWYW</span><br>
-        SAMPLES: <span class="v">3EAS ARCHIVE</span>
+        8 TRACKS // 16 STEPS<br>
+        STATUS: <span class="v">PHASE 1 — LIVE</span><br>
+        SOUND: <span class="v">PLACEHOLDER CLICK</span>
       </div>
     </div>
     <div class="dev-wrap" id="devWrap"></div>
-    <div class="lab-cs" aria-hidden="true">
-      <div class="lab-cs-inner">
-        <span class="lab-cs-tag">// SOURCE SIGNAL // STATUS</span>
-        <div class="lab-cs-title">CALIBRATING</div>
-        <div class="lab-cs-rule"></div>
-        <span class="lab-cs-sub">BEAT LAB · IN CALIBRATION</span>
-        <span class="lab-cs-note">SAMPLE PACK + INTERACTIVE LAB — SIGNAL PENDING</span>
-      </div>
-    </div>
     <div class="scene-counter">06 / 08</div>
   </section>
 
@@ -1595,129 +1201,6 @@ body{
   <button id="sp-mute" onclick="spToggle()" style="background:none;border:1px solid var(--dim);color:var(--dim);font-family:var(--mono);font-size:13px;letter-spacing:2px;padding:7px 14px;cursor:none;transition:all .15s;flex:0 0 auto">MUTE</button>
   </div>
 </div>
-
-<!-- BEAT LAB SCENE PLACEHOLDER -->
-<template id="labTemplate">
-  <div class="dev" role="region" aria-label="3EAS Source Signal Beat Lab">
-    <!-- Top chrome -->
-    <div class="dev-top">
-      <div class="dev-brand">3EAS</div>
-      <div class="dev-mod"><span class="pwr"></span>SOURCE SIGNAL // LAB v0.1</div>
-      <div class="dev-screws"><i></i><i></i><i></i></div>
-      <button class="dev-x" onclick="goScene(3)" title="Back to Acquisitions">BACK ←</button>
-    </div>
-
-    <!-- LCD strip -->
-    <div class="lcd">
-      <div class="lcd-cell">
-        <div class="lcd-lbl">PATTERN</div>
-        <div class="lcd-val sm pattern-row"><span class="px">3EAS x</span><input id="artistName" class="artist-in" type="text" placeholder="YOUR NAME" maxlength="18" oninput="updateArtist()" autocomplete="off"></div>
-      </div>
-      <div class="lcd-cell">
-        <div class="lcd-lbl">TEMPO</div>
-        <div class="lcd-val" id="lcdBpm">120<span class="un">BPM</span></div>
-      </div>
-      <div class="lcd-cell">
-        <div class="lcd-lbl">BAR // STEP</div>
-        <div class="lcd-val" id="lcdBar">01.<span id="lcdStep">07</span></div>
-      </div>
-      <div class="lcd-cell">
-        <div class="lcd-lbl">STATUS</div>
-        <div class="lcd-val sm" id="lcdStat">▶ PLAYING</div>
-      </div>
-    </div>
-
-    <!-- Body -->
-    <div class="dev-body">
-      <div class="dev-main">
-        <div class="tabs">
-          <button class="tab on" data-tab="pads" onclick="setTab('pads')">PADS</button>
-          <button class="tab" data-tab="seq" onclick="setTab('seq')">SEQUENCER</button>
-        </div>
-
-        <!-- 4x16 PAD GRID (4 channels x 16 samples = 64 pads) -->
-        <div class="pads" id="pads"></div>
-
-        <!-- 8x16 SEQUENCER -->
-        <div class="seq" id="seq">
-          <div class="seq-head" id="seqHead"></div>
-          <div id="seqRows"></div>
-          <div class="seq-playhead" id="seqPh"></div>
-        </div>
-      </div>
-
-      <!-- Side rail -->
-      <aside class="rail">
-        <div class="rail-section">
-          <div class="rail-title">// CONTROL</div>
-          <div class="knobs">
-            <div class="knob">
-              <div class="knob-dial t-bpm" id="bpmDial" title="Drag up/down to change tempo"><div class="knob-ticks"></div></div>
-              <div class="knob-cap">TEMPO</div>
-              <div class="knob-val" id="bpmVal">120</div>
-            </div>
-            <div class="knob">
-              <div class="knob-dial t-vol"><div class="knob-ticks"></div></div>
-              <div class="knob-cap">MASTER</div>
-              <div class="knob-val">078</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="rail-section">
-          <div class="rail-title">// PAD VOLUME</div>
-          <div class="padlist" id="padlist"></div>
-        </div>
-
-        <div class="rail-section">
-          <div class="rail-title">// TRANSPORT</div>
-          <div class="transport">
-            <button class="tbtn on"><span class="ic play"></span>PLAY</button>
-            <button class="tbtn"><span class="ic stop"></span>STOP</button>
-            <button class="tbtn"><span class="ic rec"></span>REC</button>
-          </div>
-        </div>
-
-        <div class="rail-section">
-          <div class="rail-title">// OUTPUT METER</div>
-          <div class="vu">
-            <div class="vu-row"><span>L</span><div class="vu-bar" id="vuL"></div></div>
-            <div class="vu-row"><span>R</span><div class="vu-bar" id="vuR"></div></div>
-          </div>
-        </div>
-      </aside>
-    </div>
-
-    <!-- Arrangement view -->
-    <div class="arr-wrap">
-      <div class="arr-head">
-        <span class="arr-title">// ARRANGEMENT</span>
-        <span class="arr-hint">CLICK A BLOCK TO CYCLE SECTION</span>
-      </div>
-      <div class="arr-track" id="arrTrack"></div>
-    </div>
-
-    <!-- Bottom checkout -->
-    <div class="dev-bot">
-      <div class="bot-info">
-        <span class="bot-eyebrow">// EXPORT YOUR FREQUENCY</span>
-        <div class="bot-title" id="botTitle">3EAS x — YOUR NAME</div>
-        <div class="bot-sub">.WAV STEMS + STEREO BOUNCE — 24bit 48kHz</div>
-      </div>
-      <div class="bot-pwyw">
-        <span class="pwyw-lbl">NAME<br>YOUR<br>PRICE</span>
-        <div class="pwyw-input"><span>$</span><input id="pwyw" type="text" value="5" inputmode="decimal"></div>
-        <div class="pwyw-presets">
-          <button class="preset" onclick="setPrice(0,this)">FREE</button>
-          <button class="preset on" onclick="setPrice(5,this)">$5</button>
-          <button class="preset" onclick="setPrice(15,this)">$15</button>
-          <button class="preset" onclick="setPrice(50,this)">$50</button>
-        </div>
-      </div>
-      <button class="bot-checkout">CHECKOUT <span class="arr">→</span><span class="stripe-mark">STRIPE</span></button>
-    </div>
-  </div>
-</template>
 
 <!-- TWEAKS -->
 <button id="tp-toggle" onclick="document.getElementById('tp').classList.toggle('vis')" title="System tweaks" style="position:fixed;bottom:38px;right:0;z-index:610;padding:8px 14px;border:1px solid var(--dimmer);border-right:none;background:rgba(0,0,0,.92);color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:3px;line-height:1;cursor:none;transition:all .15s;display:flex;align-items:center;gap:6px" onmouseover="this.style.color='var(--hot)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--accent)';this.style.borderColor='var(--dimmer)'">⚙ TWEAKS</button>
@@ -2448,7 +1931,7 @@ loadDispatch();
   const hgHOMO={A:'А',B:'В',C:'С',D:'Ꭰ',E:'Е',F:'Ϝ',G:'Ԍ',H:'Н',I:'І',J:'Ј',K:'К',L:'Ꮮ',M:'М',N:'Ν',O:'О',P:'Р',Q:'Ԛ',R:'Ꭱ',S:'Ѕ',T:'Т',U:'Ս',V:'Ѵ',W:'Ѡ',X:'Х',Y:'Υ',Z:'Ζ'};
   const hgSYMBOLS=['`','~','!','@','#','$','%','^','&','*','(',')','-','_','=','+','[',']','{','}','\\','|',';',':','\'','"',',','.','<','>','/','?'];
   const hgReduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const hgSelectors=['#s2 .scene-title','#s3 .scene-title','#s4 .scene-title','#s7 .scene-title','#sLab .lab-cs-title','#s5 .scene-title','#s6 .scene-title'];
+  const hgSelectors=['#s2 .scene-title','#s3 .scene-title','#s4 .scene-title','#s7 .scene-title','#s5 .scene-title','#s6 .scene-title'];
   const hgBusy=new WeakSet();
 
   function hgCorrupt(el){
@@ -5122,284 +4605,168 @@ function spToggle(){
   else dot.style.animation='blink 1.3s infinite';
 }
 
-/* ─── BEAT LAB ─── */
-const PAD_KIT=[
-  // Row A — drums (16)
-  {n:'KICK',s:'A.I.'},{n:'SNARE',s:'BASICK'},{n:'HAT C',s:'EXILED'},{n:'HAT O',s:'ICE'},
-  {n:'CLAP',s:'JMX'},{n:'RIM',s:'RTC'},{n:'PERC',s:'RIVER'},{n:'CYMBAL',s:'TRMLO'},
-  {n:'KICK 2',s:'MR.R'},{n:'SNR 2',s:'A.I.'},{n:'SHAKER',s:'BASICK'},{n:'TOM',s:'EXILED'},
-  {n:'808 HAT',s:'ICE'},{n:'BREAK',s:'JMX'},{n:'CRASH',s:'RTC'},{n:'STOMP',s:'RIVER'},
-  // Row B — bass (16)
-  {n:'SUB',s:'A.I.'},{n:'808',s:'BASICK'},{n:'PLUCK',s:'EXILED'},{n:'SYN BS',s:'ICE'},
-  {n:'UPRGHT',s:'JMX'},{n:'FM BS',s:'MR.R'},{n:'GROWL',s:'RIVER'},{n:'DUB BS',s:'TRMLO'},
-  {n:'REESE',s:'A.I.'},{n:'SQUARE',s:'BASICK'},{n:'808 2',s:'EXILED'},{n:'ACID BS',s:'ICE'},
-  {n:'SINE',s:'JMX'},{n:'WOBBLE',s:'MR.R'},{n:'SLAP BS',s:'RTC'},{n:'DRONE BS',s:'TRMLO'},
-  // Row C — synth (16)
-  {n:'LEAD',s:'A.I.'},{n:'PAD',s:'BASICK'},{n:'ARP',s:'EXILED'},{n:'KEYS',s:'ICE'},
-  {n:'ORGAN',s:'JMX'},{n:'BELL',s:'RTC'},{n:'STAB',s:'RIVER'},{n:'DRONE',s:'TRMLO'},
-  {n:'PLUCK SY',s:'MR.R'},{n:'CHOIR',s:'A.I.'},{n:'BRASS',s:'BASICK'},{n:'STRINGS',s:'EXILED'},
-  {n:'FM LEAD',s:'ICE'},{n:'RHODES',s:'JMX'},{n:'SWEEP',s:'RTC'},{n:'GLASS',s:'RIVER'},
-  // Row D — guitar (16)
-  {n:'CHORD',s:'JMX'},{n:'RIFF',s:'MR.R'},{n:'PICK',s:'A.I.'},{n:'SLIDE',s:'EXILED'},
-  {n:'MUTE',s:'RTC'},{n:'STRUM',s:'ICE'},{n:'FDBK',s:'BASICK'},{n:'ACSTC',s:'TRMLO'},
-  {n:'POWER CH',s:'JMX'},{n:'HARMNC',s:'MR.R'},{n:'BEND',s:'A.I.'},{n:'PALM MT',s:'EXILED'},
-  {n:'TREMOLO',s:'RTC'},{n:'12STR',s:'ICE'},{n:'FUZZ',s:'BASICK'},{n:'SOLO',s:'TRMLO'},
-];
-const ROW_LABELS=['DRUMS','BASS','SYNTH','GUITAR'];
-const PATTERN=[
-  [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,1,0], // drums
-  [1,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,0], // bass
-  [0,0,1,0, 0,0,0,0, 0,1,0,0, 0,0,0,0], // synth
-  [0,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,0,0], // guitar
-];
-const PAD_VOLS=[88,74,68,60];
+/* ─── BEAT LAB (Phase 1: sequencer core) ───
+   8 tracks x 16 steps. Timing uses the standard Web Audio lookahead
+   scheduler (schedule notes by absolute AudioContext time a little
+   ahead of "now", rather than trusting setInterval/setTimeout's own
+   timing) -- this is what keeps it drift-free under tab throttling,
+   GC pauses, etc. Placeholder synth click per active cell for now;
+   Phase 2 swaps this for real sample playback per track. */
+(function(){
+  const NUM_TRACKS=8, NUM_STEPS=16;
+  const pattern=Array.from({length:NUM_TRACKS},()=>Array(NUM_STEPS).fill(false));
 
-function buildPads(){
-  const root=document.getElementById('pads');
-  let h='';
-  PAD_KIT.forEach((p,i)=>{
-    const row=Math.floor(i/16);
-    const col=i%16;
-    const id=String.fromCharCode(65+row)+(col+1);
-    const armed=PATTERN[row]?.some(v=>v)?'armed':'';
-    h+=`<div class="pad ${armed}" data-i="${i}" data-row="${row}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <span class="pad-id">${id}</span>
-        <span class="pad-led"></span>
-      </div>
-      <div>
-        <div class="pad-name">${p.n}</div>
-        <div style="font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--dim2);text-transform:uppercase;margin-top:2px">${p.s}</div>
-      </div>
-    </div>`;
-  });
-  root.innerHTML=h;
-  root.querySelectorAll('.pad').forEach(p=>{
-    p.addEventListener('mousedown',()=>{
-      p.classList.add('hit');
-      setTimeout(()=>p.classList.remove('hit'),180);
-    });
-  });
-}
+  let audioCtx=null;
+  let isPlaying=false;
+  let currentStep=0;
+  let nextStepTime=0.0;
+  let bpm=120;
+  const LOOKAHEAD_MS=25;       // how often the scheduler wakes up to look for work
+  const SCHEDULE_AHEAD_S=0.1;  // how far past "now" it's allowed to schedule
+  let schedulerTimer=null;
+  let rafId=null;
+  let stepQueue=[];            // {step,time} pairs waiting for their turn to be drawn
+  let lastDrawnStep=-1;
 
-function buildSeq(){
-  const head=document.getElementById('seqHead');
-  let hh='<span></span>';
-  for(let i=0;i<16;i++){
-    const beat=(i%4===0);
-    hh+=`<span class="${beat?'beat':''}">${String(i+1).padStart(2,'0')}</span>`;
+  function ensureAudioCtx(){
+    if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==='suspended')audioCtx.resume();
   }
-  head.innerHTML=hh;
 
-  const rows=document.getElementById('seqRows');
-  let r='';
-  for(let row=0;row<PATTERN.length;row++){
-    r+=`<div class="seq-row" style="margin-bottom:3px">
-      <div class="seq-lbl">${ROW_LABELS[row]}<span class="ms"><i></i><i></i></span></div>`;
-    for(let s=0;s<16;s++){
-      const beat=(s%4===0)?'beat':'';
-      const on=PATTERN[row][s]?'on':'';
-      r+=`<div class="seq-cell ${beat} ${on}" data-row="${row}" data-step="${s}"></div>`;
+  // Placeholder hit sound -- a short synthesized click, no sample asset
+  // needed yet. Every trigger gets its own oscillator+gain node (Web
+  // Audio source nodes are one-shot by nature), so overlapping hits
+  // never cut each other off. That same one-node-per-hit shape carries
+  // straight into Phase 2's real sample playback.
+  function playClick(time){
+    const osc=audioCtx.createOscillator();
+    const gain=audioCtx.createGain();
+    osc.type='square';
+    osc.frequency.setValueAtTime(1100,time);
+    gain.gain.setValueAtTime(0.001,time);
+    gain.gain.exponentialRampToValueAtTime(0.35,time+0.002);
+    gain.gain.exponentialRampToValueAtTime(0.001,time+0.045);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(time);
+    osc.stop(time+0.05);
+  }
+
+  function scheduleStep(step,time){
+    for(let t=0;t<NUM_TRACKS;t++){
+      if(pattern[t][step])playClick(time);
     }
-    r+='</div>';
+    stepQueue.push({step,time});
   }
-  rows.innerHTML=r;
-  rows.querySelectorAll('.seq-cell').forEach(c=>{
-    c.addEventListener('click',()=>{
-      const row=+c.dataset.row,step=+c.dataset.step;
-      PATTERN[row][step]=PATTERN[row][step]?0:1;
-      c.classList.toggle('on');
-    });
-  });
 
-  // playhead strip
-  const ph=document.getElementById('seqPh');
-  let p='<div></div>';
-  for(let i=0;i<16;i++)p+=`<div class="seq-ph-cell" data-step="${i}"></div>`;
-  ph.innerHTML=p;
-}
-
-function buildPadList(){
-  const root=document.getElementById('padlist');
-  let h='';
-  ROW_LABELS.forEach((l,i)=>{
-    h+=`<div class="padlist-row">
-      <span>${l}</span>
-      <div class="vol"><i style="width:${PAD_VOLS[i]}%"></i></div>
-      <span class="v">${PAD_VOLS[i]}</span>
-    </div>`;
-  });
-  root.innerHTML=h;
-}
-
-// Arrangement view — a basic song-structure timeline under the grid. Each
-// block is a bar; click cycles it through A / B / FILL / off so a track's
-// shape can be roughly blocked out. Purely visual/planning for now, same
-// fidelity as the pad grid and sequencer until there's a real audio engine
-// to actually play the arrangement back.
-const ARR_STATES=['a','b','fill','off'];
-let ARR=[0,0,0,0,1,1,2,0,0,0,0,1,1,2,0,0];
-function buildArrangement(){
-  const root=document.getElementById('arrTrack');
-  if(!root)return;
-  let h='';
-  ARR.forEach((s,i)=>{
-    const st=ARR_STATES[s];
-    const label=st==='off'?'—':st==='fill'?'FILL':st.toUpperCase();
-    h+=`<div class="arr-block ${st}" data-i="${i}" title="Bar ${i+1} — click to change section">${label}</div>`;
-  });
-  root.innerHTML=h;
-  root.querySelectorAll('.arr-block').forEach(el=>{
-    el.addEventListener('click',()=>{
-      const i=+el.dataset.i;
-      ARR[i]=(ARR[i]+1)%ARR_STATES.length;
-      buildArrangement();
-    });
-  });
-}
-
-function buildMini(){
-  const root=document.getElementById('labMini');
-  if(!root)return;
-  let h='';
-  // Show 8x8 with subtle pattern of "lit" cells
-  const lit=new Set([0,2,7,9,11,14,17,19,22,26,28,31,33,36,40,44,48,53,57,60,62]);
-  const beat=new Set([18]);
-  for(let i=0;i<64;i++){
-    const cls=beat.has(i)?'beat':lit.has(i)?'lit':'';
-    h+=`<i class="${cls}"></i>`;
+  function advanceStep(){
+    const secondsPerStep=(60.0/bpm)/4; // 16 steps per bar = 16th notes
+    nextStepTime+=secondsPerStep;
+    currentStep=(currentStep+1)%NUM_STEPS;
   }
-  root.innerHTML=h;
-  // Animate beat cell traveling
-  let bp=18;
-  setInterval(()=>{
-    const cells=root.children;
-    if(!cells.length)return;
-    cells[bp]?.classList.remove('beat');
-    if(lit.has(bp))cells[bp]?.classList.add('lit');
-    bp=(bp+1)%64;
-    cells[bp]?.classList.add('beat');
-    cells[bp]?.classList.remove('lit');
-  },180);
-}
 
-let labStep=6,labOpen=false,labTimer=null;
-let LAB_BPM=120;
-const LAB_BPM_MIN=60,LAB_BPM_MAX=200;
-function setBpm(v){
-  LAB_BPM=Math.max(LAB_BPM_MIN,Math.min(LAB_BPM_MAX,Math.round(v)));
-  const lcd=document.getElementById('lcdBpm');
-  if(lcd)lcd.innerHTML=LAB_BPM+'<span class="un">BPM</span>';
-  const val=document.getElementById('bpmVal');
-  if(val)val.textContent=LAB_BPM;
-  const dial=document.getElementById('bpmDial');
-  if(dial){
-    // sweep the knob pointer across ~270° for the full 60-200 BPM range
-    const pct=(LAB_BPM-LAB_BPM_MIN)/(LAB_BPM_MAX-LAB_BPM_MIN);
-    dial.style.setProperty('--ang',(-135+pct*270)+'deg');
-  }
-  // tickLab's interval is a fixed-feel visual step clock, not real audio
-  // scheduling — scale it proportionally around the 120bpm/260ms baseline
-  // so the pad/sequencer animation actually speeds up or slows down with
-  // the knob instead of the knob just being a label.
-  if(labOpen){
-    clearInterval(labTimer);
-    labTimer=setInterval(tickLab,260*(120/LAB_BPM));
-  }
-}
-function setupTempoKnob(){
-  const dial=document.getElementById('bpmDial');
-  if(!dial)return;
-  let dragging=false,startY=0,startBpm=120;
-  const onMove=e=>{
-    if(!dragging)return;
-    const y=(e.touches?e.touches[0].clientY:e.clientY);
-    // drag up = faster, drag down = slower — 2px per BPM
-    setBpm(startBpm+(startY-y)/2);
-  };
-  const onUp=()=>{
-    dragging=false;
-    document.removeEventListener('mousemove',onMove);
-    document.removeEventListener('mouseup',onUp);
-    document.removeEventListener('touchmove',onMove);
-    document.removeEventListener('touchend',onUp);
-  };
-  const onDown=e=>{
-    dragging=true;
-    startY=(e.touches?e.touches[0].clientY:e.clientY);
-    startBpm=LAB_BPM;
-    document.addEventListener('mousemove',onMove);
-    document.addEventListener('mouseup',onUp);
-    document.addEventListener('touchmove',onMove,{passive:true});
-    document.addEventListener('touchend',onUp);
-    e.preventDefault();
-  };
-  dial.addEventListener('mousedown',onDown);
-  dial.addEventListener('touchstart',onDown,{passive:false});
-}
-function tickLab(){
-  if(!labOpen)return;
-  labStep=(labStep+1)%16;
-  // playhead
-  document.querySelectorAll('#seqPh .seq-ph-cell').forEach((c,i)=>c.classList.toggle('act',i===labStep));
-  // light columns in sequencer
-  document.querySelectorAll('#seqRows .seq-cell').forEach(c=>c.classList.remove('beat'));
-  document.querySelectorAll(`#seqRows .seq-cell[data-step="${labStep}"]`).forEach(c=>c.classList.add('beat'));
-  // strobe pads that are firing this step
-  document.querySelectorAll('.pad').forEach(p=>p.classList.remove('hit'));
-  PATTERN.forEach((row,ri)=>{
-    if(row[labStep]){
-      // strobe one random pad in that row
-      const off=ri*16+Math.floor(Math.random()*16);
-      const pad=document.querySelector(`.pad[data-i="${off}"]`);
-      pad?.classList.add('hit');
-      setTimeout(()=>pad?.classList.remove('hit'),120);
+  function scheduler(){
+    while(nextStepTime<audioCtx.currentTime+SCHEDULE_AHEAD_S){
+      scheduleStep(currentStep,nextStepTime);
+      advanceStep();
     }
-  });
-  // LCD step
-  const ls=document.getElementById('lcdStep');
-  if(ls)ls.textContent=String(labStep+1).padStart(2,'0');
-  // VU meter random
-  ['vuL','vuR'].forEach(id=>{
-    const v=document.getElementById(id);
-    if(!v)return;
-    if(!v.children.length)v.innerHTML=Array(20).fill('<i></i>').join('');
-    const lvl=Math.floor(Math.random()*16+4);
-    [...v.children].forEach((b,i)=>{
-      b.classList.toggle('lit',i<lvl);
-      b.classList.toggle('peak',i>=lvl-1&&i<lvl&&i>15);
+    schedulerTimer=setTimeout(scheduler,LOOKAHEAD_MS);
+  }
+
+  // Playhead redraw is decoupled from the audio scheduler on purpose --
+  // it just watches for scheduled steps whose time has arrived and
+  // paints them, via rAF, so UI jank can never feed back into audio
+  // timing.
+  function drawLoop(){
+    const now=audioCtx?audioCtx.currentTime:0;
+    let toDraw=lastDrawnStep;
+    while(stepQueue.length&&stepQueue[0].time<now){
+      toDraw=stepQueue.shift().step;
+    }
+    if(toDraw!==lastDrawnStep){
+      lastDrawnStep=toDraw;
+      paintPlayhead(lastDrawnStep);
+    }
+    rafId=requestAnimationFrame(drawLoop);
+  }
+
+  function paintPlayhead(step){
+    document.querySelectorAll('#blGrid .bl-cell').forEach(c=>{
+      c.classList.toggle('playing',+c.dataset.step===step);
     });
-  });
-}
+  }
+  function clearPlayhead(){
+    document.querySelectorAll('#blGrid .bl-cell.playing').forEach(c=>c.classList.remove('playing'));
+  }
 
-function setTab(t){
-  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
-  document.getElementById('pads').classList.toggle('hide',t!=='pads');
-  document.getElementById('seq').classList.toggle('show',t==='seq');
-}
+  function play(){
+    if(isPlaying)return;
+    ensureAudioCtx();
+    isPlaying=true;
+    currentStep=0;
+    stepQueue=[];
+    lastDrawnStep=-1;
+    nextStepTime=audioCtx.currentTime+0.05;
+    scheduler();
+    rafId=requestAnimationFrame(drawLoop);
+    document.getElementById('blPlay')?.classList.add('on');
+  }
+  function stop(){
+    isPlaying=false;
+    clearTimeout(schedulerTimer);
+    cancelAnimationFrame(rafId);
+    clearPlayhead();
+    document.getElementById('blPlay')?.classList.remove('on');
+  }
 
-function mountLab(){
-  const wrap=document.getElementById('devWrap');
-  const tpl=document.getElementById('labTemplate');
-  if(!wrap||!tpl||wrap.children.length)return;
-  wrap.appendChild(tpl.content.cloneNode(true));
-  buildPads();buildSeq();buildPadList();buildArrangement();
-  setupTempoKnob();
-  labOpen=true;
-  setBpm(LAB_BPM);
-}
-function openLab(){goScene(4)}
-function setPrice(v,btn){
-  document.querySelectorAll('.preset').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  document.getElementById('pwyw').value=v===0?'0':v;
-}
-function updateArtist(){
-  const v=document.getElementById('artistName').value.trim().toUpperCase();
-  const t=document.getElementById('botTitle');
-  if(t)t.textContent=v?`3EAS x ${v}`:'3EAS x — YOUR NAME';
-}
-mountLab();buildMini();
+  function buildGrid(){
+    const grid=document.getElementById('blGrid');
+    if(!grid)return;
+    let h='';
+    for(let t=0;t<NUM_TRACKS;t++){
+      h+=`<div class="bl-row"><div class="bl-row-label">TRACK ${t+1}</div>`;
+      for(let s=0;s<NUM_STEPS;s++){
+        h+=`<button class="bl-cell${s%4===0?' beat':''}" data-track="${t}" data-step="${s}" aria-pressed="false" aria-label="Track ${t+1}, step ${s+1}"></button>`;
+      }
+      h+='</div>';
+    }
+    grid.innerHTML=h;
+    grid.querySelectorAll('.bl-cell').forEach(cell=>{
+      cell.addEventListener('click',()=>{
+        const t=+cell.dataset.track,s=+cell.dataset.step;
+        pattern[t][s]=!pattern[t][s];
+        cell.classList.toggle('on',pattern[t][s]);
+        cell.setAttribute('aria-pressed',String(pattern[t][s]));
+      });
+    });
+  }
+
+  function initBeatLab(){
+    const wrap=document.getElementById('devWrap');
+    if(!wrap||wrap.dataset.mounted)return;
+    wrap.dataset.mounted='1';
+    wrap.innerHTML=`
+      <div class="bl">
+        <div class="bl-transport">
+          <button class="bl-btn bl-play" id="blPlay">▶ PLAY</button>
+          <button class="bl-btn bl-stop" id="blStop">■ STOP</button>
+          <div class="bl-bpm">
+            <label for="blBpmSlider">BPM</label>
+            <input type="range" id="blBpmSlider" min="60" max="200" value="120">
+            <span class="bl-bpm-val" id="blBpmVal">120</span>
+          </div>
+        </div>
+        <div class="bl-grid" id="blGrid"></div>
+      </div>`;
+    buildGrid();
+    document.getElementById('blPlay').addEventListener('click',play);
+    document.getElementById('blStop').addEventListener('click',stop);
+    document.getElementById('blBpmSlider').addEventListener('input',e=>{
+      bpm=+e.target.value;
+      document.getElementById('blBpmVal').textContent=bpm;
+    });
+  }
+  initBeatLab();
+})();
 
 /* ─── TWEAKS ─── */
 const TWEAK_DEFAULTS=/*EDITMODE-BEGIN*/{
