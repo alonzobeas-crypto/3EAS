@@ -1167,6 +1167,14 @@ body{
         <div class="ac-foot"><div class="ac-price">INTAKE</div><button class="ac-btn" onclick="requestCommission()" style="color:var(--accent);border-color:rgba(184,168,120,.3)">REQUEST →</button></div>
         <div class="ac-stat">— CHANNEL OPEN</div>
       </div>
+      <div class="ac" style="grid-column:1/-1">
+        <div class="ac-idx">05</div>
+        <div class="ac-cat">SERVICES // FULL SPECTRUM</div>
+        <div class="ac-name">ALL CHANNELS</div>
+        <div class="ac-desc">Web design & prompt curation.<br>Mixing, recording &amp; production for bands and artists. Lyric writing.<br>Multi-instrumentalist session player. Merch design, set decoration, live sound, live DJ.</div>
+        <div class="ac-foot"><div class="ac-price">INTAKE</div><button class="ac-btn" onclick="requestCommission('SERVICES REQUEST — (web design / prompt curation / mixing &amp; recording / production / lyrics / session player / merch design / set decoration / live sound / live DJ): ')" style="color:var(--accent);border-color:rgba(184,168,120,.3)">REQUEST →</button></div>
+        <div class="ac-stat">— CHANNEL OPEN</div>
+      </div>
     </div>
     <div class="scene-counter">04 / 08</div>
   </section>
@@ -1873,7 +1881,7 @@ renderTL();drawWavePl();
 
 /* ─── INTERACTIONS ─── */
 function nfy(b){if(b.classList.contains('done'))return;b.classList.add('done');b.textContent='NOTIFIED ✓'}
-function requestCommission(){
+function requestCommission(line){
   goScene(7);
   setTimeout(()=>{
     // The contact form was redesigned into click-to-reveal-email at some
@@ -1882,7 +1890,7 @@ function requestCommission(){
     // copy the commission-request line to the clipboard instead.
     const el=document.getElementById('emailReveal');
     if(el&&el.onclick)revealEmail(el);
-    const line='COMMISSION REQUEST — (beats / production / guitar / ableton): ';
+    line=line||'COMMISSION REQUEST — (beats / production / guitar / ableton): ';
     if(navigator.clipboard&&navigator.clipboard.writeText){
       navigator.clipboard.writeText(line).then(()=>{
         const wrap=document.getElementById('emailReveal');
@@ -2936,7 +2944,7 @@ var glitchTranslate, glitchCorrupt;
     'MUFON LOGGED THOUSANDS OF UAP REPORTS IN 2026 ALONE.',
     'RUSSIA-UKRAINE WAR: OVER 2 MILLION CASUALTIES SINCE 2022.',
     'SUDAN CIVIL WAR: 400,000+ KILLED, 14 MILLION DISPLACED SINCE 2023.',
-    'GAZA CONFLICT: 75,000+ KILLED SINCE OCTOBER 2023.',
+    'GAZA CONFLICT: 73,000+ KILLED SINCE OCTOBER 2023.',
     'AROUND 56 ACTIVE ARMED CONFLICTS ARE HAPPENING RIGHT NOW, WORLDWIDE.',
     'PHILIPPINE VICE PRESIDENT SARA DUTERTE ARRESTED, CHARGED WITH THREATENING TO ASSASSINATE THE PRESIDENT.',
     'ANTARCTICA: HUNDREDS OF PREVIOUSLY UNDETECTED SEISMIC EVENTS FOUND BENEATH THE THWAITES GLACIER.',
@@ -4244,10 +4252,10 @@ var glitchTranslate, glitchCorrupt;
 })();
 
 // US National Debt live estimate — seeded from U.S. Treasury Fiscal Data
-// (Debt to the Penny: $39.84T as of Jul 30, 2026), extrapolated at the
+// (Debt to the Penny: $40.114T as of Sep 15, 2026), extrapolated at the
 // trailing-30-day average pace of ~$12.6B/day. Not an exact real-time feed.
 (function(){
-  const BASE=39.84e12, BASE_TIME=new Date('2026-07-30T00:00:00Z').getTime();
+  const BASE=40.114445691166e12, BASE_TIME=new Date('2026-09-15T00:00:00Z').getTime();
   const PER_MS=12.6e9/86400000;
   function tick(){
     const val=BASE+(Date.now()-BASE_TIME)*PER_MS;
