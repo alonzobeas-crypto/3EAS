@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SELEXIONES</title>
+<meta name="description" content="SELEXIONES — señal pirata. Underground Latin/LA radio & DJ platform. Dos canales, una frecuencia.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SELEXIONES">
+<meta property="og:title" content="SELEXIONES — SEÑAL PIRATA">
+<meta property="og:description" content="Underground Latin/LA radio & DJ platform broadcasting on two channels: UNO / DOS.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:        #0a0806;
+  --bg2:       #12100c;
+  --fg:        #e8e2d4;
+  --dim:       #7a7264;
+  --dim2:      #4a453c;
+  --line:      rgba(232,226,212,0.12);
+  --uno:       #3fd6e0;   /* channel UNO — cyan / neon */
+  --uno-dim:   rgba(63,214,224,0.35);
+  --dos:       #e0407e;   /* channel DOS — magenta / neon */
+  --dos-dim:   rgba(224,64,126,0.35);
+  --gold:      #c9a24a;
+  --display:   'Oswald', sans-serif;
+  --mono:      'Space Mono', monospace;
+  --accent:    var(--uno);
+  --accent-dim:var(--uno-dim);
+}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);color:var(--fg);
+  font-family:var(--mono);
+  min-height:100vh;min-height:100dvh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  position:relative;
+}
+body[data-ch="DOS"]{--accent:var(--dos);--accent-dim:var(--dos-dim)}
+
+/* ── grain / scanline atmosphere ── */
+.grain{position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.scan{position:fixed;inset:0;pointer-events:none;z-index:51;opacity:.06;
+  background:repeating-linear-gradient(0deg,#000 0 1px,transparent 1px 3px);
+}
+.vignette{position:fixed;inset:0;pointer-events:none;z-index:49;
+  background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.65) 100%);
+}
+
+/* ── layout shell ── */
+.wrap{max-width:920px;margin:0 auto;padding:0 20px 80px}
+header.top{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:22px 20px;border-bottom:1px solid var(--line);
+  position:sticky;top:0;background:rgba(10,8,6,.86);backdrop-filter:blur(6px);z-index:20;
+}
+.wordmark{
+  font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:6px;
+  color:var(--fg);text-decoration:none;
+}
+.wordmark span{color:var(--accent);transition:color .25s}
+.nodes{font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase}
+.nodes a{color:var(--dim);text-decoration:none;border-bottom:1px dotted var(--dim2)}
+.nodes a:hover{color:var(--accent)}
+
+/* ── hero ── */
+.hero{padding:56px 20px 40px;text-align:center;position:relative}
+.hero .eyebrow{
+  font-size:11px;letter-spacing:5px;color:var(--dim);text-transform:uppercase;margin-bottom:18px;
+}
+.hero h1{
+  font-family:var(--display);font-weight:700;font-size:clamp(42px,10vw,88px);
+  letter-spacing:4px;line-height:.95;color:var(--fg);
+  text-shadow:0 0 24px var(--accent-dim);transition:text-shadow .3s;
+}
+.hero .tagline{
+  margin-top:16px;font-size:13px;letter-spacing:1.5px;color:var(--dim);
+  max-width:520px;margin-left:auto;margin-right:auto;line-height:1.7;
+}
+.hero .tagline em{color:var(--fg);font-style:normal;border-bottom:1px solid var(--dim2)}
+
+/* ── channel switch ── */
+.chswitch{
+  display:flex;justify-content:center;gap:0;margin:36px auto 0;max-width:360px;
+  border:1px solid var(--line);
+}
+.chbtn{
+  flex:1;padding:14px 10px;background:none;border:none;cursor:pointer;
+  font-family:var(--mono);font-size:13px;letter-spacing:3px;color:var(--dim);
+  transition:all .2s;position:relative;
+}
+.chbtn:first-child{border-right:1px solid var(--line)}
+.chbtn small{display:block;font-size:9px;letter-spacing:2px;margin-top:4px;opacity:.7}
+.chbtn.active{color:var(--fg);background:rgba(255,255,255,.03)}
+.chbtn.active::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--accent);
+  box-shadow:0 0 10px var(--accent);
+}
+.chbtn .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:8px;background:var(--dim2)}
+.chbtn[data-ch="UNO"].active .dot{background:var(--uno);box-shadow:0 0 8px var(--uno)}
+.chbtn[data-ch="DOS"].active .dot{background:var(--dos);box-shadow:0 0 8px var(--dos)}
+
+/* ── player module ── */
+.player{
+  margin:32px auto 0;max-width:560px;border:1px solid var(--line);background:var(--bg2);
+  padding:28px 24px;
+}
+.player .status-row{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:18px;
+}
+.status-row .live{color:var(--dim2)}
+.status-row .live.on{color:var(--accent);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.bars{display:inline-flex;align-items:flex-end;gap:2px;height:12px;margin-right:8px;vertical-align:middle}
+.bars i{width:2px;background:var(--dim2);display:block;height:3px;transition:background .2s}
+.bars.on i{background:var(--accent);animation:barjump .9s ease-in-out infinite}
+.bars i:nth-child(1){animation-delay:0s}
+.bars i:nth-child(2){animation-delay:.15s}
+.bars i:nth-child(3){animation-delay:.3s}
+.bars i:nth-child(4){animation-delay:.1s}
+@keyframes barjump{0%,100%{height:3px}50%{height:12px}}
+
+.nowplaying{margin-bottom:22px}
+.nowplaying .label{font-size:10px;letter-spacing:3px;color:var(--dim);text-transform:uppercase}
+.nowplaying .title{
+  font-family:var(--display);font-weight:600;font-size:22px;letter-spacing:.5px;
+  color:var(--fg);margin-top:6px;min-height:28px;
+}
+.nowplaying .sub{font-size:12px;color:var(--dim);margin-top:4px;letter-spacing:.5px}
+
+.controls{display:flex;align-items:center;gap:14px}
+.playbtn{
+  width:56px;height:56px;border-radius:50%;border:1px solid var(--accent);background:none;
+  color:var(--accent);font-size:18px;cursor:pointer;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;
+}
+.playbtn:hover{background:var(--accent);color:var(--bg)}
+.vol{flex:1;display:flex;align-items:center;gap:10px}
+.vol input[type=range]{flex:1;accent-color:var(--accent)}
+.vol span{font-size:10px;color:var(--dim);letter-spacing:1px;width:34px}
+
+.offair-msg{
+  margin-top:16px;padding:10px 12px;border:1px dashed var(--dim2);font-size:11px;
+  color:var(--dim);letter-spacing:.5px;line-height:1.6;display:none;
+}
+.offair-msg.show{display:block}
+
+/* ── schedule ── */
+.section{margin-top:56px}
+.section h2{
+  font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:4px;
+  color:var(--fg);text-transform:uppercase;padding-bottom:10px;border-bottom:1px solid var(--line);
+  margin-bottom:18px;
+}
+.section h2 .tag{color:var(--accent);margin-right:10px}
+.sched-row{
+  display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);
+  font-size:13px;
+}
+.sched-row .day{color:var(--dim);letter-spacing:2px;font-size:10px;text-transform:uppercase;flex:0 0 90px}
+.sched-row .show{flex:1;color:var(--fg)}
+.sched-row .show small{display:block;color:var(--dim);font-size:11px;margin-top:2px}
+.sched-row .time{color:var(--accent);font-size:11px;letter-spacing:1px;white-space:nowrap}
+
+/* ── djs ── */
+.djgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--line)}
+.djcard{background:var(--bg);padding:18px}
+.djcard .name{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:1px}
+.djcard .role{font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+.djcard .bio{font-size:11px;color:var(--dim);margin-top:8px;line-height:1.6}
+
+/* ── log / archive teaser ── */
+.log{display:flex;flex-direction:column;gap:10px}
+.log a{
+  display:flex;justify-content:space-between;gap:10px;text-decoration:none;color:var(--fg);
+  padding:12px 0;border-bottom:1px solid var(--line);font-size:13px;transition:color .15s;
+}
+.log a:hover{color:var(--accent)}
+.log .larr{color:var(--dim)}
+.log a:hover .larr{color:var(--accent)}
+
+/* ── footer ── */
+footer{margin-top:70px;padding:30px 20px;border-top:1px solid var(--line);text-align:center}
+.socials{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin-bottom:16px}
+.socials a{font-size:11px;letter-spacing:2px;color:var(--dim);text-decoration:none;text-transform:uppercase}
+.socials a:hover{color:var(--accent)}
+footer .fine{font-size:10px;color:var(--dim2);letter-spacing:1px}
+
+@media(max-width:520px){
+  header.top{flex-wrap:wrap;gap:8px 0;row-gap:6px}
+  .nodes{font-size:9px}
+  .hero{padding:44px 16px 30px}
+  .player{padding:22px 16px}
+  .status-row{flex-wrap:wrap;gap:6px}
+  .sched-row{flex-wrap:wrap}
+  .sched-row .day{flex:0 0 100%}
+}
+</style>
+</head>
+<body data-ch="UNO">
+<div class="grain"></div>
+<div class="scan"></div>
+<div class="vignette"></div>
+
+<header class="top">
+  <a href="#" class="wordmark">SELE<span>XI</span>ONES</a>
+  <div class="nodes">CONNECTED: <a href="https://3eascortex.com" target="_blank" rel="noopener">3EAS</a> // <a href="https://www.onnoticemusic.com/" target="_blank" rel="noopener">ON/NOTICE</a></div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow">SEÑAL PIRATA · UNDERGROUND LA BROADCAST</div>
+    <h1>SELEXIONES</h1>
+    <p class="tagline">Dos canales, una frecuencia. Latin &amp; LA-rooted underground radio — <em>selección tras selección</em>, no algorithm, no filler.</p>
+
+    <div class="chswitch" role="tablist" aria-label="Channel">
+      <button class="chbtn active" data-ch="UNO" onclick="setChannel('UNO')"><span class="dot"></span>UNO<small>ROOTS / SELECTA</small></button>
+      <button class="chbtn" data-ch="DOS" onclick="setChannel('DOS')"><span class="dot"></span>DOS<small>CLUB / EXPERIMENTAL</small></button>
+    </div>
+
+    <div class="player">
+      <div class="status-row">
+        <span><span class="bars" id="bars"><i></i><i></i><i></i><i></i></span><span class="live" id="liveTxt">OFF AIR</span></span>
+        <span id="chLabel">CHANNEL UNO</span>
+      </div>
+      <div class="nowplaying">
+        <div class="label">Transmitting Now</div>
+        <div class="title" id="npTitle">—</div>
+        <div class="sub" id="npSub">—</div>
+      </div>
+      <div class="controls">
+        <button class="playbtn" id="playBtn" onclick="togglePlay()" aria-label="Play">▶</button>
+        <div class="vol">
+          <span>VOL</span>
+          <input type="range" id="volSlider" min="0" max="100" value="80" oninput="setVolume(this.value)">
+        </div>
+      </div>
+      <div class="offair-msg" id="offairMsg">Stream not connected yet — this channel is running on placeholder config. Drop the live stream URL into CONFIG.channels.UNO/DOS.streamUrl in this file to go live.</div>
+    </div>
+  </section>
+
+  <section class="section" id="scheduleSection">
+    <h2><span class="tag">//</span>PROGRAMACIÓN</h2>
+    <div id="scheduleList"></div>
+  </section>
+
+  <section class="section">
+    <h2><span class="tag">//</span>SELECTORS</h2>
+    <div class="djgrid" id="djGrid"></div>
+  </section>
+
+  <section class="section">
+    <h2><span class="tag">//</span>TRANSMISSION LOG</h2>
+    <div class="log">
+      <a href="https://www.mixcloud.com/SELEXIONES/" target="_blank" rel="noopener">MIXCLOUD ARCHIVE <span class="larr">→</span></a>
+      <a href="https://selexiones.com" target="_blank" rel="noopener">SELEXIONES.COM <span class="larr">→</span></a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="socials">
+    <a href="https://www.mixcloud.com/SELEXIONES/" target="_blank" rel="noopener">Mixcloud</a>
+    <a href="#" target="_blank" rel="noopener">Instagram</a>
+    <a href="#" target="_blank" rel="noopener">Booking</a>
+  </div>
+  <div class="fine">LOS ANGELES · TRANSMITTING ON TWO FREQUENCIES</div>
+</footer>
+
+<script>
+/* ──────────────────────────────────────────────────────────────
+   CONFIG — single source of truth. Swap placeholders for real
+   stream URLs / schedule / roster and the UI updates itself.
+   ────────────────────────────────────────────────────────────── */
+const CONFIG = {
+  channels: {
+    UNO: {
+      label: 'CHANNEL UNO — ROOTS / SELECTA',
+      streamUrl: '', // e.g. 'https://stream.selexiones.com/uno' — empty = off air
+      nowPlaying: { title: 'SEÑAL EN ESPERA', sub: 'Cumbia, salsa dura, boogaloo, LA oldies' },
+      schedule: [
+        { day: 'LUN',  show: 'BARRIO FRECUENCIA', host: 'w/ Selector TBD', time: '19:00–21:00' },
+        { day: 'MIÉ',  show: 'RAÍCES SESSIONS',    host: 'w/ Selector TBD', time: '20:00–22:00' },
+        { day: 'SÁB',  show: 'SATURDAY SELECTA',   host: 'w/ Selector TBD', time: '14:00–17:00' },
+      ],
+    },
+    DOS: {
+      label: 'CHANNEL DOS — CLUB / EXPERIMENTAL',
+      streamUrl: '', // e.g. 'https://stream.selexiones.com/dos' — empty = off air
+      nowPlaying: { title: 'SEÑAL EN ESPERA', sub: 'Reggaeton perreo, guaracha, baile, club edits' },
+      schedule: [
+        { day: 'MAR',  show: 'MIDNIGHT PERREO',    host: 'w/ Selector TBD', time: '22:00–00:00' },
+        { day: 'VIE',  show: 'FRIDAY FRECUENCIA',  host: 'w/ Selector TBD', time: '21:00–00:00' },
+        { day: 'DOM',  show: 'DOMINGO DOWNTEMPO',  host: 'w/ Selector TBD', time: '18:00–20:00' },
+      ],
+    },
+  },
+  djs: [
+    { name: 'SELECTOR ONE', role: 'Founder / Selecta', bio: 'Placeholder bio — swap in roster.' },
+    { name: 'SELECTOR TWO', role: 'Resident', bio: 'Placeholder bio — swap in roster.' },
+    { name: 'SELECTOR THREE', role: 'Guest Rotation', bio: 'Placeholder bio — swap in roster.' },
+  ],
+};
+
+let currentCh = 'UNO';
+const audio = new Audio();
+audio.preload = 'none';
+let playing = false;
+
+function renderChannel(ch){
+  const c = CONFIG.channels[ch];
+  document.getElementById('chLabel').textContent = c.label;
+  document.getElementById('npTitle').textContent = c.nowPlaying.title;
+  document.getElementById('npSub').textContent = c.nowPlaying.sub;
+
+  const schedWrap = document.getElementById('scheduleList');
+  schedWrap.innerHTML = c.schedule.map(s => `
+    <div class="sched-row">
+      <div class="day">${s.day}</div>
+      <div class="show">${s.show}<small>${s.host}</small></div>
+      <div class="time">${s.time}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('offairMsg').classList.toggle('show', !c.streamUrl);
+}
+
+function renderDJs(){
+  document.getElementById('djGrid').innerHTML = CONFIG.djs.map(d => `
+    <div class="djcard">
+      <div class="name">${d.name}</div>
+      <div class="role">${d.role}</div>
+      <div class="bio">${d.bio}</div>
+    </div>
+  `).join('');
+}
+
+function setChannel(ch){
+  if(ch === currentCh) return;
+  currentCh = ch;
+  document.body.dataset.ch = ch;
+  document.querySelectorAll('.chbtn').forEach(b => b.classList.toggle('active', b.dataset.ch === ch));
+  renderChannel(ch);
+
+  const c = CONFIG.channels[ch];
+  if(playing){
+    if(c.streamUrl){
+      audio.src = c.streamUrl;
+      audio.play().catch(onPlayError);
+    } else {
+      stopAudio();
+    }
+  }
+}
+
+function togglePlay(){
+  const c = CONFIG.channels[currentCh];
+  if(!c.streamUrl){
+    document.getElementById('offairMsg').classList.add('show');
+    return;
+  }
+  if(playing){
+    stopAudio();
+  } else {
+    if(audio.src !== c.streamUrl) audio.src = c.streamUrl;
+    audio.play().then(onPlayStart).catch(onPlayError);
+  }
+}
+
+function onPlayStart(){
+  playing = true;
+  document.getElementById('playBtn').textContent = '■';
+  document.getElementById('liveTxt').textContent = 'ON AIR';
+  document.getElementById('liveTxt').classList.add('on');
+  document.getElementById('bars').classList.add('on');
+}
+
+function stopAudio(){
+  audio.pause();
+  playing = false;
+  document.getElementById('playBtn').textContent = '▶';
+  document.getElementById('liveTxt').textContent = 'OFF AIR';
+  document.getElementById('liveTxt').classList.remove('on');
+  document.getElementById('bars').classList.remove('on');
+}
+
+function onPlayError(){
+  stopAudio();
+  document.getElementById('offairMsg').classList.add('show');
+}
+
+function setVolume(v){
+  audio.volume = v / 100;
+}
+
+audio.addEventListener('stalled', onPlayError);
+audio.addEventListener('error', onPlayError);
+
+renderChannel(currentCh);
+renderDJs();
+setVolume(document.getElementById('volSlider').value);
+</script>
+</body>
+</html>
