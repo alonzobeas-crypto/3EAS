@@ -256,12 +256,12 @@ footer .fine{margin-top:8px;font-size:9px;color:var(--dim);letter-spacing:.5px}
 const CONFIG = {
   channels: {
     UNO: {
-      streamUrl: '', // e.g. 'https://stream.selexiones.com/uno' — empty = off air
-      track: 'MEXDUB / EL LICENCIADO – NIÑO PERDIDO EXT V6?',
+      streamUrl: 'https://stream.selexiones.com/listen/uno/radio.mp3',
+      nowPlayingUrl: 'https://stream.selexiones.com/api/nowplaying/uno',
     },
     DOS: {
-      streamUrl: '', // e.g. 'https://stream.selexiones.com/dos' — empty = off air
-      track: 'HOLY GHOST! – WAIT AND SEE',
+      streamUrl: 'https://stream.selexiones.com/listen/dos/radio.mp3',
+      nowPlayingUrl: 'https://stream.selexiones.com/api/nowplaying/dos',
     },
   },
   bio: 'SELEXIONES is Latin & LA-rooted underground radio — two channels, one frequency. UNO carries the roots: cumbia, salsa dura, boogaloo, the barrio archive. DOS carries the club: reggaeton perreo, guaracha, baile, the sound of right now. No algorithm. No filler. Selección tras selección.',
@@ -269,9 +269,10 @@ const CONFIG = {
     donate: 'https://ko-fi.com/selexiones',
     mixcloud: 'https://www.mixcloud.com/SELEXIONES/',
   },
+  nowPlayingPollMs: 17000, // matches selexiones.com's own polling cadence
 };
 
-const OFFAIR_MSG = 'Live stream not connected yet — tap play to listen on Mixcloud for now.';
+const OFFAIR_MSG = 'Signal temporarily unavailable — <a href="' + CONFIG.links.mixcloud + '" target="_blank" rel="noopener">listen to the archive on Mixcloud →</a>';
 
 const PLAY_ICON = '<svg width="16" height="16" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>';
 const PAUSE_ICON = '<svg width="16" height="16" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" fill="currentColor"/><rect x="14" y="5" width="4" height="14" fill="currentColor"/></svg>';
@@ -283,12 +284,12 @@ const players = {
 Object.values(players).forEach(p => { p.audio.preload = 'none'; });
 
 function renderStatic(){
-  document.getElementById('trackUno').textContent = CONFIG.channels.UNO.track;
-  document.getElementById('trackDos').textContent = CONFIG.channels.DOS.track;
+  document.getElementById('trackUno').textContent = 'CONNECTING…';
+  document.getElementById('trackDos').textContent = 'CONNECTING…';
   document.getElementById('playUno').innerHTML = PLAY_ICON;
   document.getElementById('playDos').innerHTML = PLAY_ICON;
-  document.getElementById('offairUno').textContent = OFFAIR_MSG;
-  document.getElementById('offairDos').textContent = OFFAIR_MSG;
+  document.getElementById('offairUno').innerHTML = OFFAIR_MSG;
+  document.getElementById('offairDos').innerHTML = OFFAIR_MSG;
   document.getElementById('offairUno').classList.toggle('show', !CONFIG.channels.UNO.streamUrl);
   document.getElementById('offairDos').classList.toggle('show', !CONFIG.channels.DOS.streamUrl);
 
@@ -309,7 +310,6 @@ function togglePlay(ch){
   const p = players[ch];
   if(!c.streamUrl){
     document.getElementById('offair' + cap(ch)).classList.add('show');
-    window.open(CONFIG.links.mixcloud, '_blank', 'noopener');
     return;
   }
   if(p.playing){
@@ -350,6 +350,25 @@ function cap(ch){ return ch.charAt(0) + ch.slice(1).toLowerCase(); }
   players[ch].audio.addEventListener('error', () => onPlayError(ch));
 });
 
+async function fetchNowPlaying(ch){
+  const url = CONFIG.channels[ch].nowPlayingUrl;
+  if(!url) return;
+  try{
+    const res = await fetch(url, { cache: 'no-store' });
+    if(!res.ok) throw new Error('bad response');
+    const data = await res.json();
+    const song = data && data.now_playing && data.now_playing.song;
+    if(song && song.text) document.getElementById('track' + cap(ch)).textContent = song.text.toUpperCase();
+  }catch(e){
+    // leave the last-known title in place — a missed poll isn't worth alarming over
+  }
+}
+
+function pollNowPlaying(){
+  fetchNowPlaying('UNO');
+  fetchNowPlaying('DOS');
+}
+
 function buildStars(){
   const wrap = document.getElementById('stars');
   const colors = ['#ffffff', '#ffd6ec', '#d9c6ff'];
@@ -369,6 +388,8 @@ function buildStars(){
 
 renderStatic();
 buildStars();
+pollNowPlaying();
+setInterval(pollNowPlaying, CONFIG.nowPlayingPollMs);
 </script>
 </body>
 </html>
