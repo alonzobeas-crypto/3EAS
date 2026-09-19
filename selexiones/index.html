@@ -265,10 +265,11 @@ const CONFIG = {
   bio: 'SELEXIONES is Latin & LA-rooted underground radio — two channels, one frequency. UNO carries the roots: cumbia, salsa dura, boogaloo, the barrio archive. DOS carries the club: reggaeton perreo, guaracha, baile, the sound of right now. No algorithm. No filler. Selección tras selección.',
   links: {
     donate: 'https://ko-fi.com/selexiones',
+    mixcloud: 'https://www.mixcloud.com/SELEXIONES/',
   },
 };
 
-const OFFAIR_MSG = 'Stream not connected yet — placeholder config. Drop the live stream URL into CONFIG to go live.';
+const OFFAIR_MSG = 'Live stream not connected yet — tap play to listen on Mixcloud for now.';
 
 const PLAY_ICON = '<svg width="16" height="16" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>';
 const PAUSE_ICON = '<svg width="16" height="16" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" fill="currentColor"/><rect x="14" y="5" width="4" height="14" fill="currentColor"/></svg>';
@@ -306,6 +307,7 @@ function togglePlay(ch){
   const p = players[ch];
   if(!c.streamUrl){
     document.getElementById('offair' + cap(ch)).classList.add('show');
+    window.open(CONFIG.links.mixcloud, '_blank', 'noopener');
     return;
   }
   if(p.playing){
