@@ -305,6 +305,18 @@ function renderStatic(){
   }
 }
 
+// Inside the native app shell (Capacitor), playback is handed off to a real
+// native player (AVPlayer / MediaPlayer) via the RadioPlayer plugin — that's
+// what makes the stream survive backgrounding and shows lock-screen controls,
+// which a WebView <audio> element cannot do. In a plain browser tab,
+// window.Capacitor is undefined and everything falls back to HTML5 Audio.
+function nativePlugin(){
+  return window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()
+    ? window.Capacitor.Plugins.RadioPlayer
+    : null;
+}
+let nativeActiveCh = null;
+
 function togglePlay(ch){
   const c = CONFIG.channels[ch];
   const p = players[ch];
@@ -312,6 +324,26 @@ function togglePlay(ch){
     document.getElementById('offair' + cap(ch)).classList.add('show');
     return;
   }
+
+  const plugin = nativePlugin();
+  if(plugin){
+    if(nativeActiveCh === ch && p.playing){
+      // Pause only — keep the native session alive so resuming is instant
+      // and the lock-screen controls don't disappear mid-pause.
+      plugin.pause();
+      markPaused(ch);
+      return;
+    }
+    if(nativeActiveCh && nativeActiveCh !== ch) stopAudio(nativeActiveCh);
+    nativeActiveCh = ch;
+    plugin.play({
+      url: c.streamUrl,
+      title: 'SELEXIONES ' + ch,
+      subtitle: document.getElementById('track' + cap(ch)).textContent,
+    }).then(() => onPlayStart(ch)).catch(() => onPlayError(ch));
+    return;
+  }
+
   if(p.playing){
     stopAudio(ch);
   } else {
@@ -326,11 +358,23 @@ function onPlayStart(ch){
   document.getElementById('dots' + cap(ch)).classList.add('on');
 }
 
-function stopAudio(ch){
-  players[ch].audio.pause();
+function markPaused(ch){
   players[ch].playing = false;
   document.getElementById('play' + cap(ch)).innerHTML = PLAY_ICON;
   document.getElementById('dots' + cap(ch)).classList.remove('on');
+}
+
+// Full stop: tears down the native session (channel switch, off-air error).
+// Pausing the still-active channel goes through markPaused() instead.
+function stopAudio(ch){
+  const plugin = nativePlugin();
+  if(plugin && nativeActiveCh === ch){
+    plugin.stop();
+    nativeActiveCh = null;
+  } else if(!plugin){
+    players[ch].audio.pause();
+  }
+  markPaused(ch);
 }
 
 function onPlayError(ch){
@@ -339,9 +383,25 @@ function onPlayError(ch){
 }
 
 function setVolume(ch, v){
-  players[ch].audio.volume = v / 100;
+  const plugin = nativePlugin();
+  if(plugin) plugin.setVolume({ value: v / 100 });
+  else players[ch].audio.volume = v / 100;
   document.getElementById('fill' + cap(ch)).style.width = v + '%';
 }
+
+// Keep the UI in sync when playback is toggled from outside the page —
+// the lock screen / notification media controls.
+(function watchNativePlaybackStatus(){
+  const plugin = nativePlugin();
+  if(!plugin) return;
+  plugin.addListener('playbackStatus', ({ playing }) => {
+    if(!nativeActiveCh) return;
+    // Lock-screen/notification controls only toggle play/pause, never a
+    // full stop, so mirror that here — markPaused, not stopAudio.
+    if(playing) onPlayStart(nativeActiveCh);
+    else markPaused(nativeActiveCh);
+  });
+})();
 
 function cap(ch){ return ch.charAt(0) + ch.slice(1).toLowerCase(); }
 
