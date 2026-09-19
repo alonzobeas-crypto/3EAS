@@ -151,17 +151,6 @@ main{position:relative;z-index:2}
   background:linear-gradient(90deg,transparent,var(--pink),transparent);
 }
 
-/* ── language select ── */
-.langrow{display:flex;gap:10px;margin-top:30px}
-.langbtn{
-  flex:1;border:1px solid var(--border);background:rgba(255,255,255,.02);color:var(--lavender);
-  font-family:var(--mono);letter-spacing:2px;padding:14px 10px;text-align:center;font-size:12px;
-  cursor:pointer;transition:all .2s;
-}
-.langbtn .arrow{margin-left:6px;color:var(--dim)}
-.langbtn:hover,.langbtn.active{border-color:var(--pink);color:#fff}
-.langbtn.active .arrow{color:var(--pink)}
-
 /* ── lower sections ── */
 .section{margin-top:44px}
 .section h2{
@@ -169,20 +158,10 @@ main{position:relative;z-index:2}
   padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:14px;
 }
 .section h2 .tag{color:var(--pink);margin-right:8px}
-.sched-row{
-  display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 12px;padding:10px 0;
-  border-bottom:1px solid var(--border);font-size:12.5px;
-}
-.sched-row .day{color:var(--dim);letter-spacing:1.5px;font-size:9px;text-transform:uppercase;flex:0 0 100%}
-.sched-row .show{flex:1;color:var(--fg)}
-.sched-row .show small{display:block;color:var(--dim);font-size:10.5px;margin-top:2px}
-.sched-row .time{color:var(--pink);font-size:10.5px;letter-spacing:.5px;white-space:nowrap}
 
-.djgrid{display:flex;flex-direction:column;gap:1px;background:var(--border)}
-.djcard{background:var(--bg2);padding:14px}
-.djcard .name{font-family:var(--serif);font-weight:700;font-size:17px;letter-spacing:1px;color:var(--fg)}
-.djcard .role{font-size:9px;color:var(--pink);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px}
-.djcard .bio{font-size:10.5px;color:var(--dim);margin-top:6px;line-height:1.6}
+.bio-text{
+  font-family:var(--mono);font-size:12.5px;line-height:1.75;color:var(--lavender);letter-spacing:.2px;
+}
 
 .log{display:flex;flex-direction:column;gap:8px}
 .log a{
@@ -207,9 +186,9 @@ footer .fine{margin-top:8px;font-size:9px;color:var(--dim);letter-spacing:.5px}
 <div class="stars" id="stars"></div>
 
 <header class="top">
-  <input class="emailInput" id="emailInput" type="email" placeholder="EMAIL" data-i18n-ph="email_ph">
-  <button class="subBtn" id="subBtn" onclick="subscribe()" data-i18n="subscribe">SUBSCRIBE</button>
-  <a class="donateBtn" id="donateBtn" href="#" target="_blank" rel="noopener"><span data-i18n="donate">DONATE</span> ♥</a>
+  <input class="emailInput" id="emailInput" type="email" placeholder="EMAIL">
+  <button class="subBtn" id="subBtn" onclick="subscribe()">SUBSCRIBE</button>
+  <a class="donateBtn" id="donateBtn" href="#" target="_blank" rel="noopener">DONATE ♥</a>
 </header>
 
 <main class="wrap">
@@ -225,7 +204,7 @@ footer .fine{margin-top:8px;font-size:9px;color:var(--dim);letter-spacing:.5px}
         <input type="range" id="volUno" min="0" max="100" value="80" oninput="setVolume('UNO',this.value)">
       </div>
     </div>
-    <div class="offair-msg" id="offairUno" data-i18n="offair"></div>
+    <div class="offair-msg" id="offairUno"></div>
   </div>
 
   <div class="chcard dos">
@@ -240,7 +219,7 @@ footer .fine{margin-top:8px;font-size:9px;color:var(--dim);letter-spacing:.5px}
         <input type="range" id="volDos" min="0" max="100" value="80" oninput="setVolume('DOS',this.value)">
       </div>
     </div>
-    <div class="offair-msg" id="offairDos" data-i18n="offair"></div>
+    <div class="offair-msg" id="offairDos"></div>
   </div>
 
   <div class="brandmark">
@@ -248,23 +227,13 @@ footer .fine{margin-top:8px;font-size:9px;color:var(--dim);letter-spacing:.5px}
     <div class="rule"></div>
   </div>
 
-  <div class="langrow">
-    <button class="langbtn active" id="langEn" onclick="setLang('en')">ENGLISH<span class="arrow">→</span></button>
-    <button class="langbtn" id="langEs" onclick="setLang('es')">ESPAÑOL<span class="arrow">→</span></button>
-  </div>
-
-  <section class="section" id="scheduleSection">
-    <h2><span class="tag">//</span><span data-i18n="tag_sched">PROGRAMACIÓN</span></h2>
-    <div id="scheduleList"></div>
+  <section class="section">
+    <h2><span class="tag">//</span>BIO</h2>
+    <p class="bio-text" id="bioText"></p>
   </section>
 
   <section class="section">
-    <h2><span class="tag">//</span><span data-i18n="tag_dj">SELECTORS</span></h2>
-    <div class="djgrid" id="djGrid"></div>
-  </section>
-
-  <section class="section">
-    <h2><span class="tag">//</span><span data-i18n="tag_log">TRANSMISSION LOG</span></h2>
+    <h2><span class="tag">//</span>ARCHIVE</h2>
     <div class="log">
       <a href="https://www.mixcloud.com/SELEXIONES/" target="_blank" rel="noopener">MIXCLOUD ARCHIVE <span class="larr">→</span></a>
       <a href="https://selexiones.com" target="_blank" rel="noopener">SELEXIONES.COM <span class="larr">→</span></a>
@@ -273,61 +242,33 @@ footer .fine{margin-top:8px;font-size:9px;color:var(--dim);letter-spacing:.5px}
 
   <footer>
     <div class="nodes">CONNECTED: <a href="https://3eascortex.com" target="_blank" rel="noopener">3EAS</a> // <a href="https://www.onnoticemusic.com/" target="_blank" rel="noopener">ON/NOTICE</a></div>
-    <div class="fine" data-i18n="footer">LOS ANGELES · TWO FREQUENCIES</div>
+    <div class="fine">LOS ANGELES · TWO FREQUENCIES</div>
   </footer>
 </main>
 
 <script>
 /* ──────────────────────────────────────────────────────────────
    CONFIG — single source of truth. Swap placeholders for real
-   stream URLs / schedule / roster / donate link and the UI
-   updates itself.
+   stream URLs / bio copy / donate link and the UI updates itself.
    ────────────────────────────────────────────────────────────── */
 const CONFIG = {
   channels: {
     UNO: {
       streamUrl: '', // e.g. 'https://stream.selexiones.com/uno' — empty = off air
       track: 'MEXDUB / EL LICENCIADO – NIÑO PERDIDO EXT V6?',
-      schedule: [
-        { day: 'LUN', show: 'BARRIO FRECUENCIA', host: 'w/ Selector TBD', time: '19:00–21:00' },
-        { day: 'MIÉ', show: 'RAÍCES SESSIONS',    host: 'w/ Selector TBD', time: '20:00–22:00' },
-        { day: 'SÁB', show: 'SATURDAY SELECTA',   host: 'w/ Selector TBD', time: '14:00–17:00' },
-      ],
     },
     DOS: {
       streamUrl: '', // e.g. 'https://stream.selexiones.com/dos' — empty = off air
       track: 'HOLY GHOST! – WAIT AND SEE',
-      schedule: [
-        { day: 'MAR', show: 'MIDNIGHT PERREO',   host: 'w/ Selector TBD', time: '22:00–00:00' },
-        { day: 'VIE', show: 'FRIDAY FRECUENCIA', host: 'w/ Selector TBD', time: '21:00–00:00' },
-        { day: 'DOM', show: 'DOMINGO DOWNTEMPO', host: 'w/ Selector TBD', time: '18:00–20:00' },
-      ],
     },
   },
-  djs: [
-    { name: 'SELECTOR ONE', role: 'Founder / Selecta', bio: 'Placeholder bio — swap in roster.' },
-    { name: 'SELECTOR TWO', role: 'Resident', bio: 'Placeholder bio — swap in roster.' },
-    { name: 'SELECTOR THREE', role: 'Guest Rotation', bio: 'Placeholder bio — swap in roster.' },
-  ],
+  bio: 'SELEXIONES is Latin & LA-rooted underground radio — two channels, one frequency. UNO carries the roots: cumbia, salsa dura, boogaloo, the barrio archive. DOS carries the club: reggaeton perreo, guaracha, baile, the sound of right now. No algorithm. No filler. Selección tras selección.',
   links: {
     donate: '', // e.g. 'https://ko-fi.com/selexiones' — empty disables the button (shows alert)
   },
 };
 
-const I18N = {
-  en: {
-    email_ph: 'EMAIL', subscribe: 'SUBSCRIBE', donate: 'DONATE',
-    tag_sched: 'SCHEDULE', tag_dj: 'SELECTORS', tag_log: 'TRANSMISSION LOG',
-    offair: 'Stream not connected yet — placeholder config. Drop the live stream URL into CONFIG to go live.',
-    footer: 'LOS ANGELES · TWO FREQUENCIES',
-  },
-  es: {
-    email_ph: 'CORREO', subscribe: 'SUSCRIBIRSE', donate: 'DONAR',
-    tag_sched: 'PROGRAMACIÓN', tag_dj: 'SELECTORS', tag_log: 'REGISTRO DE TRANSMISIÓN',
-    offair: 'Señal aún no conectada — configuración provisional. Agrega la URL del stream en CONFIG para salir al aire.',
-    footer: 'LOS ANGELES · DOS FRECUENCIAS',
-  },
-};
+const OFFAIR_MSG = 'Stream not connected yet — placeholder config. Drop the live stream URL into CONFIG to go live.';
 
 const PLAY_ICON = '<svg width="16" height="16" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>';
 const PAUSE_ICON = '<svg width="16" height="16" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" fill="currentColor"/><rect x="14" y="5" width="4" height="14" fill="currentColor"/></svg>';
@@ -343,26 +284,12 @@ function renderStatic(){
   document.getElementById('trackDos').textContent = CONFIG.channels.DOS.track;
   document.getElementById('playUno').innerHTML = PLAY_ICON;
   document.getElementById('playDos').innerHTML = PLAY_ICON;
+  document.getElementById('offairUno').textContent = OFFAIR_MSG;
+  document.getElementById('offairDos').textContent = OFFAIR_MSG;
   document.getElementById('offairUno').classList.toggle('show', !CONFIG.channels.UNO.streamUrl);
   document.getElementById('offairDos').classList.toggle('show', !CONFIG.channels.DOS.streamUrl);
 
-  const schedWrap = document.getElementById('scheduleList');
-  schedWrap.innerHTML = [...CONFIG.channels.UNO.schedule.map(s => ({...s, ch:'UNO'})), ...CONFIG.channels.DOS.schedule.map(s => ({...s, ch:'DOS'}))]
-    .map(s => `
-      <div class="sched-row">
-        <div class="day">${s.day} · ${s.ch}</div>
-        <div class="show">${s.show}<small>${s.host}</small></div>
-        <div class="time">${s.time}</div>
-      </div>
-    `).join('');
-
-  document.getElementById('djGrid').innerHTML = CONFIG.djs.map(d => `
-    <div class="djcard">
-      <div class="name">${d.name}</div>
-      <div class="role">${d.role}</div>
-      <div class="bio">${d.bio}</div>
-    </div>
-  `).join('');
+  document.getElementById('bioText').textContent = CONFIG.bio;
 
   const donateBtn = document.getElementById('donateBtn');
   if(CONFIG.links.donate){
@@ -424,24 +351,11 @@ function subscribe(){
   if(!email || !email.includes('@')) return;
   // TODO: wire to a real mailing-list provider (Mailchimp, ConvertKit, Buttondown…)
   const btn = document.getElementById('subBtn');
+  const label = btn.textContent;
   btn.classList.add('sent');
   btn.textContent = '✓';
-  setTimeout(() => { btn.classList.remove('sent'); applyLang(currentLang); }, 2200);
+  setTimeout(() => { btn.classList.remove('sent'); btn.textContent = label; }, 2200);
   document.getElementById('emailInput').value = '';
-}
-
-let currentLang = 'en';
-function setLang(lang){
-  currentLang = lang;
-  document.documentElement.lang = lang;
-  document.getElementById('langEn').classList.toggle('active', lang === 'en');
-  document.getElementById('langEs').classList.toggle('active', lang === 'es');
-  applyLang(lang);
-}
-function applyLang(lang){
-  const dict = I18N[lang];
-  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = dict[el.dataset.i18n]; });
-  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = dict[el.dataset.i18nPh]; });
 }
 
 function buildStars(){
@@ -463,7 +377,6 @@ function buildStars(){
 
 renderStatic();
 buildStars();
-applyLang(currentLang);
 </script>
 </body>
 </html>
