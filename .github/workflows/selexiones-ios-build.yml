@@ -32,9 +32,11 @@ jobs:
       # export job (xcodebuild archive + exportArchive) using an API key
       # or certificate/profile stored in secrets, then upload to
       # TestFlight/App Store Connect via Fastlane or altool.
+      # No shared .xcscheme is checked into the repo (Capacitor doesn't
+      # generate one), so build the target directly rather than by scheme.
       - name: Build for iOS Simulator (unsigned)
         working-directory: selexiones-app/ios/App
         run: |
-          xcodebuild -workspace App.xcworkspace -scheme App \
+          xcodebuild -project App.xcodeproj -target App \
             -sdk iphonesimulator -configuration Debug \
             CODE_SIGNING_ALLOWED=NO build
