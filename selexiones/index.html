@@ -60,6 +60,7 @@ header.top{
   background:rgba(7,4,13,.78);backdrop-filter:blur(8px);
   border-bottom:1px solid var(--border);
 }
+.subForm{display:flex;gap:8px;flex:1 1 auto}
 .emailInput{
   background:rgba(255,255,255,.03);border:1px solid var(--border);color:var(--fg);
   font-family:var(--mono);font-size:11px;letter-spacing:2px;padding:10px 12px;
@@ -73,7 +74,6 @@ header.top{
   cursor:pointer;white-space:nowrap;border-radius:3px;transition:border-color .2s;
 }
 .subBtn:hover{border-color:var(--pink)}
-.subBtn.sent{border-color:var(--pink);color:var(--pink)}
 .donateBtn{
   background:linear-gradient(135deg,#ff62b0,#ff2f8f);border:1px solid rgba(255,255,255,.3);color:#fff;
   font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:2px;padding:10px 16px;
@@ -186,8 +186,10 @@ footer .fine{margin-top:8px;font-size:9px;color:var(--dim);letter-spacing:.5px}
 <div class="stars" id="stars"></div>
 
 <header class="top">
-  <input class="emailInput" id="emailInput" type="email" placeholder="EMAIL">
-  <button class="subBtn" id="subBtn" onclick="subscribe()">SUBSCRIBE</button>
+  <form class="subForm" action="https://buttondown.com/api/emails/embed-subscribe/selexiones" method="post" target="popupwindow" onsubmit="window.open('https://buttondown.com/selexiones','popupwindow')">
+    <input class="emailInput" type="email" name="email" placeholder="EMAIL" required>
+    <input class="subBtn" type="submit" value="SUBSCRIBE">
+  </form>
   <a class="donateBtn" id="donateBtn" href="#" target="_blank" rel="noopener">DONATE ♥</a>
 </header>
 
@@ -347,18 +349,6 @@ function cap(ch){ return ch.charAt(0) + ch.slice(1).toLowerCase(); }
   players[ch].audio.addEventListener('stalled', () => onPlayError(ch));
   players[ch].audio.addEventListener('error', () => onPlayError(ch));
 });
-
-function subscribe(){
-  const email = document.getElementById('emailInput').value.trim();
-  if(!email || !email.includes('@')) return;
-  // TODO: wire to a real mailing-list provider (Mailchimp, ConvertKit, Buttondown…)
-  const btn = document.getElementById('subBtn');
-  const label = btn.textContent;
-  btn.classList.add('sent');
-  btn.textContent = '✓';
-  setTimeout(() => { btn.classList.remove('sent'); btn.textContent = label; }, 2200);
-  document.getElementById('emailInput').value = '';
-}
 
 function buildStars(){
   const wrap = document.getElementById('stars');
