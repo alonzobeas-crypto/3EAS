@@ -1,0 +1,40 @@
+name: SELEXIONES iOS Build
+
+on:
+  push:
+    branches:
+      - claude/selexiones-app-bow2gf
+    paths:
+      - 'selexiones-app/**'
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: selexiones-app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Sync Capacitor
+        run: npx cap sync ios
+
+      # Unsigned simulator build — proves the project compiles, no Apple
+      # Developer account needed. Once one exists, add a signed archive/
+      # export job (xcodebuild archive + exportArchive) using an API key
+      # or certificate/profile stored in secrets, then upload to
+      # TestFlight/App Store Connect via Fastlane or altool.
+      - name: Build for iOS Simulator (unsigned)
+        working-directory: selexiones-app/ios/App
+        run: |
+          xcodebuild -workspace App.xcworkspace -scheme App \
+            -sdk iphonesimulator -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO build

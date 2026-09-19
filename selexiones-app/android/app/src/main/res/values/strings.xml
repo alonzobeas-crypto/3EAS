@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SELEXIONES</string>
+    <string name="title_activity_main">SELEXIONES</string>
+    <string name="package_name">com.selexiones.app</string>
+    <string name="custom_url_scheme">com.selexiones.app</string>
+</resources>

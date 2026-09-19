@@ -1,0 +1,21 @@
+node_modules/
+
+# Android
+android/.gradle/
+android/local.properties
+android/app/build/
+android/build/
+android/captures/
+android/.idea/
+
+# iOS
+ios/App/Pods/
+ios/App/build/
+ios/App/DerivedData/
+ios/App/App.xcworkspace/xcuserdata/
+ios/App/App.xcodeproj/xcuserdata/
+ios/App/Podfile.lock
+
+# Capacitor generates these from www/ on every sync — no need to track duplicates
+android/app/src/main/assets/public/
+ios/App/App/public/
