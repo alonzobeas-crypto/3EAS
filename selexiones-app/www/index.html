@@ -296,12 +296,29 @@ function renderStatic(){
   document.getElementById('bioText').textContent = CONFIG.bio;
 
   const donateBtn = document.getElementById('donateBtn');
-  if(CONFIG.links.donate){
+  // Hide donate on iOS — Apple's external-payment-link rules make an outbound
+  // ko-fi button on this button's own screen a real App Review risk. Android
+  // and the plain web build are unaffected.
+  const isIOS = window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'ios';
+  if(isIOS){
+    donateBtn.style.display = 'none';
+  } else if(CONFIG.links.donate){
     donateBtn.href = CONFIG.links.donate;
   } else {
     donateBtn.removeAttribute('href');
     donateBtn.style.cursor = 'pointer';
     donateBtn.addEventListener('click', e => { e.preventDefault(); alert('Donate link not configured yet — set CONFIG.links.donate.'); });
+  }
+
+  // Belt-and-suspenders: on native platforms the HTML5 <audio> elements are
+  // never intentionally used (togglePlay routes to the native plugin), but
+  // make sure they're truly inert so nothing can ever double up audio output.
+  if(nativePlugin()){
+    Object.values(players).forEach(p => {
+      p.audio.pause();
+      p.audio.removeAttribute('src');
+      p.audio.load();
+    });
   }
 }
 
@@ -340,6 +357,7 @@ function togglePlay(ch){
       url: c.streamUrl,
       title: 'SELEXIONES ' + ch,
       subtitle: document.getElementById('track' + cap(ch)).textContent,
+      nowPlayingUrl: c.nowPlayingUrl,
     }).then(() => onPlayStart(ch)).catch(() => onPlayError(ch));
     return;
   }
@@ -390,7 +408,9 @@ function setVolume(ch, v){
 }
 
 // Keep the UI in sync when playback is toggled from outside the page —
-// the lock screen / notification media controls.
+// the lock screen / notification media controls — and when the native
+// plugin's own now-playing poller (which keeps running while backgrounded,
+// unlike a JS setInterval) reports a track change.
 (function watchNativePlaybackStatus(){
   const plugin = nativePlugin();
   if(!plugin) return;
@@ -400,6 +420,10 @@ function setVolume(ch, v){
     // full stop, so mirror that here — markPaused, not stopAudio.
     if(playing) onPlayStart(nativeActiveCh);
     else markPaused(nativeActiveCh);
+  });
+  plugin.addListener('nowPlaying', ({ text }) => {
+    if(!nativeActiveCh || !text) return;
+    document.getElementById('track' + cap(nativeActiveCh)).textContent = text.toUpperCase();
   });
 })();
 
@@ -448,8 +472,14 @@ function buildStars(){
 
 renderStatic();
 buildStars();
-pollNowPlaying();
-setInterval(pollNowPlaying, CONFIG.nowPlayingPollMs);
+
+// On native platforms the RadioPlayer plugin polls now-playing itself (per
+// the active channel, and it keeps running while backgrounded) — the JS
+// poller here is the web-build-only fallback.
+if(!nativePlugin()){
+  pollNowPlaying();
+  setInterval(pollNowPlaying, CONFIG.nowPlayingPollMs);
+}
 </script>
 </body>
 </html>
