@@ -419,7 +419,7 @@ body{
 }
 .s1-radio-item:nth-of-type(2) .s1-radio-btn{animation-delay:-4.5s}
 .s1-radio-item:hover .s1-radio-btn{color:var(--hot);border-color:var(--accent);transform:scale(1.25)}
-.s1-radio-btn.playing{color:var(--hot);border-color:var(--accent);animation:s1RadioPulse 2.2s ease-in-out infinite,s1Glitch 9s steps(1,end) infinite}
+.s1-radio-btn.playing{color:var(--hot);border-color:var(--accent);animation:s1RadioPulse 2.2s ease-in-out infinite,s1GlitchPlaying 9s steps(1,end) infinite}
 .s1-radio-item:nth-of-type(2) .s1-radio-btn.playing{animation-delay:0s,-4.5s}
 @keyframes s1RadioPulse{0%,100%{opacity:1}50%{opacity:.45}}
 @keyframes s1Glitch{
@@ -428,6 +428,13 @@ body{
   94%{text-shadow:2px 0 var(--hot),-2px 0 var(--accent)}
   95.5%{text-shadow:-1px 0 var(--accent)}
   96%{text-shadow:none}
+}
+@keyframes s1GlitchPlaying{
+  0%,92%,100%{text-shadow:none;border-color:var(--accent)}
+  92.5%{text-shadow:-2px 0 #0ff,2px 0 #fff;border-color:#0ff}
+  94%{text-shadow:2px 0 #0ff,-2px 0 #fff;border-color:#0ff}
+  95.5%{text-shadow:-1px 0 #0ff;border-color:var(--accent)}
+  96%{text-shadow:none;border-color:var(--accent)}
 }
 .s1-radio-mid{
   position:relative;align-self:center;width:9px;height:30px;
