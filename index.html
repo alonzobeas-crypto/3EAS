@@ -405,18 +405,12 @@ body{
 .s1-scroll.vis{opacity:1}
 .s1-scroll::before{content:'';width:1px;height:40px;background:linear-gradient(to bottom,transparent,var(--dimmer))}
 
-.s1-radio{
-  position:absolute;bottom:60px;right:60px;z-index:10;
-  display:flex;flex-direction:column;align-items:flex-end;gap:8px;
-  mix-blend-mode:screen;opacity:0;transition:opacity 1s 2.8s;
-}
-.s1-radio.vis{opacity:.55}
-.s1-radio-label{font-family:var(--mono);font-size:9px;letter-spacing:4px;color:var(--dim2)}
-.s1-radio-btns{display:flex;gap:8px}
+.s1-radio{display:flex;gap:6px;mix-blend-mode:screen}
 .s1-radio-btn{
-  font-family:var(--mono);font-size:10px;letter-spacing:3px;
+  font-family:var(--mono);font-size:10px;letter-spacing:2px;
+  width:34px;height:22px;display:flex;align-items:center;justify-content:center;
   background:none;border:1px solid var(--dimmer);color:var(--dim2);
-  padding:6px 12px;cursor:none;transition:color .3s,border-color .3s,opacity .3s;
+  cursor:none;transition:color .3s,border-color .3s,opacity .3s;
 }
 .s1-radio-btn:hover{color:var(--accent);border-color:var(--dim)}
 .s1-radio-btn.playing{color:var(--hot);border-color:var(--accent);animation:s1RadioPulse 2.2s ease-in-out infinite}
@@ -1080,6 +1074,11 @@ body{
       <div class="s1-sub" id="s1sub">
         <div class="s1-sub-text">SIGNAL & SOUND</div>
         <div class="s1-rule"></div>
+        <div class="s1-radio" id="s1radio">
+          <button class="s1-radio-btn" id="selBtnUno" onclick="selToggle('uno')">UNO</button>
+          <button class="s1-radio-btn" id="selBtnDos" onclick="selToggle('dos')">DOS</button>
+        </div>
+        <div class="s1-rule"></div>
         <div class="s1-tag">CAPTURE DON'T KILL</div>
       </div>
       <div class="s1-status" id="s1stat">
@@ -1090,13 +1089,6 @@ body{
       </div>
     </div>
     <div class="s1-scroll" id="s1scroll" onclick="spStart()" style="cursor:pointer">TAP TO ENTER · SCROLL TO EXPLORE</div>
-    <div class="s1-radio" id="s1radio">
-      <div class="s1-radio-label">SELEXIONES</div>
-      <div class="s1-radio-btns">
-        <button class="s1-radio-btn" id="selBtnUno" onclick="selToggle('uno')">UNO</button>
-        <button class="s1-radio-btn" id="selBtnDos" onclick="selToggle('dos')">DOS</button>
-      </div>
-    </div>
     <div class="scene-counter">01 / 08</div>
   </section>
 
@@ -1772,7 +1764,6 @@ setTimeout(()=>{
     document.getElementById('s1sub').classList.add('vis');
     document.getElementById('s1stat').classList.add('vis');
     document.getElementById('s1scroll').classList.add('vis');
-    document.getElementById('s1radio').classList.add('vis');
     scenes[0].classList.add('active');
   },200);
 },2200);
