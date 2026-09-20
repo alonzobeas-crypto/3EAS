@@ -1083,13 +1083,13 @@ body{
         <div class="s1-sub-text">SIGNAL & SOUND</div>
         <div class="s1-rule"></div>
         <div class="s1-radio" id="s1radio">
-          <div class="s1-radio-item">
+          <div class="s1-radio-item" onmouseenter="selUpdateNow('uno')">
             <button class="s1-radio-btn" id="selBtnUno" onclick="selToggle('uno')">UNO</button>
-            <div class="s1-radio-now" id="selNowUno">— LOADING —</div>
+            <div class="s1-radio-now" id="selNowUno">···</div>
           </div>
-          <div class="s1-radio-item">
+          <div class="s1-radio-item" onmouseenter="selUpdateNow('dos')">
             <button class="s1-radio-btn" id="selBtnDos" onclick="selToggle('dos')">DOS</button>
-            <div class="s1-radio-now" id="selNowDos">— LOADING —</div>
+            <div class="s1-radio-now" id="selNowDos">···</div>
           </div>
         </div>
         <div class="s1-rule"></div>
@@ -2757,19 +2757,18 @@ function selToggle(key){
   if(btn)btn.classList.add('playing');
   audio.play().catch(()=>{if(selAudio===audio)selStop();});
 }
-// Now-playing text for the hover tooltip -- polled independently of
-// playback state so it's ready the instant a visitor hovers, even if
-// they never press play.
+// Now-playing text for the hover tooltip -- fetched only on mouseenter,
+// never in the background, so nothing is requested or shown before a
+// visitor actually hovers a station.
 const SEL_NOWPLAYING={uno:'https://stream.selexiones.com/api/nowplaying/uno',dos:'https://stream.selexiones.com/api/nowplaying/dos'};
 function selUpdateNow(key){
+  const el=document.getElementById(key==='uno'?'selNowUno':'selNowDos');
+  if(el)el.textContent='···';
   fetch(SEL_NOWPLAYING[key]).then(r=>r.json()).then(d=>{
     const song=d&&d.now_playing&&d.now_playing.song;
-    const el=document.getElementById(key==='uno'?'selNowUno':'selNowDos');
     if(el&&song)el.textContent=(song.artist?song.artist+' — ':'')+(song.title||'');
   }).catch(()=>{});
 }
-selUpdateNow('uno');selUpdateNow('dos');
-setInterval(()=>{selUpdateNow('uno');selUpdateNow('dos');},30000);
 
 function spStart(){
   selStop(); // starting the main jukebox always wins over a Selexiones stream
