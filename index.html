@@ -429,13 +429,12 @@ body{
   95.5%{text-shadow:-1px 0 var(--accent)}
   96%{text-shadow:none}
 }
-.s1-radio-sliver{
-  position:absolute;top:0;right:0;width:9px;height:30px;z-index:2;
-  background:rgba(184,168,120,.18);border-left:1px solid var(--dim);
+.s1-radio-mid{
+  align-self:center;width:9px;height:30px;
+  background:rgba(184,168,120,.18);border-left:1px solid var(--dim);border-right:1px solid var(--dim);
   display:block;cursor:none;transition:background .2s,border-color .2s;
 }
-.s1-radio-sliver-left{right:auto;left:0;border-left:none;border-right:1px solid var(--dim)}
-.s1-radio-sliver:hover{background:var(--accent);border-color:var(--hot)}
+.s1-radio-mid:hover{background:var(--accent);border-color:var(--hot)}
 .s1-radio-now{
   position:absolute;bottom:100%;left:50%;margin-bottom:14px;
   transform-origin:bottom center;
@@ -1110,12 +1109,11 @@ body{
         <div class="s1-radio" id="s1radio">
           <div class="s1-radio-item" onmouseenter="selUpdateNow('uno')">
             <button class="s1-radio-btn" id="selBtnUno" onclick="selToggle('uno')">UNO</button>
-            <a class="s1-radio-sliver s1-radio-sliver-left" href="https://selexiones.com" target="_blank" rel="noopener noreferrer" aria-label="Open the full SELEXIONES site" title="selexiones.com"></a>
             <div class="s1-radio-now" id="selNowUno">···</div>
           </div>
+          <a class="s1-radio-mid" href="https://selexiones.com" target="_blank" rel="noopener noreferrer" aria-label="Open the full SELEXIONES site" title="selexiones.com"></a>
           <div class="s1-radio-item" onmouseenter="selUpdateNow('dos')">
             <button class="s1-radio-btn" id="selBtnDos" onclick="selToggle('dos')">DOS</button>
-            <a class="s1-radio-sliver" href="https://selexiones.com" target="_blank" rel="noopener noreferrer" aria-label="Open the full SELEXIONES site" title="selexiones.com"></a>
             <div class="s1-radio-now" id="selNowDos">···</div>
           </div>
         </div>
