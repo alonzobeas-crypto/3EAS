@@ -413,7 +413,7 @@ body{
 .s1-radio-btn{
   font-family:var(--mono);font-size:13px;letter-spacing:3px;
   width:64px;height:30px;display:flex;align-items:center;justify-content:center;
-  background:none;border:1px solid var(--dim);color:var(--accent);
+  background:none;border:1px solid var(--dim);color:var(--accent);text-decoration:none;
   mix-blend-mode:screen;cursor:none;transition:color .3s,border-color .3s,opacity .3s,transform .25s;
   animation:s1Glitch 9s steps(1,end) infinite;
 }
@@ -448,7 +448,6 @@ body{
   box-shadow:0 16px 36px rgba(0,0,0,.75),0 0 0 1px rgba(184,168,120,.15);
   transition:opacity .3s,transform .35s cubic-bezier(.16,1,.3,1);
 }
-.s1-radio-item:hover .s1-radio-now{opacity:1;transform:translateX(-50%) translateY(0) scale(1) rotateX(0deg)}
 
 /* ══════════════════════════════
    SCENE 02 — TRANSMISSIONS
@@ -1109,16 +1108,14 @@ body{
         <div class="s1-sub-text">SIGNAL & SOUND</div>
         <div class="s1-rule"></div>
         <div class="s1-radio" id="s1radio">
-          <div class="s1-radio-item" onmouseenter="selUpdateNow('uno')">
-            <button class="s1-radio-btn" id="selBtnUno" onclick="selToggle('uno')">UNO</button>
-            <div class="s1-radio-now" id="selNowUno">···</div>
+          <div class="s1-radio-item">
+            <a class="s1-radio-btn" id="selBtnUno" href="https://selexiones.com/selexiones.html#ch-uno" target="_blank" rel="noopener">UNO</a>
           </div>
           <a class="s1-radio-mid" href="https://selexiones.com" target="_blank" rel="noopener noreferrer" aria-label="Open the full SELEXIONES site" title="selexiones.com">
             <div class="s1-radio-now">SELEXIONES</div>
           </a>
-          <div class="s1-radio-item" onmouseenter="selUpdateNow('dos')">
-            <button class="s1-radio-btn" id="selBtnDos" onclick="selToggle('dos')">DOS</button>
-            <div class="s1-radio-now" id="selNowDos">···</div>
+          <div class="s1-radio-item">
+            <a class="s1-radio-btn" id="selBtnDos" href="https://selexiones.com/selexiones.html#ch-dos" target="_blank" rel="noopener">DOS</a>
           </div>
         </div>
         <div class="s1-rule"></div>
@@ -2748,59 +2745,11 @@ function ensureSpWatch(){
   }
 }));
 
-/* ─── SELEXIONES hero radio ───
-   Two live AzuraCast streams, direct <audio> playback (no iframe/CORS
-   needed). Mutually exclusive with each other and with the main jukebox --
-   only one audio source ever plays at once. Starting a station also
-   disarms the jukebox's pending "first gesture" auto-start listeners
-   (see armSpGestureRetry below) so a later scroll/click can't quietly
-   start the jukebox underneath a station that's already playing. Declared
-   here, right before spStart(), since spStart() calls selStop() and this
-   file's first spStart() call runs synchronously at load -- any later
-   position would hit selPlaying while it's still in the `let` TDZ. */
-const SEL_STREAMS={uno:'https://stream.selexiones.com/listen/uno/radio.mp3',dos:'https://stream.selexiones.com/listen/dos/radio.mp3'};
-let selAudio=null,selPlaying=null;
-function selBtn(key){return document.getElementById(key==='uno'?'selBtnUno':'selBtnDos');}
-function selStop(){
-  if(!selPlaying)return;
-  const b=selBtn(selPlaying);
-  if(b)b.classList.remove('playing');
-  if(selAudio){selAudio.pause();selAudio.src='';selAudio=null;}
-  selPlaying=null;
-}
-function selToggle(key){
-  if(selPlaying===key){selStop();return;}
-  selStop();
-  if(spStarted&&!spStopped)spStop();
-  document.removeEventListener('click',spStart);
-  document.removeEventListener('keydown',spStart);
-  document.removeEventListener('touchstart',spStart);
-  document.removeEventListener('touchend',spStart);
-  document.getElementById('scroll').removeEventListener('scroll',spStart);
-  const btn=selBtn(key);
-  const audio=new Audio(SEL_STREAMS[key]);
-  audio.preload='none';
-  audio.addEventListener('error',()=>{if(selAudio===audio)selStop();});
-  selAudio=audio;
-  selPlaying=key;
-  if(btn)btn.classList.add('playing');
-  audio.play().catch(()=>{if(selAudio===audio)selStop();});
-}
-// Now-playing text for the hover tooltip -- fetched only on mouseenter,
-// never in the background, so nothing is requested or shown before a
-// visitor actually hovers a station.
-const SEL_NOWPLAYING={uno:'https://stream.selexiones.com/api/nowplaying/uno',dos:'https://stream.selexiones.com/api/nowplaying/dos'};
-function selUpdateNow(key){
-  const el=document.getElementById(key==='uno'?'selNowUno':'selNowDos');
-  if(el)el.textContent='···';
-  fetch(SEL_NOWPLAYING[key]).then(r=>r.json()).then(d=>{
-    const song=d&&d.now_playing&&d.now_playing.song;
-    if(el&&song)el.textContent=(song.artist?song.artist+' — ':'')+(song.title||'');
-  }).catch(()=>{});
-}
-
+/* ─── SELEXIONES hero links ───
+   No audio is streamed or embedded here -- these just link out to
+   Selexiones' own station pages (rebroadcasting their stream directly
+   would be a copyright issue), and never touch the jukebox. */
 function spStart(){
-  selStop(); // starting the main jukebox always wins over a Selexiones stream
   if(spStarted)return;
   spStarted=true;
   // Unlock both decks under the current user gesture, then start a random track
@@ -4772,7 +4721,6 @@ document.getElementById('ticker')?.addEventListener('pointerdown',e=>{
 })();
 
 function spPlay(){
-  selStop(); // resuming the jukebox always wins over a Selexiones stream
   if(audio&&!audio.paused){audio.pause();playing=false;const b=document.getElementById('pbtn');if(b)b.textContent='▶';}
   if(!spStarted){spStart();return;}
   if(spStopped){
@@ -4790,7 +4738,6 @@ function spPlay(){
 }
 // Skip = crossfade to a new random track immediately.
 function spSkip(){
-  selStop(); // resuming the jukebox always wins over a Selexiones stream
   if(!spStarted){spStart();return;}
   if(spStopped){
     // Was previously routed through spStart(), which no-ops here because
