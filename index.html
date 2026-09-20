@@ -424,6 +424,7 @@ body{
   background:rgba(184,168,120,.18);border-left:1px solid var(--dim);
   display:block;cursor:none;transition:background .2s,border-color .2s;
 }
+.s1-radio-sliver-left{right:auto;left:0;border-left:none;border-right:1px solid var(--dim)}
 .s1-radio-sliver:hover{background:var(--accent);border-color:var(--hot)}
 .s1-radio-now{
   position:absolute;bottom:100%;left:50%;margin-bottom:14px;
@@ -1099,7 +1100,7 @@ body{
         <div class="s1-radio" id="s1radio">
           <div class="s1-radio-item" onmouseenter="selUpdateNow('uno')">
             <button class="s1-radio-btn" id="selBtnUno" onclick="selToggle('uno')">UNO</button>
-            <a class="s1-radio-sliver" href="https://selexiones.com" target="_blank" rel="noopener noreferrer" aria-label="Open the full SELEXIONES site" title="selexiones.com"></a>
+            <a class="s1-radio-sliver s1-radio-sliver-left" href="https://selexiones.com" target="_blank" rel="noopener noreferrer" aria-label="Open the full SELEXIONES site" title="selexiones.com"></a>
             <div class="s1-radio-now" id="selNowUno">···</div>
           </div>
           <div class="s1-radio-item" onmouseenter="selUpdateNow('dos')">
