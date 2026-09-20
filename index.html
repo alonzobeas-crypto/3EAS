@@ -448,7 +448,6 @@ body{
   box-shadow:0 16px 36px rgba(0,0,0,.75),0 0 0 1px rgba(184,168,120,.15);
   transition:opacity .3s,transform .35s cubic-bezier(.16,1,.3,1);
 }
-.s1-radio-item:hover .s1-radio-now{opacity:1;transform:translateX(-50%) translateY(0) scale(1) rotateX(0deg)}
 
 /* ══════════════════════════════
    SCENE 02 — TRANSMISSIONS
@@ -1109,16 +1108,14 @@ body{
         <div class="s1-sub-text">SIGNAL & SOUND</div>
         <div class="s1-rule"></div>
         <div class="s1-radio" id="s1radio">
-          <div class="s1-radio-item" onmouseenter="selUpdateNow('uno')">
+          <div class="s1-radio-item">
             <button class="s1-radio-btn" id="selBtnUno" onclick="selToggle('uno')">UNO</button>
-            <div class="s1-radio-now" id="selNowUno">···</div>
           </div>
           <a class="s1-radio-mid" href="https://selexiones.com" target="_blank" rel="noopener noreferrer" aria-label="Open the full SELEXIONES site" title="selexiones.com">
             <div class="s1-radio-now">SELEXIONES</div>
           </a>
-          <div class="s1-radio-item" onmouseenter="selUpdateNow('dos')">
+          <div class="s1-radio-item">
             <button class="s1-radio-btn" id="selBtnDos" onclick="selToggle('dos')">DOS</button>
-            <div class="s1-radio-now" id="selNowDos">···</div>
           </div>
         </div>
         <div class="s1-rule"></div>
@@ -2786,19 +2783,6 @@ function selToggle(key){
   if(btn)btn.classList.add('playing');
   audio.play().catch(()=>{if(selAudio===audio)selStop();});
 }
-// Now-playing text for the hover tooltip -- fetched only on mouseenter,
-// never in the background, so nothing is requested or shown before a
-// visitor actually hovers a station.
-const SEL_NOWPLAYING={uno:'https://stream.selexiones.com/api/nowplaying/uno',dos:'https://stream.selexiones.com/api/nowplaying/dos'};
-function selUpdateNow(key){
-  const el=document.getElementById(key==='uno'?'selNowUno':'selNowDos');
-  if(el)el.textContent='···';
-  fetch(SEL_NOWPLAYING[key]).then(r=>r.json()).then(d=>{
-    const song=d&&d.now_playing&&d.now_playing.song;
-    if(el&&song)el.textContent=(song.artist?song.artist+' — ':'')+(song.title||'');
-  }).catch(()=>{});
-}
-
 function spStart(){
   selStop(); // starting the main jukebox always wins over a Selexiones stream
   if(spStarted)return;
