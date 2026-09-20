@@ -405,6 +405,23 @@ body{
 .s1-scroll.vis{opacity:1}
 .s1-scroll::before{content:'';width:1px;height:40px;background:linear-gradient(to bottom,transparent,var(--dimmer))}
 
+.s1-radio{
+  position:absolute;bottom:60px;right:60px;z-index:10;
+  display:flex;flex-direction:column;align-items:flex-end;gap:8px;
+  mix-blend-mode:screen;opacity:0;transition:opacity 1s 2.8s;
+}
+.s1-radio.vis{opacity:.55}
+.s1-radio-label{font-family:var(--mono);font-size:9px;letter-spacing:4px;color:var(--dim2)}
+.s1-radio-btns{display:flex;gap:8px}
+.s1-radio-btn{
+  font-family:var(--mono);font-size:10px;letter-spacing:3px;
+  background:none;border:1px solid var(--dimmer);color:var(--dim2);
+  padding:6px 12px;cursor:none;transition:color .3s,border-color .3s,opacity .3s;
+}
+.s1-radio-btn:hover{color:var(--accent);border-color:var(--dim)}
+.s1-radio-btn.playing{color:var(--hot);border-color:var(--accent);animation:s1RadioPulse 2.2s ease-in-out infinite}
+@keyframes s1RadioPulse{0%,100%{opacity:1}50%{opacity:.45}}
+
 /* ══════════════════════════════
    SCENE 02 — TRANSMISSIONS
 ══════════════════════════════ */
@@ -845,7 +862,7 @@ body{
   .s1-sub{margin-top:0}
   .s1-status{margin-top:2px;padding-top:2px;gap:2px 8px}
   .s1-title{line-height:.9}
-  .s1-scroll,.s1-coords{display:none}
+  .s1-scroll,.s1-coords,.s1-radio{display:none}
   .s2-body,.s6-body{grid-template-columns:1fr}
   .player,.lform{border-left:none;border-top:1px solid var(--dimmer)}
   .s5-grid{grid-template-columns:1fr;gap:6px}
@@ -1073,6 +1090,13 @@ body{
       </div>
     </div>
     <div class="s1-scroll" id="s1scroll" onclick="spStart()" style="cursor:pointer">TAP TO ENTER · SCROLL TO EXPLORE</div>
+    <div class="s1-radio" id="s1radio">
+      <div class="s1-radio-label">SELEXIONES</div>
+      <div class="s1-radio-btns">
+        <button class="s1-radio-btn" id="selBtnUno" onclick="selToggle('uno')">UNO</button>
+        <button class="s1-radio-btn" id="selBtnDos" onclick="selToggle('dos')">DOS</button>
+      </div>
+    </div>
     <div class="scene-counter">01 / 08</div>
   </section>
 
@@ -1748,6 +1772,7 @@ setTimeout(()=>{
     document.getElementById('s1sub').classList.add('vis');
     document.getElementById('s1stat').classList.add('vis');
     document.getElementById('s1scroll').classList.add('vis');
+    document.getElementById('s1radio').classList.add('vis');
     scenes[0].classList.add('active');
   },200);
 },2200);
@@ -2689,7 +2714,47 @@ function ensureSpWatch(){
   }
 }));
 
+/* ─── SELEXIONES hero radio ───
+   Two live AzuraCast streams, direct <audio> playback (no iframe/CORS
+   needed). Mutually exclusive with each other and with the main jukebox --
+   only one audio source ever plays at once. Starting a station also
+   disarms the jukebox's pending "first gesture" auto-start listeners
+   (see armSpGestureRetry below) so a later scroll/click can't quietly
+   start the jukebox underneath a station that's already playing. Declared
+   here, right before spStart(), since spStart() calls selStop() and this
+   file's first spStart() call runs synchronously at load -- any later
+   position would hit selPlaying while it's still in the `let` TDZ. */
+const SEL_STREAMS={uno:'https://stream.selexiones.com/listen/uno/radio.mp3',dos:'https://stream.selexiones.com/listen/dos/radio.mp3'};
+let selAudio=null,selPlaying=null;
+function selBtn(key){return document.getElementById(key==='uno'?'selBtnUno':'selBtnDos');}
+function selStop(){
+  if(!selPlaying)return;
+  const b=selBtn(selPlaying);
+  if(b)b.classList.remove('playing');
+  if(selAudio){selAudio.pause();selAudio.src='';selAudio=null;}
+  selPlaying=null;
+}
+function selToggle(key){
+  if(selPlaying===key){selStop();return;}
+  selStop();
+  if(spStarted&&!spStopped)spStop();
+  document.removeEventListener('click',spStart);
+  document.removeEventListener('keydown',spStart);
+  document.removeEventListener('touchstart',spStart);
+  document.removeEventListener('touchend',spStart);
+  document.getElementById('scroll').removeEventListener('scroll',spStart);
+  const btn=selBtn(key);
+  const audio=new Audio(SEL_STREAMS[key]);
+  audio.preload='none';
+  audio.addEventListener('error',()=>{if(selAudio===audio)selStop();});
+  selAudio=audio;
+  selPlaying=key;
+  if(btn)btn.classList.add('playing');
+  audio.play().catch(()=>{if(selAudio===audio)selStop();});
+}
+
 function spStart(){
+  selStop(); // starting the main jukebox always wins over a Selexiones stream
   if(spStarted)return;
   spStarted=true;
   // Unlock both decks under the current user gesture, then start a random track
