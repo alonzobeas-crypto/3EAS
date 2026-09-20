@@ -4748,6 +4748,7 @@ document.getElementById('ticker')?.addEventListener('pointerdown',e=>{
 })();
 
 function spPlay(){
+  selStop(); // resuming the jukebox always wins over a Selexiones stream
   if(audio&&!audio.paused){audio.pause();playing=false;const b=document.getElementById('pbtn');if(b)b.textContent='▶';}
   if(!spStarted){spStart();return;}
   if(spStopped){
@@ -4765,6 +4766,7 @@ function spPlay(){
 }
 // Skip = crossfade to a new random track immediately.
 function spSkip(){
+  selStop(); // resuming the jukebox always wins over a Selexiones stream
   if(!spStarted){spStart();return;}
   if(spStopped){
     // Was previously routed through spStart(), which no-ops here because
