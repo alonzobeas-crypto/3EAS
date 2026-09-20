@@ -415,10 +415,20 @@ body{
   width:64px;height:30px;display:flex;align-items:center;justify-content:center;
   background:none;border:1px solid var(--dim);color:var(--accent);
   mix-blend-mode:screen;cursor:none;transition:color .3s,border-color .3s,opacity .3s,transform .25s;
+  animation:s1Glitch 9s steps(1,end) infinite;
 }
+.s1-radio-item:nth-child(2) .s1-radio-btn{animation-delay:-4.5s}
 .s1-radio-item:hover .s1-radio-btn{color:var(--hot);border-color:var(--accent);transform:scale(1.25)}
-.s1-radio-btn.playing{color:var(--hot);border-color:var(--accent);animation:s1RadioPulse 2.2s ease-in-out infinite}
+.s1-radio-btn.playing{color:var(--hot);border-color:var(--accent);animation:s1RadioPulse 2.2s ease-in-out infinite,s1Glitch 9s steps(1,end) infinite}
+.s1-radio-item:nth-child(2) .s1-radio-btn.playing{animation-delay:0s,-4.5s}
 @keyframes s1RadioPulse{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes s1Glitch{
+  0%,92%,100%{text-shadow:none}
+  92.5%{text-shadow:-2px 0 var(--hot),2px 0 var(--accent)}
+  94%{text-shadow:2px 0 var(--hot),-2px 0 var(--accent)}
+  95.5%{text-shadow:-1px 0 var(--accent)}
+  96%{text-shadow:none}
+}
 .s1-radio-sliver{
   position:absolute;top:0;right:0;width:9px;height:30px;z-index:2;
   background:rgba(184,168,120,.18);border-left:1px solid var(--dim);
