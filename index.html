@@ -405,24 +405,29 @@ body{
 .s1-scroll.vis{opacity:1}
 .s1-scroll::before{content:'';width:1px;height:40px;background:linear-gradient(to bottom,transparent,var(--dimmer))}
 
-.s1-radio{display:flex;gap:6px;mix-blend-mode:screen}
-.s1-radio-item{position:relative}
+.s1-radio{display:flex;gap:10px}
+.s1-radio-item{position:relative;perspective:600px}
 .s1-radio-btn{
-  font-family:var(--mono);font-size:10px;letter-spacing:2px;
-  width:34px;height:22px;display:flex;align-items:center;justify-content:center;
-  background:none;border:1px solid var(--dimmer);color:var(--dim2);
-  cursor:none;transition:color .3s,border-color .3s,opacity .3s,transform .25s;
+  font-family:var(--mono);font-size:13px;letter-spacing:3px;
+  width:64px;height:30px;display:flex;align-items:center;justify-content:center;
+  background:none;border:1px solid var(--dim);color:var(--accent);
+  mix-blend-mode:screen;cursor:none;transition:color .3s,border-color .3s,opacity .3s,transform .25s;
 }
-.s1-radio-item:hover .s1-radio-btn{color:var(--accent);border-color:var(--dim);transform:scale(1.3)}
+.s1-radio-item:hover .s1-radio-btn{color:var(--hot);border-color:var(--accent);transform:scale(1.25)}
 .s1-radio-btn.playing{color:var(--hot);border-color:var(--accent);animation:s1RadioPulse 2.2s ease-in-out infinite}
 @keyframes s1RadioPulse{0%,100%{opacity:1}50%{opacity:.45}}
 .s1-radio-now{
-  position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:10px;
-  font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--dim2);
-  white-space:nowrap;max-width:240px;overflow:hidden;text-overflow:ellipsis;
-  opacity:0;pointer-events:none;transition:opacity .25s;
+  position:absolute;bottom:100%;left:50%;margin-bottom:14px;
+  transform-origin:bottom center;
+  transform:translateX(-50%) translateY(8px) scale(.8) rotateX(-18deg);
+  background:rgba(0,0,0,.94);border:1px solid var(--accent);padding:10px 18px;
+  font-family:var(--mono);font-size:13px;letter-spacing:1.5px;color:var(--hot);
+  white-space:nowrap;max-width:300px;overflow:hidden;text-overflow:ellipsis;
+  opacity:0;pointer-events:none;
+  box-shadow:0 16px 36px rgba(0,0,0,.75),0 0 0 1px rgba(184,168,120,.15);
+  transition:opacity .3s,transform .35s cubic-bezier(.16,1,.3,1);
 }
-.s1-radio-item:hover .s1-radio-now{opacity:.85}
+.s1-radio-item:hover .s1-radio-now{opacity:1;transform:translateX(-50%) translateY(0) scale(1) rotateX(0deg)}
 
 /* ══════════════════════════════
    SCENE 02 — TRANSMISSIONS
