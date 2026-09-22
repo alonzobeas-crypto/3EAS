@@ -2064,10 +2064,13 @@ setTimeout(()=>{
     scenes[0].classList.add('active');
     langTick();
     setInterval(langTick,250);
-    setInterval(langCategoryTick,60000);
     manTick();
     setInterval(manTick,250);
-    setInterval(manCategoryTick,60000);
+    // Single shared timer so both sides' category (the paired role,
+    // e.g. uncle/wife) always switches at the exact same moment --
+    // two separate setInterval calls would drift apart over a long
+    // session instead of staying locked together.
+    setInterval(()=>{langCategoryTick();manCategoryTick();},60000);
     // Macro cycle: visible for 1 minute out of every 5, rather than
     // running constantly. The word/category ticks above (the micro
     // cycle) keep running underneath regardless of visibility, so it's
