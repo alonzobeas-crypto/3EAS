@@ -1843,7 +1843,9 @@ function scheduleGlitchPair(){
    independent of the gesture-gated glitch family below, since it's a
    small readout rather than a disruptive effect. */
 const LANG_WORDS={
-  woman:[['English','WOMAN'],['Spanish','MUJER'],['French','FEMME'],['Portuguese','MULHER'],['Italian','DONNA'],['German','FRAU'],['Dutch','VROUW'],['Swedish','KVINNA'],['Polish','KOBIETA'],['Russian','ЖЕНЩИНА'],['Greek','ΓΥΝΑΙΚΑ'],['Romanian','FEMEIE'],['Turkish','KADIN'],['Arabic','امرأة'],['Hebrew','אישה'],['Persian','زن'],['Hindi','महिला'],['Bengali','নারী'],['Swahili','MWANAMKE'],['Zulu','OWESIFAZANE'],['Mandarin','女人'],['Japanese','女性'],['Korean','여자'],['Vietnamese','PHỤ NỮ'],['Indonesian','PEREMPUAN'],['Tagalog','BABAE'],['Hawaiian','WAHINE'],['Māori','WAHINE'],['Nahuatl','CIHUATL'],['Quechua','WARMI'],['Guaraní','KUÑA'],['Basque','EMAKUME']],
+  woman:[['English','WOMAN'],['Spanish','MUJER'],['French','FEMME'],['Portuguese','MULHER'],['Italian','DONNA'],['German','FRAU'],['Dutch','VROUW'],['Swedish','KVINNA'],['Polish','KOBIETA'],['Russian','ЖЕНЩИНА'],['Greek','ΓΥΝΑΙΚΑ'],['Romanian','FEMEIE'],['Turkish','KADIN'],['Arabic','امرأة'],['Hebrew','אישה'],['Persian','زن'],['Hindi','महिला'],['Bengali','নারী'],['Swahili','MWANAMKE'],['Zulu','OWESIFAZANE'],['Mandarin','女人'],['Japanese','女性'],['Korean','여자'],['Vietnamese','PHỤ NỮ'],['Indonesian','PEREMPUAN'],['Tagalog','BABAE'],['Hawaiian','WAHINE'],['Māori','WAHINE'],['Nahuatl','CIHUATL'],['Quechua','WARMI'],['Guaraní','KUÑA'],['Basque','EMAKUME'],
+    ['Ukrainian','ЖІНКА'],['Czech','ŽENA'],['Danish','KVINDE'],['Norwegian','KVINNE'],['Icelandic','KONA'],['Welsh','MENYW'],['Irish','BEAN'],['Catalan','DONA'],['Yiddish','פֿרוי'],['Punjabi','ਔਰਤ'],['Marathi','स्त्री'],['Malayalam','സ്ത്രീ'],['Georgian','ქალი'],['Armenian','կին'],['Mongolian','ЭМЭГТЭЙ'],['Amharic','ሴት'],['Somali','HAWEENEY'],['Xhosa','UMFAZI'],['Afrikaans','VROU'],['Cebuano','BABAYE'],
+    ['English (slang)','CHICK'],['English (slang)','GAL'],['English (slang)','BROAD'],['English (slang)','DAME'],['Spanish (slang)','TÍA'],['French (slang)','MEUF']],
   sister:[['English','SISTER'],['Spanish','HERMANA'],['French','SŒUR'],['Portuguese','IRMÃ'],['Italian','SORELLA'],['German','SCHWESTER'],['Dutch','ZUS'],['Swedish','SYSTER'],['Polish','SIOSTRA'],['Russian','СЕСТРА'],['Greek','ΑΔΕΛΦΗ'],['Romanian','SORĂ'],['Turkish','KIZ KARDEŞ'],['Arabic','أخت'],['Hebrew','אחות'],['Persian','خواهر'],['Hindi','बहन'],['Bengali','বোন'],['Swahili','DADA'],['Mandarin','姐妹'],['Japanese','姉妹'],['Korean','자매'],['Vietnamese','CHỊ EM'],['Indonesian','SAUDARI'],['Tagalog','KAPATID NA BABAE'],['Hawaiian','KAIKUAHINE'],['Māori','TUAHINE'],['Quechua','ÑAÑA'],['Basque','AHIZPA']],
   daughter:[['English','DAUGHTER'],['Spanish','HIJA'],['French','FILLE'],['Portuguese','FILHA'],['Italian','FIGLIA'],['German','TOCHTER'],['Dutch','DOCHTER'],['Swedish','DOTTER'],['Polish','CÓRKA'],['Russian','ДОЧЬ'],['Greek','ΚΟΡΗ'],['Romanian','FIICĂ'],['Turkish','KIZ'],['Arabic','ابنة'],['Hebrew','בת'],['Persian','دختر'],['Hindi','बेटी'],['Bengali','কন্যা'],['Swahili','BINTI'],['Mandarin','女儿'],['Japanese','娘'],['Korean','딸'],['Vietnamese','CON GÁI'],['Indonesian','ANAK PEREMPUAN'],['Tagalog','ANAK NA BABAE'],['Hawaiian','KAIKAMAHINE'],['Māori','TAMĀHINE'],['Quechua','USHI'],['Guaraní','TAJYRA'],['Basque','ALABA']],
   queen:[['English','QUEEN'],['Spanish','REINA'],['French','REINE'],['Portuguese','RAINHA'],['Italian','REGINA'],['German','KÖNIGIN'],['Dutch','KONINGIN'],['Swedish','DROTTNING'],['Polish','KRÓLOWA'],['Russian','КОРОЛЕВА'],['Greek','ΒΑΣΙΛΙΣΣΑ'],['Romanian','REGINĂ'],['Turkish','KRALİÇE'],['Arabic','ملكة'],['Hebrew','מלכה'],['Persian','ملکه'],['Hindi','रानी'],['Bengali','রাণী'],['Swahili','MALKIA'],['Mandarin','女王'],['Japanese','女王'],['Korean','여왕'],['Vietnamese','NỮ HOÀNG'],['Indonesian','RATU'],['Tagalog','REYNA'],['Hawaiian',"ALI'I WAHINE"],['Māori','KUINI'],['Nahuatl','CIHUAPILLI'],['Quechua','QOYA'],['Basque','ERREGINA']],
@@ -1895,13 +1897,34 @@ const LANG_CATEGORIES=['woman','sister','daughter','queen','niece','auntie','nur
 // flash instead of a fixed pair -- so it isn't locked to always
 // rendering the same (e.g. always-blue) combination.
 const GLITCH_COLORS=['#0ff','#f0f','#0f8','#f44','#ff0','var(--hot)','var(--accent)'];
-function glitchFlash(el){
+// Leetspeak-style character substitution for the brief glitch frame --
+// letters that have a numeral look-alike become that numeral, others
+// just flip case (a crude stand-in for small caps, which text-transform
+// can't do per-character). Purely cosmetic scrambling of the ALREADY-
+// CHOSEN word for a couple hundred ms before it resolves to the clean
+// text underneath -- it never changes what word/language was picked.
+const LEET_MAP={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9'};
+function leetify(s){
+  return s.split('').map(ch=>{
+    if(Math.random()>0.4)return ch;
+    const upper=ch.toUpperCase();
+    if(LEET_MAP[upper])return LEET_MAP[upper];
+    if(/[a-zA-Z]/.test(ch))return ch===upper?ch.toLowerCase():ch.toUpperCase();
+    return ch;
+  }).join('');
+}
+function glitchFlash(el,cleanText){
   const c1=GLITCH_COLORS[Math.floor(Math.random()*GLITCH_COLORS.length)];
   let c2=GLITCH_COLORS[Math.floor(Math.random()*GLITCH_COLORS.length)];
   if(c2===c1)c2=GLITCH_COLORS[(GLITCH_COLORS.indexOf(c1)+1)%GLITCH_COLORS.length];
   el.classList.add('lang-flicker');
   el.style.textShadow=`-2px 0 ${c1},2px 0 ${c2}`;
-  setTimeout(()=>{el.style.textShadow='none';el.classList.remove('lang-flicker');},180);
+  el.textContent=leetify(cleanText);
+  setTimeout(()=>{
+    el.textContent=cleanText;
+    el.style.textShadow='none';
+    el.classList.remove('lang-flicker');
+  },180);
 }
 let langCatIdx=0,langWordIdx=-1;
 function langTick(){
@@ -1919,9 +1942,8 @@ function langTick(){
     break;
   }
   langWordIdx=idx;
-  el.textContent=list[idx][1];
   el.dataset.lang=list[idx][0];
-  glitchFlash(el);
+  glitchFlash(el,list[idx][1]);
 }
 function langCategoryTick(){
   let idx=langCatIdx;
@@ -1939,7 +1961,9 @@ function langCategoryTick(){
 // the two sides don't sync up and drift in and out of phase with each
 // other over time.
 const MAN_WORDS={
-  man:[['English','MAN'],['Spanish','HOMBRE'],['French','HOMME'],['Portuguese','HOMEM'],['Italian','UOMO'],['German','MANN'],['Dutch','MAN'],['Swedish','MAN'],['Polish','MĘŻCZYZNA'],['Russian','МУЖЧИНА'],['Greek','ΑΝΤΡΑΣ'],['Romanian','BĂRBAT'],['Turkish','ERKEK'],['Arabic','رجل'],['Hebrew','איש'],['Persian','مرد'],['Hindi','आदमी'],['Bengali','পুরুষ'],['Swahili','MWANAUME'],['Zulu','INDODA'],['Mandarin','男人'],['Japanese','男性'],['Korean','남자'],['Vietnamese','ĐÀN ÔNG'],['Indonesian','LAKI-LAKI'],['Tagalog','LALAKI'],['Hawaiian','KĀNE'],['Māori','TĀNE'],['Nahuatl','TLACATL'],['Quechua','QHARI'],['Guaraní',"KUIMBA'E"],['Basque','GIZON']],
+  man:[['English','MAN'],['Spanish','HOMBRE'],['French','HOMME'],['Portuguese','HOMEM'],['Italian','UOMO'],['German','MANN'],['Dutch','MAN'],['Swedish','MAN'],['Polish','MĘŻCZYZNA'],['Russian','МУЖЧИНА'],['Greek','ΑΝΤΡΑΣ'],['Romanian','BĂRBAT'],['Turkish','ERKEK'],['Arabic','رجل'],['Hebrew','איש'],['Persian','مرد'],['Hindi','आदमी'],['Bengali','পুরুষ'],['Swahili','MWANAUME'],['Zulu','INDODA'],['Mandarin','男人'],['Japanese','男性'],['Korean','남자'],['Vietnamese','ĐÀN ÔNG'],['Indonesian','LAKI-LAKI'],['Tagalog','LALAKI'],['Hawaiian','KĀNE'],['Māori','TĀNE'],['Nahuatl','TLACATL'],['Quechua','QHARI'],['Guaraní',"KUIMBA'E"],['Basque','GIZON'],
+    ['Ukrainian','ЧОЛОВІК'],['Czech','MUŽ'],['Danish','MAND'],['Norwegian','MANN'],['Icelandic','MAÐUR'],['Welsh','DYN'],['Irish','FEAR'],['Catalan','HOME'],['Yiddish','מאַן'],['Punjabi','ਆਦਮੀ'],['Marathi','पुरुष'],['Malayalam','പുരുഷൻ'],['Georgian','კაცი'],['Armenian','տղամարդ'],['Mongolian','ЭРЭГТЭЙ'],['Amharic','ወንድ'],['Somali','NIN'],['Xhosa','INDODA'],['Afrikaans','MAN'],['Cebuano','LALAKI'],
+    ['English (slang)','DUDE'],['English (slang)','GUY'],['English (slang)','BLOKE'],['English (slang)','FELLA'],['Spanish (slang)','TÍO'],['French (slang)','MEC']],
   brother:[['English','BROTHER'],['Spanish','HERMANO'],['French','FRÈRE'],['Portuguese','IRMÃO'],['Italian','FRATELLO'],['German','BRUDER'],['Dutch','BROER'],['Swedish','BRODER'],['Polish','BRAT'],['Russian','БРАТ'],['Greek','ΑΔΕΛΦΟΣ'],['Romanian','FRATE'],['Turkish','ERKEK KARDEŞ'],['Arabic','أخ'],['Hebrew','אח'],['Persian','برادر'],['Hindi','भाई'],['Bengali','ভাই'],['Swahili','KAKA'],['Mandarin','兄弟'],['Japanese','兄弟'],['Korean','형제'],['Vietnamese','ANH EM'],['Indonesian','SAUDARA'],['Tagalog','KAPATID NA LALAKI'],['Hawaiian','KAIKUNĀNE'],['Māori','TUNGĀNE'],['Quechua','WAWQE'],['Basque','ANAIA']],
   son:[['English','SON'],['Spanish','HIJO'],['French','FILS'],['Portuguese','FILHO'],['Italian','FIGLIO'],['German','SOHN'],['Dutch','ZOON'],['Swedish','SON'],['Polish','SYN'],['Russian','СЫН'],['Greek','ΓΙΟΣ'],['Romanian','FIU'],['Turkish','OĞUL'],['Arabic','ابن'],['Hebrew','בן'],['Persian','پسر'],['Hindi','बेटा'],['Bengali','ছেলে'],['Swahili','MWANA WA KIUME'],['Mandarin','儿子'],['Japanese','息子'],['Korean','아들'],['Vietnamese','CON TRAI'],['Indonesian','ANAK LAKI-LAKI'],['Tagalog','ANAK NA LALAKI'],['Hawaiian','KEIKIKĀNE'],['Māori','TAMA'],['Quechua','CHURI'],['Guaraní',"TA'ÝRA"],['Basque','SEME']],
   king:[['English','KING'],['Spanish','REY'],['French','ROI'],['Portuguese','REI'],['Italian','RE'],['German','KÖNIG'],['Dutch','KONING'],['Swedish','KUNG'],['Polish','KRÓL'],['Russian','КОРОЛЬ'],['Greek','ΒΑΣΙΛΙΑΣ'],['Romanian','REGE'],['Turkish','KRAL'],['Arabic','ملك'],['Hebrew','מלך'],['Persian','شاه'],['Hindi','राजा'],['Bengali','রাজা'],['Swahili','MFALME'],['Mandarin','国王'],['Japanese','王'],['Korean','왕'],['Vietnamese','VUA'],['Indonesian','RAJA'],['Tagalog','HARI'],['Hawaiian','MŌʻĪ'],['Māori','KINGI'],['Nahuatl','TLATOANI'],['Quechua','SAPA INKA'],['Basque','ERREGE']],
@@ -1997,9 +2021,8 @@ function manTick(){
     break;
   }
   manWordIdx=idx;
-  el.textContent=list[idx][1];
   el.dataset.lang=list[idx][0];
-  glitchFlash(el);
+  glitchFlash(el,list[idx][1]);
 }
 function manCategoryTick(){
   let idx=manCatIdx;
