@@ -1149,7 +1149,7 @@ body{
         <div class="s1-tag">CAPTURE DON'T KILL</div>
       </div>
       <div class="s1-status" id="s1stat">
-        <div class="st-item"><span class="v" id="langWord2">MAN</span><span class="v"> = </span><span class="v" id="langWord">WOMAN</span></div>
+        <div class="st-item" id="echoesRow"><span class="v" id="langWord2">MAN</span><span class="v"> = </span><span class="v" id="langWord">WOMAN</span></div>
         <div class="st-item">STATUS<span class="v live">◉ TRANSMITTING</span></div>
         <div class="st-item">ORIGIN<span class="v">LINCOLN HEIGHTS</span></div>
         <div class="st-item">RELEASES<span class="v">INCOMING</span></div>
@@ -2063,11 +2063,19 @@ setTimeout(()=>{
     document.getElementById('s1scroll').classList.add('vis');
     scenes[0].classList.add('active');
     langTick();
-    setInterval(langTick,900);
+    setInterval(langTick,250);
     setInterval(langCategoryTick,60000);
     manTick();
-    setInterval(manTick,900);
+    setInterval(manTick,250);
     setInterval(manCategoryTick,60000);
+    // Visible for 1 minute, hidden for 1 minute, repeating -- rather
+    // than running constantly. The word/category ticks above keep
+    // running underneath regardless, so it's mid-cycle whenever it
+    // reappears rather than always restarting fresh.
+    setInterval(()=>{
+      const row=document.getElementById('echoesRow');
+      if(row)row.style.display=(row.style.display==='none')?'':'none';
+    },60000);
   },200);
 },2200);
 
