@@ -415,7 +415,7 @@ body{
    rather than a one-off effect unique to this readout. */
 #langWord2,#langWord{animation:echoFade 6s ease-in-out infinite}
 #langWord{animation-delay:-3s}
-@keyframes echoFade{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes echoFade{0%,100%{opacity:.75}50%{opacity:.12}}
 /* Glitch flash colors are chosen fresh in JS per flicker (see
    glitchFlash()) via inline text-shadow rather than a fixed keyframe,
    so it's never locked to one color (e.g. always blue) -- it draws
@@ -1887,52 +1887,48 @@ const LANG_CATEGORIES=['woman','sister','daughter','queen','niece','auntie','nur
 // fixed pair -- so it isn't locked to always rendering the same (e.g.
 // always-blue) combination.
 const GLITCH_COLORS=['#0ff','#f0f','#0f8','#f44','#ff0','var(--hot)','var(--accent)'];
-// Leetspeak-style character substitution for the brief glitch frame --
-// letters that have a numeral look-alike become that numeral, others
-// just flip case (a crude stand-in for small caps, which text-transform
-// can't do per-character). Purely cosmetic scrambling of the ALREADY-
-// CHOSEN word for a couple hundred ms before it resolves to the clean
-// text underneath -- it never changes what word/language was picked.
+// Letter-corruption glitch, same mechanic as the jukebox's own song-title
+// glitch (see spBuildTitleGlitch/spTitleCorruptIv above): one <span> per
+// character, then a single shared interval that continuously nibbles at
+// a random character or two -- leetspeak numeral swap or a case flip,
+// each reverting on its own short random delay -- while the rest of the
+// word stays put. That reads as a persistent flicker rather than the
+// whole word flashing and resolving at once. Colors are picked fresh
+// per corrupted character instead of the jukebox's fixed accent+cyan
+// pair, so it isn't locked to always rendering the same combination.
 const LEET_MAP={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9'};
-function leetify(s){
-  return s.split('').map(ch=>{
-    if(Math.random()>0.4)return ch;
-    const upper=ch.toUpperCase();
-    if(LEET_MAP[upper])return LEET_MAP[upper];
-    if(/[a-zA-Z]/.test(ch))return ch===upper?ch.toLowerCase():ch.toUpperCase();
-    return ch;
-  }).join('');
+function renderWordSpans(el,word){
+  el.textContent='';
+  const frag=document.createDocumentFragment();
+  word.split('').forEach(ch=>{
+    const sp=document.createElement('span');
+    sp.dataset.orig=ch;
+    sp.textContent=ch;
+    frag.appendChild(sp);
+  });
+  el.appendChild(frag);
 }
-function glitchFlash(el,cleanText){
-  const c1=GLITCH_COLORS[Math.floor(Math.random()*GLITCH_COLORS.length)];
-  let c2=GLITCH_COLORS[Math.floor(Math.random()*GLITCH_COLORS.length)];
-  if(c2===c1)c2=GLITCH_COLORS[(GLITCH_COLORS.indexOf(c1)+1)%GLITCH_COLORS.length];
-  // Generation guard: if another glitchFlash starts on this same element
-  // before this one finishes, the stale one's queued timeout bails
-  // instead of stomping the newer word back to the wrong text.
-  //
-  // The slow opacity fade in/out lives entirely in the CSS echoFade
-  // animation on #langWord/#langWord2 (always running, 6s cycle) --
-  // deliberately NOT touched here. An earlier version disabled that
-  // animation on every flash to drive its own JS opacity fade instead,
-  // but at a 250ms tick rate each new flash cancelled the previous
-  // one's fade before it ever got visibly underway, and toggling
-  // animation:none/'' every 250ms meant echoFade itself never ran
-  // continuously either -- net result, no visible fade at all. Leaving
-  // echoFade alone and keeping this to just the fast text/color flicker
-  // gives a continuous slow fade with fast glitches layered on top,
-  // instead of the two fighting each other.
-  const gen=(el._glitchGen=(el._glitchGen||0)+1);
-  el.classList.add('lang-flicker');
-  el.style.textShadow=`-2px 0 ${c1},2px 0 ${c2}`;
-  el.textContent=leetify(cleanText);
-  setTimeout(()=>{
-    if(el._glitchGen!==gen)return;
-    el.textContent=cleanText;
-    el.style.textShadow='none';
-    el.classList.remove('lang-flicker');
-  },180);
+function corruptRandomChars(el){
+  const spans=el.querySelectorAll(':scope > span');
+  if(!spans.length)return;
+  const n=1+Math.floor(Math.random()*2);
+  for(let k=0;k<n;k++){
+    const sp=spans[Math.floor(Math.random()*spans.length)];
+    const orig=sp.dataset.orig;
+    if(!/[A-Za-z]/.test(orig))continue;
+    const up=orig.toUpperCase();
+    const c1=GLITCH_COLORS[Math.floor(Math.random()*GLITCH_COLORS.length)];
+    const c2=GLITCH_COLORS[Math.floor(Math.random()*GLITCH_COLORS.length)];
+    sp.style.textShadow=`-1px 0 ${c1},1px 0 ${c2}`;
+    sp.textContent=(LEET_MAP[up]&&Math.random()<0.5)?LEET_MAP[up]:(orig===up?orig.toLowerCase():up);
+    setTimeout(()=>{sp.textContent=orig;sp.style.textShadow='none';},150+Math.random()*150);
+  }
 }
+setInterval(()=>{
+  const w=document.getElementById('langWord'),m=document.getElementById('langWord2');
+  if(w)corruptRandomChars(w);
+  if(m)corruptRandomChars(m);
+},220);
 let langCatIdx=0,langWordIdx=-1;
 function langTick(){
   const el=document.getElementById('langWord');
@@ -1950,7 +1946,7 @@ function langTick(){
   }
   langWordIdx=idx;
   el.dataset.lang=list[idx][0];
-  glitchFlash(el,list[idx][1]);
+  renderWordSpans(el,list[idx][1]);
 }
 function langCategoryTick(){
   let idx=langCatIdx;
@@ -2030,7 +2026,7 @@ function manTick(){
   }
   manWordIdx=idx;
   el.dataset.lang=list[idx][0];
-  glitchFlash(el,list[idx][1]);
+  renderWordSpans(el,list[idx][1]);
 }
 function manCategoryTick(){
   let idx=manCatIdx;
