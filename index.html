@@ -910,12 +910,12 @@ body{
   /* center hero on phone, kill dead space top/bottom */
   #s1{align-items:center;justify-content:center;text-align:center;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
   #s1 .s1-main{display:flex;flex-direction:column;align-items:center;gap:0}
-  .s1-sub,.s1-status{justify-content:center}
+  .s1-sub,.s1-status{justify-content:center;flex-wrap:wrap}
   .s1-title{font-size:clamp(90px,26vw,160px)}
-  .s1-sub{margin-top:0}
-  .s1-status{margin-top:2px;padding-top:2px;gap:2px 8px}
+  .s1-sub{margin-top:0;row-gap:10px}
+  .s1-status{margin-top:2px;padding-top:2px;gap:6px 8px;row-gap:6px}
   .s1-title{line-height:.9}
-  .s1-scroll,.s1-coords,.s1-radio{display:none}
+  .s1-scroll,.s1-coords{display:none}
   .s2-body,.s6-body{grid-template-columns:1fr}
   .player,.lform{border-left:none;border-top:1px solid var(--dimmer)}
   .s5-grid{grid-template-columns:1fr;gap:6px}
@@ -1908,37 +1908,30 @@ function glitchFlash(el,cleanText){
   let c2=GLITCH_COLORS[Math.floor(Math.random()*GLITCH_COLORS.length)];
   if(c2===c1)c2=GLITCH_COLORS[(GLITCH_COLORS.indexOf(c1)+1)%GLITCH_COLORS.length];
   // Generation guard: if another glitchFlash starts on this same element
-  // before this one finishes (shouldn't happen at the current tick rate,
-  // but cheap insurance), the stale one's queued timeouts bail instead of
-  // stomping the newer word back to the wrong text.
+  // before this one finishes, the stale one's queued timeout bails
+  // instead of stomping the newer word back to the wrong text.
+  //
+  // The slow opacity fade in/out lives entirely in the CSS echoFade
+  // animation on #langWord/#langWord2 (always running, 6s cycle) --
+  // deliberately NOT touched here. An earlier version disabled that
+  // animation on every flash to drive its own JS opacity fade instead,
+  // but at a 250ms tick rate each new flash cancelled the previous
+  // one's fade before it ever got visibly underway, and toggling
+  // animation:none/'' every 250ms meant echoFade itself never ran
+  // continuously either -- net result, no visible fade at all. Leaving
+  // echoFade alone and keeping this to just the fast text/color flicker
+  // gives a continuous slow fade with fast glitches layered on top,
+  // instead of the two fighting each other.
   const gen=(el._glitchGen=(el._glitchGen||0)+1);
   el.classList.add('lang-flicker');
-  // animation:none (not animationPlayState:paused) -- pausing freezes the
-  // ambient breathing animation's current frame in place, and that frozen
-  // value still outranks inline style for the same property, so our own
-  // opacity fade would never actually show. Fully removing the animation
-  // hands opacity back to inline style for the duration of the glitch.
-  el.style.animation='none';
-  el.style.transition='opacity .4s ease';
-  el.style.opacity='1';
   el.style.textShadow=`-2px 0 ${c1},2px 0 ${c2}`;
   el.textContent=leetify(cleanText);
-  setTimeout(()=>{
-    if(el._glitchGen!==gen)return;
-    el.style.opacity='0'; // longer fade-out before the glitch text disappears
-  },380);
   setTimeout(()=>{
     if(el._glitchGen!==gen)return;
     el.textContent=cleanText;
     el.style.textShadow='none';
     el.classList.remove('lang-flicker');
-    el.style.opacity='1';
-  },780);
-  setTimeout(()=>{
-    if(el._glitchGen!==gen)return;
-    el.style.transition='';
-    el.style.animation='';
-  },820);
+  },180);
 }
 let langCatIdx=0,langWordIdx=-1;
 function langTick(){
