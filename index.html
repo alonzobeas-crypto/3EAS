@@ -420,6 +420,14 @@ body{
 .st-item{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--dim2)}
 .st-item .v{color:var(--accent);margin-left:8px}
 .st-item .live{color:var(--hot);animation:pulse 2s infinite}
+#langWord.lang-flicker{animation:langFlicker .35s steps(1)}
+@keyframes langFlicker{
+  0%{text-shadow:none}
+  20%{text-shadow:-2px 0 var(--hot),2px 0 #0ff;opacity:.7}
+  45%{text-shadow:2px 0 var(--hot),-2px 0 #0ff;opacity:1}
+  70%{text-shadow:-1px 0 var(--accent);opacity:.85}
+  100%{text-shadow:none;opacity:1}
+}
 
 .s1-scroll{
   position:absolute;bottom:130px;left:60px;z-index:10;
@@ -1152,6 +1160,7 @@ body{
         <div class="st-item">ORIGIN<span class="v">LINCOLN HEIGHTS</span></div>
         <div class="st-item">RELEASES<span class="v">INCOMING</span></div>
         <div class="st-item">CLEARANCE<span class="v">OPEN</span></div>
+        <div class="st-item">VOICES<span class="v" id="langWord">WOMAN</span></div>
       </div>
     </div>
     <div class="s1-scroll" id="s1scroll" onclick="spStart()" style="cursor:pointer">TAP TO ENTER · SCROLL TO EXPLORE</div>
@@ -1818,6 +1827,42 @@ function scheduleGlitchPair(){
   }, delay);
 }
 
+/* ─── VOICES: multilingual word glitch ───
+   "The world never stays static" -- a small hero readout that flickers
+   the current word through a fast rotation of languages (~4/sec), and
+   swaps which word it's cycling (woman/sister/daughter/queen/niece)
+   once a minute. Kinship terms are the tricky part: many languages mark
+   "sister"/"daughter"/"niece" relative to the speaker's own gender or
+   to which side of the family (mother's vs. father's), with no single
+   generic word -- these lists use the most common/standard dictionary
+   form per language and skip languages where that would be a real
+   stretch rather than guess. Always running once the hero reveals,
+   independent of the gesture-gated glitch family below, since it's a
+   small readout rather than a disruptive effect. */
+const LANG_WORDS={
+  woman:[['English','WOMAN'],['Spanish','MUJER'],['French','FEMME'],['Portuguese','MULHER'],['Italian','DONNA'],['German','FRAU'],['Dutch','VROUW'],['Swedish','KVINNA'],['Polish','KOBIETA'],['Russian','ЖЕНЩИНА'],['Greek','ΓΥΝΑΙΚΑ'],['Romanian','FEMEIE'],['Turkish','KADIN'],['Arabic','امرأة'],['Hebrew','אישה'],['Persian','زن'],['Hindi','महिला'],['Bengali','নারী'],['Swahili','MWANAMKE'],['Zulu','OWESIFAZANE'],['Mandarin','女人'],['Japanese','女性'],['Korean','여자'],['Vietnamese','PHỤ NỮ'],['Indonesian','PEREMPUAN'],['Tagalog','BABAE'],['Hawaiian','WAHINE'],['Māori','WAHINE'],['Nahuatl','CIHUATL'],['Quechua','WARMI'],['Guaraní','KUÑA'],['Basque','EMAKUME']],
+  sister:[['English','SISTER'],['Spanish','HERMANA'],['French','SŒUR'],['Portuguese','IRMÃ'],['Italian','SORELLA'],['German','SCHWESTER'],['Dutch','ZUS'],['Swedish','SYSTER'],['Polish','SIOSTRA'],['Russian','СЕСТРА'],['Greek','ΑΔΕΛΦΗ'],['Romanian','SORĂ'],['Turkish','KIZ KARDEŞ'],['Arabic','أخت'],['Hebrew','אחות'],['Persian','خواهر'],['Hindi','बहन'],['Bengali','বোন'],['Swahili','DADA'],['Mandarin','姐妹'],['Japanese','姉妹'],['Korean','자매'],['Vietnamese','CHỊ EM'],['Indonesian','SAUDARI'],['Tagalog','KAPATID NA BABAE'],['Hawaiian','KAIKUAHINE'],['Māori','TUAHINE'],['Quechua','ÑAÑA'],['Basque','AHIZPA']],
+  daughter:[['English','DAUGHTER'],['Spanish','HIJA'],['French','FILLE'],['Portuguese','FILHA'],['Italian','FIGLIA'],['German','TOCHTER'],['Dutch','DOCHTER'],['Swedish','DOTTER'],['Polish','CÓRKA'],['Russian','ДОЧЬ'],['Greek','ΚΟΡΗ'],['Romanian','FIICĂ'],['Turkish','KIZ'],['Arabic','ابنة'],['Hebrew','בת'],['Persian','دختر'],['Hindi','बेटी'],['Bengali','কন্যা'],['Swahili','BINTI'],['Mandarin','女儿'],['Japanese','娘'],['Korean','딸'],['Vietnamese','CON GÁI'],['Indonesian','ANAK PEREMPUAN'],['Tagalog','ANAK NA BABAE'],['Hawaiian','KAIKAMAHINE'],['Māori','TAMĀHINE'],['Quechua','USHI'],['Guaraní','TAJYRA'],['Basque','ALABA']],
+  queen:[['English','QUEEN'],['Spanish','REINA'],['French','REINE'],['Portuguese','RAINHA'],['Italian','REGINA'],['German','KÖNIGIN'],['Dutch','KONINGIN'],['Swedish','DROTTNING'],['Polish','KRÓLOWA'],['Russian','КОРОЛЕВА'],['Greek','ΒΑΣΙΛΙΣΣΑ'],['Romanian','REGINĂ'],['Turkish','KRALİÇE'],['Arabic','ملكة'],['Hebrew','מלכה'],['Persian','ملکه'],['Hindi','रानी'],['Bengali','রাণী'],['Swahili','MALKIA'],['Mandarin','女王'],['Japanese','女王'],['Korean','여왕'],['Vietnamese','NỮ HOÀNG'],['Indonesian','RATU'],['Tagalog','REYNA'],['Hawaiian',"ALI'I WAHINE"],['Māori','KUINI'],['Nahuatl','CIHUAPILLI'],['Quechua','QOYA'],['Basque','ERREGINA']],
+  niece:[['English','NIECE'],['Spanish','SOBRINA'],['French','NIÈCE'],['Portuguese','SOBRINHA'],['Italian','NIPOTE'],['German','NICHTE'],['Dutch','NICHT'],['Russian','ПЛЕМЯННИЦА'],['Greek','ΑΝΙΨΙΑ'],['Romanian','NEPOATĂ'],['Turkish','YEĞEN'],['Hebrew','אחיינית'],['Hindi','भतीजी'],['Swahili','MPWA'],['Mandarin','侄女'],['Japanese','姪'],['Korean','조카딸'],['Vietnamese','CHÁU GÁI'],['Indonesian','KEPONAKAN PEREMPUAN'],['Tagalog','PAMANGKIN NA BABAE']]
+};
+const LANG_CATEGORIES=['woman','sister','daughter','queen','niece'];
+let langCatIdx=0,langWordIdx=-1;
+function langTick(){
+  const el=document.getElementById('langWord');
+  if(!el)return;
+  const list=LANG_WORDS[LANG_CATEGORIES[langCatIdx]];
+  langWordIdx=(langWordIdx+1)%list.length;
+  el.textContent=list[langWordIdx][1];
+  el.classList.remove('lang-flicker');
+  void el.offsetWidth; // restart the CSS animation
+  el.classList.add('lang-flicker');
+}
+function langCategoryTick(){
+  langCatIdx=(langCatIdx+1)%LANG_CATEGORIES.length;
+  langWordIdx=-1;
+}
+
 /* ─── INTRO ─── */
 setTimeout(()=>{
   document.getElementById('intro').classList.add('out');
@@ -1831,6 +1876,9 @@ setTimeout(()=>{
     document.getElementById('s1stat').classList.add('vis');
     document.getElementById('s1scroll').classList.add('vis');
     scenes[0].classList.add('active');
+    langTick();
+    setInterval(langTick,250);
+    setInterval(langCategoryTick,60000);
   },200);
 },2200);
 
