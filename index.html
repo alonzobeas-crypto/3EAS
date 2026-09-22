@@ -420,14 +420,17 @@ body{
 .st-item{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--dim2)}
 .st-item .v{color:var(--accent);margin-left:8px}
 .st-item .live{color:var(--hot);animation:pulse 2s infinite}
-#langWord.lang-flicker{animation:langFlicker .35s steps(1)}
-@keyframes langFlicker{
-  0%{text-shadow:none}
-  20%{text-shadow:-2px 0 var(--hot),2px 0 #0ff;opacity:.7}
-  45%{text-shadow:2px 0 var(--hot),-2px 0 #0ff;opacity:1}
-  70%{text-shadow:-1px 0 var(--accent);opacity:.85}
-  100%{text-shadow:none;opacity:1}
-}
+/* Ambient breathing, opposite phase, same shape as the UNO/DOS boxes'
+   own fade -- so the two words feel like part of the same system
+   rather than a one-off effect unique to this readout. */
+#langWord2,#langWord{animation:echoFade 6s ease-in-out infinite}
+#langWord{animation-delay:-3s}
+@keyframes echoFade{0%,100%{opacity:.35}50%{opacity:1}}
+/* Glitch flash colors are chosen fresh in JS per flicker (see
+   glitchFlash()) via inline text-shadow rather than a fixed keyframe,
+   so it's never locked to one color (e.g. always blue) -- it draws
+   from the same RGB-split palette the ticker's own glitch effects use. */
+.lang-flicker{transition:text-shadow .18s steps(1),opacity .18s steps(1)}
 
 .s1-scroll{
   position:absolute;bottom:130px;left:60px;z-index:10;
@@ -1870,6 +1873,19 @@ const LANG_WORDS={
 // glitch: sometimes mundane, sometimes a jarring juxtaposition (e.g.
 // uncle/wife, son/cam girl) -- "the world never stays static."
 const LANG_CATEGORIES=['woman','sister','daughter','queen','niece','auntie','nurse','teacher','maid','midwife','witch','stripper','sex worker','prostitute','actress','cam girl','dominatrix','wife'];
+// Same RGB-split glitch the ticker itself uses (see #ticker's
+// glitch-shift keyframe), but with the shadow colors picked fresh each
+// flash instead of a fixed pair -- so it isn't locked to always
+// rendering the same (e.g. always-blue) combination.
+const GLITCH_COLORS=['#0ff','#f0f','#0f8','#f44','#ff0','var(--hot)','var(--accent)'];
+function glitchFlash(el){
+  const c1=GLITCH_COLORS[Math.floor(Math.random()*GLITCH_COLORS.length)];
+  let c2=GLITCH_COLORS[Math.floor(Math.random()*GLITCH_COLORS.length)];
+  if(c2===c1)c2=GLITCH_COLORS[(GLITCH_COLORS.indexOf(c1)+1)%GLITCH_COLORS.length];
+  el.classList.add('lang-flicker');
+  el.style.textShadow=`-2px 0 ${c1},2px 0 ${c2}`;
+  setTimeout(()=>{el.style.textShadow='none';el.classList.remove('lang-flicker');},180);
+}
 let langCatIdx=0,langWordIdx=-1;
 function langTick(){
   const el=document.getElementById('langWord');
@@ -1888,9 +1904,7 @@ function langTick(){
   langWordIdx=idx;
   el.textContent=list[idx][1];
   el.dataset.lang=list[idx][0];
-  el.classList.remove('lang-flicker');
-  void el.offsetWidth; // restart the CSS animation
-  el.classList.add('lang-flicker');
+  glitchFlash(el);
 }
 function langCategoryTick(){
   let idx=langCatIdx;
@@ -1951,9 +1965,7 @@ function manTick(){
   manWordIdx=idx;
   el.textContent=list[idx][1];
   el.dataset.lang=list[idx][0];
-  el.classList.remove('lang-flicker');
-  void el.offsetWidth;
-  el.classList.add('lang-flicker');
+  glitchFlash(el);
 }
 function manCategoryTick(){
   let idx=manCatIdx;
