@@ -919,6 +919,13 @@ body{
   .s1-status{margin-top:2px;padding-top:2px;gap:6px 8px;row-gap:6px}
   .s1-title{line-height:.9}
   .s1-scroll,.s1-coords{display:none}
+  /* The two flex:1 rule dividers exist to split available space
+     between the two side texts and the UNO/DOS group on one line --
+     once .s1-sub wraps onto separate lines per item, a rule sharing a
+     wrapped line with just one text item grows to fill the rest of
+     that line instead of centering, shoving the text to one edge.
+     They don't serve a purpose once things wrap, so drop them. */
+  .s1-rule{display:none}
   .s2-body,.s6-body{grid-template-columns:1fr}
   .player,.lform{border-left:none;border-top:1px solid var(--dimmer)}
   .s5-grid{grid-template-columns:1fr;gap:6px}
