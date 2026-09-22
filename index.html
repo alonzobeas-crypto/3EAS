@@ -1156,11 +1156,11 @@ body{
         <div class="s1-tag">CAPTURE DON'T KILL</div>
       </div>
       <div class="s1-status" id="s1stat">
+        <div class="st-item"><span class="v" id="langWord2">MAN</span><span class="v"> = </span><span class="v" id="langWord">WOMAN</span></div>
         <div class="st-item">STATUS<span class="v live">◉ TRANSMITTING</span></div>
         <div class="st-item">ORIGIN<span class="v">LINCOLN HEIGHTS</span></div>
         <div class="st-item">RELEASES<span class="v">INCOMING</span></div>
         <div class="st-item">CLEARANCE<span class="v">OPEN</span></div>
-        <div class="st-item">VOICES<span class="v" id="langWord">WOMAN</span></div>
       </div>
     </div>
     <div class="s1-scroll" id="s1scroll" onclick="spStart()" style="cursor:pointer">TAP TO ENTER · SCROLL TO EXPLORE</div>
@@ -1878,6 +1878,48 @@ function langCategoryTick(){
   langWordIdx=-1;
 }
 
+// Mirror of the above for the hero's other corner -- same mechanic,
+// same mirrored categories (man/brother/son/king/nephew/uncle, then
+// traditional and stigmatized male-coded labor), independent state so
+// the two sides don't sync up and drift in and out of phase with each
+// other over time.
+const MAN_WORDS={
+  man:[['English','MAN'],['Spanish','HOMBRE'],['French','HOMME'],['Portuguese','HOMEM'],['Italian','UOMO'],['German','MANN'],['Dutch','MAN'],['Swedish','MAN'],['Polish','MĘŻCZYZNA'],['Russian','МУЖЧИНА'],['Greek','ΑΝΤΡΑΣ'],['Romanian','BĂRBAT'],['Turkish','ERKEK'],['Arabic','رجل'],['Hebrew','איש'],['Persian','مرد'],['Hindi','आदमी'],['Bengali','পুরুষ'],['Swahili','MWANAUME'],['Zulu','INDODA'],['Mandarin','男人'],['Japanese','男性'],['Korean','남자'],['Vietnamese','ĐÀN ÔNG'],['Indonesian','LAKI-LAKI'],['Tagalog','LALAKI'],['Hawaiian','KĀNE'],['Māori','TĀNE'],['Nahuatl','TLACATL'],['Quechua','QHARI'],['Guaraní',"KUIMBA'E"],['Basque','GIZON']],
+  brother:[['English','BROTHER'],['Spanish','HERMANO'],['French','FRÈRE'],['Portuguese','IRMÃO'],['Italian','FRATELLO'],['German','BRUDER'],['Dutch','BROER'],['Swedish','BRODER'],['Polish','BRAT'],['Russian','БРАТ'],['Greek','ΑΔΕΛΦΟΣ'],['Romanian','FRATE'],['Turkish','ERKEK KARDEŞ'],['Arabic','أخ'],['Hebrew','אח'],['Persian','برادر'],['Hindi','भाई'],['Bengali','ভাই'],['Swahili','KAKA'],['Mandarin','兄弟'],['Japanese','兄弟'],['Korean','형제'],['Vietnamese','ANH EM'],['Indonesian','SAUDARA'],['Tagalog','KAPATID NA LALAKI'],['Hawaiian','KAIKUNĀNE'],['Māori','TUNGĀNE'],['Quechua','WAWQE'],['Basque','ANAIA']],
+  son:[['English','SON'],['Spanish','HIJO'],['French','FILS'],['Portuguese','FILHO'],['Italian','FIGLIO'],['German','SOHN'],['Dutch','ZOON'],['Swedish','SON'],['Polish','SYN'],['Russian','СЫН'],['Greek','ΓΙΟΣ'],['Romanian','FIU'],['Turkish','OĞUL'],['Arabic','ابن'],['Hebrew','בן'],['Persian','پسر'],['Hindi','बेटा'],['Bengali','ছেলে'],['Swahili','MWANA WA KIUME'],['Mandarin','儿子'],['Japanese','息子'],['Korean','아들'],['Vietnamese','CON TRAI'],['Indonesian','ANAK LAKI-LAKI'],['Tagalog','ANAK NA LALAKI'],['Hawaiian','KEIKIKĀNE'],['Māori','TAMA'],['Quechua','CHURI'],['Guaraní',"TA'ÝRA"],['Basque','SEME']],
+  king:[['English','KING'],['Spanish','REY'],['French','ROI'],['Portuguese','REI'],['Italian','RE'],['German','KÖNIG'],['Dutch','KONING'],['Swedish','KUNG'],['Polish','KRÓL'],['Russian','КОРОЛЬ'],['Greek','ΒΑΣΙΛΙΑΣ'],['Romanian','REGE'],['Turkish','KRAL'],['Arabic','ملك'],['Hebrew','מלך'],['Persian','شاه'],['Hindi','राजा'],['Bengali','রাজা'],['Swahili','MFALME'],['Mandarin','国王'],['Japanese','王'],['Korean','왕'],['Vietnamese','VUA'],['Indonesian','RAJA'],['Tagalog','HARI'],['Hawaiian','MŌʻĪ'],['Māori','KINGI'],['Nahuatl','TLATOANI'],['Quechua','SAPA INKA'],['Basque','ERREGE']],
+  nephew:[['English','NEPHEW'],['Spanish','SOBRINO'],['French','NEVEU'],['Portuguese','SOBRINHO'],['Italian','NIPOTE'],['German','NEFFE'],['Dutch','NEEF'],['Russian','ПЛЕМЯННИК'],['Greek','ΑΝΙΨΙΟΣ'],['Romanian','NEPOT'],['Turkish','YEĞEN'],['Hebrew','אחיין'],['Hindi','भतीजा'],['Swahili','MPWA'],['Mandarin','侄子'],['Japanese','甥'],['Korean','조카'],['Vietnamese','CHÁU TRAI'],['Indonesian','KEPONAKAN LAKI-LAKI'],['Tagalog','PAMANGKIN NA LALAKI']],
+  uncle:[['English','UNCLE'],['Spanish','TÍO'],['French','ONCLE'],['Portuguese','TIO'],['Italian','ZIO'],['German','ONKEL'],['Dutch','OOM'],['Swedish','FARBROR'],['Polish','WUJEK'],['Russian','ДЯДЯ'],['Greek','ΘΕΙΟΣ'],['Romanian','UNCHI'],['Turkish','AMCA'],['Arabic','خال'],['Hebrew','דוד'],['Persian','عمو'],['Hindi','मामा'],['Swahili','MJOMBA'],['Mandarin','叔叔'],['Japanese','おじさん'],['Korean','삼촌'],['Vietnamese','CẬU'],['Indonesian','PAMAN'],['Tagalog','TITO'],['Hawaiian',"'ANAKALA"],['Basque','OSABA']],
+  // Traditional male-coded labor
+  soldier:[['English','SOLDIER'],['Spanish','SOLDADO'],['French','SOLDAT'],['Portuguese','SOLDADO'],['Italian','SOLDATO'],['German','SOLDAT'],['Dutch','SOLDAAT'],['Swedish','SOLDAT'],['Polish','ŻOŁNIERZ'],['Russian','СОЛДАТ'],['Greek','ΣΤΡΑΤΙΩΤΗΣ'],['Romanian','SOLDAT'],['Turkish','ASKER'],['Arabic','جندي'],['Hebrew','חייל'],['Persian','سرباز'],['Hindi','सैनिक'],['Swahili','ASKARI'],['Mandarin','士兵'],['Japanese','兵士'],['Korean','군인'],['Vietnamese','LÍNH'],['Indonesian','TENTARA'],['Tagalog','SUNDALO']],
+  farmer:[['English','FARMER'],['Spanish','GRANJERO'],['French','FERMIER'],['Portuguese','FAZENDEIRO'],['Italian','CONTADINO'],['German','BAUER'],['Dutch','BOER'],['Swedish','BONDE'],['Polish','ROLNIK'],['Russian','ФЕРМЕР'],['Greek','ΑΓΡΟΤΗΣ'],['Romanian','FERMIER'],['Turkish','ÇİFTÇİ'],['Arabic','فلاح'],['Hebrew','חקלאי'],['Persian','کشاورز'],['Hindi','किसान'],['Swahili','MKULIMA'],['Mandarin','农民'],['Japanese','農家'],['Korean','농부'],['Vietnamese','NÔNG DÂN'],['Indonesian','PETANI'],['Tagalog','MAGSASAKA']],
+  butler:[['English','BUTLER'],['Spanish','MAYORDOMO'],['French','MAJORDOME'],['Portuguese','MORDOMO'],['Italian','MAGGIORDOMO'],['German','BUTLER'],['Dutch','BUTLER'],['Swedish','BETJÄNT'],['Polish','LOKAJ'],['Russian','ДВОРЕЦКИЙ'],['Turkish','UŞAK'],['Mandarin','管家'],['Japanese','執事'],['Korean','집사'],['Vietnamese','QUẢN GIA'],['Indonesian','PELAYAN'],['Tagalog','MAYORDOMO']],
+  blacksmith:[['English','BLACKSMITH'],['Spanish','HERRERO'],['French','FORGERON'],['Portuguese','FERREIRO'],['Italian','FABBRO'],['German','SCHMIED'],['Dutch','SMID'],['Swedish','SMED'],['Polish','KOWAL'],['Russian','КУЗНЕЦ'],['Greek','ΣΙΔΗΡΟΥΡΓΟΣ'],['Romanian','FIERAR'],['Turkish','DEMİRCİ'],['Mandarin','铁匠'],['Japanese','鍛冶屋'],['Korean','대장장이'],['Vietnamese','THỢ RÈN'],['Indonesian','PANDAI BESI'],['Tagalog','PANDAY']],
+  // Stigmatized/frowned-upon male-coded labor
+  warlock:[['English','WARLOCK'],['Spanish','BRUJO'],['French','SORCIER'],['Portuguese','BRUXO'],['Italian','STREGONE'],['German','HEXENMEISTER'],['Dutch','TOVENAAR'],['Swedish','TROLLKARL'],['Polish','CZARNOKSIĘŻNIK'],['Russian','КОЛДУН'],['Greek','ΜΑΓΟΣ'],['Romanian','VRĂJITOR'],['Turkish','BÜYÜCÜ'],['Hindi','जादूगर'],['Mandarin','男巫'],['Japanese','魔法使い'],['Korean','마법사'],['Vietnamese','PHÙ THỦY NAM'],['Indonesian','PENYIHIR PRIA'],['Tagalog','MANGKUKULAM NA LALAKI']],
+  'male stripper':[['English','MALE STRIPPER'],['Spanish','BAILARÍN EXÓTICO'],['French','STRIPTEASEUR'],['Portuguese','DANÇARINO EXÓTICO'],['Italian','SPOGLIARELLISTA'],['German','STRIPTEASETÄNZER'],['Dutch','STRIPTEASEDANSER'],['Swedish','STRIPPARE'],['Polish','TANCERZ EROTYCZNY'],['Russian','СТРИПТИЗЁР'],['Turkish','STRİPTİZCİ'],['Mandarin','脱衣舞男'],['Japanese','男性ストリッパー'],['Korean','남성 스트리퍼'],['Vietnamese','VŨ NAM THOÁT Y'],['Indonesian','PENARI TELANJANG PRIA']],
+  gigolo:[['English','GIGOLO'],['Spanish','GIGOLÓ'],['French','GIGOLO'],['Portuguese','GIGOLÔ'],['Italian','GIGOLÒ'],['German','GIGOLO'],['Dutch','GIGOLO'],['Swedish','GIGOLO'],['Polish','ŻIGOLAK'],['Russian','ЖИГОЛО'],['Turkish','JİGOLO'],['Mandarin','牛郎'],['Japanese','ジゴロ'],['Korean','지골로'],['Vietnamese','TRAI BAO'],['Indonesian','GIGOLO']],
+  actor:[['English','ACTOR'],['Spanish','ACTOR'],['French','ACTEUR'],['Portuguese','ATOR'],['Italian','ATTORE'],['German','SCHAUSPIELER'],['Dutch','ACTEUR'],['Swedish','SKÅDESPELARE'],['Polish','AKTOR'],['Russian','АКТЁР'],['Greek','ΗΘΟΠΟΙΟΣ'],['Romanian','ACTOR'],['Turkish','AKTÖR'],['Arabic','ممثل'],['Hebrew','שחקן'],['Persian','بازیگر'],['Hindi','अभिनेता'],['Swahili','MWIGIZAJI'],['Mandarin','男演员'],['Japanese','俳優'],['Korean','남배우'],['Vietnamese','NAM DIỄN VIÊN'],['Indonesian','AKTOR'],['Tagalog','AKTOR']],
+  'cam boy':[['English','CAM BOY'],['Spanish','CHICO CAM'],['French','CAM BOY'],['Portuguese','GAROTO DE WEBCAM'],['Italian','CAM BOY'],['German','CAMBOY'],['Dutch','CAMBOY'],['Japanese','キャムボーイ'],['Korean','캠보이'],['Indonesian','CAM BOY']],
+  dom:[['English','DOM'],['Spanish','AMO'],['French','DOMINANT'],['Portuguese','DOMINADOR'],['Italian','DOMINATORE'],['German','DOM'],['Dutch','DOM'],['Swedish','DOM'],['Russian','ДОМ'],['Turkish','DOM'],['Japanese','王様'],['Korean','왕님'],['Indonesian','DOM']]
+};
+const MAN_CATEGORIES=['man','brother','son','king','nephew','uncle','soldier','farmer','butler','blacksmith','warlock','male stripper','gigolo','actor','cam boy','dom'];
+let manCatIdx=0,manWordIdx=-1;
+function manTick(){
+  const el=document.getElementById('langWord2');
+  if(!el)return;
+  const list=MAN_WORDS[MAN_CATEGORIES[manCatIdx]];
+  manWordIdx=(manWordIdx+1)%list.length;
+  el.textContent=list[manWordIdx][1];
+  el.classList.remove('lang-flicker');
+  void el.offsetWidth;
+  el.classList.add('lang-flicker');
+}
+function manCategoryTick(){
+  manCatIdx=(manCatIdx+1)%MAN_CATEGORIES.length;
+  manWordIdx=-1;
+}
+
 /* ─── INTRO ─── */
 setTimeout(()=>{
   document.getElementById('intro').classList.add('out');
@@ -1894,6 +1936,9 @@ setTimeout(()=>{
     langTick();
     setInterval(langTick,250);
     setInterval(langCategoryTick,60000);
+    manTick();
+    setInterval(manTick,250);
+    setInterval(manCategoryTick,60000);
   },200);
 },2200);
 
