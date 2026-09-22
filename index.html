@@ -2068,14 +2068,20 @@ setTimeout(()=>{
     manTick();
     setInterval(manTick,250);
     setInterval(manCategoryTick,60000);
-    // Visible for 1 minute, hidden for 1 minute, repeating -- rather
-    // than running constantly. The word/category ticks above keep
-    // running underneath regardless, so it's mid-cycle whenever it
-    // reappears rather than always restarting fresh.
-    setInterval(()=>{
+    // Macro cycle: visible for 1 minute out of every 5, rather than
+    // running constantly. The word/category ticks above (the micro
+    // cycle) keep running underneath regardless of visibility, so it's
+    // already mid-cycle -- a fresh random pairing/language -- whenever
+    // it reappears rather than always restarting fresh.
+    function echoesCycle(){
       const row=document.getElementById('echoesRow');
-      if(row)row.style.display=(row.style.display==='none')?'':'none';
-    },60000);
+      if(!row)return;
+      row.style.display='';
+      setTimeout(()=>{if(row)row.style.display='none';},60000);
+    }
+    echoesCycle();
+    setInterval(echoesCycle,300000);
+    window.__echoesCycle=echoesCycle;
   },200);
 },2200);
 
