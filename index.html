@@ -1907,14 +1907,38 @@ function glitchFlash(el,cleanText){
   const c1=GLITCH_COLORS[Math.floor(Math.random()*GLITCH_COLORS.length)];
   let c2=GLITCH_COLORS[Math.floor(Math.random()*GLITCH_COLORS.length)];
   if(c2===c1)c2=GLITCH_COLORS[(GLITCH_COLORS.indexOf(c1)+1)%GLITCH_COLORS.length];
+  // Generation guard: if another glitchFlash starts on this same element
+  // before this one finishes (shouldn't happen at the current tick rate,
+  // but cheap insurance), the stale one's queued timeouts bail instead of
+  // stomping the newer word back to the wrong text.
+  const gen=(el._glitchGen=(el._glitchGen||0)+1);
   el.classList.add('lang-flicker');
+  // animation:none (not animationPlayState:paused) -- pausing freezes the
+  // ambient breathing animation's current frame in place, and that frozen
+  // value still outranks inline style for the same property, so our own
+  // opacity fade would never actually show. Fully removing the animation
+  // hands opacity back to inline style for the duration of the glitch.
+  el.style.animation='none';
+  el.style.transition='opacity .4s ease';
+  el.style.opacity='1';
   el.style.textShadow=`-2px 0 ${c1},2px 0 ${c2}`;
   el.textContent=leetify(cleanText);
   setTimeout(()=>{
+    if(el._glitchGen!==gen)return;
+    el.style.opacity='0'; // longer fade-out before the glitch text disappears
+  },380);
+  setTimeout(()=>{
+    if(el._glitchGen!==gen)return;
     el.textContent=cleanText;
     el.style.textShadow='none';
     el.classList.remove('lang-flicker');
-  },180);
+    el.style.opacity='1';
+  },780);
+  setTimeout(()=>{
+    if(el._glitchGen!==gen)return;
+    el.style.transition='';
+    el.style.animation='';
+  },820);
 }
 let langCatIdx=0,langWordIdx=-1;
 function langTick(){
@@ -2039,10 +2063,10 @@ setTimeout(()=>{
     document.getElementById('s1scroll').classList.add('vis');
     scenes[0].classList.add('active');
     langTick();
-    setInterval(langTick,250);
+    setInterval(langTick,900);
     setInterval(langCategoryTick,60000);
     manTick();
-    setInterval(manTick,250);
+    setInterval(manTick,900);
     setInterval(manCategoryTick,60000);
   },200);
 },2200);
