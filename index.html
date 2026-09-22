@@ -412,9 +412,12 @@ body{
 .st-item .live{color:var(--hot);animation:pulse 2s infinite}
 /* Ambient breathing, opposite phase, same shape as the UNO/DOS boxes'
    own fade -- so the two words feel like part of the same system
-   rather than a one-off effect unique to this readout. */
+   rather than a one-off effect unique to this readout. Both words
+   fade IN SYNC (no delay offset) -- unlike the two separate UNO/DOS
+   boxes, these two sit in one combined "X = Y" phrase, so an
+   opposite-phase fade left one word bright while the other nearly
+   vanished, making the row look lopsided rather than balanced. */
 #langWord2,#langWord{animation:echoFade 6s ease-in-out infinite}
-#langWord{animation-delay:-3s}
 @keyframes echoFade{0%,100%{opacity:.75}50%{opacity:.12}}
 /* Glitch flash colors are chosen fresh in JS per flicker (see
    glitchFlash()) via inline text-shadow rather than a fixed keyframe,
