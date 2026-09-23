@@ -811,6 +811,7 @@ body{
 .scene-eyebrow{font-size:13px}
 .ti span{font-size:16px!important;letter-spacing:2px!important;color:var(--hot)!important}
 .st-item{font-size:13px}
+.s1-echoes-line{font-size:16px}
 .s1-scroll{font-size:12px}
 .s1-coords{font-size:13px}
 .s1-tag,.s1-sub-text{font-size:12px}
@@ -1859,7 +1860,8 @@ const LANG_WORDS={
   priestess:[['English','PRIESTESS'],['Spanish','SACERDOTISA'],['French','PRÊTRESSE'],['Portuguese','SACERDOTISA'],['Italian','SACERDOTESSA'],['German','PRIESTERIN'],['Swedish','PRÄSTINNA'],['Polish','KAPŁANKA'],['Russian','ЖРИЦА'],['Greek','ΙΕΡΕΙΑ'],['Romanian','PREOTEASĂ'],['Mandarin','女祭司'],['Japanese','女祭司'],['Korean','여사제'],['Vietnamese','NỮ TU SĨ'],['Tagalog','BABAYLAN']],
   nun:[['English','NUN'],['Spanish','MONJA'],['French','NONNE'],['Portuguese','FREIRA'],['Italian','MONACA'],['German','NONNE'],['Dutch','NON'],['Swedish','NUNNA'],['Polish','ZAKONNICA'],['Russian','МОНАХИНЯ'],['Greek','ΚΑΛΟΓΡΙΑ'],['Romanian','CĂLUGĂRIȚĂ'],['Turkish','RAHİBE'],['Arabic','راهبة'],['Hebrew','נזירה'],['Persian','راهبه'],['Hindi','नन'],['Mandarin','修女'],['Japanese','修道女'],['Korean','수녀'],['Vietnamese','NỮ TU'],['Indonesian','BIARAWATI'],['Tagalog','MADRE']],
   madam:[['English','MADAM'],['Spanish','MADAMA'],['French','MAQUERELLE'],['Portuguese','CAFETINA'],['Italian','MAITRESSE'],['Russian','МАДАМ'],['Mandarin','老鸨'],['Indonesian','GERMO']],
-  nanny:[['English','NANNY'],['Spanish','NIÑERA'],['French','NOUNOU'],['Portuguese','BABÁ'],['Italian','TATA'],['German','KINDERMÄDCHEN'],['Dutch','KINDERMEISJE'],['Swedish','BARNFLICKA'],['Polish','NIANIA'],['Russian','НЯНЯ'],['Greek','ΝΤΑΝΤΑ'],['Romanian','DĂDACĂ'],['Turkish','DADI'],['Arabic','مربية'],['Hebrew','מטפלת'],['Persian','پرستار بچه'],['Hindi','आया'],['Mandarin','保姆'],['Japanese','ベビーシッター'],['Korean','보모'],['Vietnamese','BẢO MẪU'],['Indonesian','PENGASUH'],['Tagalog','YAYA']]
+  nanny:[['English','NANNY'],['Spanish','NIÑERA'],['French','NOUNOU'],['Portuguese','BABÁ'],['Italian','TATA'],['German','KINDERMÄDCHEN'],['Dutch','KINDERMEISJE'],['Swedish','BARNFLICKA'],['Polish','NIANIA'],['Russian','НЯНЯ'],['Greek','ΝΤΑΝΤΑ'],['Romanian','DĂDACĂ'],['Turkish','DADI'],['Arabic','مربية'],['Hebrew','מטפלת'],['Persian','پرستار بچه'],['Hindi','आया'],['Mandarin','保姆'],['Japanese','ベビーシッター'],['Korean','보모'],['Vietnamese','BẢO MẪU'],['Indonesian','PENGASUH'],['Tagalog','YAYA']],
+  eve:[['English','EVE'],['Spanish','EVA'],['French','ÈVE'],['Portuguese','EVA'],['Italian','EVA'],['German','EVA'],['Dutch','EVA'],['Swedish','EVA'],['Polish','EWA'],['Russian','ЕВА'],['Greek','ΕΥΑ'],['Romanian','EVA'],['Turkish','HAVVA'],['Arabic','حواء'],['Hebrew','חוה'],['Persian','حوا'],['Hindi','हव्वा'],['Mandarin','夏娃'],['Japanese','イブ'],['Korean','이브'],['Vietnamese','Ê-VA'],['Indonesian','HAWA'],['Tagalog','EBA']]
 };
 // A shared, randomized pairing instead of matched-index cycling -- the
 // two sides used to land on the Nth category of their own list at the
@@ -1868,7 +1870,7 @@ const LANG_WORDS={
 // each side's own pool means the pairing itself becomes part of the
 // glitch: sometimes mundane, sometimes a jarring juxtaposition (e.g.
 // uncle/wife, son/cam girl) -- "the world never stays static."
-const LANG_CATEGORIES=['woman','sister','daughter','queen','niece','auntie','nurse','teacher','maid','midwife','witch','stripper','sex worker','prostitute','actress','cam girl','dominatrix','wife','doctor','lawyer','engineer','scientist','waitress','widow','bride','princess','chairwoman','businesswoman','policewoman','heroine','priestess','nun','madam','nanny'];
+const LANG_CATEGORIES=['woman','sister','daughter','queen','niece','auntie','nurse','teacher','maid','midwife','witch','stripper','sex worker','prostitute','actress','cam girl','dominatrix','wife','doctor','lawyer','engineer','scientist','waitress','widow','bride','princess','chairwoman','businesswoman','policewoman','heroine','priestess','nun','madam','nanny','eve'];
 // RGB-split glitch flash, colors picked fresh each time instead of a
 // fixed pair -- so it isn't locked to always rendering the same (e.g.
 // always-blue) combination.
@@ -1994,9 +1996,10 @@ const MAN_WORDS={
   priest:[['English','PRIEST'],['Spanish','SACERDOTE'],['French','PRÊTRE'],['Portuguese','SACERDOTE'],['Italian','SACERDOTE'],['German','PRIESTER'],['Dutch','PRIESTER'],['Swedish','PRÄST'],['Polish','KAPŁAN'],['Russian','ЖРЕЦ'],['Greek','ΙΕΡΕΑΣ'],['Romanian','PREOT'],['Turkish','RAHİP'],['Arabic','كاهن'],['Hebrew','כומר'],['Mandarin','男祭司'],['Japanese','男性祭司'],['Korean','남사제'],['Vietnamese','NAM TU SĨ']],
   monk:[['English','MONK'],['Spanish','MONJE'],['French','MOINE'],['Portuguese','MONGE'],['Italian','MONACO'],['German','MÖNCH'],['Dutch','MONNIK'],['Swedish','MUNK'],['Polish','MNICH'],['Russian','МОНАХ'],['Greek','ΚΑΛΟΓΕΡΟΣ'],['Romanian','CĂLUGĂR'],['Turkish','KEŞİŞ'],['Arabic','راهب'],['Hebrew','נזיר'],['Persian','راهب'],['Hindi','भिक्षु'],['Mandarin','僧侣'],['Japanese','修道士'],['Korean','수도승'],['Vietnamese','NHÀ SƯ'],['Indonesian','BIARAWAN'],['Tagalog','MONGHE']],
   pimp:[['English','PIMP'],['Spanish','PROXENETA'],['French','PROXÉNÈTE'],['Portuguese','CAFETÃO'],['Italian','PAPPONE'],['German','ZUHÄLTER'],['Russian','СВОДНИК'],['Turkish','PEZEVENK'],['Mandarin','皮条客'],['Japanese','ポン引き']],
-  manny:[['English','MANNY'],['Spanish','NIÑERO'],['German','KINDERPFLEGER'],['Mandarin','男保姆'],['Japanese','男性ベビーシッター'],['Korean','남자 보모'],['Vietnamese','BẢO MẪU NAM']]
+  manny:[['English','MANNY'],['Spanish','NIÑERO'],['German','KINDERPFLEGER'],['Mandarin','男保姆'],['Japanese','男性ベビーシッター'],['Korean','남자 보모'],['Vietnamese','BẢO MẪU NAM']],
+  adam:[['English','ADAM'],['Spanish','ADÁN'],['French','ADAM'],['Portuguese','ADÃO'],['Italian','ADAMO'],['German','ADAM'],['Dutch','ADAM'],['Swedish','ADAM'],['Polish','ADAM'],['Russian','АДАМ'],['Greek','ΑΔΑΜ'],['Romanian','ADAM'],['Turkish','ÂDEM'],['Arabic','آدم'],['Hebrew','אדם'],['Persian','آدم'],['Hindi','आदम'],['Mandarin','亚当'],['Japanese','アダム'],['Korean','아담'],['Vietnamese','A-ĐAM'],['Indonesian','ADAM'],['Tagalog','ADAN']]
 };
-const MAN_CATEGORIES=['man','brother','son','king','nephew','uncle','soldier','farmer','butler','blacksmith','male midwife','warlock','male stripper','gigolo','male prostitute','actor','cam boy','dom','husband','doctor','lawyer','engineer','scientist','waiter','widower','groom','prince','chairman','businessman','policeman','hero','priest','monk','pimp','manny'];
+const MAN_CATEGORIES=['man','brother','son','king','nephew','uncle','soldier','farmer','butler','blacksmith','male midwife','warlock','male stripper','gigolo','male prostitute','actor','cam boy','dom','husband','doctor','lawyer','engineer','scientist','waiter','widower','groom','prince','chairman','businessman','policeman','hero','priest','monk','pimp','manny','adam'];
 let manCatIdx=0,manWordIdx=-1;
 function manTick(){
   const el=document.getElementById('langWord2');
