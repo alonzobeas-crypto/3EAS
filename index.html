@@ -407,6 +407,7 @@ body{
   opacity:0;transition:opacity 1s 2.5s;
 }
 .s1-status.vis{opacity:1}
+.s1-echoes-line{display:flex;justify-content:center;width:100%;margin-top:10px}
 .st-item{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--dim2)}
 .st-item .v{color:var(--accent);margin-left:8px}
 .st-item .live{color:var(--hot);animation:pulse 2s infinite}
@@ -1159,12 +1160,12 @@ body{
         <div class="s1-tag">CAPTURE DON'T KILL</div>
       </div>
       <div class="s1-status" id="s1stat">
-        <div class="st-item" id="echoesRow"><span class="v" id="langWord2">MAN</span><span class="v"> = </span><span class="v" id="langWord">WOMAN</span></div>
         <div class="st-item">STATUS<span class="v live">◉ TRANSMITTING</span></div>
         <div class="st-item">ORIGIN<span class="v">LINCOLN HEIGHTS</span></div>
         <div class="st-item">RELEASES<span class="v">INCOMING</span></div>
         <div class="st-item">CLEARANCE<span class="v">OPEN</span></div>
       </div>
+      <div class="s1-echoes-line st-item" id="echoesRow"><span class="v" id="langWord2">MAN</span><span class="v"> = </span><span class="v" id="langWord">WOMAN</span></div>
     </div>
     <div class="s1-scroll" id="s1scroll" onclick="spStart()" style="cursor:pointer">TAP TO ENTER · SCROLL TO EXPLORE</div>
     <div class="scene-counter">01 / 08</div>
