@@ -407,14 +407,18 @@ body{
   opacity:0;transition:opacity 1s 2.5s;
 }
 .s1-status.vis{opacity:1}
+.s1-echoes-line{display:flex;justify-content:center;width:100%;margin-top:10px}
 .st-item{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--dim2)}
 .st-item .v{color:var(--accent);margin-left:8px}
 .st-item .live{color:var(--hot);animation:pulse 2s infinite}
 /* Ambient breathing, opposite phase, same shape as the UNO/DOS boxes'
    own fade -- so the two words feel like part of the same system
-   rather than a one-off effect unique to this readout. */
+   rather than a one-off effect unique to this readout. Both words
+   fade IN SYNC (no delay offset) -- unlike the two separate UNO/DOS
+   boxes, these two sit in one combined "X = Y" phrase, so an
+   opposite-phase fade left one word bright while the other nearly
+   vanished, making the row look lopsided rather than balanced. */
 #langWord2,#langWord{animation:echoFade 6s ease-in-out infinite}
-#langWord{animation-delay:-3s}
 @keyframes echoFade{0%,100%{opacity:.75}50%{opacity:.12}}
 /* Glitch flash colors are chosen fresh in JS per flicker (see
    glitchFlash()) via inline text-shadow rather than a fixed keyframe,
@@ -916,6 +920,13 @@ body{
   .s1-status{margin-top:2px;padding-top:2px;gap:6px 8px;row-gap:6px}
   .s1-title{line-height:.9}
   .s1-scroll,.s1-coords{display:none}
+  /* The two flex:1 rule dividers exist to split available space
+     between the two side texts and the UNO/DOS group on one line --
+     once .s1-sub wraps onto separate lines per item, a rule sharing a
+     wrapped line with just one text item grows to fill the rest of
+     that line instead of centering, shoving the text to one edge.
+     They don't serve a purpose once things wrap, so drop them. */
+  .s1-rule{display:none}
   .s2-body,.s6-body{grid-template-columns:1fr}
   .player,.lform{border-left:none;border-top:1px solid var(--dimmer)}
   .s5-grid{grid-template-columns:1fr;gap:6px}
@@ -1149,12 +1160,12 @@ body{
         <div class="s1-tag">CAPTURE DON'T KILL</div>
       </div>
       <div class="s1-status" id="s1stat">
-        <div class="st-item" id="echoesRow"><span class="v" id="langWord2">MAN</span><span class="v"> = </span><span class="v" id="langWord">WOMAN</span></div>
         <div class="st-item">STATUS<span class="v live">◉ TRANSMITTING</span></div>
         <div class="st-item">ORIGIN<span class="v">LINCOLN HEIGHTS</span></div>
         <div class="st-item">RELEASES<span class="v">INCOMING</span></div>
         <div class="st-item">CLEARANCE<span class="v">OPEN</span></div>
       </div>
+      <div class="s1-echoes-line st-item" id="echoesRow"><span class="v" id="langWord2">MAN</span><span class="v"> = </span><span class="v" id="langWord">WOMAN</span></div>
     </div>
     <div class="s1-scroll" id="s1scroll" onclick="spStart()" style="cursor:pointer">TAP TO ENTER · SCROLL TO EXPLORE</div>
     <div class="scene-counter">01 / 08</div>
