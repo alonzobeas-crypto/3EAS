@@ -1611,7 +1611,18 @@ function drawHP(){
       const sp=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
       if(sp>maxSp){p.vx=p.vx/sp*maxSp;p.vy=p.vy/sp*maxSp;}
       p.x+=p.vx;p.y+=p.vy;
-      if(p.x<0)p.x=hw;if(p.x>hw)p.x=0;if(p.y<0)p.y=hh;if(p.y>hh)p.y=0;
+      if(p.legacy){
+        // Bounce off soft walls well inside the viewport instead of
+        // wrapping edge-to-edge -- the full-bleed wrap let it drift under
+        // the nav bar, the jukebox transport, the tweaks button and the
+        // ticker, all of which paint an opaque background over the canvas
+        // and hid it completely for as long as it sat back there.
+        const mgX=hw*.04,topY=hh*.09,botY=hh*.72;
+        if(p.x<mgX){p.x=mgX;p.vx*=-1;}else if(p.x>hw-mgX){p.x=hw-mgX;p.vx*=-1;}
+        if(p.y<topY){p.y=topY;p.vy*=-1;}else if(p.y>botY){p.y=botY;p.vy*=-1;}
+      }else{
+        if(p.x<0)p.x=hw;if(p.x>hw)p.x=0;if(p.y<0)p.y=hh;if(p.y>hh)p.y=0;
+      }
     }
     if(p.legacy){
       // Slow pulse between the site's legacy signal colors (ticker link
