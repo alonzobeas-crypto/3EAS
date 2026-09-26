@@ -1598,8 +1598,13 @@ function drawHP(){
   hpart.forEach(p=>{
     if(!(p.legacy&&p.legacyFrozen)){
       const dx=mx-p.x,dy=my-p.y,d=Math.sqrt(dx*dx+dy*dy);
-      if(d<160&&d>0.01){
-        const force=(1-d/160)*.9;
+      // The legacy particle flees from a wider radius and harder than the
+      // ambient field's gentle nudge -- it's meant to feel like it's
+      // actively evading the cursor, worth a proper chase before you
+      // finally pin it down, rather than sitting there for an easy click.
+      const fleeR=p.legacy?230:160;
+      if(d<fleeR&&d>0.01){
+        const force=(1-d/fleeR)*(p.legacy?2.2:.9);
         p.vx-=(dx/d)*force;
         p.vy-=(dy/d)*force;
       }
@@ -1613,7 +1618,8 @@ function drawHP(){
       p.vy+=Math.sin(p.wa)*wanderKick;
       p.vx*=.985;p.vy*=.985;
       const sp=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
-      if(sp>maxSp){p.vx=p.vx/sp*maxSp;p.vy=p.vy/sp*maxSp;}
+      const spCap=p.legacy?maxSp*1.6:maxSp;
+      if(sp>spCap){p.vx=p.vx/sp*spCap;p.vy=p.vy/sp*spCap;}
       p.x+=p.vx;p.y+=p.vy;
       if(p.legacy){
         // Bounce off soft walls well inside the viewport instead of
@@ -1630,11 +1636,19 @@ function drawHP(){
     }
     if(p.legacy){
       // Slow pulse between the site's legacy signal colors (ticker link
-      // red #a8695a, corruption-glitch cyan #0ff) instead of ambient tan.
+      // red #a8695a, corruption-glitch cyan #0ff) instead of ambient tan --
+      // a soft glowing halo behind a brighter core so it reads as a light
+      // source blending between the two, like a beacon, not just a flat dot.
       const pulse=(Math.sin(ht*.35)+1)/2;
       const lr=Math.round(168+(0-168)*pulse),lg=Math.round(105+(255-105)*pulse),lb=Math.round(90+(255-90)*pulse);
-      hx.beginPath();hx.arc(p.x,p.y,p.r*(4.5+rBoost),0,Math.PI*2);
-      hx.fillStyle=`rgba(${lr},${lg},${lb},${op})`;hx.fill();
+      const coreR=p.r*(4.5+rBoost),glowR=coreR*5;
+      const glow=hx.createRadialGradient(p.x,p.y,0,p.x,p.y,glowR);
+      glow.addColorStop(0,`rgba(${lr},${lg},${lb},${op*.55})`);
+      glow.addColorStop(1,`rgba(${lr},${lg},${lb},0)`);
+      hx.beginPath();hx.arc(p.x,p.y,glowR,0,Math.PI*2);
+      hx.fillStyle=glow;hx.fill();
+      hx.beginPath();hx.arc(p.x,p.y,coreR,0,Math.PI*2);
+      hx.fillStyle=`rgba(${lr},${lg},${lb},${Math.min(1,op+.25)})`;hx.fill();
     }else{
       hx.beginPath();hx.arc(p.x,p.y,p.r*(1.9+rBoost),0,Math.PI*2);
       hx.fillStyle=`rgba(200,186,140,${op})`;hx.fill();
