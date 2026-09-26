@@ -1636,11 +1636,19 @@ function drawHP(){
     }
     if(p.legacy){
       // Slow pulse between the site's legacy signal colors (ticker link
-      // red #a8695a, corruption-glitch cyan #0ff) instead of ambient tan.
+      // red #a8695a, corruption-glitch cyan #0ff) instead of ambient tan --
+      // a soft glowing halo behind a brighter core so it reads as a light
+      // source blending between the two, like a beacon, not just a flat dot.
       const pulse=(Math.sin(ht*.35)+1)/2;
       const lr=Math.round(168+(0-168)*pulse),lg=Math.round(105+(255-105)*pulse),lb=Math.round(90+(255-90)*pulse);
-      hx.beginPath();hx.arc(p.x,p.y,p.r*(4.5+rBoost),0,Math.PI*2);
-      hx.fillStyle=`rgba(${lr},${lg},${lb},${op})`;hx.fill();
+      const coreR=p.r*(4.5+rBoost),glowR=coreR*5;
+      const glow=hx.createRadialGradient(p.x,p.y,0,p.x,p.y,glowR);
+      glow.addColorStop(0,`rgba(${lr},${lg},${lb},${op*.55})`);
+      glow.addColorStop(1,`rgba(${lr},${lg},${lb},0)`);
+      hx.beginPath();hx.arc(p.x,p.y,glowR,0,Math.PI*2);
+      hx.fillStyle=glow;hx.fill();
+      hx.beginPath();hx.arc(p.x,p.y,coreR,0,Math.PI*2);
+      hx.fillStyle=`rgba(${lr},${lg},${lb},${Math.min(1,op+.25)})`;hx.fill();
     }else{
       hx.beginPath();hx.arc(p.x,p.y,p.r*(1.9+rBoost),0,Math.PI*2);
       hx.fillStyle=`rgba(200,186,140,${op})`;hx.fill();
