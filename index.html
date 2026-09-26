@@ -1542,7 +1542,7 @@ window.addEventListener('resize',resizeGrain);
 /* ─── HERO CANVAS ─── */
 const hc=document.getElementById('s1-canvas');
 const hx=hc.getContext('2d');
-let hw,hh,hfx='combined',hpart=[],ht=0,legacyParticle=null;
+let hw,hh,hfx='combined',hpart=[],ht=0,legacyParticle=null,legacyVisible=true;
 function resizeHero(){
   hw=hc.width=window.innerWidth;
   hh=hc.height=window.innerHeight;
@@ -1634,13 +1634,15 @@ function drawHP(){
         if(p.x<0)p.x=hw;if(p.x>hw)p.x=0;if(p.y<0)p.y=hh;if(p.y>hh)p.y=0;
       }
     }
-    if(p.legacy){
-      // Slow pulse between the site's legacy signal colors (ticker link
-      // red #a8695a, corruption-glitch cyan #0ff) instead of ambient tan --
-      // a soft glowing halo behind a brighter core so it reads as a light
-      // source blending between the two, like a beacon, not just a flat dot.
+    if(p.legacy&&legacyVisible){
+      // Pulse between true red and true blue -- red mixed with cyan (the
+      // ticker's signal colors) landed on a muddy teal at the midpoint
+      // instead of reading as a red/blue blend, so this uses saturated
+      // endpoints that pass through a visible magenta/purple halfway,
+      // like an emergency beacon. Soft glowing halo behind a brighter
+      // core so it reads as a light source, not just a flat dot.
       const pulse=(Math.sin(ht*.35)+1)/2;
-      const lr=Math.round(168+(0-168)*pulse),lg=Math.round(105+(255-105)*pulse),lb=Math.round(90+(255-90)*pulse);
+      const lr=Math.round(230+(40-230)*pulse),lg=Math.round(40+(70-40)*pulse),lb=Math.round(40+(255-40)*pulse);
       const coreR=p.r*(4.5+rBoost),glowR=coreR*5;
       const glow=hx.createRadialGradient(p.x,p.y,0,p.x,p.y,glowR);
       glow.addColorStop(0,`rgba(${lr},${lg},${lb},${op*.55})`);
@@ -1649,7 +1651,7 @@ function drawHP(){
       hx.fillStyle=glow;hx.fill();
       hx.beginPath();hx.arc(p.x,p.y,coreR,0,Math.PI*2);
       hx.fillStyle=`rgba(${lr},${lg},${lb},${Math.min(1,op+.25)})`;hx.fill();
-    }else{
+    }else if(!p.legacy){
       hx.beginPath();hx.arc(p.x,p.y,p.r*(1.9+rBoost),0,Math.PI*2);
       hx.fillStyle=`rgba(200,186,140,${op})`;hx.fill();
     }
@@ -1662,13 +1664,34 @@ function drawHP(){
 // Click/tap the pulsing legacy particle to stop it in place -- generous
 // hit radius since the dot itself renders only a few px across.
 document.addEventListener('click',e=>{
-  if(!legacyParticle||legacyParticle.legacyFrozen)return;
+  if(!legacyParticle||legacyParticle.legacyFrozen||!legacyVisible)return;
   const dx=e.clientX-legacyParticle.x,dy=e.clientY-legacyParticle.y;
   if(Math.sqrt(dx*dx+dy*dy)<22){
     legacyParticle.legacyFrozen=true;
     showLegacyMessage();
   }
 });
+// Vanishes and respawns elsewhere every so often instead of always sitting
+// somewhere findable -- part of the chase, not just a static target.
+function scheduleLegacyVisibility(){
+  const showFor=14000+Math.random()*16000; // ~14-30s visible
+  setTimeout(()=>{
+    if(!legacyParticle||legacyParticle.legacyFrozen)return; // caught -- stay put, no more vanishing
+    legacyVisible=false;
+    const hideFor=3000+Math.random()*5000; // ~3-8s gone
+    setTimeout(()=>{
+      if(!legacyParticle||legacyParticle.legacyFrozen)return;
+      const mgX=hw*.04,topY=hh*.09,botY=hh*.72;
+      legacyParticle.x=mgX+Math.random()*(hw-2*mgX);
+      legacyParticle.y=topY+Math.random()*(botY-topY);
+      legacyParticle.vx=(Math.random()-.5)*.3;
+      legacyParticle.vy=(Math.random()-.5)*.3;
+      legacyVisible=true;
+      scheduleLegacyVisibility();
+    },hideFor);
+  },showFor);
+}
+scheduleLegacyVisibility();
 function showLegacyMessage(){
   let el=document.getElementById('legacyMsg');
   if(!el){
