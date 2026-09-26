@@ -1598,8 +1598,13 @@ function drawHP(){
   hpart.forEach(p=>{
     if(!(p.legacy&&p.legacyFrozen)){
       const dx=mx-p.x,dy=my-p.y,d=Math.sqrt(dx*dx+dy*dy);
-      if(d<160&&d>0.01){
-        const force=(1-d/160)*.9;
+      // The legacy particle flees from a wider radius and harder than the
+      // ambient field's gentle nudge -- it's meant to feel like it's
+      // actively evading the cursor, worth a proper chase before you
+      // finally pin it down, rather than sitting there for an easy click.
+      const fleeR=p.legacy?230:160;
+      if(d<fleeR&&d>0.01){
+        const force=(1-d/fleeR)*(p.legacy?2.2:.9);
         p.vx-=(dx/d)*force;
         p.vy-=(dy/d)*force;
       }
@@ -1613,7 +1618,8 @@ function drawHP(){
       p.vy+=Math.sin(p.wa)*wanderKick;
       p.vx*=.985;p.vy*=.985;
       const sp=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
-      if(sp>maxSp){p.vx=p.vx/sp*maxSp;p.vy=p.vy/sp*maxSp;}
+      const spCap=p.legacy?maxSp*1.6:maxSp;
+      if(sp>spCap){p.vx=p.vx/sp*spCap;p.vy=p.vy/sp*spCap;}
       p.x+=p.vx;p.y+=p.vy;
       if(p.legacy){
         // Bounce off soft walls well inside the viewport instead of
