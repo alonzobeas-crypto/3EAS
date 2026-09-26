@@ -35,6 +35,11 @@ logs/
 .env.local
 .env.production
 
+# Keys / credentials
+*.pem
+*.key
+*credentials*.json
+
 # Cache
 .cache/
 *.cache
