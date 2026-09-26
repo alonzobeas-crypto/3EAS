@@ -367,6 +367,14 @@ body{
 @keyframes glitchA-degrade{0%{clip-path:polygon(0 0,100% 0,100% 20%,0 20%);transform:translateX(-9px);opacity:.9}25%{clip-path:polygon(0 30%,100% 30%,100% 50%,0 50%);transform:translateX(8px);opacity:.7}50%{clip-path:polygon(0 55%,100% 55%,100% 75%,0 75%);transform:translateX(-7px);opacity:.85}75%{clip-path:polygon(0 80%,100% 80%,100% 100%,0 100%);transform:translateX(6px);opacity:.6}100%{clip-path:polygon(0 10%,100% 10%,100% 40%,0 40%);transform:translateX(-5px);opacity:.9}}
 @keyframes glitchA-hero{0%,80%,100%{clip-path:none;transform:none;opacity:0}81%{clip-path:polygon(0 8%,100% 8%,100% 30%,0 30%);transform:translateX(8px);opacity:.8}82.5%{clip-path:polygon(0 40%,100% 40%,100% 60%,0 60%);transform:translateX(-8px);opacity:.75}84%{clip-path:polygon(0 65%,100% 65%,100% 88%,0 88%);transform:translateX(5px);opacity:.6}86%{opacity:0}}
 .s1-title.vis{clip-path:inset(0 0 0% 0)}
+/* Old-CRT power-on stutter -- a brief run (not infinite) fired once when
+   the mouse first lands on the hero title, before the hover corruption
+   loop takes over steady-state. */
+.s1-title.hw-boot{animation:hwPowerOn .42s steps(1,end) 1!important}
+.s1-title.hw-boot::before{animation:hwPowerOnA .42s steps(1,end) 1!important}
+.s1-title.hw-boot::after{animation:hwPowerOnA .42s steps(1,end) .03s 1!important}
+@keyframes hwPowerOn{0%{opacity:.12;filter:brightness(.35) saturate(.5)}6%{opacity:.85;filter:brightness(1.5)}11%{opacity:.08;filter:brightness(.3)}18%{opacity:1;filter:brightness(1.7) saturate(1.3)}26%{opacity:.15;filter:brightness(.3)}36%{opacity:.9;filter:brightness(1.15)}48%{opacity:.35;filter:brightness(.55)}62%{opacity:1;filter:brightness(1.05)}78%{opacity:.7;filter:brightness(.85)}100%{opacity:1;filter:brightness(1) saturate(1)}}
+@keyframes hwPowerOnA{0%,100%{opacity:0}10%{opacity:.6}20%{opacity:0}35%{opacity:.5}50%{opacity:0}65%{opacity:.4}100%{opacity:0}}
 
 .s1-sub{
   display:flex;align-items:center;justify-content:center;gap:24px;margin-top:20px;
@@ -2581,22 +2589,26 @@ loadDispatch();
   const hwBACKWARDS={A:'∀',C:'Ɔ',E:'Ǝ',F:'Ⅎ',G:'⅁',K:'ʞ',L:'Ꞁ',N:'ᴎ',R:'Я',S:'Ƨ',Y:'⅄'};
   const hwHOMO={A:'А',B:'В',C:'С',D:'Ꭰ',E:'Е',F:'Ϝ',G:'Ԍ',H:'Н',I:'І',J:'Ј',K:'К',L:'Ꮮ',M:'М',N:'Ν',O:'О',P:'Р',Q:'Ԛ',R:'Ꭱ',S:'Ѕ',T:'Т',U:'Ս',V:'Ѵ',W:'Ѡ',X:'Х',Y:'Υ',Z:'Ζ'};
   const hwSYMBOLS=['`','~','!','@','#','$','%','^','&','*','(',')','-','_','=','+','[',']','{','}','\\','|',';',':','\'','"',',','.','<','>','/','?'];
+  const hwBLOCKS=['█','▓','▒','░','▌','▐','■','◆','◼','▚'];
+  const hwBIN=['0','1'];
   const hwReduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let hwTimer=null,hwOrig=null;
+  let hwTimer=null,hwOrig=null,hwBootTimer=null;
 
   function hwCorruptOnce(el){
     if(el.classList.contains('degrade'))return; // CASAS flash in progress -- don't stomp it
     const chars=hwOrig.split('');
     for(let i=0;i<chars.length;i++){
       const c=chars[i];
-      if(c==='3'&&Math.random()<0.12){chars[i]='B';continue;} // occasional 3 -> B
-      if(/[a-zA-Z]/.test(c)&&Math.random()<0.14){
+      if(c==='3'&&Math.random()<0.15){chars[i]='B';continue;} // occasional 3 -> B
+      if(/[a-zA-Z]/.test(c)&&Math.random()<0.19){
         const up=c.toUpperCase();
         const roll=Math.random();
-        if(roll<0.35&&hwLEET[up])chars[i]=hwLEET[up];
-        else if(roll<0.65&&hwHOMO[up])chars[i]=hwHOMO[up];
-        else if(roll<0.75&&hwBACKWARDS[up])chars[i]=hwBACKWARDS[up];
-        else if(roll<0.8)chars[i]=hwSYMBOLS[Math.floor(Math.random()*hwSYMBOLS.length)];
+        if(roll<0.28&&hwLEET[up])chars[i]=hwLEET[up];
+        else if(roll<0.5&&hwHOMO[up])chars[i]=hwHOMO[up];
+        else if(roll<0.62&&hwBACKWARDS[up])chars[i]=hwBACKWARDS[up];
+        else if(roll<0.72)chars[i]=hwSYMBOLS[Math.floor(Math.random()*hwSYMBOLS.length)];
+        else if(roll<0.83)chars[i]=hwBLOCKS[Math.floor(Math.random()*hwBLOCKS.length)];
+        else if(roll<0.91)chars[i]=hwBIN[Math.floor(Math.random()*hwBIN.length)];
         else chars[i]=(c===up)?c.toLowerCase():up;
       }
     }
@@ -2610,10 +2622,14 @@ loadDispatch();
     hwOrig=el.textContent;
     if(!hwOrig||!hwOrig.trim())return;
     el.style.textShadow='2px 0 var(--accent),-2px 0 #0ff';
+    el.classList.add('hw-boot'); // old-CRT power-on stutter, once per hover-in
+    hwBootTimer=setTimeout(()=>el.classList.remove('hw-boot'),420);
     hwCorruptOnce(el);
-    hwTimer=setInterval(()=>hwCorruptOnce(el),130);
+    hwTimer=setInterval(()=>hwCorruptOnce(el),90);
   }
   function hwStop(el){
+    if(hwBootTimer){clearTimeout(hwBootTimer);hwBootTimer=null;}
+    el.classList.remove('hw-boot');
     if(!hwTimer)return;
     clearInterval(hwTimer);
     hwTimer=null;
@@ -3320,7 +3336,6 @@ var glitchTranslate, glitchCorrupt;
     'FAUX VAX CARD LOVE STORY',
     'YOU CAN\'T ADMIT YOU STOLE FROM ME GAMBLIN\' MAN??',
     'YOU\'VE BEEN LOCKED OUT LACS',
-    'NEVER GOING TO A LAKER GAME AGAIN',
     'HUMANS ARE NOW HACKABLE ANIMALS',
     'CHURCH OF MOLT',
     'A.I.\'S BEEN SENTIENT',
