@@ -276,6 +276,12 @@ body{
 ══════════════════════════════ */
 #s1{justify-content:center;align-items:center;text-align:center;padding:0 60px}
 #s1-canvas{position:fixed;inset:0;z-index:1;pointer-events:none}
+/* One particle in the ambient hero field pulses red->blue (the site's own
+   legacy signal colors, #a8695a/#0ff, already used for the ticker's links
+   and the corruption-glitch cyan) instead of the field's usual tan. Find
+   it and click it to stop it -- see legacyMsg below. */
+#legacyMsg{position:fixed;left:50%;bottom:16%;transform:translateX(-50%);max-width:520px;text-align:center;font-family:var(--mono);font-size:13px;letter-spacing:2px;line-height:1.9;color:var(--hot);text-shadow:0 0 20px rgba(232,224,192,.35);opacity:0;transition:opacity 2.4s ease;z-index:45;pointer-events:none;padding:0 24px}
+#legacyMsg.vis{opacity:1}
 
 /* Technical lines */
 .tech-v{position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,rgba(184,168,120,.06) 30%,rgba(184,168,120,.10) 50%,rgba(184,168,120,.06) 70%,transparent);pointer-events:none}
@@ -1512,7 +1518,7 @@ window.addEventListener('resize',resizeGrain);
 /* ─── HERO CANVAS ─── */
 const hc=document.getElementById('s1-canvas');
 const hx=hc.getContext('2d');
-let hw,hh,hfx='combined',hpart=[],ht=0;
+let hw,hh,hfx='combined',hpart=[],ht=0,legacyParticle=null;
 function resizeHero(){
   hw=hc.width=window.innerWidth;
   hh=hc.height=window.innerHeight;
@@ -1525,6 +1531,11 @@ function initHP(){
   // correctly instead of sticking with whatever count was set at load.
   const count=window.innerWidth>768?600:300;
   hpart=Array.from({length:count},()=>({x:Math.random()*hw,y:Math.random()*hh,vx:(Math.random()-.5)*.072,vy:(Math.random()-.5)*.072,r:Math.random()*.8+.3,wa:Math.random()*Math.PI*2}));
+  // One particle in the field is "the signal" -- pulses the site's own
+  // legacy red/blue instead of ambient tan. Click it to stop it.
+  legacyParticle=hpart[Math.floor(Math.random()*hpart.length)];
+  legacyParticle.legacy=true;
+  legacyParticle.legacyFrozen=false;
 }
 resizeHero();window.addEventListener('resize',resizeHero);
 function heroLoop(){
@@ -1561,32 +1572,63 @@ function drawHP(){
   const rBoost=band.bass*2.6;            // bass = particle "kick" size pulse
   const op=.6+band.treble*.4;            // treble = sparkle/opacity
   hpart.forEach(p=>{
-    const dx=mx-p.x,dy=my-p.y,d=Math.sqrt(dx*dx+dy*dy);
-    if(d<160&&d>0.01){
-      const force=(1-d/160)*.9;
-      p.vx-=(dx/d)*force;
-      p.vy-=(dy/d)*force;
+    if(!(p.legacy&&p.legacyFrozen)){
+      const dx=mx-p.x,dy=my-p.y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<160&&d>0.01){
+        const force=(1-d/160)*.9;
+        p.vx-=(dx/d)*force;
+        p.vy-=(dy/d)*force;
+      }
+      // Gentle organic wander — like a microbe drifting under a scope. The
+      // heading angle itself drifts slowly and randomly (rather than jittering
+      // velocity directly), which keeps the motion smooth and meandering
+      // instead of noisy. This also keeps particles perpetually adrift instead
+      // of decaying to a dead stop the way pure damping did.
+      p.wa+=(Math.random()-.5)*.35;
+      p.vx+=Math.cos(p.wa)*wanderKick;
+      p.vy+=Math.sin(p.wa)*wanderKick;
+      p.vx*=.985;p.vy*=.985;
+      const sp=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
+      if(sp>maxSp){p.vx=p.vx/sp*maxSp;p.vy=p.vy/sp*maxSp;}
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=hw;if(p.x>hw)p.x=0;if(p.y<0)p.y=hh;if(p.y>hh)p.y=0;
     }
-    // Gentle organic wander — like a microbe drifting under a scope. The
-    // heading angle itself drifts slowly and randomly (rather than jittering
-    // velocity directly), which keeps the motion smooth and meandering
-    // instead of noisy. This also keeps particles perpetually adrift instead
-    // of decaying to a dead stop the way pure damping did.
-    p.wa+=(Math.random()-.5)*.35;
-    p.vx+=Math.cos(p.wa)*wanderKick;
-    p.vy+=Math.sin(p.wa)*wanderKick;
-    p.vx*=.985;p.vy*=.985;
-    const sp=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
-    if(sp>maxSp){p.vx=p.vx/sp*maxSp;p.vy=p.vy/sp*maxSp;}
-    p.x+=p.vx;p.y+=p.vy;
-    if(p.x<0)p.x=hw;if(p.x>hw)p.x=0;if(p.y<0)p.y=hh;if(p.y>hh)p.y=0;
-    hx.beginPath();hx.arc(p.x,p.y,p.r*(1.9+rBoost),0,Math.PI*2);
-    hx.fillStyle=`rgba(200,186,140,${op})`;hx.fill();
+    if(p.legacy){
+      // Slow pulse between the site's legacy signal colors (ticker link
+      // red #a8695a, corruption-glitch cyan #0ff) instead of ambient tan.
+      const pulse=(Math.sin(ht*.35)+1)/2;
+      const lr=Math.round(168+(0-168)*pulse),lg=Math.round(105+(255-105)*pulse),lb=Math.round(90+(255-90)*pulse);
+      hx.beginPath();hx.arc(p.x,p.y,p.r*(4.5+rBoost),0,Math.PI*2);
+      hx.fillStyle=`rgba(${lr},${lg},${lb},${op})`;hx.fill();
+    }else{
+      hx.beginPath();hx.arc(p.x,p.y,p.r*(1.9+rBoost),0,Math.PI*2);
+      hx.fillStyle=`rgba(200,186,140,${op})`;hx.fill();
+    }
   });
   for(let i=0;i<hpart.length;i++)for(let j=i+1;j<hpart.length;j++){
     const dx=hpart[i].x-hpart[j].x,dy=hpart[i].y-hpart[j].y,d=Math.sqrt(dx*dx+dy*dy);
     if(d<120){hx.beginPath();hx.strokeStyle=`rgba(184,168,120,${.26*(1-d/120)})`;hx.lineWidth=.9;hx.moveTo(hpart[i].x,hpart[i].y);hx.lineTo(hpart[j].x,hpart[j].y);hx.stroke()}
   }
+}
+// Click/tap the pulsing legacy particle to stop it in place -- generous
+// hit radius since the dot itself renders only a few px across.
+document.addEventListener('click',e=>{
+  if(!legacyParticle||legacyParticle.legacyFrozen)return;
+  const dx=e.clientX-legacyParticle.x,dy=e.clientY-legacyParticle.y;
+  if(Math.sqrt(dx*dx+dy*dy)<22){
+    legacyParticle.legacyFrozen=true;
+    showLegacyMessage();
+  }
+});
+function showLegacyMessage(){
+  let el=document.getElementById('legacyMsg');
+  if(!el){
+    el=document.createElement('div');
+    el.id='legacyMsg';
+    document.body.appendChild(el);
+  }
+  el.textContent="you know why you're here. If you wait long enough, you'll begin to decode the DNA";
+  requestAnimationFrame(()=>el.classList.add('vis'));
 }
 function drawScan(){
   const lc=Math.floor((ht*60)%hh);
@@ -3331,6 +3373,8 @@ var glitchTranslate, glitchCorrupt;
     'ACTIVE CONFLICT: SAHEL',
     'ACTIVE CONFLICT: IRAN',
     'ACTIVE CONFLICT: LEBANON',
+    'ACTIVE CONFLICT: HAITI',
+    'ACTIVE CONFLICT: MEXICO',
     '<a href="https://worldofmusic.com" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">WORLD OF MUSIC</a>',
     '<a href="https://youtu.be/V3kZwsysuqQ?is=qFyWR45vjnMyJPe3" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">RETICULUM NODE</a>',
     'FAUX VAX CARD LOVE STORY',
