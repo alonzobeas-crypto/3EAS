@@ -620,9 +620,13 @@ body{
 }
 
 /* Coming-soon overlay over Beat Lab -- shown to everyone by default;
-   an access code hides it (see the gating IIFE further down the script). */
+   an access code hides it (see the gating IIFE further down the script).
+   inset:0 (not the old 24/44/60) so it covers #sLab's full box -- the
+   real sequencer's dev-wrap renders taller than that inset box, which
+   left a real, clickable strip of actual .bl-cell step buttons exposed
+   along the bottom/side edges even while "locked." */
 .lab-cs{
-  position:absolute;inset:24px 44px 60px;z-index:50;
+  position:absolute;inset:0;z-index:50;
   display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;
 }
 .lab-cs::before{
@@ -5559,6 +5563,12 @@ function spToggleCollapse(){
     if(cs)cs.style.display=isUnlocked()?'none':'';
     const sLab=document.getElementById('sLab');
     if(sLab)sLab.classList.toggle('bl-scrollable',isUnlocked());
+    // Backstop for the overlay: dev-wrap renders taller than #sLab's own
+    // box, so its real .bl-cell step buttons could still be clicked in
+    // the sliver past the overlay's edge even with full coverage above --
+    // hard-disable interaction with the real sequencer while locked.
+    const dw=document.getElementById('devWrap');
+    if(dw)dw.style.pointerEvents=isUnlocked()?'':'none';
   }
   function wire(){
     const btn=document.getElementById('labCsAccessBtn');
