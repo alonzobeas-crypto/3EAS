@@ -911,6 +911,7 @@ body{
   .tb-support .n,.tb-subscribe .n{display:none}
   #topnav{padding:0;height:62px}
   .tb-brand{font-size:18px;padding:0 14px;letter-spacing:2px}
+  #aibTrigger{width:38px}
   .tb-right{font-size:12px;letter-spacing:1px;padding:0 8px;gap:5px}
   a[title="Instagram"]{width:38px!important}
   a[title="Instagram"] svg{width:14px;height:14px}
@@ -1062,20 +1063,19 @@ body{
    Everything here is namespaced #aib* / .aib-* so it can't collide with the
    rest of the site. Talks to the Cloudflare Worker in /worker. */
 #aibTrigger{
-  position:fixed;right:18px;bottom:84px;z-index:900; /* clears the ticker + tweaks toggle */
-  display:flex;align-items:center;gap:10px;
-  font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;
-  color:var(--accent);background:rgba(0,0,0,.82);
-  border:1px solid var(--border-hi);padding:9px 14px 9px 12px;cursor:none;
-  transition:color .15s,border-color .15s,opacity .3s,transform .3s;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:44px;background:none;border:none;padding:0;cursor:none;position:relative;
 }
-#aibTrigger:hover{color:var(--hot);border-color:var(--hot)}
-#aibTrigger .aib-dot{width:7px;height:7px;border-radius:50%;background:#a8695a;box-shadow:0 0 8px #a8695a;animation:aibBlink 1.3s steps(1) infinite}
-#aibTrigger .aib-trig-freq{color:var(--dim2)}
-#aibTrigger.aib-away{opacity:0;transform:translateY(12px);pointer-events:none}
-#aibTrigger.aib-nudge .aib-trig-label{animation:aibNudge .9s steps(1) 1}
-@keyframes aibBlink{0%,55%{opacity:1}56%,100%{opacity:.15}}
-@keyframes aibNudge{0%,100%{transform:none}20%{transform:translateX(-2px) skewX(6deg)}40%{transform:translateX(2px) skewX(-4deg)}60%{transform:translateX(-1px)}}
+#aibTrigger .aib-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:#a8695a;box-shadow:0 0 6px #a8695a;
+  transition:background .3s,box-shadow .3s,transform .3s;
+}
+#aibTrigger:hover .aib-dot,#aibTrigger:focus-visible .aib-dot,#aibTrigger.aib-active .aib-dot{
+  background:var(--hot);box-shadow:0 0 10px var(--hot),0 0 20px rgba(232,224,192,.4);transform:scale(1.5);
+}
+#aibTrigger.aib-nudge .aib-dot{animation:aibNudge .9s steps(1) 1}
+@keyframes aibNudge{0%,100%{transform:scale(1) translateX(0)}20%{transform:scale(1.4) translateX(-1px)}40%{transform:scale(.8) translateX(1px)}60%{transform:scale(1.2)}80%{transform:scale(1)}}
 
 #aibPanel{
   position:fixed;right:18px;bottom:48px;z-index:901; /* sits above the ticker */
@@ -1084,10 +1084,24 @@ body{
   background:#030303;border:1px solid var(--accent);
   box-shadow:0 0 50px rgba(184,168,120,.07),inset 0 0 80px rgba(0,0,0,.9);
   transform:translateY(calc(100% + 40px));opacity:0;pointer-events:none;
-  transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .25s;
+  transition:transform .25s ease,opacity .2s;
   font-family:var(--mono);color:var(--fg);
 }
 #aibPanel.open{transform:none;opacity:1;pointer-events:auto}
+/* Hover on the trigger particle opens the panel with a slow glitch reveal
+   rather than a snap -- clip-path slices + skew jitter over ~1.2s. */
+#aibPanel.open.aib-open-glitch{animation:aibSlowOpen 1.2s steps(14,end) 1}
+@keyframes aibSlowOpen{
+  0%{opacity:0;clip-path:inset(0 0 100% 0);transform:translateY(26px) skewX(4deg)}
+  7%{opacity:.4;clip-path:inset(0 55% 15% 0);transform:translateY(20px) skewX(-5deg)}
+  14%{opacity:.1;clip-path:inset(45% 0 35% 25%);transform:translateY(17px) skewX(6deg)}
+  25%{opacity:.65;clip-path:inset(0 15% 50% 0);transform:translateY(13px) skewX(-2deg)}
+  36%{opacity:.25;clip-path:inset(60% 30% 0 0);transform:translateY(10px) skewX(3deg)}
+  50%{opacity:.8;clip-path:inset(0 0 20% 0);transform:translateY(6px) skewX(-1deg)}
+  63%{opacity:.45;clip-path:inset(18% 0 0 45%);transform:translateY(4px)}
+  78%{opacity:.95;clip-path:inset(0 0 4% 0);transform:translateY(2px)}
+  100%{opacity:1;clip-path:inset(0 0 0 0);transform:translateY(0) skewX(0)}
+}
 #aibPanel.open.aib-jolt{animation:aibJolt .32s steps(2,end) 1}
 @keyframes aibJolt{0%{transform:translateX(0)}25%{transform:translateX(-4px) skewX(2deg)}50%{transform:translateX(3px) skewX(-1deg)}75%{transform:translateX(-1px)}100%{transform:none}}
 /* panel-local scanlines; thicker + rolling while she transmits */
@@ -1159,7 +1173,7 @@ body{
 .aib-boot-log .bad{color:#a8695a}
 
 @media (max-width:600px){
-  #aibTrigger{right:12px;bottom:auto;top:76px} /* bottom edge is owned by the player + ticker on phones */
+  #aibTrigger{width:34px}
   #aibPanel{right:0;bottom:0;width:100vw;height:82dvh;border-left:none;border-right:none;border-bottom:none}
   .aib-tag{letter-spacing:2px}
   .aib-title{font-size:30px;letter-spacing:4px}
@@ -1208,6 +1222,8 @@ body{
 <!-- TOPBAR -->
 <nav id="topnav">
   <div class="tb-brand" onclick="goScene(0)">3EAS</div>
+  <!-- ═══ A.I. BABY trigger — styles in #aib-style, logic + panel markup near </body> ═══ -->
+  <button id="aibTrigger" type="button" hidden aria-controls="aibPanel" aria-expanded="false" aria-label="Open A.I. Baby chat"><span class="aib-dot"></span></button>
   <div class="tb-links">
     <a href="#" class="tb-link" onclick="goScene(1);return false"><span class="n">01</span>TRANSMISSIONS</a>
     <a href="#" class="tb-link" onclick="goScene(2);return false"><span class="n">02</span>VISUALS</a>
@@ -6315,10 +6331,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   window.__armSignalGlitch = scheduleNext;
 })();
 </script>
-<!-- ═══ A.I. BABY — chat panel (styles in #aib-style, backend in /worker) ═══ -->
-<button id="aibTrigger" type="button" hidden aria-controls="aibPanel" aria-expanded="false">
-  <span class="aib-dot"></span><span class="aib-trig-label">A.I. BABY</span><span class="aib-trig-freq">RX</span>
-</button>
+<!-- ═══ A.I. BABY — chat panel (trigger moved into #topnav; styles in #aib-style, backend in /worker) ═══ -->
 <section id="aibPanel" role="dialog" aria-label="A.I. Baby transmission" aria-hidden="true">
   <div class="aib-hd">
     <div>
@@ -6401,19 +6414,29 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   let T=null,chain=null,liveSources=[],txEndTimer=null,transmitting=false;
 
   // ── OPEN / CLOSE ──────────────────────────────────────────────────────────
+  // Hover opens it on desktop (a still particle beside the logo that wakes up
+  // under the cursor); click/focus cover touch and keyboard, where there's no
+  // hover to fire. Closing stays deliberate -- only the ✕ button, so a mouse
+  // passing between the trigger and the panel (they're not adjacent) doesn't
+  // slam it shut mid-crossing.
+  trig.addEventListener('mouseenter',openPanel);
+  trig.addEventListener('focus',openPanel);
   trig.addEventListener('click',openPanel);
   closeBtn.addEventListener('click',closePanel);
   function openPanel(){
-    panel.classList.add('open');panel.setAttribute('aria-hidden','false');
-    trig.classList.add('aib-away');trig.setAttribute('aria-expanded','true');
+    if(panel.classList.contains('open'))return;
+    panel.classList.remove('aib-open-glitch');void panel.offsetWidth;
+    panel.classList.add('open','aib-open-glitch');
+    panel.setAttribute('aria-hidden','false');
+    trig.classList.add('aib-active');trig.setAttribute('aria-expanded','true');
     startScope();
     loadTone(); // warm it while the boot sequence runs
     if(!opened){opened=true;bootSequence()}
     else if(online)setTimeout(()=>input.focus(),350);
   }
   function closePanel(){
-    panel.classList.remove('open');panel.setAttribute('aria-hidden','true');
-    trig.classList.remove('aib-away');trig.setAttribute('aria-expanded','false');
+    panel.classList.remove('open','aib-open-glitch');panel.setAttribute('aria-hidden','true');
+    trig.classList.remove('aib-active');trig.setAttribute('aria-expanded','false');
     stopVoice();stopScope();
   }
   voxBtn.addEventListener('click',()=>{
