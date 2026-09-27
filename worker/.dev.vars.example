@@ -1,0 +1,6 @@
+MOCK_MODE="true"
+ALLOW_NO_ORIGIN="true"
+# Fill in when accounts exist, then set MOCK_MODE="false" to test live locally:
+# OPENROUTER_API_KEY=""
+# OPENAI_API_KEY=""
+# SPEAK_SECRET=""

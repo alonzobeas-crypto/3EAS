@@ -1,0 +1,50 @@
+# AI BABY — Cloudflare Worker
+# Deployed separately from the Pages site:  cd worker && npx wrangler deploy
+# Secrets (never in this file):
+#   npx wrangler secret put OPENROUTER_API_KEY
+#   npx wrangler secret put OPENAI_API_KEY
+#   npx wrangler secret put SPEAK_SECRET        # any long random string
+# Local dev secrets go in worker/.dev.vars (gitignored) — see .dev.vars.example
+
+name = "ai-baby"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+
+[vars]
+# "true" = no upstream calls, canned text + synthetic robot WAV. Flip to "false"
+# only after both API keys are set as secrets.
+MOCK_MODE = "true"
+
+# Browser origins allowed to call the Worker (comma-separated, exact match).
+ALLOWED_ORIGINS = "https://3eascortex.com,https://www.3eascortex.com,http://localhost:8080,http://127.0.0.1:8080"
+
+# Requests with no Origin header (curl, scripts). Keep "false" in production.
+ALLOW_NO_ORIGIN = "false"
+
+# LLM via OpenRouter. Verify slugs on openrouter.ai/models before going live.
+LLM_MODEL = "nousresearch/hermes-4-70b"
+LLM_FALLBACK_MODEL = "deepseek/deepseek-chat"
+LLM_MAX_TOKENS = "220"
+
+# OpenAI TTS. tts-1 = the $15/1M chars tier the cost math assumes.
+TTS_MODEL = "tts-1"
+TTS_VOICE = "shimmer"
+
+# Cost caps
+MAX_INPUT_CHARS = "500"      # per user message
+MAX_HISTORY = "10"           # messages of context sent upstream
+MAX_SPEAK_CHARS = "600"      # hard cap on chars sent to TTS per reply
+DAILY_IP_CAP = "60"          # replies per IP per UTC day (best-effort, see src/ratelimit.js)
+DAILY_GLOBAL_CAP = "3000"    # replies per UTC day across everyone (best-effort)
+
+# Per-IP burst limit — Workers Rate Limiting binding (period must be 10 or 60).
+# Enforced at the edge per location; complements the daily caps above.
+[[ratelimits]]
+name = "RL_CHAT"
+namespace_id = "3001"
+simple = { limit = 6, period = 60 }
+
+[[ratelimits]]
+name = "RL_SPEAK"
+namespace_id = "3002"
+simple = { limit = 8, period = 60 }
