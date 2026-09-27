@@ -336,7 +336,14 @@ body{
    species of signal (thermal/RF sensor feed) than the eye/face overlays. */
 .s1-wifi{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 1.2s ease}
 .s1-wifi.vis{opacity:1}
-.wifi-skel{position:absolute;top:50%;left:50%;width:min(46vw,420px);height:min(58vh,560px);transform:translate(-50%,-50%);overflow:visible}
+/* Placement (--wx/--wy/--wrot/--wscale) is set per-reveal in JS so no two
+   reveals look the same -- different pose, spot, tilt and size each time. */
+.wifi-skel{
+  position:absolute;top:var(--wy,50%);left:var(--wx,50%);
+  width:min(40vw,360px);height:min(50vh,480px);
+  transform:translate(-50%,-50%) rotate(var(--wrot,0deg)) scale(var(--wscale,1));
+  overflow:visible;transition:opacity .4s ease;
+}
 .wifi-bone{stroke:#3ef07a;stroke-width:2;fill:none;filter:drop-shadow(0 0 4px rgba(62,240,122,.85))}
 .wifi-joint{fill:#ff4d4d;filter:drop-shadow(0 0 3px rgba(255,77,77,.9))}
 .wifi-head{stroke:#3ef07a;stroke-width:2;fill:rgba(62,240,122,.08);filter:drop-shadow(0 0 5px rgba(62,240,122,.8))}
@@ -346,6 +353,8 @@ body{
   min-width:170px;text-shadow:0 0 6px rgba(62,240,122,.6);
 }
 .wifi-hud.hud-tl{top:14%;left:6%}
+.wifi-hud.hud-tr{top:14%;right:6%}
+.wifi-hud.hud-bl{bottom:26%;left:6%}
 .wifi-hud.hud-br{bottom:26%;right:6%}
 .wifi-hud-title{font-size:11px;letter-spacing:4px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .wifi-hud-title .dot{width:6px;height:6px;border-radius:50%;background:#3ef07a;animation:wifiBlink 1.4s infinite}
@@ -1193,6 +1202,25 @@ body{
         </g>
         <g class="wifi-joints" id="wifiJoints"></g>
       </svg>
+      <svg class="wifi-skel wifi-skel2" id="wifiSkel2" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" style="display:none">
+        <circle class="wifi-head" cx="150" cy="46" r="20"/>
+        <g class="wifi-bones">
+          <line class="wifi-bone" data-a="neck" data-b="shoulderL"/>
+          <line class="wifi-bone" data-a="neck" data-b="shoulderR"/>
+          <line class="wifi-bone" data-a="shoulderL" data-b="elbowL"/>
+          <line class="wifi-bone" data-a="elbowL" data-b="handL"/>
+          <line class="wifi-bone" data-a="shoulderR" data-b="elbowR"/>
+          <line class="wifi-bone" data-a="elbowR" data-b="handR"/>
+          <line class="wifi-bone" data-a="neck" data-b="hipC"/>
+          <line class="wifi-bone" data-a="hipC" data-b="hipL"/>
+          <line class="wifi-bone" data-a="hipC" data-b="hipR"/>
+          <line class="wifi-bone" data-a="hipL" data-b="kneeL"/>
+          <line class="wifi-bone" data-a="kneeL" data-b="footL"/>
+          <line class="wifi-bone" data-a="hipR" data-b="kneeR"/>
+          <line class="wifi-bone" data-a="kneeR" data-b="footR"/>
+        </g>
+        <g class="wifi-joints" id="wifiJoints2"></g>
+      </svg>
       <div class="wifi-hud hud-tl">
         <div class="wifi-hud-title"><span class="dot"></span>VITAL SIGNS</div>
         <div class="wifi-row">HEART RATE <span class="v" id="wifiHr">78 BPM</span></div>
@@ -1984,18 +2012,49 @@ function showVideo2(){
 // skeleton + live HUD numbers) instead of a video. Same isolation pattern
 // as the eye/face overlays -- one shared s1OverlayBusy guard so only ever
 // one of the three shows at a time.
-const WIFI_JOINTS={
-  neck:[150,90],shoulderL:[110,100],shoulderR:[190,100],
-  elbowL:[90,150],elbowR:[210,150],handL:[80,200],handR:[220,200],
-  hipC:[150,210],hipL:[130,215],hipR:[170,215],
-  kneeL:[125,290],kneeR:[175,290],footL:[120,370],footR:[180,370]
-};
-let wifiRafId=null,wifiHudTimer=null;
-function wifiLayout(t){
-  const skel=document.getElementById('wifiSkel');
+//
+// Randomized per reveal so it never looks the same twice: which pose,
+// where onscreen, how tilted/scaled, whether a second body shows up, and
+// which corners the two HUD panels sit in.
+const WIFI_POSE_VARIANTS=[
+  { // neutral standing
+    neck:[150,90],shoulderL:[110,100],shoulderR:[190,100],
+    elbowL:[90,150],elbowR:[210,150],handL:[80,200],handR:[220,200],
+    hipC:[150,210],hipL:[130,215],hipR:[170,215],
+    kneeL:[125,290],kneeR:[175,290],footL:[120,370],footR:[180,370]
+  },
+  { // one arm raised
+    neck:[150,90],shoulderL:[110,100],shoulderR:[190,100],
+    elbowL:[95,155],elbowR:[205,55],handL:[85,205],handR:[190,10],
+    hipC:[150,210],hipL:[130,215],hipR:[170,215],
+    kneeL:[125,290],kneeR:[175,290],footL:[120,370],footR:[180,370]
+  },
+  { // wide crouched stance
+    neck:[150,100],shoulderL:[105,110],shoulderR:[195,110],
+    elbowL:[85,165],elbowR:[215,165],handL:[75,215],handR:[225,215],
+    hipC:[150,230],hipL:[115,235],hipR:[185,235],
+    kneeL:[100,310],kneeR:[200,310],footL:[95,370],footR:[205,370]
+  }
+];
+let wifiRafId=null,wifiHudTimer=null,wifiActive=[];
+function wifiBuildJoints(skelId,jointsId){
+  const skel=document.getElementById(skelId),joints=document.getElementById(jointsId);
+  if(joints&&!joints.children.length){
+    // Bones are already <line>s in the static markup; only the per-joint
+    // <circle> dots need to be created once here.
+    Object.keys(WIFI_POSE_VARIANTS[0]).forEach(()=>{
+      const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('class','wifi-joint');c.setAttribute('r','3.5');
+      joints.appendChild(c);
+    });
+  }
+  return {skel,joints};
+}
+function wifiLayout(cfg,t){
+  const{skel,joints,pose}=cfg;
   if(!skel)return;
   skel.querySelectorAll('.wifi-bone').forEach(line=>{
-    const a=WIFI_JOINTS[line.dataset.a],b=WIFI_JOINTS[line.dataset.b];
+    const a=pose[line.dataset.a],b=pose[line.dataset.b];
     // Tiny per-joint sway so the skeleton reads as a live, jittery tracking
     // lock rather than a static graphic.
     const sx=Math.sin(t*1.7+a[1])*1.6,sy=Math.cos(t*1.4+a[0])*1.2;
@@ -2003,16 +2062,8 @@ function wifiLayout(t){
     line.setAttribute('x1',a[0]+sx);line.setAttribute('y1',a[1]+sy);
     line.setAttribute('x2',b[0]+sx2);line.setAttribute('y2',b[1]+sy2);
   });
-  const joints=document.getElementById('wifiJoints');
-  if(joints&&!joints.children.length){
-    Object.values(WIFI_JOINTS).forEach(()=>{
-      const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-      c.setAttribute('class','wifi-joint');c.setAttribute('r','3.5');
-      joints.appendChild(c);
-    });
-  }
   if(joints){
-    Object.values(WIFI_JOINTS).forEach((p,i)=>{
+    Object.values(pose).forEach((p,i)=>{
       const sx=Math.sin(t*1.7+p[1])*1.6,sy=Math.cos(t*1.4+p[0])*1.2;
       const c=joints.children[i];
       if(c){c.setAttribute('cx',p[0]+sx);c.setAttribute('cy',p[1]+sy);}
@@ -2020,18 +2071,28 @@ function wifiLayout(t){
   }
 }
 function wifiTick(t){
-  wifiLayout(t*0.001);
+  wifiActive.forEach(cfg=>wifiLayout(cfg,t*0.001));
   wifiRafId=requestAnimationFrame(wifiTick);
 }
 function wifiRandomizeHud(){
   const hr=document.getElementById('wifiHr'),resp=document.getElementById('wifiResp'),
-        conf=document.getElementById('wifiConf'),rssi=document.getElementById('wifiRssi'),
-        persons=document.getElementById('wifiPersons');
+        conf=document.getElementById('wifiConf'),rssi=document.getElementById('wifiRssi');
   if(hr)hr.textContent=(62+Math.floor(Math.random()*35))+' BPM';
   if(resp)resp.textContent=(12+Math.floor(Math.random()*9))+' RPM';
   if(conf)conf.textContent=(74+Math.floor(Math.random()*25))+'%';
   if(rssi)rssi.textContent='-'+(28+Math.floor(Math.random()*40))+' dBm';
-  if(persons)persons.textContent=String(1+(Math.random()<.3?1:0));
+}
+// Random placement well inside the visible hero area, matching the same
+// safe-zone thinking as the legacy particle -- clear of the nav up top and
+// the ticker/jukebox/tweaks cluster at the bottom.
+function wifiRandomPlacement(skel){
+  const wx=18+Math.random()*64,wy=20+Math.random()*45;
+  const wrot=Math.random()<0.2?(Math.random()<0.5?-1:1)*(70+Math.random()*20):(Math.random()-0.5)*16;
+  const wscale=0.75+Math.random()*0.45;
+  skel.style.setProperty('--wx',wx+'%');
+  skel.style.setProperty('--wy',wy+'%');
+  skel.style.setProperty('--wrot',wrot+'deg');
+  skel.style.setProperty('--wscale',wscale.toFixed(2));
 }
 function showWifiSensing(){
   const el=document.getElementById('s1wifi');
@@ -2039,6 +2100,30 @@ function showWifiSensing(){
   if(s1OverlayBusy){setTimeout(()=>showWifiSensing(),1500);return;}
   s1OverlayBusy=true;
   el.classList.add('vis');
+
+  const {skel:skel1,joints:joints1}=wifiBuildJoints('wifiSkel','wifiJoints');
+  wifiRandomPlacement(skel1);
+  wifiActive=[{skel:skel1,joints:joints1,pose:WIFI_POSE_VARIANTS[Math.floor(Math.random()*WIFI_POSE_VARIANTS.length)]}];
+
+  const showSecond=Math.random()<0.4;
+  const skel2=document.getElementById('wifiSkel2');
+  if(showSecond){
+    const {skel,joints}=wifiBuildJoints('wifiSkel2','wifiJoints2');
+    wifiRandomPlacement(skel);
+    skel.style.display='';
+    wifiActive.push({skel,joints,pose:WIFI_POSE_VARIANTS[Math.floor(Math.random()*WIFI_POSE_VARIANTS.length)]});
+  }else if(skel2){
+    skel2.style.display='none';
+  }
+  const personsEl=document.getElementById('wifiPersons');
+  if(personsEl)personsEl.textContent=showSecond?'2':'1';
+
+  // Swap which corners the two HUD panels sit in each reveal.
+  const huds=el.querySelectorAll('.wifi-hud');
+  const swapped=Math.random()<0.5;
+  huds[0].className='wifi-hud '+(swapped?'hud-tr':'hud-tl');
+  huds[1].className='wifi-hud '+(swapped?'hud-bl':'hud-br');
+
   wifiRandomizeHud();
   wifiHudTimer=setInterval(wifiRandomizeHud,900);
   wifiRafId=requestAnimationFrame(wifiTick);
@@ -2046,6 +2131,7 @@ function showWifiSensing(){
     el.classList.remove('vis');
     clearInterval(wifiHudTimer);wifiHudTimer=null;
     cancelAnimationFrame(wifiRafId);wifiRafId=null;
+    wifiActive=[];
     s1OverlayBusy=false;
   },8000);
 }
