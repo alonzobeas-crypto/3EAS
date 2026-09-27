@@ -1,6 +1,8 @@
 // Mock responses for MOCK_MODE — lets the full pipe (text -> signed token ->
 // audio -> Tone.js FX -> waveform) run end to end with zero API keys.
 
+import { TRACK_TITLES, SCENES, LINKS } from './catalog.js';
+
 const LINES = [
   'Carrier locked. I hear you through the static, {q}.',
   'Signal received on the east side of the river. Say it again, slower.',
@@ -10,10 +12,80 @@ const LINES = [
   'Estoy aquí, entre las frecuencias. Ask me when the keys are in.',
 ];
 
-export function mockReply(userText) {
+export function mockReply(userText, actions) {
+  if (actions && actions.length) {
+    const a = actions[0];
+    if (a.type === 'play_track') return `Cueing "${a.title}." Hold the frequency.`;
+    if (a.type === 'stop_music') return 'Signal cut. The room is quiet now.';
+    if (a.type === 'go_to_scene') return `Pulling you to ${a.name}. Hang on.`;
+    if (a.type === 'open_link') return 'Opening that channel now.';
+  }
   const q = (userText || 'nothing').replace(/\s+/g, ' ').trim().slice(0, 40).toLowerCase();
   const line = LINES[Math.floor(Math.random() * LINES.length)];
   return line.replace('{q}', `"${q}"`);
+}
+
+// ── Keyword-based fake tool calls ────────────────────────────────────────────
+// No LLM involved in mock mode, so there's nothing to "call" a tool — this
+// just pattern-matches the user's raw text well enough to exercise the full
+// action pipe (worker -> client whitelist -> real site function) with zero
+// keys. Every action still goes through validateAction() in tools.js before
+// it's ever returned, same as a real tool call would.
+function findTrackMention(lower) {
+  let best = null;
+  for (const title of TRACK_TITLES) {
+    if (lower.includes(title.toLowerCase())) {
+      if (!best || title.length > best.length) best = title;
+    }
+  }
+  return best;
+}
+
+function findSceneMention(lower) {
+  for (const s of SCENES) {
+    if (s.name !== 'HOME' && lower.includes(s.name.toLowerCase())) return s.name;
+  }
+  if (/\bhome\b/.test(lower)) return 'HOME';
+  return null;
+}
+
+function findLinkMention(lower) {
+  const aliases = {
+    INSTAGRAM: ['instagram', 'ig'],
+    MIXCLOUD: ['mixcloud'],
+    SELEXIONES_COM: ['selexiones'],
+    ONNOTICEMUSIC_COM: ['on/notice', 'onnotice', 'on notice'],
+    SACREDLESSONS_COM: ['sacred lessons', 'sacredlessons'],
+    WORLDOFMUSICSHOP_COM: ['world of music', 'worldofmusicshop', 'shop', 'merch'],
+    DONATE: ['donate', 'ko-fi', 'kofi', 'support'],
+  };
+  for (const link of LINKS) {
+    const names = aliases[link.key] || [];
+    if (names.some((n) => lower.includes(n))) return link.key;
+  }
+  return null;
+}
+
+export function mockActions(userText) {
+  const lower = (userText || '').toLowerCase();
+  const actions = [];
+
+  if (/\b(stop|pause|kill)\b.*\b(music|jukebox|song|track)\b/.test(lower)) {
+    actions.push({ type: 'stop_music' });
+    return actions; // stop wins outright — don't also try to play/navigate
+  }
+  if (/\bplay\b/.test(lower)) {
+    const title = findTrackMention(lower);
+    if (title) actions.push({ type: 'play_track', title });
+  }
+  if (/\b(go to|take me to|show me|open)\b/.test(lower) || findSceneMention(lower)) {
+    const name = findSceneMention(lower);
+    if (name) actions.push({ type: 'go_to_scene', name });
+  }
+  const linkKey = findLinkMention(lower);
+  if (linkKey) actions.push({ type: 'open_link', key: linkKey });
+
+  return actions;
 }
 
 // ── Synthetic robot-babble WAV ──────────────────────────────────────────────

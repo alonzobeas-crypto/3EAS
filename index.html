@@ -1488,13 +1488,13 @@ body{
     </div>
     <div class="s6-body">
       <div class="llinks">
-        <a href="https://www.mixcloud.com/SELEXIONES/" target="_blank" class="lrow">MIXCLOUD <span class="larr">→</span></a>
-        <a href="https://instagram.com/zo.losangeles" target="_blank" class="lrow">INSTAGRAM <span class="larr">→</span></a>
-        <a href="https://selexiones.com" target="_blank" class="lrow">SELEXIONES.COM <span class="larr">→</span></a>
-        <a href="https://www.onnoticemusic.com/" target="_blank" class="lrow">ONNOTICEMUSIC.COM <span class="larr">→</span></a>
-        <a href="https://sacredlessons.com" target="_blank" class="lrow">SACREDLESSONS.COM <span class="larr">→</span></a>
-        <a href="https://worldofmusicshop.com" target="_blank" class="lrow">WORLDOFMUSICSHOP.COM <span class="larr">→</span></a>
-        <a href="https://ko-fi.com/3eascortex" target="_blank" class="lrow">DONATE / SUPPORT <span class="larr">→</span></a>
+        <a href="https://www.mixcloud.com/SELEXIONES/" target="_blank" class="lrow" data-aib-key="MIXCLOUD">MIXCLOUD <span class="larr">→</span></a>
+        <a href="https://instagram.com/zo.losangeles" target="_blank" class="lrow" data-aib-key="INSTAGRAM">INSTAGRAM <span class="larr">→</span></a>
+        <a href="https://selexiones.com" target="_blank" class="lrow" data-aib-key="SELEXIONES_COM">SELEXIONES.COM <span class="larr">→</span></a>
+        <a href="https://www.onnoticemusic.com/" target="_blank" class="lrow" data-aib-key="ONNOTICEMUSIC_COM">ONNOTICEMUSIC.COM <span class="larr">→</span></a>
+        <a href="https://sacredlessons.com" target="_blank" class="lrow" data-aib-key="SACREDLESSONS_COM">SACREDLESSONS.COM <span class="larr">→</span></a>
+        <a href="https://worldofmusicshop.com" target="_blank" class="lrow" data-aib-key="WORLDOFMUSICSHOP_COM">WORLDOFMUSICSHOP.COM <span class="larr">→</span></a>
+        <a href="https://ko-fi.com/3eascortex" target="_blank" class="lrow" data-aib-key="DONATE">DONATE / SUPPORT <span class="larr">→</span></a>
 
         <div style="padding:24px 0;border-bottom:1px solid var(--dimmer)">
           <p style="font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--dim2);line-height:2.4">3EAS<br>LINCOLN HEIGHTS, NELA // © 2026<br><span style="font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--dim2)">PASSWORDPILLS</span></p>
@@ -5460,6 +5460,30 @@ function spStop(){
   if(dot){dot.style.background='var(--dimmer)';dot.style.animation='none'}
 }
 
+// Requested by A.I. BABY's play_track action -- reuses the existing
+// crossfade engine instead of duplicating it: splices the match to the
+// front of the remaining shuffle bag so the very next natural pick lands
+// on it, then triggers the same skip/crossfade path a real button click
+// would. Cold-start (jukebox never started this session) still starts on
+// a random track like a normal first play, since spStart() always
+// reshuffles from scratch -- acceptable, and far lower-risk than reaching
+// into that gesture/autoplay-retry logic to force a specific first track.
+function spPlayTitle(title){
+  const norm=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  const want=norm(title);
+  let idx=SP_TRACKS.findIndex(t=>norm(t.title)===want);
+  if(idx===-1)idx=SP_TRACKS.findIndex(t=>norm(t.title).includes(want)||want.includes(norm(t.title)));
+  if(idx===-1)return false;
+  if(!spStarted){spStart();return true;}
+  if(spBag.length-spBagPos<1)spShuffle();
+  const pos=spBag.indexOf(idx,spBagPos);
+  if(pos!==-1){[spBag[spBagPos],spBag[pos]]=[spBag[pos],spBag[spBagPos]];}
+  else{spBag.splice(spBagPos,0,idx);}
+  if(spStopped){spSkip();}
+  else{if(spFading){spFading=false;spGen++;}spCrossfade();}
+  return true;
+}
+
 function spToggle(){
   spMuted=!spMuted;
   spA.muted=spMuted;spB.muted=spMuted;
@@ -6449,6 +6473,43 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
 
   form.addEventListener('submit',e=>{e.preventDefault();transmit()});
 
+  // ── Action whitelist ─────────────────────────────────────────────────────
+  // The ONLY code path that ever acts on worker output beyond displaying
+  // text. Never eval, never call anything by a name the worker/model sent —
+  // every action type below maps to exactly one fixed, hardcoded call, and
+  // every value is checked against something already on this page before
+  // use. The worker validates independently too (see worker/src/tools.js);
+  // neither side trusts the other's validation alone.
+  //
+  // Scene name -> goScene() index is read live from the real top-nav links
+  // (same elements a visitor clicks) instead of a hand-written duplicate, so
+  // it can't drift from the actual nav.
+  const AIB_SCENES={HOME:0};
+  document.querySelectorAll('.tb-link').forEach(a=>{
+    const m=(a.getAttribute('onclick')||'').match(/goScene\((\d+)\)/);
+    if(!m)return;
+    const label=a.textContent.replace(/^\d+/,'').trim().toUpperCase();
+    if(label)AIB_SCENES[label]=Number(m[1]);
+  });
+  function aibRunActions(actions){
+    if(!Array.isArray(actions))return;
+    for(const a of actions){
+      if(!a||typeof a!=='object')continue;
+      try{
+        if(a.type==='go_to_scene'&&typeof a.name==='string'&&Object.prototype.hasOwnProperty.call(AIB_SCENES,a.name)){
+          goScene(AIB_SCENES[a.name]);
+        }else if(a.type==='play_track'&&typeof a.title==='string'&&typeof spPlayTitle==='function'){
+          spPlayTitle(a.title); // no-ops if the title isn't a real SP_TRACKS entry
+        }else if(a.type==='stop_music'&&typeof spStop==='function'){
+          spStop();
+        }else if(a.type==='open_link'&&typeof a.key==='string'){
+          const link=document.querySelector('[data-aib-key="'+CSS.escape(a.key)+'"]');
+          if(link&&link.href)window.open(link.href,'_blank','noopener');
+        }
+      }catch(e){console.warn('[aib] action failed',a,e);}
+    }
+  }
+
   async function transmit(){
     const q=input.value.trim();
     if(!q||busy||!online)return;
@@ -6465,6 +6526,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
       const data=await res.json().catch(()=>({}));
       if(!res.ok)throw apiErr(res,data);
       history.push({role:'assistant',content:data.text});
+      aibRunActions(data.actions); // fires immediately -- navigation/playback shouldn't wait on voice/text reveal
 
       // Voice first (bounded wait), then reveal text in sync with it.
       let voice=null;

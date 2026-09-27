@@ -11,7 +11,8 @@
 
 import { checkLimits } from './ratelimit.js';
 import { PERSONA } from './persona.js';
-import { mockReply, mockWav } from './mock.js';
+import { mockReply, mockActions, mockWav } from './mock.js';
+import { TOOLS, toolCallsToActions, validateAction } from './tools.js';
 
 const SPEAK_TTL_SEC = 300;
 const MAX_BODY_BYTES = 16 * 1024;
@@ -70,13 +71,17 @@ async function handleChat(request, env, cors) {
   const lim = await checkLimits(env, clientIp(request), 'chat');
   if (!lim.ok) return err(cors, 429, lim.reason, 'Signal saturated', lim.retryAfter);
 
-  let text;
+  let text, actions;
   if (isMock(env)) {
     await sleep(350 + Math.random() * 500); // feel the latency in the UI
-    text = mockReply(last.content);
+    actions = mockActions(last.content); // already validated shapes, but re-validate anyway below for one code path
+    text = mockReply(last.content, actions);
   } else {
-    text = await callLLM(env, history);
+    const llmResult = await callLLM(env, history);
+    text = llmResult.text;
+    actions = llmResult.actions;
   }
+  actions = actions.map((a) => validateAction(a)).filter(Boolean);
   text = cleanForSpeech(text).slice(0, Number(env.MAX_SPEAK_CHARS || 600));
   if (!text) text = 'Static. Only static.';
 
@@ -86,6 +91,7 @@ async function handleChat(request, env, cors) {
   return json(cors, 200, {
     id: crypto.randomUUID(),
     text,
+    actions,
     speak: { token, exp },
     mock: isMock(env),
     remainingToday: lim.remainingToday,
@@ -132,11 +138,20 @@ async function callLLM(env, history) {
       messages: [{ role: 'system', content: PERSONA }, ...history],
       max_tokens: Number(env.LLM_MAX_TOKENS || 220),
       temperature: 0.9,
+      tools: TOOLS,
+      tool_choice: 'auto',
     }),
   });
   if (!res.ok) throw new Error(`openrouter ${res.status}: ${(await res.text()).slice(0, 300)}`);
   const data = await res.json();
-  return data?.choices?.[0]?.message?.content || '';
+  const msg = data?.choices?.[0]?.message;
+  return {
+    text: msg?.content || '',
+    // toolCallsToActions already validates each call's shape against the
+    // catalog — a hallucinated tool name or an out-of-catalog title/scene
+    // is silently dropped there, not trusted through to the client.
+    actions: toolCallsToActions(msg?.tool_calls),
+  };
 }
 
 async function callTTS(env, text) {
