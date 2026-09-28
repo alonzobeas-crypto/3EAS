@@ -3738,7 +3738,6 @@ var glitchTranslate, glitchCorrupt;
     'THE PENTAGON IS A GIANT VAMPIRE',
     'THE UNITED STATES MILITARY INDUSTRIAL COMPLEX IS THE LARGEST POLLUTER IN HUMAN HISTORY',
     'DID YOU KNOW ROLLS ROYCE MADE LASERS?',
-    "YOU CAN'T VOTE YOUR WAY OUT OF THIS....",
     "IF YOU WORK IN HOLLYWOOD, GET OUT WHILE YOU CAN AND BUILD YOUR OWN. IT'S NOT GETTING ANY BETTER.",
     'PROMPT HACKS ARE REAL. PROTECT YO NECK.',
     'SIGNAL INTERCEPTED.',
@@ -3885,6 +3884,33 @@ var glitchTranslate, glitchCorrupt;
   // constant instead of a hardcoded 80, so they can't drift out of sync.
   const TICKER_DUR=window.innerWidth>900?42:80;
   window.TICKER_DUR=TICKER_DUR; // the separate hover-handler IIFE further down needs this too
+  // Lines get added to the pool in themed runs (a batch about one topic, or
+  // a sentence split into fragments), so neighbors in the source array are
+  // usually related. A plain random draw could land three lines from the
+  // same run in one pass — reads as the ticker "repeating itself" even when
+  // nothing literally repeats. Pool position is used as a theme proxy: each
+  // batch keeps its picks at least TICKER_SPREAD positions apart from each
+  // other AND from the previous batch (so a theme can't straddle the cycle
+  // boundary either), relaxing the gap only when the remaining unseen items
+  // are too few/too clustered to fill the batch otherwise.
+  const TICKER_SPREAD=12;
+  const tickerPoolIdx=new Map();
+  let tickerLastBatch=[];
+  function pickSpread(cands,n,blocked,pool){
+    if(!tickerPoolIdx.size)pool.forEach((s,i)=>{if(!tickerPoolIdx.has(s))tickerPoolIdx.set(s,i);});
+    const order=shuffleArr(cands);
+    for(let gap=TICKER_SPREAD;gap>=0;gap=gap>3?Math.floor(gap/2):gap-1){
+      const taken=blocked.map(s=>tickerPoolIdx.get(s));
+      const out=[];
+      for(const item of order){
+        if(out.length>=n)break;
+        const i=tickerPoolIdx.get(item);
+        if(taken.every(t=>Math.abs(t-i)>gap)){out.push(item);taken.push(i);}
+      }
+      if(out.length>=n||gap===0)return out;
+    }
+    return order.slice(0,n);
+  }
   function nextTickerBatch(pool){
     if(!tickerSeenLoaded)loadTickerSeen();
     let unseen=pool.filter(item=>!tickerSeen.has(item));
@@ -3893,13 +3919,19 @@ var glitchTranslate, glitchCorrupt;
       // fresh one. (Resetting any earlier than this — e.g. once fewer than
       // a full batch remains — would re-show items already displayed
       // earlier in the SAME lap, which defeats the whole guarantee. The
-      // last batch or two of a lap just runs shorter instead.)
+      // last batch or two of a lap just runs shorter instead.) The lines
+      // that just scrolled by in the lap's final batch sit out the first
+      // draw of the new lap, so the lap boundary can't put the same line
+      // on screen twice in a row.
       tickerSeen=new Set();
-      unseen=pool.slice();
+      const justShown=new Set(tickerLastBatch);
+      unseen=pool.filter(item=>!justShown.has(item));
+      if(!unseen.length)unseen=pool.slice();
     }
     const batchSize=14+Math.floor(Math.random()*13); // 14-26, re-rolled every cycle
-    const batch=shuffleArr(unseen).slice(0,Math.min(batchSize,unseen.length));
+    const batch=pickSpread(unseen,Math.min(batchSize,unseen.length),tickerLastBatch,pool);
     batch.forEach(item=>tickerSeen.add(item));
+    tickerLastBatch=batch;
     saveTickerSeen();
     return batch;
   }
