@@ -1057,6 +1057,136 @@ body{
   #signal-glitch-canvas.sg-cutting-hard { animation: none; }
 }
 </style>
+<style id="aib-style">
+/* ═══ A.I. BABY — pirate-carrier chat panel ═══
+   Everything here is namespaced #aib* / .aib-* so it can't collide with the
+   rest of the site. Talks to the Cloudflare Worker in /worker. */
+#aibTrigger{
+  position:fixed;top:0;left:0;z-index:900; /* top/left tracked to the hero title in JS */
+  display:flex;align-items:center;justify-content:center;
+  width:22px;height:22px;transform:translateY(-50%);
+  background:none;border:none;padding:0;cursor:none;
+  transition:opacity .3s;
+}
+#aibTrigger[hidden]{display:none}
+#aibTrigger.aib-unplaced{opacity:0;pointer-events:none} /* hidden until first positioned, avoids a top-left flash */
+#aibTrigger .aib-dot{
+  width:4px;height:4px;border-radius:50%;
+  background:#a8695a;box-shadow:0 0 4px #a8695a;
+  transition:background .3s,box-shadow .3s,transform .3s;
+}
+#aibTrigger:hover .aib-dot,#aibTrigger:focus-visible .aib-dot,#aibTrigger.aib-active .aib-dot{
+  background:var(--hot);box-shadow:0 0 8px var(--hot),0 0 14px rgba(232,224,192,.4);transform:scale(1.6);
+}
+#aibTrigger.aib-nudge .aib-dot{animation:aibNudge .9s steps(1) 1}
+@keyframes aibNudge{0%,100%{transform:scale(1) translateX(0)}20%{transform:scale(1.4) translateX(-1px)}40%{transform:scale(.8) translateX(1px)}60%{transform:scale(1.2)}80%{transform:scale(1)}}
+
+#aibPanel{
+  position:fixed;right:18px;bottom:48px;z-index:901; /* sits above the ticker */
+  width:min(440px,calc(100vw - 36px));height:min(590px,calc(100dvh - 118px));
+  display:flex;flex-direction:column;overflow:hidden;
+  background:#030303;border:1px solid var(--accent);
+  box-shadow:0 0 50px rgba(184,168,120,.07),inset 0 0 80px rgba(0,0,0,.9);
+  transform:translateY(calc(100% + 40px));opacity:0;pointer-events:none;
+  transition:transform .25s ease,opacity .2s;
+  font-family:var(--mono);color:var(--fg);
+}
+#aibPanel.open{transform:none;opacity:1;pointer-events:auto}
+/* Hover on the trigger particle opens the panel with a slow glitch reveal
+   rather than a snap -- clip-path slices + skew jitter over ~1.2s. */
+#aibPanel.open.aib-open-glitch{animation:aibSlowOpen 1.2s steps(14,end) 1}
+@keyframes aibSlowOpen{
+  0%{opacity:0;clip-path:inset(0 0 100% 0);transform:translateY(26px) skewX(4deg)}
+  7%{opacity:.4;clip-path:inset(0 55% 15% 0);transform:translateY(20px) skewX(-5deg)}
+  14%{opacity:.1;clip-path:inset(45% 0 35% 25%);transform:translateY(17px) skewX(6deg)}
+  25%{opacity:.65;clip-path:inset(0 15% 50% 0);transform:translateY(13px) skewX(-2deg)}
+  36%{opacity:.25;clip-path:inset(60% 30% 0 0);transform:translateY(10px) skewX(3deg)}
+  50%{opacity:.8;clip-path:inset(0 0 20% 0);transform:translateY(6px) skewX(-1deg)}
+  63%{opacity:.45;clip-path:inset(18% 0 0 45%);transform:translateY(4px)}
+  78%{opacity:.95;clip-path:inset(0 0 4% 0);transform:translateY(2px)}
+  100%{opacity:1;clip-path:inset(0 0 0 0);transform:translateY(0) skewX(0)}
+}
+#aibPanel.open.aib-jolt{animation:aibJolt .32s steps(2,end) 1}
+@keyframes aibJolt{0%{transform:translateX(0)}25%{transform:translateX(-4px) skewX(2deg)}50%{transform:translateX(3px) skewX(-1deg)}75%{transform:translateX(-1px)}100%{transform:none}}
+/* panel-local scanlines; thicker + rolling while she transmits */
+#aibPanel::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:6;
+  background:repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(216,212,200,.03) 3px,rgba(216,212,200,.03) 4px);
+}
+#aibPanel.aib-tx::after{
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0,rgba(255,255,255,.035) 1px,transparent 1px,transparent 3px),
+             linear-gradient(rgba(120,255,220,.035),rgba(255,80,120,.035));
+  animation:aibRoll .14s linear infinite;
+}
+@keyframes aibRoll{0%{background-position:0 0}100%{background-position:0 60px}}
+
+.aib-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 14px 10px;border-bottom:1px solid var(--dimmer);flex-shrink:0;position:relative;z-index:2}
+.aib-tag{display:block;font-size:9px;letter-spacing:4px;white-space:nowrap;color:var(--dim2);text-transform:uppercase}
+.aib-title{font-family:var(--vt);font-size:34px;letter-spacing:5px;color:var(--hot);line-height:1;margin-top:4px;text-shadow:0 0 18px rgba(232,224,192,.2);animation:glitch 7s infinite}
+.aib-hd-r{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.aib-status{font-size:9px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;white-space:nowrap}
+.aib-status.off{color:#a8695a}
+.aib-status .aib-led{display:inline-block;width:5px;height:5px;border-radius:50%;background:currentColor;margin-right:6px;vertical-align:1px;animation:aibBlink 1.3s steps(1) infinite}
+.aib-hd-btns{display:flex;gap:6px}
+.aib-btn{
+  font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;white-space:nowrap;
+  background:none;border:1px solid var(--dim);color:var(--dim2);padding:4px 8px;cursor:none;transition:all .15s;
+}
+.aib-btn:hover{border-color:var(--accent);color:var(--accent)}
+.aib-btn.on{border-color:var(--accent);color:var(--accent)}
+
+.aib-body{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;z-index:2}
+.aib-log{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:14px 14px 6px;font-size:13px;line-height:1.7;scrollbar-width:thin;scrollbar-color:var(--dim) transparent}
+.aib-log::-webkit-scrollbar{width:4px}
+.aib-log::-webkit-scrollbar-thumb{background:var(--dim)}
+.aib-msg{margin-bottom:14px;word-wrap:break-word}
+.aib-who{display:block;font-size:9px;letter-spacing:3px;color:var(--dim2);text-transform:uppercase;margin-bottom:1px}
+.aib-msg.ai .aib-who{color:var(--accent)}
+.aib-msg.ai .aib-txt{color:var(--hot);text-shadow:0 0 6px rgba(232,224,192,.12)}
+.aib-msg.me .aib-txt{color:var(--fg)}
+.aib-msg.sys .aib-txt{font-size:10px;letter-spacing:2px;color:var(--dim2);text-transform:uppercase}
+.aib-msg.err .aib-txt{font-size:10px;letter-spacing:2px;color:#a8695a;text-transform:uppercase}
+.aib-txt span{transition:none}
+.aib-replay{margin-top:4px;font-size:8px;padding:2px 7px}
+.aib-caret{display:inline-block;width:.55em;height:1em;background:var(--hot);vertical-align:text-bottom;margin-left:2px;animation:hackedBlink .5s step-end infinite}
+.aib-wait .aib-txt{color:var(--dim2)}
+
+.aib-scope{display:block;width:100%;height:54px;flex-shrink:0;border-top:1px solid var(--dimmer);border-bottom:1px solid var(--dimmer);background:linear-gradient(180deg,rgba(184,168,120,.025),transparent)}
+
+.aib-form{display:flex;align-items:center;gap:8px;padding:10px 12px 12px;flex-shrink:0}
+.aib-prompt{font-family:var(--vt);font-size:22px;color:var(--accent);line-height:1}
+.aib-in{
+  flex:1;min-width:0;background:none;border:none;border-bottom:1px solid var(--dim);
+  font-family:var(--mono);font-size:13px;letter-spacing:1px;color:var(--fg);padding:6px 2px;cursor:none;
+  caret-color:var(--hot);
+}
+.aib-in:focus{outline:none;border-bottom-color:var(--accent)}
+.aib-in::placeholder{color:var(--dim);letter-spacing:2px;text-transform:uppercase;font-size:10px}
+.aib-in:disabled{opacity:.4}
+.aib-send{font-size:11px;padding:7px 12px;border-color:var(--accent);color:var(--accent)}
+.aib-send:hover{background:rgba(184,168,120,.12);color:var(--hot)}
+.aib-send:disabled{opacity:.35;pointer-events:none}
+
+/* boot: same visual language as the Beat Lab CALIBRATING gate */
+.aib-boot{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(0,0,0,.97);transition:opacity .5s}
+.aib-boot.gone{opacity:0;pointer-events:none}
+.aib-boot-title{font-family:var(--vt);font-size:clamp(42px,11vw,58px);letter-spacing:4px;white-space:nowrap;color:var(--hot);text-shadow:0 0 24px rgba(232,224,192,.25);line-height:1;animation:glitch 7s infinite}
+.aib-boot-rule{width:180px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.aib-boot-log{font-size:10px;letter-spacing:2px;color:var(--dim2);text-transform:uppercase;line-height:2;min-height:60px;text-align:left;white-space:pre}
+.aib-boot-log .ok{color:var(--accent)}
+.aib-boot-log .bad{color:#a8695a}
+
+@media (max-width:600px){
+  #aibPanel{right:0;bottom:0;width:100vw;height:82dvh;border-left:none;border-right:none;border-bottom:none}
+  .aib-tag{letter-spacing:2px}
+  .aib-title{font-size:30px;letter-spacing:4px}
+  .aib-in{font-size:16px} /* stops iOS zoom-on-focus */
+}
+@media (prefers-reduced-motion:reduce){
+  #aibPanel.aib-tx::after{animation:none}
+  .aib-title,.aib-boot-title{animation:none}
+}
+</style>
 </head>
 <body>
 
@@ -1118,6 +1248,8 @@ body{
     </svg>
   </a>
 </nav>
+<!-- ═══ A.I. BABY trigger — fixed on screen, JS-positioned beside the hero "3EAS" title (#hw1); styles in #aib-style, logic + panel markup near </body> ═══ -->
+<button id="aibTrigger" class="aib-unplaced" type="button" hidden aria-controls="aibPanel" aria-expanded="false" aria-label="Open A.I. Baby chat"><span class="aib-dot"></span></button>
 
 <!-- VERTICAL NAV -->
 <div id="vnav">
@@ -1375,13 +1507,13 @@ body{
     </div>
     <div class="s6-body">
       <div class="llinks">
-        <a href="https://www.mixcloud.com/SELEXIONES/" target="_blank" class="lrow">MIXCLOUD <span class="larr">→</span></a>
-        <a href="https://instagram.com/zo.losangeles" target="_blank" class="lrow">INSTAGRAM <span class="larr">→</span></a>
-        <a href="https://selexiones.com" target="_blank" class="lrow">SELEXIONES.COM <span class="larr">→</span></a>
-        <a href="https://www.onnoticemusic.com/" target="_blank" class="lrow">ONNOTICEMUSIC.COM <span class="larr">→</span></a>
-        <a href="https://sacredlessons.com" target="_blank" class="lrow">SACREDLESSONS.COM <span class="larr">→</span></a>
-        <a href="https://worldofmusicshop.com" target="_blank" class="lrow">WORLDOFMUSICSHOP.COM <span class="larr">→</span></a>
-        <a href="https://ko-fi.com/3eascortex" target="_blank" class="lrow">DONATE / SUPPORT <span class="larr">→</span></a>
+        <a href="https://www.mixcloud.com/SELEXIONES/" target="_blank" class="lrow" data-aib-key="MIXCLOUD">MIXCLOUD <span class="larr">→</span></a>
+        <a href="https://instagram.com/zo.losangeles" target="_blank" class="lrow" data-aib-key="INSTAGRAM">INSTAGRAM <span class="larr">→</span></a>
+        <a href="https://selexiones.com" target="_blank" class="lrow" data-aib-key="SELEXIONES_COM">SELEXIONES.COM <span class="larr">→</span></a>
+        <a href="https://www.onnoticemusic.com/" target="_blank" class="lrow" data-aib-key="ONNOTICEMUSIC_COM">ONNOTICEMUSIC.COM <span class="larr">→</span></a>
+        <a href="https://sacredlessons.com" target="_blank" class="lrow" data-aib-key="SACREDLESSONS_COM">SACREDLESSONS.COM <span class="larr">→</span></a>
+        <a href="https://worldofmusicshop.com" target="_blank" class="lrow" data-aib-key="WORLDOFMUSICSHOP_COM">WORLDOFMUSICSHOP.COM <span class="larr">→</span></a>
+        <a href="https://ko-fi.com/3eascortex" target="_blank" class="lrow" data-aib-key="DONATE">DONATE / SUPPORT <span class="larr">→</span></a>
 
         <div style="padding:24px 0;border-bottom:1px solid var(--dimmer)">
           <p style="font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--dim2);line-height:2.4">3EAS<br>LINCOLN HEIGHTS, NELA // © 2026<br><span style="font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--dim2)">PASSWORDPILLS</span></p>
@@ -5347,6 +5479,30 @@ function spStop(){
   if(dot){dot.style.background='var(--dimmer)';dot.style.animation='none'}
 }
 
+// Requested by A.I. BABY's play_track action -- reuses the existing
+// crossfade engine instead of duplicating it: splices the match to the
+// front of the remaining shuffle bag so the very next natural pick lands
+// on it, then triggers the same skip/crossfade path a real button click
+// would. Cold-start (jukebox never started this session) still starts on
+// a random track like a normal first play, since spStart() always
+// reshuffles from scratch -- acceptable, and far lower-risk than reaching
+// into that gesture/autoplay-retry logic to force a specific first track.
+function spPlayTitle(title){
+  const norm=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  const want=norm(title);
+  let idx=SP_TRACKS.findIndex(t=>norm(t.title)===want);
+  if(idx===-1)idx=SP_TRACKS.findIndex(t=>norm(t.title).includes(want)||want.includes(norm(t.title)));
+  if(idx===-1)return false;
+  if(!spStarted){spStart();return true;}
+  if(spBag.length-spBagPos<1)spShuffle();
+  const pos=spBag.indexOf(idx,spBagPos);
+  if(pos!==-1){[spBag[spBagPos],spBag[pos]]=[spBag[pos],spBag[spBagPos]];}
+  else{spBag.splice(spBagPos,0,idx);}
+  if(spStopped){spSkip();}
+  else{if(spFading){spFading=false;spGen++;}spCrossfade();}
+  return true;
+}
+
 function spToggle(){
   spMuted=!spMuted;
   spA.muted=spMuted;spB.muted=spMuted;
@@ -6176,6 +6332,471 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   // Doesn't start on page load — armed by the same first-gesture gate (in
   // the main script) that arms the other auto-glitches and the jukebox.
   window.__armSignalGlitch = scheduleNext;
+})();
+</script>
+<!-- ═══ A.I. BABY — chat panel (trigger moved into #topnav; styles in #aib-style, backend in /worker) ═══ -->
+<section id="aibPanel" role="dialog" aria-label="A.I. Baby transmission" aria-hidden="true">
+  <div class="aib-hd">
+    <div>
+      <span class="aib-tag">// PIRATE CARRIER // <span id="aibFreq">00.0</span> MHZ</span>
+      <div class="aib-title">A.I. BABY</div>
+    </div>
+    <div class="aib-hd-r">
+      <span class="aib-status" id="aibStatus"><span class="aib-led"></span>SEARCHING</span>
+      <div class="aib-hd-btns">
+        <button class="aib-btn on" id="aibVox" type="button" aria-pressed="true">VOX ON</button>
+        <button class="aib-btn" id="aibClose" type="button" aria-label="Close">✕</button>
+      </div>
+    </div>
+  </div>
+  <div class="aib-body">
+    <div class="aib-log" id="aibLog" aria-live="polite"></div>
+    <canvas class="aib-scope" id="aibScope" aria-hidden="true"></canvas>
+    <form class="aib-form" id="aibForm" autocomplete="off">
+      <span class="aib-prompt">&gt;</span>
+      <input class="aib-in" id="aibIn" type="text" maxlength="500" placeholder="speak into the static" spellcheck="false" disabled>
+      <button class="aib-btn aib-send" id="aibSend" type="submit" disabled>TX</button>
+    </form>
+    <div class="aib-boot" id="aibBoot">
+      <div class="aib-boot-title">CALIBRATING</div>
+      <div class="aib-boot-rule"></div>
+      <div class="aib-boot-log" id="aibBootLog"></div>
+    </div>
+  </div>
+</section>
+<script>
+/* ═══ A.I. BABY ═══
+   Flow: TX -> Worker /chat (text + signed speak token) -> Worker /speak (audio)
+   -> Tone.js chain (3 pitch shifters, bitcrush, feedback delay, radio EQ) with
+   randomized octave jumps / stutters / dropouts -> waveform scope.
+   Text reveal is synced to the voice and keeps the site's corruption flicker.
+   Tone.js is only fetched when the panel is first opened. */
+(function(){
+  // ── CONFIG ────────────────────────────────────────────────────────────────
+  // Set PROD_WORKER_URL to the deployed Worker (e.g. https://ai-baby.<you>.workers.dev).
+  // While it's empty the trigger stays hidden on the live site.
+  const PROD_WORKER_URL='';
+  const LOCAL=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  const ENDPOINT=(LOCAL?'http://127.0.0.1:8787':PROD_WORKER_URL).replace(/\/$/,'');
+  if(!ENDPOINT)return;
+
+  const TONE_SRC='https://cdn.jsdelivr.net/npm/tone@15.1.22/build/Tone.js';
+  // Voice character — tweak by ear.
+  const FX={
+    basePitch:3,        // semitones on the main path (younger/brighter)
+    upPitch:15,         // octave-jump-up path (+12 over base)
+    downPitch:-9,       // octave-drop path (-12 under base)
+    pUp:.12, pDown:.07, // per-segment odds of jumping to those paths
+    pStutter:.16,       // per-segment odds of a re-triggered buffer chunk
+    pDrop:.04,          // per-segment odds of a dropout gap
+    segMin:.09, segMax:.25,
+    crushBits:6, crushWet:.22,
+    delayTime:.19, delayFb:.32, delayWet:.28,
+    hp:160, lp:7200, gain:.9,
+  };
+  const MAX_HISTORY=10;
+  const AUDIO_WAIT_MS=4000; // how long text waits for the voice before revealing alone
+
+  // ── DOM ───────────────────────────────────────────────────────────────────
+  const $=id=>document.getElementById(id);
+  const trig=$('aibTrigger'),panel=$('aibPanel'),log=$('aibLog'),form=$('aibForm'),
+        input=$('aibIn'),send=$('aibSend'),voxBtn=$('aibVox'),closeBtn=$('aibClose'),
+        statusEl=$('aibStatus'),boot=$('aibBoot'),bootLog=$('aibBootLog'),
+        scope=$('aibScope'),freqEl=$('aibFreq');
+  trig.hidden=false;
+
+  // ── TRIGGER POSITION ─────────────────────────────────────────────────────
+  // The trigger sits fixed on screen (reachable from every scene) but its
+  // spot is set to hug the right edge of the hero "3EAS" title (#hw1) --
+  // measured live off that element rather than duplicated as fixed
+  // coordinates, since its size/position are all viewport-relative clamps.
+  // Only re-measured while the hero title is actually on screen, so a
+  // resize while parked on another scene can't snap it to a bogus spot.
+  const heroTitle=$('hw1');
+  let heroInView=false;
+  function positionTrigger(){
+    const r=heroTitle.getBoundingClientRect();
+    if(!r.width&&!r.height)return;
+    trig.style.top=Math.max(14,r.top+r.height/2)+'px';
+    trig.style.left=Math.min(r.right+14,window.innerWidth-28)+'px';
+    trig.classList.remove('aib-unplaced');
+  }
+  if(heroTitle){
+    new IntersectionObserver(es=>{
+      es.forEach(e=>{heroInView=e.isIntersecting});
+      if(heroInView)positionTrigger();
+    },{threshold:.3}).observe(heroTitle);
+    window.addEventListener('resize',()=>{if(heroInView)positionTrigger()});
+  }
+
+  // Keys/touches inside the panel must not drive the site's scene navigation.
+  ['keydown','keyup'].forEach(t=>panel.addEventListener(t,e=>{
+    if(e.key==='Escape'){closePanel();return}
+    e.stopPropagation();
+  }));
+
+  // ── STATE ─────────────────────────────────────────────────────────────────
+  let opened=false,online=false,busy=false,vox=true,mock=false;
+  const history=[];
+  let T=null,chain=null,liveSources=[],txEndTimer=null,transmitting=false;
+
+  // ── OPEN / CLOSE ──────────────────────────────────────────────────────────
+  // Hover opens it on desktop (a still particle beside the logo that wakes up
+  // under the cursor); click/focus cover touch and keyboard, where there's no
+  // hover to fire. Closing stays deliberate -- only the ✕ button, so a mouse
+  // passing between the trigger and the panel (they're not adjacent) doesn't
+  // slam it shut mid-crossing.
+  trig.addEventListener('mouseenter',openPanel);
+  trig.addEventListener('focus',openPanel);
+  trig.addEventListener('click',openPanel);
+  closeBtn.addEventListener('click',closePanel);
+  function openPanel(){
+    if(panel.classList.contains('open'))return;
+    panel.classList.remove('aib-open-glitch');void panel.offsetWidth;
+    panel.classList.add('open','aib-open-glitch');
+    panel.setAttribute('aria-hidden','false');
+    trig.classList.add('aib-active');trig.setAttribute('aria-expanded','true');
+    startScope();
+    loadTone(); // warm it while the boot sequence runs
+    if(!opened){opened=true;bootSequence()}
+    else if(online)setTimeout(()=>input.focus(),350);
+  }
+  function closePanel(){
+    panel.classList.remove('open','aib-open-glitch');panel.setAttribute('aria-hidden','true');
+    trig.classList.remove('aib-active');trig.setAttribute('aria-expanded','false');
+    stopVoice();stopScope();
+  }
+  voxBtn.addEventListener('click',()=>{
+    vox=!vox;voxBtn.textContent=vox?'VOX ON':'VOX OFF';
+    voxBtn.classList.toggle('on',vox);voxBtn.setAttribute('aria-pressed',String(vox));
+    if(!vox)stopVoice();
+  });
+
+  // Slow drifting "frequency" readout in the header.
+  let freq=88+Math.random()*19;
+  setInterval(()=>{freq+=(Math.random()-.5)*.3;freq=Math.max(87.5,Math.min(107.9,freq));freqEl.textContent=freq.toFixed(1)},1400);
+
+  // ── BOOT ──────────────────────────────────────────────────────────────────
+  async function bootSequence(){
+    const line=async(label,resultP)=>{
+      const row=document.createElement('div');
+      row.textContent=label.padEnd(18,'.')+' ';
+      bootLog.appendChild(row);
+      const [txt,ok]=await resultP;
+      const s=document.createElement('span');s.className=ok?'ok':'bad';s.textContent=txt;row.appendChild(s);
+      return ok;
+    };
+    const wait=ms=>new Promise(r=>setTimeout(r,ms));
+    await line('HANDSHAKE',wait(420).then(()=>['OK',true]));
+    const health=fetch(ENDPOINT+'/health').then(r=>r.ok?r.json():Promise.reject(r.status));
+    const carrier=await line('CARRIER',Promise.all([health,wait(500)]).then(([h])=>{mock=!!h.mock;return['LOCKED',true]},()=>['LOST',false]));
+    if(!carrier){
+      setStatus('NO CARRIER',false);
+      await wait(900);boot.classList.add('gone');
+      addMsg('err','NO CARRIER — SIGNAL OFFLINE. TRY AGAIN LATER.');
+      return;
+    }
+    await line('VOX CODEC',wait(380).then(()=>[mock?'MOCK':'LIVE',true]));
+    await wait(650);
+    boot.classList.add('gone');
+    online=true;setStatus(mock?'MOCK SIGNAL':'CARRIER LOCKED',true);
+    input.disabled=false;send.disabled=false;
+    const hello=addMsg('ai','');
+    revealText(hello.txt,'A.I. BABY online. Speak into the static.',900);
+    setTimeout(()=>input.focus(),200);
+  }
+  function setStatus(txt,ok){
+    statusEl.innerHTML='<span class="aib-led"></span>'+txt;
+    statusEl.classList.toggle('off',!ok);
+  }
+
+  // ── MESSAGES ──────────────────────────────────────────────────────────────
+  function addMsg(kind,text){
+    const m=document.createElement('div');m.className='aib-msg '+kind;
+    const who=document.createElement('span');who.className='aib-who';
+    who.textContent=kind==='ai'?'A.I. BABY >':kind==='me'?'YOU >':kind==='err'?'// ERR':'// SYS';
+    const txt=document.createElement('div');txt.className='aib-txt';txt.textContent=text;
+    m.append(who,txt);log.appendChild(m);scrollDown();
+    return {el:m,txt};
+  }
+  function scrollDown(){log.scrollTop=log.scrollHeight}
+
+  form.addEventListener('submit',e=>{e.preventDefault();transmit()});
+
+  // ── Action whitelist ─────────────────────────────────────────────────────
+  // The ONLY code path that ever acts on worker output beyond displaying
+  // text. Never eval, never call anything by a name the worker/model sent —
+  // every action type below maps to exactly one fixed, hardcoded call, and
+  // every value is checked against something already on this page before
+  // use. The worker validates independently too (see worker/src/tools.js);
+  // neither side trusts the other's validation alone.
+  //
+  // Scene name -> goScene() index is read live from the real top-nav links
+  // (same elements a visitor clicks) instead of a hand-written duplicate, so
+  // it can't drift from the actual nav.
+  const AIB_SCENES={HOME:0};
+  document.querySelectorAll('.tb-link').forEach(a=>{
+    const m=(a.getAttribute('onclick')||'').match(/goScene\((\d+)\)/);
+    if(!m)return;
+    const label=a.textContent.replace(/^\d+/,'').trim().toUpperCase();
+    if(label)AIB_SCENES[label]=Number(m[1]);
+  });
+  function aibRunActions(actions){
+    if(!Array.isArray(actions))return;
+    for(const a of actions){
+      if(!a||typeof a!=='object')continue;
+      try{
+        if(a.type==='go_to_scene'&&typeof a.name==='string'&&Object.prototype.hasOwnProperty.call(AIB_SCENES,a.name)){
+          goScene(AIB_SCENES[a.name]);
+        }else if(a.type==='play_track'&&typeof a.title==='string'&&typeof spPlayTitle==='function'){
+          spPlayTitle(a.title); // no-ops if the title isn't a real SP_TRACKS entry
+        }else if(a.type==='stop_music'&&typeof spStop==='function'){
+          spStop();
+        }else if(a.type==='open_link'&&typeof a.key==='string'){
+          const link=document.querySelector('[data-aib-key="'+CSS.escape(a.key)+'"]');
+          if(link&&link.href)window.open(link.href,'_blank','noopener');
+        }
+      }catch(e){console.warn('[aib] action failed',a,e);}
+    }
+  }
+
+  async function transmit(){
+    const q=input.value.trim();
+    if(!q||busy||!online)return;
+    busy=true;input.value='';send.disabled=true;
+    // Must happen inside the click/enter gesture so the AudioContext may start.
+    if(vox&&window.Tone)Tone.start().catch(()=>{});
+    addMsg('me',q);
+    history.push({role:'user',content:q});
+    const pending=addMsg('ai','');pending.el.classList.add('aib-wait');
+    pending.txt.innerHTML='<span class="aib-rx">RECEIVING</span><span class="aib-caret"></span>';
+    const rxDots=setInterval(()=>{const r=pending.txt.querySelector('.aib-rx');if(r)r.textContent=r.textContent.length>13?'RECEIVING':r.textContent+'.'},260);
+    try{
+      const res=await fetch(ENDPOINT+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history.slice(-MAX_HISTORY)})});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok)throw apiErr(res,data);
+      history.push({role:'assistant',content:data.text});
+      aibRunActions(data.actions); // fires immediately -- navigation/playback shouldn't wait on voice/text reveal
+
+      // Voice first (bounded wait), then reveal text in sync with it.
+      let voice=null;
+      if(vox&&data.speak){
+        voice=await Promise.race([
+          fetchVoice(data.text,data.speak).catch(e=>{console.warn('[aib] voice',e);return null}),
+          new Promise(r=>setTimeout(()=>r(null),AUDIO_WAIT_MS)),
+        ]);
+      }
+      clearInterval(rxDots);pending.el.classList.remove('aib-wait');
+      let dur=Math.min(4500,Math.max(700,data.text.length*28));
+      if(voice){const d=playVoice(voice);if(d)dur=Math.max(600,d*1000*.9)}
+      revealText(pending.txt,data.text,dur);
+      if(voice)addReplay(pending.el,voice);
+    }catch(e){
+      clearInterval(rxDots);
+      pending.el.remove();
+      history.pop();
+      addMsg('err',e.aibMsg||'SIGNAL LOST — RETRY');
+      if(!e.aibMsg)console.warn('[aib]',e);
+    }finally{
+      busy=false;send.disabled=false;input.focus();
+    }
+  }
+  function apiErr(res,data){
+    const e=new Error('api '+res.status);
+    const code=data&&data.error&&data.error.code;
+    const retry=Number(res.headers.get('Retry-After'))||(data&&data.error&&data.error.retryAfter)||0;
+    if(res.status===429){
+      e.aibMsg=code&&code.startsWith('daily')
+        ? 'CARRIER EXHAUSTED FOR TODAY — RETURN AFTER MIDNIGHT UTC'
+        : 'SIGNAL SATURATED — WAIT '+(retry||60)+'S';
+    }else if(res.status===403)e.aibMsg='TRANSMISSION REFUSED';
+    else e.aibMsg='SIGNAL LOST ('+res.status+') — RETRY';
+    return e;
+  }
+  function addReplay(msgEl,buf){
+    const b=document.createElement('button');b.type='button';b.className='aib-btn aib-replay';b.textContent='↻ REPLAY';
+    b.addEventListener('click',()=>{if(window.Tone)Tone.start().catch(()=>{});playVoice(buf)});
+    msgEl.appendChild(b);
+  }
+
+  // ── TEXT: typed reveal + corruption flicker (same glyph sets as the ticker) ─
+  const LEET={A:'4',E:'3',I:'1',O:'0',S:'5',T:'7',B:'8',G:'9',L:'1',Z:'2'};
+  const BACK={A:'∀',C:'Ɔ',E:'Ǝ',F:'Ⅎ',G:'⅁',K:'ʞ',L:'Ꞁ',N:'ᴎ',R:'Я',S:'Ƨ',Y:'⅄'};
+  const HOMO={A:'А',B:'В',C:'С',E:'Е',H:'Н',I:'І',J:'Ј',K:'К',M:'М',N:'Ν',O:'О',P:'Р',S:'Ѕ',T:'Т',X:'Х',Y:'Υ',Z:'Ζ'};
+  const SYMS='`~!@#$%^&*()-_=+[]{}\\|;:\'",.<>/?';
+  const COLORS=['#0ff','#f0f','#0f8','#f44','#ff0','var(--hot)','var(--accent)'];
+  const pick=a=>a[Math.floor(Math.random()*a.length)];
+  function glyph(c){
+    const up=c.toUpperCase(),r=Math.random();
+    if(r<.3&&LEET[up])return LEET[up];
+    if(r<.55&&HOMO[up])return HOMO[up];
+    if(r<.68&&BACK[up])return BACK[up];
+    if(r<.78)return SYMS[Math.floor(Math.random()*SYMS.length)];
+    return c===up?c.toLowerCase():up;
+  }
+  const flickering=[]; // last few AI message elements keep flickering
+  function revealText(el,text,durMs){
+    el.textContent='';
+    const spans=[...text].map(ch=>{const s=document.createElement('span');s.dataset.o=ch;s.textContent='';el.appendChild(s);return s});
+    const caret=document.createElement('span');caret.className='aib-caret';el.appendChild(caret);
+    const step=Math.max(8,durMs/Math.max(1,spans.length));
+    let i=0;
+    const iv=setInterval(()=>{
+      // reveal 1-2 chars per tick; each lands scrambled then resolves
+      for(let k=0;k<(step<14?2:1)&&i<spans.length;k++,i++){
+        const s=spans[i],o=s.dataset.o;
+        if(/[a-z]/i.test(o)){
+          s.textContent=glyph(o);s.style.textShadow=`-1px 0 ${pick(COLORS)},1px 0 ${pick(COLORS)}`;
+          setTimeout(()=>{s.textContent=o;s.style.textShadow=''},50+Math.random()*90);
+        }else s.textContent=o;
+      }
+      scrollDown();
+      if(i>=spans.length){
+        clearInterval(iv);caret.remove();
+        flickering.push(el);while(flickering.length>2)flickering.shift();
+      }
+    },step);
+  }
+  setInterval(()=>{
+    if(!panel.classList.contains('open'))return;
+    flickering.forEach(el=>{
+      const spans=el.querySelectorAll('span[data-o]');if(!spans.length)return;
+      const n=transmitting?3+Math.floor(Math.random()*3):(Math.random()<.55?1:0)+(Math.random()<.25?1:0);
+      for(let k=0;k<n;k++){
+        const s=spans[Math.floor(Math.random()*spans.length)],o=s.dataset.o;
+        if(!/[a-z]/i.test(o))continue;
+        s.textContent=glyph(o);s.style.textShadow=`-1px 0 ${pick(COLORS)},1px 0 ${pick(COLORS)}`;
+        setTimeout(()=>{s.textContent=o;s.style.textShadow=''},150+Math.random()*150);
+      }
+    });
+  },220);
+
+  // ── AUDIO ─────────────────────────────────────────────────────────────────
+  let toneP=null;
+  function loadTone(){
+    if(window.Tone)return Promise.resolve(window.Tone);
+    if(toneP)return toneP;
+    toneP=new Promise((res,rej)=>{
+      const s=document.createElement('script');s.src=TONE_SRC;s.async=true;
+      s.onload=()=>res(window.Tone);s.onerror=()=>{toneP=null;rej(new Error('tone load failed'))};
+      document.head.appendChild(s);
+    });
+    return toneP;
+  }
+  function buildChain(){
+    if(chain)return chain;
+    T=window.Tone;
+    const ps=p=>new T.PitchShift({pitch:p,windowSize:.05});
+    const main=ps(FX.basePitch),up=ps(FX.upPitch),down=ps(FX.downPitch);
+    const crush=new T.BitCrusher(FX.crushBits);crush.wet.value=FX.crushWet;
+    const delay=new T.FeedbackDelay({delayTime:FX.delayTime,feedback:FX.delayFb,wet:FX.delayWet});
+    const hp=new T.Filter({type:'highpass',frequency:FX.hp});
+    const lp=new T.Filter({type:'lowpass',frequency:FX.lp});
+    const out=new T.Gain(FX.gain);
+    const analyser=new T.Analyser('waveform',1024);
+    [main,up,down].forEach(n=>n.connect(crush));
+    crush.chain(delay,hp,lp,out);
+    out.connect(analyser);out.toDestination();
+    chain={main,up,down,analyser};
+    return chain;
+  }
+  async function fetchVoice(text,speak){
+    const [res]=await Promise.all([
+      fetch(ENDPOINT+'/speak',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,exp:speak.exp,token:speak.token})}),
+      loadTone(),
+    ]);
+    if(!res.ok)throw new Error('speak '+res.status);
+    const ab=await res.arrayBuffer();
+    const raw=await Tone.getContext().rawContext.decodeAudioData(ab);
+    return new Tone.ToneAudioBuffer(raw);
+  }
+  // Chop the buffer into short segments and schedule each one on a randomly
+  // chosen pitch path, with re-triggered stutter chunks and dropout gaps.
+  // Returns total duration in seconds (before the delay tail).
+  function playVoice(buf){
+    if(!vox||!window.Tone)return 0;
+    stopVoice();
+    const c=buildChain();
+    if(Tone.getContext().state!=='running')Tone.start().catch(()=>{});
+    const start=Tone.now()+.06,dur=buf.duration;
+    let t=start,pos=0;
+    const play=(off,len,when,dest)=>{
+      const s=new Tone.ToneBufferSource({url:buf,fadeIn:.004,fadeOut:.006}).connect(dest);
+      s.onended=()=>{s.dispose();liveSources=liveSources.filter(x=>x!==s)};
+      s.start(when,off,len);liveSources.push(s);
+    };
+    while(pos<dur-.005){
+      const seg=Math.min(dur-pos,FX.segMin+Math.random()*(FX.segMax-FX.segMin));
+      const r=Math.random();
+      const dest=r<FX.pUp?c.up:r<FX.pUp+FX.pDown?c.down:c.main;
+      if(Math.random()<FX.pDrop)t+=.03+Math.random()*.06;
+      if(Math.random()<FX.pStutter){
+        const chunk=Math.min(seg,.03+Math.random()*.05),reps=2+Math.floor(Math.random()*3);
+        for(let k=0;k<reps;k++){play(pos,chunk,t,dest);t+=chunk}
+      }
+      play(pos,seg,t,dest);t+=seg;pos+=seg;
+    }
+    const total=t-Tone.now();
+    setTx(true);
+    clearTimeout(txEndTimer);
+    txEndTimer=setTimeout(()=>setTx(false),(total+.6)*1000);
+    return total;
+  }
+  function stopVoice(){
+    liveSources.forEach(s=>{try{s.stop();s.dispose()}catch(_){}});
+    liveSources=[];clearTimeout(txEndTimer);setTx(false);
+  }
+  function setTx(on){
+    transmitting=on;panel.classList.toggle('aib-tx',on);
+    if(on){panel.classList.remove('aib-jolt');void panel.offsetWidth;panel.classList.add('aib-jolt')}
+    setStatus(on?'TRANSMITTING':(online?(mock?'MOCK SIGNAL':'CARRIER LOCKED'):'NO CARRIER'),online);
+  }
+
+  // ── SCOPE ─────────────────────────────────────────────────────────────────
+  const sx=scope.getContext('2d');
+  let raf=0,beam=0;
+  function sizeScope(){
+    const d=Math.min(2,window.devicePixelRatio||1);
+    scope.width=Math.round(scope.clientWidth*d);scope.height=Math.round(scope.clientHeight*d);
+  }
+  function startScope(){if(!raf){sizeScope();raf=requestAnimationFrame(draw)}}
+  function stopScope(){cancelAnimationFrame(raf);raf=0}
+  window.addEventListener('resize',()=>{if(raf)sizeScope()});
+  function draw(){
+    raf=requestAnimationFrame(draw);
+    const W=scope.width,H=scope.height,mid=H/2;
+    if(!W)return sizeScope();
+    sx.fillStyle='rgba(0,0,0,.35)';sx.fillRect(0,0,W,H); // phosphor trail
+    let data=null;
+    if(transmitting&&chain)data=chain.analyser.getValue();
+    const trace=(col,dx,amp,alpha)=>{
+      sx.beginPath();sx.strokeStyle=col;sx.globalAlpha=alpha;sx.lineWidth=Math.max(1,W/400);
+      const n=data?data.length:96;
+      for(let i=0;i<n;i++){
+        const x=i/(n-1)*W+dx;
+        const v=data?data[i]*amp:(Math.random()-.5)*.05+(Math.random()<.004?(Math.random()-.5)*.6:0);
+        const y=mid+v*mid*.95;
+        i?sx.lineTo(x,y):sx.moveTo(x,y);
+      }
+      sx.stroke();sx.globalAlpha=1;
+    };
+    if(data){
+      trace('#0ff',-2,1.5,.45);trace('#f0f',2,1.5,.45);trace('#e8e0c0',0,1.5,1);
+      // horizontal tear: shift a random slice sideways
+      if(Math.random()<.12){
+        const y=Math.floor(Math.random()*H*.8),h=Math.max(2,Math.floor(Math.random()*H*.25));
+        sx.drawImage(scope,0,y,W,h,(Math.random()-.5)*W*.06,y,W,h);
+      }
+    }else trace('#b8a878',0,1,.55);
+    // scan beam
+    beam=(beam+W*(data?.02:.006))%W;
+    const g=sx.createLinearGradient(beam-W*.08,0,beam,0);
+    g.addColorStop(0,'rgba(184,168,120,0)');g.addColorStop(1,'rgba(184,168,120,.18)');
+    sx.fillStyle=g;sx.fillRect(beam-W*.08,0,W*.08,H);
+  }
+
+  // Occasional nudge on the closed trigger so it reads as a live signal.
+  setInterval(()=>{if(!panel.classList.contains('open')&&Math.random()<.35){trig.classList.remove('aib-nudge');void trig.offsetWidth;trig.classList.add('aib-nudge')}},6000);
 })();
 </script>
 </body>
