@@ -73,6 +73,7 @@ export default {
 // ── Routes ──────────────────────────────────────────────────────────────────
 
 async function checkout(req, env) {
+  guardMock(env);
   let body;
   try {
     body = await req.json();
@@ -111,6 +112,7 @@ async function checkout(req, env) {
 }
 
 async function order(url, env) {
+  guardMock(env);
   const sid = url.searchParams.get('session_id') || '';
   let productId;
 
@@ -247,6 +249,15 @@ function b64url(bytes) {
 
 function isMock(env) {
   return String(env.MOCK_MODE) !== 'false';
+}
+
+// Mock mode hands out free "paid" orders, so it only ever runs against a
+// localhost site. Deployed with MOCK_MODE still "true", the shop stays shut
+// instead of giving files away.
+function guardMock(env) {
+  if (isMock(env) && !/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/?$/.test(String(env.SITE_URL || ''))) {
+    throw new HttpError(503, 'not_open', 'The shop is not open yet.');
+  }
 }
 
 function corsFor(req, env) {

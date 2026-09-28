@@ -49,7 +49,6 @@ const PUBLIC_BASE = LOCAL ? 'http://localhost:8080/media/.local-public' : cfg.pu
 const AUDIO_EXT = new Set(['.wav', '.aif', '.aiff', '.flac', '.mp3', '.m4a']);
 const LOSSLESS = new Set(['.wav', '.aif', '.aiff', '.flac']);
 
-main();
 
 function main() {
   preflight();
@@ -326,3 +325,5 @@ function today() { return new Date().toISOString().slice(0, 10); }
 function readJson(p) { return JSON.parse(fs.readFileSync(p, 'utf8')); }
 function writeJson(p, v) { fs.writeFileSync(p, JSON.stringify(v, null, 2) + '\n'); }
 function die(msg) { console.error(`✗ ${msg}`); process.exit(1); }
+
+main();
