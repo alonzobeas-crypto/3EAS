@@ -4,6 +4,8 @@
 # Secrets (never in this file):
 #   npx wrangler secret put STRIPE_SECRET_KEY   # sk_test_... first, sk_live_... when ready
 #   npx wrangler secret put DL_SECRET           # openssl rand -hex 32
+#   npx wrangler secret put STRIPE_WEBHOOK_SECRET  # whsec_... from the Stripe webhook (merch)
+#   npx wrangler secret put PRINTFUL_TOKEN      # only if you sell print-on-demand items
 # Local dev values go in shop/.dev.vars (gitignored) — see .dev.vars.example
 
 name = "3eas-shop"
@@ -28,11 +30,24 @@ CURRENCY = "usd"
 # (3eascortex.com/?order=cs_...) mints fresh ones any time, so this can be short.
 LINK_TTL_SECONDS = "3600"
 
+# Print-on-demand: "false" = orders land in Printful as drafts you confirm by
+# hand (safe while you check the first few); "true" = Printful charges your
+# card and ships automatically.
+PRINTFUL_AUTO_CONFIRM = "false"
+
 # Private bucket: sale masters + catalog.json (prices and file list).
 # Nothing in it is publicly reachable; only /file with a valid signature can read it.
 [[r2_buckets]]
 binding = "VAULT"
 bucket_name = "3eas-vault"
+
+# Merch stock: how many of each ship-from-studio item have sold, plus a record
+# of every merch order the webhook already handled (so Stripe retries never
+# double-count). Create it once with:  npx wrangler kv namespace create STOCK
+# and paste the id it prints here.
+[[kv_namespaces]]
+binding = "STOCK"
+id = "PASTE_KV_NAMESPACE_ID_HERE"
 
 # Per-IP burst limit on /checkout and /order (period must be 10 or 60).
 [[ratelimits]]

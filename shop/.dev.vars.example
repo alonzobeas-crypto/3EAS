@@ -3,3 +3,5 @@ SITE_URL=http://localhost:8080
 DL_SECRET=local-dev-secret-change-me
 # Only needed once MOCK_MODE is "false" locally:
 # STRIPE_SECRET_KEY=sk_test_...
+# Merch webhook testing. Any string works locally; use `stripe listen` for real events.
+STRIPE_WEBHOOK_SECRET=whsec_local_test

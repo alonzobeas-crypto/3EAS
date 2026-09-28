@@ -1076,6 +1076,33 @@ body{
 #shopPanel .sp-btn:hover,#shopPanel .sp-btn:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
 #shopPanel .sp-actions{display:flex;justify-content:flex-end}
 #pbuy[disabled]{opacity:.45}
+#shopPanel .sp-box.sp-wide{max-width:980px}
+#shopPanel .mx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1px;background:var(--dimmer);border:1px solid var(--dimmer)}
+#shopPanel .mx-card{background:var(--bg);padding:16px;display:flex;flex-direction:column;gap:10px}
+#shopPanel .mx-img{aspect-ratio:1/1;max-width:100%;background:#0b0a09;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--dimmer)}
+#shopPanel .mx-img img{width:100%;height:100%;object-fit:cover;display:block}
+#shopPanel .mx-noimg{font-size:10px;letter-spacing:3px;color:var(--dim2)}
+#shopPanel .mx-thumbs{display:flex;gap:6px;flex-wrap:wrap}
+#shopPanel .mx-thumb{width:44px;height:44px;padding:0;border:1px solid var(--dimmer);background:none;overflow:hidden}
+#shopPanel .mx-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+#shopPanel .mx-thumb[aria-current="true"],#shopPanel .mx-thumb:focus-visible{border-color:var(--accent);outline:none}
+#shopPanel .mx-title{margin:0;font-weight:400;font-size:15px;letter-spacing:3px;line-height:1.4;color:var(--hot);overflow-wrap:anywhere}
+#shopPanel .mx-desc{margin:0;font-size:11px;letter-spacing:1px;line-height:1.7;color:var(--dim2)}
+#shopPanel .mx-bundle{margin:0;font-size:10px;letter-spacing:2px;color:var(--accent)}
+#shopPanel .mx-price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#shopPanel .mx-price span{font-family:var(--vt);font-size:26px;letter-spacing:2px;color:var(--accent)}
+#shopPanel .mx-price small{font-size:10px;letter-spacing:1px;color:var(--dim2)}
+#shopPanel .mx-opt{display:flex;flex-direction:column;gap:6px}
+#shopPanel .mx-lbl{font-size:9px;letter-spacing:4px;color:var(--dim2)}
+#shopPanel .mx-chips{display:flex;gap:6px;flex-wrap:wrap}
+#shopPanel .mx-chip{background:none;border:1px solid var(--dim);color:var(--fg);font-family:var(--mono);font-size:10px;letter-spacing:2px;padding:7px 10px;min-width:40px}
+#shopPanel .mx-chip[aria-checked="true"]{border-color:var(--accent);color:var(--bg);background:var(--accent)}
+#shopPanel .mx-chip:hover:not([disabled]),#shopPanel .mx-chip:focus-visible{border-color:var(--accent);outline:none}
+#shopPanel .mx-chip[disabled]{opacity:.35;text-decoration:line-through}
+#shopPanel .mx-left{margin:0;font-size:10px;letter-spacing:3px;color:#a8695a}
+#shopPanel .mx-buy{margin-top:auto;background:var(--accent);color:var(--bg);border:none;font-family:var(--mono);font-size:11px;letter-spacing:4px;padding:12px;text-transform:uppercase}
+#shopPanel .mx-buy:hover:not([disabled]),#shopPanel .mx-buy:focus-visible{background:var(--hot);outline:none}
+#shopPanel .mx-buy[disabled]{background:none;border:1px solid var(--dimmer);color:var(--dim2)}
 </style>
 <style id="aib-style">
 /* ═══ A.I. BABY — pirate-carrier chat panel ═══
@@ -1405,7 +1432,7 @@ body{
         <div class="ac-cat">APPAREL // CDK COLLECTION</div>
         <div class="ac-name">THE UNIFORM</div>
         <div class="ac-desc">Apparel & accessories.<br>The signal has a dress code.<br>Wear the frequency.</div>
-        <div class="ac-foot"><div class="ac-price">INCOMING</div><a class="ac-btn" href="https://www.etsy.com/shop/3EASCORTEX" target="_blank" style="text-decoration:none;color:var(--accent);border-color:rgba(184,168,120,.3)">SHOP ETSY →</a></div>
+        <div class="ac-foot"><div class="ac-price">INCOMING</div><button class="ac-btn" data-merch="apparel" onclick="openMerch(this.dataset.merch)" style="color:var(--accent);border-color:rgba(184,168,120,.3)" hidden>VIEW →</button></div>
         <div class="ac-stat">— SIGNAL PENDING</div>
       </div>
       <div class="ac">
@@ -1420,8 +1447,8 @@ body{
         <div class="ac-idx">03</div>
         <div class="ac-cat">PHYSICAL // LIMITED PRESS</div>
         <div class="ac-name">ARTIFACTS</div>
-        <div class="ac-desc">Vinyl. Tapes. Physical media.<br>Limited pressings. No restock.<br>The object IS the signal.</div>
-        <div class="ac-foot"><div class="ac-price">INCOMING</div><a class="ac-btn" href="https://www.etsy.com/shop/3EASCORTEX" target="_blank" style="text-decoration:none;color:var(--accent);border-color:rgba(184,168,120,.3)">SHOP ETSY →</a></div>
+        <div class="ac-desc">Vinyl. Tapes. Prints. Zines.<br>Limited pressings. No restock.<br>The object IS the signal.</div>
+        <div class="ac-foot"><div class="ac-price">INCOMING</div><button class="ac-btn" data-merch="media,print" onclick="openMerch(this.dataset.merch)" style="color:var(--accent);border-color:rgba(184,168,120,.3)" hidden>VIEW →</button></div>
         <div class="ac-stat">— SIGNAL PENDING</div>
       </div>
       <div class="ac">
@@ -2926,25 +2953,46 @@ loadDispatch();
   }
 })();
 
-/* ─── SHOP: buy TRANSMISSIONS, deliver files after Stripe ───
+/* ─── SHOP: TRANSMISSIONS + merch, straight from this site ───
    Talks to the 3eas-shop Worker (shop/ in this repo). While SHOP_PROD_URL is
-   empty the BUY button reads SIGNAL PENDING on the live site and nothing is
+   empty, BUY buttons read SIGNAL PENDING on the live site and nothing is
    sold. After paying, Stripe sends the buyer to /?order=<session id>. That
-   link is their receipt: reopening it any time mints fresh download links. */
+   link is their receipt: reopening it shows the order and mints fresh
+   download links for anything digital. */
+const MERCH=[
+  /* ▼ MEDIA PIPELINE: merch (generated from media/merch.json, do not hand-edit) ▼ */
+  /* ▲ MEDIA PIPELINE: merch ▲ */
+];
 (function(){
   const SHOP_PROD_URL=''; // e.g. https://3eas-shop.<you>.workers.dev
   const LOCAL=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
   const SHOP=(LOCAL?'http://127.0.0.1:8788':SHOP_PROD_URL).replace(/\/$/,'');
   const money=c=>'$'+(c/100).toFixed(c%100?2:0);
   const mb=b=>b?(b/1048576).toFixed(b>104857600?0:1)+' MB':'';
-  let busy=false,lastFocus=null;
+  let busy=false,lastFocus=null,stock=null;
 
   function shopFetch(path,opts){
     const ctrl=new AbortController();
     const t=setTimeout(()=>ctrl.abort(),15000);
     return fetch(SHOP+path,Object.assign({},opts,{signal:ctrl.signal})).finally(()=>clearTimeout(t));
   }
+  async function startCheckout(payload,btn,restore){
+    if(busy||!SHOP)return;
+    busy=true;btn.textContent='CONNECTING…';btn.disabled=true;
+    try{
+      const r=await shopFetch('/checkout',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok||!d.url)throw new Error((d.error&&d.error.message)||'Checkout could not start. Try again in a minute.');
+      location.href=d.url;
+    }catch(e){
+      restore();
+      const msg=e.name==='AbortError'?'The shop did not answer. Try again in a minute.':e.message;
+      if(document.getElementById('shopPanel')&&document.getElementById('merchGrid'))flash(msg);
+      else render({error:msg});
+    }finally{busy=false;}
+  }
 
+  // ── TRANSMISSIONS player button ──
   window.shopSyncBuy=function(t){
     const b=document.getElementById('pbuy');
     if(!b)return;
@@ -2953,24 +3001,28 @@ loadDispatch();
     b.disabled=!SHOP;
     b.textContent=SHOP?'BUY '+money(t.buy.price):'SIGNAL PENDING';
   };
-
-  window.buyT=async function(){
-    if(busy||!SHOP||!cur2||!cur2.buy)return;
-    const b=document.getElementById('pbuy');
-    busy=true;b.textContent='CONNECTING…';
-    try{
-      const r=await shopFetch('/checkout',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({productId:cur2.buy.id})});
-      const d=await r.json().catch(()=>({}));
-      if(!r.ok||!d.url)throw new Error((d.error&&d.error.message)||'Checkout could not start. Try again in a minute.');
-      location.href=d.url;
-    }catch(e){
-      window.shopSyncBuy(cur2);
-      render({error:e.name==='AbortError'?'The shop did not answer. Try again in a minute.':e.message});
-    }finally{busy=false;}
+  window.buyT=function(){
+    if(!cur2||!cur2.buy)return;
+    startCheckout({productId:cur2.buy.id},document.getElementById('pbuy'),()=>window.shopSyncBuy(cur2));
   };
 
-  function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!=null)n.textContent=text;return n;}
+  // ── ACQUISITIONS cards ──
+  function syncCards(){
+    document.querySelectorAll('[data-merch]').forEach(btn=>{
+      const cats=btn.dataset.merch.split(',');
+      const items=MERCH.filter(m=>cats.includes(m.category));
+      if(!items.length)return;
+      const card=btn.closest('.ac');
+      const low=Math.min(...items.map(m=>m.price));
+      card.querySelector('.ac-price').textContent=(items.length>1?'FROM ':'')+money(low);
+      card.querySelector('.ac-stat').textContent='— '+items.length+(items.length===1?' ITEM':' ITEMS')+' // '+(SHOP?'TRANSMITTING':'SIGNAL PENDING');
+      btn.hidden=false;
+    });
+  }
+  syncCards();
 
+  // ── Panel shell ──
+  function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!=null)n.textContent=text;return n;}
   function close(){
     const p=document.getElementById('shopPanel');
     if(p)p.remove();
@@ -2978,8 +3030,7 @@ loadDispatch();
     if(lastFocus&&lastFocus.focus)lastFocus.focus();
   }
   function onKey(e){if(e.key==='Escape')close();}
-
-  function render(state){
+  function shell(wide){
     let p=document.getElementById('shopPanel');
     if(!p){
       lastFocus=document.activeElement;
@@ -2990,48 +3041,86 @@ loadDispatch();
       document.body.appendChild(p);
     }
     p.textContent='';
-    const box=el('div','sp-box');
-    box.appendChild(el('span','sp-tag','// TRANSMISSION // ACQUIRED'));
-    if(state.loading){
-      const t=el('div','sp-title','VERIFYING ORDER…');t.id='shopPanelTitle';box.appendChild(t);
-      box.appendChild(el('p','sp-note','Checking your payment with the vault.'));
-    }else if(state.error){
-      const t=el('div','sp-title','SIGNAL LOST');t.id='shopPanelTitle';box.appendChild(t);
-      box.appendChild(el('p','sp-err',state.error));
-    }else{
-      const t=el('div','sp-title',state.product.title);t.id='shopPanelTitle';box.appendChild(t);
-      box.appendChild(el('p','sp-note','Paid. Your files are below.'));
-      const list=el('div','sp-files');
-      state.files.forEach(f=>{
-        const row=el('div','sp-file');
-        const info=el('div');info.appendChild(el('b',null,f.label));info.appendChild(el('small',null,[f.name,mb(f.bytes)].filter(Boolean).join(' · ')));
-        const a=el('a','sp-dl','DOWNLOAD');a.href=f.url;a.rel='noopener';
-        row.appendChild(info);row.appendChild(a);list.appendChild(row);
-      });
-      box.appendChild(list);
-      box.appendChild(el('p','sp-note','Download links work for one hour. This page is your receipt: bookmark it or copy the link below, and open it again any time for fresh links.'));
-      const link=el('div','sp-link');
-      const inp=el('input');inp.id='shopOrderLink';inp.readOnly=true;inp.value=location.href;inp.setAttribute('aria-label','Your order link');
-      const cp=el('button','sp-btn','COPY');cp.type='button';
-      cp.addEventListener('click',()=>{
-        const done=()=>{cp.textContent='COPIED';setTimeout(()=>cp.textContent='COPY',1600);};
-        if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(inp.value).then(done,()=>{inp.select();});}
-        else inp.select();
-      });
-      link.appendChild(inp);link.appendChild(cp);box.appendChild(link);
-    }
-    if(!state.loading){
-      const acts=el('div','sp-actions');
-      const x=el('button','sp-btn','CLOSE');x.type='button';x.addEventListener('click',close);
-      acts.appendChild(x);box.appendChild(acts);
-    }
+    const box=el('div','sp-box'+(wide?' sp-wide':''));
     p.appendChild(box);
-    const focusable=p.querySelector('.sp-dl,.sp-btn');
+    return box;
+  }
+  function heading(box,tag,title){
+    box.appendChild(el('span','sp-tag',tag));
+    const t=el('div','sp-title',title);t.id='shopPanelTitle';box.appendChild(t);
+  }
+  function closeRow(box){
+    const acts=el('div','sp-actions');
+    const x=el('button','sp-btn','CLOSE');x.type='button';x.addEventListener('click',close);
+    acts.appendChild(x);box.appendChild(acts);
+  }
+  function flash(msg){
+    const f=document.getElementById('merchFlash');
+    if(f){f.textContent=msg;f.hidden=false;}
+  }
+  function fileList(box,files){
+    const list=el('div','sp-files');
+    files.forEach(f=>{
+      const row=el('div','sp-file');
+      const info=el('div');info.appendChild(el('b',null,f.label));info.appendChild(el('small',null,[f.name,mb(f.bytes)].filter(Boolean).join(' · ')));
+      const a=el('a','sp-dl','DOWNLOAD');a.href=f.url;a.rel='noopener';
+      row.appendChild(info);row.appendChild(a);list.appendChild(row);
+    });
+    box.appendChild(list);
+  }
+  function receiptLink(box){
+    const link=el('div','sp-link');
+    const inp=el('input');inp.id='shopOrderLink';inp.readOnly=true;inp.value=location.href;inp.setAttribute('aria-label','Your order link');
+    const cp=el('button','sp-btn','COPY');cp.type='button';
+    cp.addEventListener('click',()=>{
+      const done=()=>{cp.textContent='COPIED';setTimeout(()=>cp.textContent='COPY',1600);};
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(inp.value).then(done,()=>{inp.select();});}
+      else inp.select();
+    });
+    link.appendChild(inp);link.appendChild(cp);box.appendChild(link);
+  }
+
+  // ── Order / receipt panel ──
+  function render(state){
+    const box=shell(false);
+    if(state.loading){
+      heading(box,'// ORDER // VERIFYING','VERIFYING ORDER…');
+      box.appendChild(el('p','sp-note','Checking your payment.'));
+    }else if(state.error){
+      heading(box,'// ORDER','SIGNAL LOST');
+      box.appendChild(el('p','sp-err',state.error));
+    }else if(state.physical){
+      heading(box,'// ARTIFACT // ACQUIRED',state.product.title);
+      const ph=state.physical,s=ph.shipTo;
+      const bits=['Paid.'];
+      if(ph.variant)bits.push('Size '+ph.variant+'.');
+      if(s&&(s.city||s.country))bits.push('Ships to '+[s.city,s.region,s.country].filter(Boolean).join(', ')+'.');
+      box.appendChild(el('p','sp-note',bits.join(' ')));
+      box.appendChild(el('p','sp-note',ph.fulfillment==='pod'
+        ?'Printed to order and shipped in about 1 to 2 weeks. Stripe emails your receipt, and tracking follows when it ships.'
+        :'Packed by hand in Lincoln Heights and shipped within a few days. Stripe emails your receipt.'));
+      if(state.files&&state.files.length){
+        box.appendChild(el('p','sp-note','Your digital copy'+(state.bundle?' of '+state.bundle.title:'')+' is ready now:'));
+        fileList(box,state.files);
+        box.appendChild(el('p','sp-note','Download links work for one hour. Keep this page as your receipt and reopen it for fresh links.'));
+      }else{
+        box.appendChild(el('p','sp-note','Keep this page as your receipt.'));
+      }
+      receiptLink(box);
+    }else{
+      heading(box,'// TRANSMISSION // ACQUIRED',state.product.title);
+      box.appendChild(el('p','sp-note','Paid. Your files are below.'));
+      fileList(box,state.files);
+      box.appendChild(el('p','sp-note','Download links work for one hour. This page is your receipt: bookmark it or copy the link below, and open it again any time for fresh links.'));
+      receiptLink(box);
+    }
+    if(!state.loading)closeRow(box);
+    const focusable=box.querySelector('.sp-dl,.sp-btn');
     if(focusable)focusable.focus();
   }
 
   async function checkOrder(id){
-    if(!SHOP){render({error:'The shop is offline right now. Your payment is safe. Open this same link again later to download.'});return;}
+    if(!SHOP){render({error:'The shop is offline right now. Your payment is safe. Open this same link again later.'});return;}
     render({loading:true});
     try{
       const r=await shopFetch('/order?session_id='+encodeURIComponent(id),{});
@@ -3041,6 +3130,99 @@ loadDispatch();
     }catch(e){
       render({error:(e.name==='AbortError'?'The shop did not answer.':e.message)+' If you paid and this keeps happening, email passwordpills@pm.me with this link.'});
     }
+  }
+
+  // ── Merch browser ──
+  window.openMerch=async function(cats){
+    const want=String(cats||'').split(',');
+    const items=MERCH.filter(m=>want.includes(m.category));
+    if(!items.length)return;
+    const box=shell(true);
+    heading(box,'// 03 // OBTAIN ARTIFACTS',want.includes('apparel')?'THE UNIFORM':'ARTIFACTS');
+    const fl=el('p','sp-err');fl.id='merchFlash';fl.hidden=true;box.appendChild(fl);
+    const grid=el('div','mx-grid');grid.id='merchGrid';box.appendChild(grid);
+    items.forEach(m=>grid.appendChild(merchCard(m)));
+    closeRow(box);
+    const first=box.querySelector('.mx-chip:not([disabled]),.mx-buy');
+    if(first)first.focus();
+    if(SHOP&&!stock){
+      try{
+        const r=await shopFetch('/stock',{});
+        if(r.ok){stock=(await r.json()).products||{};document.querySelectorAll('.mx-card').forEach(c=>c._sync&&c._sync());}
+      }catch(e){}
+    }
+  };
+
+  function chips(label,opts,onPick){
+    const wrap=el('div','mx-opt');
+    wrap.appendChild(el('span','mx-lbl',label));
+    const row=el('div','mx-chips');row.setAttribute('role','radiogroup');row.setAttribute('aria-label',label);
+    opts.forEach(o=>{
+      const c=el('button','mx-chip',o.label);c.type='button';c.dataset.v=o.id;c.setAttribute('role','radio');c.setAttribute('aria-checked','false');
+      c.addEventListener('click',()=>onPick(o.id));
+      row.appendChild(c);
+    });
+    wrap.appendChild(row);
+    return wrap;
+  }
+
+  function merchCard(m){
+    const card=el('article','mx-card');
+    let size=m.variants.length===1?m.variants[0].id:null,region='us',img=0;
+    const fig=el('div','mx-img');
+    const pic=el('img');pic.alt=m.title;pic.loading='lazy';
+    if(m.images[0])pic.src=m.images[0];else fig.appendChild(el('span','mx-noimg','NO IMAGE // SIGNAL PENDING'));
+    if(m.images[0])fig.appendChild(pic);
+    card.appendChild(fig);
+    if(m.images.length>1){
+      const th=el('div','mx-thumbs');
+      m.images.forEach((u,i)=>{
+        const b=el('button','mx-thumb');b.type='button';b.setAttribute('aria-label','Photo '+(i+1));
+        const t=el('img');t.src=u;t.alt='';b.appendChild(t);
+        b.addEventListener('click',()=>{img=i;pic.src=u;sync();});
+        th.appendChild(b);
+      });
+      card.appendChild(th);
+    }
+    card.appendChild(el('h3','mx-title',m.title));
+    if(m.desc)card.appendChild(el('p','mx-desc',m.desc));
+    if(m.bundle)card.appendChild(el('p','mx-bundle','INCLUDES DIGITAL: '+m.bundle));
+    const priceRow=el('div','mx-price');
+    priceRow.appendChild(el('span',null,money(m.price)));
+    const shipTxt=el('small');priceRow.appendChild(shipTxt);
+    card.appendChild(priceRow);
+    let sizeChips=null;
+    if(m.variants.length>1){sizeChips=chips('SIZE',m.variants,v=>{size=v;sync();});card.appendChild(sizeChips);}
+    const regionChips=chips('SHIP TO',[{id:'us',label:'US'},{id:'intl',label:'INTERNATIONAL'}],v=>{region=v;sync();});
+    card.appendChild(regionChips);
+    const left=el('p','mx-left');card.appendChild(left);
+    const buy=el('button','mx-buy');buy.type='button';card.appendChild(buy);
+    buy.addEventListener('click',()=>{
+      if(!size){flash('Pick a size first.');return;}
+      startCheckout({productId:m.id,variant:size,region},buy,sync);
+    });
+    function leftFor(v){return stock&&stock[m.id]&&stock[m.id][v]!=null?stock[m.id][v]:null;}
+    function sync(){
+      shipTxt.textContent='+ '+money(m.ship[region])+' shipping';
+      if(sizeChips)sizeChips.querySelectorAll('.mx-chip').forEach(c=>{
+        const n=leftFor(c.dataset.v);
+        c.disabled=n===0;
+        if(n===0&&size===c.dataset.v)size=null;
+        c.setAttribute('aria-checked',String(c.dataset.v===size));
+      });
+      regionChips.querySelectorAll('.mx-chip').forEach(c=>c.setAttribute('aria-checked',String(c.dataset.v===region)));
+      card.querySelectorAll('.mx-thumb').forEach((b,i)=>b.setAttribute('aria-current',String(i===img)));
+      const n=size?leftFor(size):null;
+      const allOut=m.fulfillment==='self'&&stock&&stock[m.id]&&m.variants.every(v=>leftFor(v.id)===0);
+      left.textContent=allOut?'SOLD OUT // NO RESTOCK':(n!=null&&n<=10?n+' LEFT':(m.fulfillment==='pod'?'PRINTED TO ORDER':''));
+      left.hidden=!left.textContent;
+      if(!SHOP){buy.textContent='SIGNAL PENDING';buy.disabled=true;}
+      else if(allOut||(size&&n===0)){buy.textContent='SOLD OUT';buy.disabled=true;}
+      else{buy.textContent=size?'BUY '+money(m.price):'PICK A SIZE';buy.disabled=false;}
+    }
+    card._sync=sync;
+    sync();
+    return card;
   }
 
   const orderId=new URLSearchParams(location.search).get('order');

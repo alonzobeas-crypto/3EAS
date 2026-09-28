@@ -17,6 +17,10 @@
 //   "3EAS - River Viper [$7].wav"      sell for $7 instead of the default price
 //   "3EAS - River Viper [@1:15].wav"   start the preview at 1:15
 //
+// Merch lives in media/merch.json (see media/merch.example.json). Photos go in
+// media/merch-photos/. Every run, including --sync, re-checks merch.json,
+// uploads any new photos and republishes prices, sizes and stock.
+//
 // Needs: Node 18+, ffmpeg/ffprobe on PATH, and `npx wrangler login` done once in shop/.
 // After it finishes: commit and push index.html + media/catalog.json.
 
@@ -31,6 +35,7 @@ const ROOT = path.dirname(MEDIA);
 const SHOP = path.join(ROOT, 'shop');
 const INDEX = path.join(ROOT, 'index.html');
 const CATALOG = path.join(MEDIA, 'catalog.json');
+const MERCH = path.join(MEDIA, 'merch.json');
 const BUILD = path.join(MEDIA, '.build');
 const LOCAL_PUBLIC = path.join(MEDIA, '.local-public');
 
@@ -84,12 +89,19 @@ function main() {
     }
   }
 
-  // Publish: vault catalog (prices + file list for the shop) and the site's track lists.
+  const merch = buildMerch(catalog);
+
+  // Publish: vault catalog (prices, files, stock for the shop) and the site's lists.
   const vaultCatalog = {
     version: 1,
-    products: Object.fromEntries(catalog.transmissions.map((t) => [t.id, {
-      id: t.id, title: t.title, price: t.price, available: t.available !== false, files: t.files,
-    }])),
+    shipping: merch.shipping,
+    intlCountries: merch.intlCountries,
+    products: Object.fromEntries([
+      ...catalog.transmissions.map((t) => [t.id, {
+        id: t.id, kind: 'digital', title: t.title, price: t.price, available: t.available !== false, files: t.files,
+      }]),
+      ...merch.vault.map((m) => [m.id, m]),
+    ]),
   };
   fs.mkdirSync(BUILD, { recursive: true });
   const vaultPath = path.join(BUILD, 'vault-catalog.json');
@@ -99,7 +111,7 @@ function main() {
   } else {
     upload('vault', 'catalog.json', vaultPath, 'application/json', 'no-store');
     writeJson(CATALOG, catalog);
-    updateIndex(catalog);
+    updateIndex(catalog, merch.site);
   }
 
   console.log('\n── Done ──');
@@ -107,7 +119,7 @@ function main() {
   for (const s of results.skipped) console.log(`  = skipped (already in catalog): ${s}`);
   for (const f of results.failed) console.log(`  ✗ ${f}`);
   if (!DRY) {
-    console.log(`\nJukebox: ${catalog.jukebox.length} pipeline tracks · Transmissions for sale: ${catalog.transmissions.length}`);
+    console.log(`\nJukebox: ${catalog.jukebox.length} pipeline tracks · Transmissions for sale: ${catalog.transmissions.length} · Merch items: ${merch.site.length}`);
     if (LOCAL) console.log('Local test run: index.html now points at localhost. Do NOT commit it; `git checkout index.html media/catalog.json` to undo.');
     else console.log('Next: commit and push index.html and media/catalog.json.');
   }
@@ -190,6 +202,112 @@ function processFile(section, src, catalog) {
   return entry;
 }
 
+// ── Merch ───────────────────────────────────────────────────────────────────
+
+const MERCH_CATEGORIES = new Set(['apparel', 'media', 'print']);
+
+function buildMerch(catalog) {
+  const empty = { site: [], vault: [], shipping: {}, intlCountries: [] };
+  if (!fs.existsSync(MERCH)) return empty;
+  const m = readJson(MERCH);
+  const errors = [];
+  const shipping = {};
+  for (const [name, r] of Object.entries(m.shipping || {})) {
+    const us = dollars(r && r.us), intl = dollars(r && r.intl);
+    if (us === null || intl === null) errors.push(`shipping "${name}" needs "us" and "intl" prices in dollars`);
+    shipping[name] = { us, intl };
+  }
+  const intlCountries = (m.intlCountries || []).map((c) => String(c).toUpperCase());
+  for (const c of intlCountries) if (!/^[A-Z]{2}$/.test(c)) errors.push(`intlCountries: "${c}" is not a 2-letter country code`);
+
+  const txIds = new Set(catalog.transmissions.map((t) => t.id));
+  const seen = new Set();
+  const items = [];
+  (m.products || []).forEach((p, i) => {
+    const where = `product ${i + 1}${p && p.title ? ` (${p.title})` : ''}`;
+    const title = String((p && p.title) || '').replace(/[<>]/g, '').trim();
+    if (!title) { errors.push(`${where}: needs a "title"`); return; }
+    const id = p.id ? String(p.id) : slugify(title);
+    if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(id)) errors.push(`${where}: id "${id}" must be lowercase letters, numbers and dashes`);
+    if (seen.has(id) || txIds.has(id)) errors.push(`${where}: id "${id}" is already used`);
+    seen.add(id);
+    const price = dollars(p.price);
+    if (price === null || price < 50) errors.push(`${where}: "price" must be at least 0.50 (dollars)`);
+    if (!MERCH_CATEGORIES.has(p.category)) errors.push(`${where}: "category" must be apparel, media or print`);
+    if (!['self', 'pod'].includes(p.fulfillment)) errors.push(`${where}: "fulfillment" must be "self" (you ship it) or "pod" (Printful)`);
+    if (!shipping[p.shipping]) errors.push(`${where}: "shipping" must be one of: ${Object.keys(shipping).join(', ') || '(none defined)'}`);
+    if (p.bundle && !txIds.has(p.bundle)) errors.push(`${where}: "bundle" ${p.bundle} is not a transmission in media/catalog.json`);
+
+    // Variants: "sizes" {label: number} or a single "stock"/"printful" number.
+    let variants = [];
+    if (p.sizes && typeof p.sizes === 'object') {
+      variants = Object.entries(p.sizes).map(([label, n]) => ({ id: slugify(label) || 'one', label: String(label).toUpperCase(), n }));
+    } else {
+      variants = [{ id: 'one', label: 'ONE SIZE', n: p.fulfillment === 'pod' ? p.printful : p.stock }];
+    }
+    if (!variants.length) errors.push(`${where}: "sizes" is empty`);
+    const vids = new Set();
+    for (const v of variants) {
+      if (vids.has(v.id)) errors.push(`${where}: two sizes both become "${v.id}"`);
+      vids.add(v.id);
+      if (p.fulfillment === 'self' && !(Number.isInteger(v.n) && v.n >= 0)) errors.push(`${where}: stock for ${v.label} must be a whole number (0 or more)`);
+      if (p.fulfillment === 'pod' && !(Number.isInteger(v.n) && v.n > 0)) errors.push(`${where}: ${v.label} needs its Printful sync variant id`);
+    }
+    const images = Array.isArray(p.images) ? p.images : [];
+    for (const img of images) if (!fs.existsSync(path.join(MEDIA, img))) errors.push(`${where}: photo not found: media/${img}`);
+    items.push({ p, id, title, price, variants, images });
+  });
+  if (errors.length) die(`media/merch.json has problems:\n  - ${errors.join('\n  - ')}`);
+
+  catalog.merchImages ||= {};
+  const site = [];
+  const vault = [];
+  for (const { p, id, title, price, variants, images } of items) {
+    const urls = images.map((img) => merchImage(catalog, id, path.join(MEDIA, img)));
+    const available = p.available !== false;
+    vault.push({
+      id, kind: 'physical', title: title.toUpperCase(), category: p.category, price, available,
+      fulfillment: p.fulfillment, shipping: p.shipping, bundle: p.bundle || null, image: urls[0] || null,
+      variants: variants.map((v) => (p.fulfillment === 'self'
+        ? { id: v.id, label: v.label, stock: v.n }
+        : { id: v.id, label: v.label, printful: v.n })),
+    });
+    if (!available) continue;
+    const bundle = p.bundle ? catalog.transmissions.find((t) => t.id === p.bundle) : null;
+    site.push({
+      id, title: title.toUpperCase(), category: p.category, price, desc: String(p.description || ''),
+      images: urls, fulfillment: p.fulfillment,
+      ship: shipping[p.shipping],
+      variants: variants.map((v) => ({ id: v.id, label: v.label })),
+      bundle: bundle ? bundle.title : null,
+    });
+  }
+  if (site.length) console.log(`\nMerch: ${site.length} item(s) listed`);
+  return { site, vault, shipping, intlCountries };
+}
+
+// Photos are resized to 1400px JPEGs and uploaded once; the key includes a
+// hash of the original, so swapping a photo publishes a new URL.
+function merchImage(catalog, id, src) {
+  const hash = sha1(src).slice(0, 8);
+  const key = `merch/${id}-${hash}.jpg`;
+  const cacheKey = `${PUBLIC_BASE}|${key}`;
+  if (catalog.merchImages[cacheKey]) return catalog.merchImages[cacheKey];
+  const out = path.join(BUILD, 'merch', `${id}-${hash}.jpg`);
+  fs.mkdirSync(path.dirname(out), { recursive: true });
+  run('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', src, '-vf', "scale='min(1400,iw)':-2", '-q:v', '4', '-frames:v', '1', out]);
+  upload('public', key, out, 'image/jpeg', 'public, max-age=31536000, immutable');
+  const url = `${PUBLIC_BASE}/${key}`;
+  if (!DRY) catalog.merchImages[cacheKey] = url;
+  return url;
+}
+
+function dollars(v) {
+  const n = Number(v);
+  if (v === null || v === undefined || v === '' || !Number.isFinite(n) || n < 0) return null;
+  return Math.round(n * 100);
+}
+
 // ── ffmpeg ──────────────────────────────────────────────────────────────────
 
 function probe(src) {
@@ -252,16 +370,20 @@ const JB_OPEN = '/* ▼ MEDIA PIPELINE: jukebox (generated from media/catalog.js
 const JB_CLOSE = '/* ▲ MEDIA PIPELINE: jukebox ▲ */';
 const TX_OPEN = '/* ▼ MEDIA PIPELINE: transmissions (generated from media/catalog.json, do not hand-edit) ▼ */';
 const TX_CLOSE = '/* ▲ MEDIA PIPELINE: transmissions ▲ */';
+const MX_OPEN = '/* ▼ MEDIA PIPELINE: merch (generated from media/merch.json, do not hand-edit) ▼ */';
+const MX_CLOSE = '/* ▲ MEDIA PIPELINE: merch ▲ */';
 
-function updateIndex(catalog) {
+function updateIndex(catalog, merchSite) {
   let html = fs.readFileSync(INDEX, 'utf8');
   const jb = catalog.jukebox.map((t) => `  {title:${js(t.title)},src:${js(t.src)},gain:${Number(t.gain) || 1}},`);
   const tx = catalog.transmissions.filter((t) => t.available !== false).map((t, i) =>
     `  {id:${1000 + i},title:${js(t.title)},artist:'3EAS',type:'release',dur:0,src:${js(t.preview)},buy:{id:${js(t.id)},price:${Number(t.price)}}},`);
   html = replaceBlock(html, JB_OPEN, JB_CLOSE, jb);
   html = replaceBlock(html, TX_OPEN, TX_CLOSE, tx);
+  const mx = (merchSite || []).map((m) => `  ${JSON.stringify(m).replace(/</g, '\\u003c')},`);
+  html = replaceBlock(html, MX_OPEN, MX_CLOSE, mx);
   fs.writeFileSync(INDEX, html);
-  console.log(`\nindex.html updated: ${jb.length} jukebox + ${tx.length} transmissions from the pipeline.`);
+  console.log(`\nindex.html updated: ${jb.length} jukebox + ${tx.length} transmissions + ${mx.length} merch from the pipeline.`);
 }
 
 function replaceBlock(html, open, close, lines) {
@@ -276,10 +398,8 @@ function replaceBlock(html, open, close, lines) {
 
 function preflight() {
   if (!fs.existsSync(INDEX)) die('Run this from inside the 3eas repo (index.html not found).');
-  if (!SYNC) {
-    for (const bin of ['ffmpeg', 'ffprobe']) {
-      if (spawnSync(bin, ['-version']).status !== 0) die(`${bin} not found. Install it first (Mac: brew install ffmpeg).`);
-    }
+  for (const bin of ['ffmpeg', 'ffprobe']) {
+    if (spawnSync(bin, ['-version']).status !== 0) die(`${bin} not found. Install it first (Mac: brew install ffmpeg).`);
   }
   if (!DRY && !fs.existsSync(path.join(SHOP, 'node_modules', 'wrangler'))) {
     die('Wrangler is not installed yet. Run: cd shop && npm install && npx wrangler login');

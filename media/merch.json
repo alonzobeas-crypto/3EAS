@@ -1,0 +1,9 @@
+{
+  "shipping": {
+    "apparel": { "us": 6, "intl": 18 },
+    "media": { "us": 5, "intl": 22 },
+    "print": { "us": 7, "intl": 20 }
+  },
+  "intlCountries": ["CA", "MX", "GB", "IE", "FR", "DE", "ES", "IT", "NL", "BE", "PT", "AT", "CH", "SE", "NO", "DK", "FI", "PL", "CZ", "GR", "JP", "KR", "AU", "NZ", "BR", "AR", "CL", "CO", "PE"],
+  "products": []
+}

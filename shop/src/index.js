@@ -1,22 +1,23 @@
-// 3EAS SHOP — direct sales for TRANSMISSIONS.
+// 3EAS SHOP — direct sales from 3eascortex.com. No store in the middle.
 //
-//   POST /checkout {productId}          -> { url }   Stripe Checkout (or mock) URL to send the buyer to
-//   GET  /order?session_id=cs_...        -> { product, files:[{label,name,bytes,url}], expiresAt }
-//   GET  /file?k=&n=&e=&s=               -> the file itself, streamed from the private VAULT bucket
-//   GET  /health                         -> { ok, mock }
+//   POST /checkout {productId, variant?, region?}  -> { url }  Stripe Checkout (or mock) URL
+//   GET  /order?session_id=cs_...                  -> what they bought + download links
+//   GET  /file?k=&n=&e=&s=                         -> a file streamed from the private VAULT bucket
+//   GET  /stock                                    -> units left per merch size (ship-from-studio items)
+//   POST /stripe-webhook                           -> Stripe calls this when a merch order is paid
+//   GET  /health                                   -> { ok, mock }
 //
-// Prices and the file list live in VAULT/catalog.json, written by
-// media/pipeline.mjs. The browser only ever sends a product id; the price
-// always comes from the catalog, never from the client.
-//
-// Payment is verified on demand: /order asks Stripe directly whether the
-// session is paid, so there is no webhook to configure. The order link the
-// buyer lands on (3eascortex.com/?order=cs_...) is their receipt; reopening it
-// any time mints fresh download links.
+// Two kinds of product, both listed in VAULT/catalog.json (written by media/pipeline.mjs):
+//   digital   TRANSMISSIONS. Payment is checked on demand when the buyer opens their order link.
+//   physical  merch. Stripe collects the shipping address. The webhook then either counts the
+//             unit as sold (fulfillment "self": you ship it from the studio) or sends the order
+//             to Printful (fulfillment "pod": they print and ship it).
+// The browser only ever sends ids; prices, stock and shipping always come from the catalog.
 
 const PRODUCT_ID_RE = /^[a-z0-9][a-z0-9-]{0,79}$/;
+const VARIANT_RE = /^[a-z0-9][a-z0-9-]{0,19}$/;
 const SESSION_RE = /^cs_(test|live)_[A-Za-z0-9]{10,200}$/;
-const MOCK_SESSION_RE = /^mock_([a-z0-9][a-z0-9-]{0,79})$/;
+const MOCK_SESSION_RE = /^mock_([a-z0-9][a-z0-9-]{0,79})(?:~([a-z0-9][a-z0-9-]{0,19}))?$/;
 const FILE_KEY_RE = /^(masters|mp3)\/[A-Za-z0-9._-]{1,160}$/;
 
 class HttpError extends Error {
@@ -50,9 +51,16 @@ export default {
           requireOrigin(cors);
           await rateLimit(req, env);
           return json(await order(url, env), 200, cors.headers);
+        case '/stock':
+          requireMethod(req, 'GET');
+          requireOrigin(cors);
+          return json(await stock(env), 200, cors.headers);
         case '/file':
           requireMethod(req, 'GET');
           return await file(url, env);
+        case '/stripe-webhook':
+          requireMethod(req, 'POST');
+          return json(await webhook(req, env), 200, {});
         default:
           throw new HttpError(404, 'not_found', 'No such route.');
       }
@@ -82,29 +90,57 @@ async function checkout(req, env) {
   }
   const id = String((body && body.productId) || '');
   if (!PRODUCT_ID_RE.test(id)) throw new HttpError(400, 'bad_product', 'Unknown product.');
-  const product = await getProduct(env, id);
-  if (!product || product.available === false) throw new HttpError(404, 'not_for_sale', 'That transmission is not for sale right now.');
+  const catalog = await getCatalog(env);
+  const product = findProduct(catalog, id);
+  if (!product || product.available === false) throw new HttpError(404, 'not_for_sale', 'That item is not for sale right now.');
 
   const price = Number(product.price);
-  if (!Number.isInteger(price) || price < 50) throw new HttpError(500, 'bad_price', 'This product has no valid price yet.');
+  if (!Number.isInteger(price) || price < 50) throw new HttpError(500, 'bad_price', 'This item has no valid price yet.');
 
   const site = String(env.SITE_URL || '').replace(/\/$/, '');
-  if (isMock(env)) {
-    return { url: `${site}/?order=mock_${id}`, mock: true };
-  }
-
   const form = new URLSearchParams();
   form.set('mode', 'payment');
   form.set('line_items[0][quantity]', '1');
   form.set('line_items[0][price_data][currency]', String(env.CURRENCY || 'usd'));
   form.set('line_items[0][price_data][unit_amount]', String(price));
-  form.set('line_items[0][price_data][product_data][name]', `3EAS — ${product.title}`);
-  form.set('line_items[0][price_data][product_data][description]', describeFiles(product));
   form.set('metadata[product_id]', id);
   form.set('payment_intent_data[metadata][product_id]', id);
   form.set('success_url', `${site}/?order={CHECKOUT_SESSION_ID}`);
   form.set('cancel_url', `${site}/`);
   form.set('allow_promotion_codes', 'true');
+
+  if (product.kind === 'physical') {
+    const variant = pickVariant(product, body.variant);
+    const region = body.region === 'intl' ? 'intl' : 'us';
+    if (product.fulfillment === 'self') {
+      const left = await remaining(env, product, variant);
+      if (left < 1) throw new HttpError(409, 'sold_out', `${product.title}${variantSuffix(variant)} is sold out.`);
+    }
+    const rates = (catalog.shipping || {})[product.shipping];
+    const rate = rates && Number(rates[region]);
+    if (!Number.isInteger(rate) || rate < 0) throw new HttpError(500, 'no_shipping', 'Shipping is not set up for this item.');
+    const countries = region === 'us' ? ['US'] : (catalog.intlCountries || []).filter((c) => /^[A-Z]{2}$/.test(c) && c !== 'US');
+    if (!countries.length) throw new HttpError(400, 'no_intl', 'International shipping is not available yet.');
+
+    if (isMock(env)) return { url: `${site}/?order=mock_${id}~${variant.id}`, mock: true };
+
+    form.set('line_items[0][price_data][product_data][name]', `3EAS — ${product.title}${variantSuffix(variant)}`);
+    if (product.image) form.set('line_items[0][price_data][product_data][images][0]', product.image);
+    countries.forEach((c, i) => form.set(`shipping_address_collection[allowed_countries][${i}]`, c));
+    form.set('shipping_options[0][shipping_rate_data][type]', 'fixed_amount');
+    form.set('shipping_options[0][shipping_rate_data][display_name]', region === 'us' ? 'US shipping' : 'International shipping');
+    form.set('shipping_options[0][shipping_rate_data][fixed_amount][amount]', String(rate));
+    form.set('shipping_options[0][shipping_rate_data][fixed_amount][currency]', String(env.CURRENCY || 'usd'));
+    if (product.fulfillment === 'pod') form.set('phone_number_collection[enabled]', 'true');
+    form.set('metadata[kind]', 'physical');
+    form.set('metadata[variant]', variant.id);
+    form.set('metadata[region]', region);
+  } else {
+    if (isMock(env)) return { url: `${site}/?order=mock_${id}`, mock: true };
+    form.set('line_items[0][price_data][product_data][name]', `3EAS — ${product.title}`);
+    form.set('line_items[0][price_data][product_data][description]', describeFiles(product));
+    form.set('metadata[kind]', 'digital');
+  }
 
   const session = await stripe(env, 'POST', '/v1/checkout/sessions', form);
   if (!session.url) throw new HttpError(502, 'stripe', 'Checkout could not start. Try again in a minute.');
@@ -114,29 +150,52 @@ async function checkout(req, env) {
 async function order(url, env) {
   guardMock(env);
   const sid = url.searchParams.get('session_id') || '';
-  let productId;
+  let productId, variantId, shipTo = null;
 
   const mock = MOCK_SESSION_RE.exec(sid);
   if (mock) {
     if (!isMock(env)) throw new HttpError(400, 'bad_order', 'That order link is not valid.');
     productId = mock[1];
+    variantId = mock[2];
+    shipTo = { name: 'TEST BUYER', city: 'Los Angeles', region: 'CA', country: 'US' };
   } else if (SESSION_RE.test(sid)) {
     if (isMock(env)) throw new HttpError(400, 'bad_order', 'The shop is in test mode; real orders are not being checked.');
     const session = await stripe(env, 'GET', `/v1/checkout/sessions/${encodeURIComponent(sid)}`);
-    const paid = session.status === 'complete' &&
-      (session.payment_status === 'paid' || session.payment_status === 'no_payment_required');
-    if (!paid) throw new HttpError(402, 'unpaid', 'This order has not been paid.');
+    if (!isPaid(session)) throw new HttpError(402, 'unpaid', 'This order has not been paid.');
     productId = session.metadata && session.metadata.product_id;
+    variantId = session.metadata && session.metadata.variant;
+    const sd = session.shipping_details || (session.collected_information && session.collected_information.shipping_details);
+    if (sd && sd.address) shipTo = { name: sd.name || '', city: sd.address.city || '', region: sd.address.state || '', country: sd.address.country || '' };
   } else {
     throw new HttpError(400, 'bad_order', 'That order link is not valid.');
   }
 
-  const product = productId && PRODUCT_ID_RE.test(productId) ? await getProduct(env, productId) : null;
-  if (!product) throw new HttpError(404, 'gone', 'This order is paid, but the files are missing. Email passwordpills@pm.me and we will send them.');
+  const catalog = await getCatalog(env);
+  const product = productId && PRODUCT_ID_RE.test(productId) ? findProduct(catalog, productId) : null;
+  const missing = 'This order is paid, but the item is missing from the shop. Email passwordpills@pm.me and we will sort it out.';
+  if (!product) throw new HttpError(404, 'gone', missing);
 
+  if (product.kind === 'physical') {
+    const variant = (product.variants || []).find((v) => v.id === variantId) || null;
+    const bundle = product.bundle ? findProduct(catalog, product.bundle) : null;
+    const dl = bundle ? await signedFiles(env, bundle, url.origin) : { files: [], exp: null };
+    return {
+      product: { id: product.id, title: product.title },
+      physical: { variant: variant && variant.label !== 'ONE SIZE' ? variant.label : null, fulfillment: product.fulfillment, shipTo },
+      bundle: bundle ? { id: bundle.id, title: bundle.title } : null,
+      files: dl.files,
+      expiresAt: dl.exp,
+    };
+  }
+
+  const dl = await signedFiles(env, product, url.origin);
+  if (!dl.files.length) throw new HttpError(404, 'gone', missing);
+  return { product: { id: product.id, title: product.title }, files: dl.files, expiresAt: dl.exp };
+}
+
+async function signedFiles(env, product, origin) {
   const ttl = Math.max(60, Math.min(86400, Number(env.LINK_TTL_SECONDS) || 3600));
   const exp = Math.floor(Date.now() / 1000) + ttl;
-  const origin = url.origin;
   const files = [];
   for (const f of product.files || []) {
     if (!FILE_KEY_RE.test(f.key)) continue;
@@ -145,8 +204,176 @@ async function order(url, env) {
     const q = new URLSearchParams({ k: f.key, n: name, e: String(exp), s });
     files.push({ label: f.label || name, name, bytes: f.bytes || null, url: `${origin}/file?${q}` });
   }
-  if (!files.length) throw new HttpError(404, 'gone', 'This order is paid, but the files are missing. Email passwordpills@pm.me and we will send them.');
-  return { product: { id: product.id, title: product.title }, files, expiresAt: exp };
+  return { files, exp };
+}
+
+async function stock(env) {
+  const catalog = await getCatalog(env);
+  const out = {};
+  for (const p of Object.values(catalog.products || {})) {
+    if (p.kind !== 'physical' || p.available === false) continue;
+    const sold = p.fulfillment === 'self' ? await getSold(env, p.id) : {};
+    out[p.id] = {};
+    for (const v of p.variants || []) {
+      out[p.id][v.id] = p.fulfillment === 'self' ? Math.max(0, (Number(v.stock) || 0) - (sold[v.id] || 0)) : null;
+    }
+  }
+  return { products: out };
+}
+
+// Stripe → us, once per paid checkout. Only merch needs it: counts the sale
+// against stock, or hands the order to Printful. Answering non-2xx makes
+// Stripe retry for up to three days, so failures are loud, not lost.
+async function webhook(req, env) {
+  const raw = await req.text();
+  await verifyStripeSignature(env, req.headers.get('Stripe-Signature') || '', raw);
+  let event;
+  try {
+    event = JSON.parse(raw);
+  } catch {
+    throw new HttpError(400, 'bad_json', 'Bad event body.');
+  }
+  const type = event && event.type;
+  if (type !== 'checkout.session.completed' && type !== 'checkout.session.async_payment_succeeded') return { ok: true, ignored: type };
+  const session = event.data && event.data.object;
+  if (!session || !isPaid(session)) return { ok: true, ignored: 'unpaid' };
+  const meta = session.metadata || {};
+  if (meta.kind !== 'physical') return { ok: true, ignored: 'digital' };
+
+  requireKv(env);
+  const doneKey = `done:${session.id}`;
+  if (await env.STOCK.get(doneKey)) return { ok: true, duplicate: true };
+
+  const catalog = await getCatalog(env);
+  const product = findProduct(catalog, meta.product_id);
+  if (!product || product.kind !== 'physical') throw new HttpError(500, 'unknown_product', `Paid order for unknown product ${meta.product_id}`);
+  const variant = (product.variants || []).find((v) => v.id === meta.variant);
+  if (!variant) throw new HttpError(500, 'unknown_variant', `Paid order for unknown variant ${meta.variant}`);
+
+  let result;
+  if (product.fulfillment === 'pod') {
+    result = await printfulOrder(env, session, product, variant);
+  } else {
+    const sold = await getSold(env, product.id);
+    sold[variant.id] = (sold[variant.id] || 0) + 1;
+    await env.STOCK.put(`sold:${product.id}`, JSON.stringify(sold));
+    result = { counted: true, sold: sold[variant.id] };
+  }
+  await env.STOCK.put(doneKey, JSON.stringify({ at: new Date().toISOString(), product: product.id, variant: variant.id, ...result }), { expirationTtl: 60 * 60 * 24 * 90 });
+  return { ok: true, ...result };
+}
+
+// ── Merch helpers ───────────────────────────────────────────────────────────
+
+function pickVariant(product, given) {
+  const variants = product.variants || [];
+  const want = String(given || (variants.length === 1 ? variants[0].id : ''));
+  if (!VARIANT_RE.test(want)) throw new HttpError(400, 'pick_size', 'Pick a size first.');
+  const v = variants.find((x) => x.id === want);
+  if (!v) throw new HttpError(400, 'pick_size', 'That size does not exist.');
+  return v;
+}
+
+function variantSuffix(v) {
+  return v && v.label && v.label !== 'ONE SIZE' ? ` (${v.label})` : '';
+}
+
+async function getSold(env, productId) {
+  requireKv(env);
+  const raw = await env.STOCK.get(`sold:${productId}`);
+  try {
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+async function remaining(env, product, variant) {
+  const sold = await getSold(env, product.id);
+  return (Number(variant.stock) || 0) - (sold[variant.id] || 0);
+}
+
+function requireKv(env) {
+  if (!env.STOCK) throw new HttpError(500, 'config', 'Stock storage is not set up.');
+}
+
+async function printfulOrder(env, session, product, variant) {
+  const sd = session.shipping_details || (session.collected_information && session.collected_information.shipping_details) || {};
+  const a = sd.address || {};
+  const cd = session.customer_details || {};
+  const body = {
+    external_id: (await sha256hex(session.id)).slice(0, 32),
+    shipping: 'STANDARD',
+    recipient: {
+      name: sd.name || cd.name || '',
+      address1: a.line1 || '',
+      address2: a.line2 || '',
+      city: a.city || '',
+      state_code: a.state || '',
+      country_code: a.country || '',
+      zip: a.postal_code || '',
+      email: cd.email || '',
+      phone: cd.phone || '',
+    },
+    items: [{ sync_variant_id: Number(variant.printful), quantity: 1 }],
+  };
+  if (!env.PRINTFUL_TOKEN) {
+    if (isMock(env)) {
+      await env.STOCK.put(`pod:${session.id}`, JSON.stringify(body), { expirationTtl: 60 * 60 * 24 });
+      return { printful: 'mock', draft: body.external_id };
+    }
+    throw new HttpError(500, 'config', 'PRINTFUL_TOKEN is not set; print-on-demand order not sent.');
+  }
+  const confirm = String(env.PRINTFUL_AUTO_CONFIRM) === 'true';
+  const res = await fetch(`https://api.printful.com/orders${confirm ? '?confirm=true' : ''}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.PRINTFUL_TOKEN}`,
+      'Content-Type': 'application/json',
+      ...(env.PRINTFUL_STORE_ID ? { 'X-PF-Store-Id': String(env.PRINTFUL_STORE_ID) } : {}),
+    },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 409) return { printful: 'already_sent', draft: body.external_id };
+  if (!res.ok) {
+    console.error('printful', res.status, JSON.stringify(data));
+    throw new HttpError(502, 'printful', `Printful rejected the order (${res.status}).`);
+  }
+  return { printful: confirm ? 'confirmed' : 'draft', printfulId: data && data.result && data.result.id };
+}
+
+async function verifyStripeSignature(env, header, raw) {
+  const secret = env.STRIPE_WEBHOOK_SECRET;
+  if (!secret) throw new HttpError(500, 'config', 'STRIPE_WEBHOOK_SECRET is not set.');
+  const parts = Object.create(null);
+  const sigs = [];
+  for (const kv of header.split(',')) {
+    const [k, v] = kv.split('=');
+    if (k === 'v1') sigs.push(v);
+    else if (k && v) parts[k.trim()] = v.trim();
+  }
+  const t = Number(parts.t);
+  if (!t || !sigs.length) throw new HttpError(400, 'bad_signature', 'Missing Stripe signature.');
+  if (Math.abs(Date.now() / 1000 - t) > 300) throw new HttpError(400, 'stale', 'Stripe event is too old.');
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const mac = new Uint8Array(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${t}.${raw}`)));
+  const want = new TextEncoder().encode([...mac].map((b) => b.toString(16).padStart(2, '0')).join(''));
+  for (const s of sigs) {
+    const got = new TextEncoder().encode(s.trim());
+    if (got.length === want.length && crypto.subtle.timingSafeEqual(got, want)) return;
+  }
+  throw new HttpError(400, 'bad_signature', 'Stripe signature does not match.');
+}
+
+async function sha256hex(s) {
+  const d = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)));
+  return [...d].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+function isPaid(session) {
+  return session.status === 'complete' &&
+    (session.payment_status === 'paid' || session.payment_status === 'no_payment_required');
 }
 
 async function file(url, env) {
@@ -179,13 +406,17 @@ async function file(url, env) {
 
 let catalogCache = { at: 0, data: null };
 
-async function getProduct(env, id) {
+async function getCatalog(env) {
   if (!catalogCache.data || Date.now() - catalogCache.at > 60_000) {
     const obj = await env.VAULT.get('catalog.json');
     if (!obj) throw new HttpError(503, 'no_catalog', 'The shop is not stocked yet.');
     catalogCache = { at: Date.now(), data: await obj.json() };
   }
-  const products = (catalogCache.data && catalogCache.data.products) || {};
+  return catalogCache.data;
+}
+
+function findProduct(catalog, id) {
+  const products = (catalog && catalog.products) || {};
   return Object.prototype.hasOwnProperty.call(products, id) ? products[id] : null;
 }
 
