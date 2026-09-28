@@ -1,6 +1,6 @@
 # 3EAS SHOP
 
-Sells TRANSMISSIONS straight from 3eascortex.com. No store in the middle: Stripe takes the card, Cloudflare holds the files, the money lands in your Stripe account.
+Sells TRANSMISSIONS and merch straight from 3eascortex.com. No store in the middle: Stripe takes the card, Cloudflare holds the files, the money lands in your Stripe account.
 
 ```
 visitor hears a 90s preview ──▶ BUY $5 ──▶ Stripe Checkout ──▶ back to 3eascortex.com/?order=cs_...
@@ -18,7 +18,8 @@ The order link is the buyer's receipt. Reopening it any time gives fresh downloa
 |---|---|---|
 | `3eas-media` R2 bucket | public, served at `media.3eascortex.com` | jukebox MP3s, 90s previews |
 | `3eas-vault` R2 bucket | private | sale masters, buyer MP3s, `catalog.json` (prices) |
-| `3eas-shop` Worker | this folder | `/checkout`, `/order`, `/file` |
+| `3eas-shop` Worker | this folder | `/checkout`, `/order`, `/file`, `/stock`, `/stripe-webhook` |
+| `STOCK` KV store | Cloudflare | how many of each studio-shipped item have sold |
 | `media/pipeline.mjs` | repo | encodes, uploads, writes the site's track lists |
 
 ## Test it on your computer (no accounts needed)
@@ -41,8 +42,9 @@ Open `http://localhost:8080`, go to TRANSMISSIONS, pick the track, hit BUY. Mock
 2. **Move 3eascortex.com's DNS to Cloudflare.** Cloudflare dashboard → Add a site → copy your current records (the GitHub Pages ones) → at Namecheap set the two nameservers Cloudflare gives you. Namecheap stays the registrar, GitHub Pages keeps hosting the site.
 3. **Buckets.** R2 → create `3eas-media` and `3eas-vault`. On `3eas-media` → Settings → Custom domain → `media.3eascortex.com`. Leave `3eas-vault` with no public access.
 4. **Stripe test run, on your computer.** Stripe Dashboard → Developers → API keys → copy the test key (`sk_test_...`). In `shop/.dev.vars` add `STRIPE_SECRET_KEY=sk_test_...` and `MOCK_MODE=false`, run `npm run dev` and the site locally as above, and buy with Stripe's test card `4242 4242 4242 4242` (any future date, any CVC). You should land back on your local site with both downloads working.
-5. **Fill the vault:** `node media/pipeline.mjs` (uploads for real this time), then commit and push `index.html` and `media/catalog.json`.
-6. **Deploy with the live key only.** A deployed test key would let anyone who finds the Worker "pay" with the test card.
+5. **Stock storage** (skip if no merch yet): `npx wrangler kv namespace create STOCK` and paste the id into `wrangler.toml`.
+6. **Fill the vault:** `node media/pipeline.mjs` (uploads for real this time), then commit and push `index.html` and `media/catalog.json`.
+7. **Deploy with the live key only.** A deployed test key would let anyone who finds the Worker "pay" with the test card.
    ```bash
    cd shop
    npx wrangler login
@@ -51,9 +53,47 @@ Open `http://localhost:8080`, go to TRANSMISSIONS, pick the track, hit BUY. Mock
    # wrangler.toml: MOCK_MODE = "false"
    npm run deploy                               # prints https://3eas-shop.<you>.workers.dev
    ```
-7. **Open the shop.** In `index.html` search `SHOP_PROD_URL`, paste the Worker URL, commit, push. The BUY buttons switch from SIGNAL PENDING to live. Make one real $5 purchase yourself and refund it in Stripe.
+   Selling merch: now add the Stripe webhook (see Merch below) pointing at that URL, and `npx wrangler secret put STRIPE_WEBHOOK_SECRET`.
+8. **Open the shop.** In `index.html` search `SHOP_PROD_URL`, paste the Worker URL, commit, push. The BUY buttons switch from SIGNAL PENDING to live. Make one real $5 purchase yourself and refund it in Stripe.
 
-Until step 7, the live site shows SIGNAL PENDING and sells nothing. If the Worker is ever deployed with `MOCK_MODE` still `"true"`, it refuses every order instead of giving files away.
+Until step 8, the live site shows SIGNAL PENDING and sells nothing. If the Worker is ever deployed with `MOCK_MODE` still `"true"`, it refuses every order instead of giving files away.
+
+## Merch
+
+Merch shows up in ACQUISITIONS: apparel under THE UNIFORM, vinyl/tapes/CDs and prints/posters/zines under ARTIFACTS. Each item gets its own card with photos, sizes, US or international shipping, and a BUY button. Sizes that sell out cross themselves off.
+
+Edit `media/merch.json` (copy the shapes from `media/merch.example.json`), put photos in `media/merch-photos/`, then:
+
+```bash
+node media/pipeline.mjs --sync
+git add index.html media/catalog.json media/merch.json media/merch-photos && git commit -m "Merch" && git push
+```
+
+Per item:
+
+| Field | Meaning |
+|---|---|
+| `title`, `description` | shown on the card |
+| `category` | `apparel`, `media` or `print` |
+| `price` | dollars, e.g. `35` |
+| `fulfillment` | `self` = you ship it from the studio, `pod` = Printful prints and ships |
+| `shipping` | which rate from the `shipping` table at the top (dollars, flat per order, `us` and `intl`) |
+| `sizes` | `self`: `{"S": 10, "M": 20}` = units on hand. `pod`: `{"M": 4012345671}` = Printful sync variant ids |
+| `stock` / `printful` | same thing for one-size items |
+| `bundle` | a transmission id from `media/catalog.json`; buyers get its download on the receipt page |
+| `available` | `false` hides it |
+
+**Stock** is the total number of each size you've ever had for sale; the shop subtracts what's sold. To restock, add the new units to that number and `--sync`. Two people buying the very last unit at the same second can both get through; you'd refund one.
+
+**Ship-from-studio orders** appear in Stripe → Payments with the buyer's address. Pack, ship, and add tracking there if you want.
+
+**Print-on-demand**: create the products in Printful (Stores → "Manual order / API" store), copy each size's *sync variant id* into `sizes`, and set `PRINTFUL_TOKEN` (Printful → Developers → private token). Orders arrive in Printful as drafts until you set `PRINTFUL_AUTO_CONFIRM = "true"` in `wrangler.toml`; confirm the first few by hand.
+
+**Webhook (needed for merch)**: Stripe → Developers → Webhooks → Add endpoint → `https://3eas-shop.<you>.workers.dev/stripe-webhook`, events `checkout.session.completed` and `checkout.session.async_payment_succeeded`. Copy its signing secret and run `npx wrangler secret put STRIPE_WEBHOOK_SECRET`.
+
+**Stock storage**: `npx wrangler kv namespace create STOCK`, paste the id into `wrangler.toml`.
+
+**Sales tax**: prices go through as-is, with no tax added. Selling physical goods in California normally means holding a seller's permit and remitting sales tax; Stripe Tax can add it automatically for a small fee. Check with an accountant; this isn't tax advice.
 
 ## Adding music
 
