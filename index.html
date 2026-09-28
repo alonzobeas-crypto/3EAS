@@ -911,7 +911,6 @@ body{
   .tb-support .n,.tb-subscribe .n{display:none}
   #topnav{padding:0;height:62px}
   .tb-brand{font-size:18px;padding:0 14px;letter-spacing:2px}
-  #aibTrigger{width:38px}
   .tb-right{font-size:12px;letter-spacing:1px;padding:0 8px;gap:5px}
   a[title="Instagram"]{width:38px!important}
   a[title="Instagram"] svg{width:14px;height:14px}
@@ -1063,16 +1062,17 @@ body{
    Everything here is namespaced #aib* / .aib-* so it can't collide with the
    rest of the site. Talks to the Cloudflare Worker in /worker. */
 #aibTrigger{
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  width:44px;background:none;border:none;padding:0;cursor:none;position:relative;
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:18px;height:18px;margin-left:2px;vertical-align:middle;
+  background:none;border:none;padding:0;cursor:none;position:relative;
 }
 #aibTrigger .aib-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:#a8695a;box-shadow:0 0 6px #a8695a;
+  width:4px;height:4px;border-radius:50%;
+  background:#a8695a;box-shadow:0 0 4px #a8695a;
   transition:background .3s,box-shadow .3s,transform .3s;
 }
 #aibTrigger:hover .aib-dot,#aibTrigger:focus-visible .aib-dot,#aibTrigger.aib-active .aib-dot{
-  background:var(--hot);box-shadow:0 0 10px var(--hot),0 0 20px rgba(232,224,192,.4);transform:scale(1.5);
+  background:var(--hot);box-shadow:0 0 8px var(--hot),0 0 14px rgba(232,224,192,.4);transform:scale(1.6);
 }
 #aibTrigger.aib-nudge .aib-dot{animation:aibNudge .9s steps(1) 1}
 @keyframes aibNudge{0%,100%{transform:scale(1) translateX(0)}20%{transform:scale(1.4) translateX(-1px)}40%{transform:scale(.8) translateX(1px)}60%{transform:scale(1.2)}80%{transform:scale(1)}}
@@ -1173,7 +1173,6 @@ body{
 .aib-boot-log .bad{color:#a8695a}
 
 @media (max-width:600px){
-  #aibTrigger{width:34px}
   #aibPanel{right:0;bottom:0;width:100vw;height:82dvh;border-left:none;border-right:none;border-bottom:none}
   .aib-tag{letter-spacing:2px}
   .aib-title{font-size:30px;letter-spacing:4px}
@@ -1221,9 +1220,7 @@ body{
 
 <!-- TOPBAR -->
 <nav id="topnav">
-  <div class="tb-brand" onclick="goScene(0)">3EAS</div>
-  <!-- ═══ A.I. BABY trigger — styles in #aib-style, logic + panel markup near </body> ═══ -->
-  <button id="aibTrigger" type="button" hidden aria-controls="aibPanel" aria-expanded="false" aria-label="Open A.I. Baby chat"><span class="aib-dot"></span></button>
+  <div class="tb-brand" onclick="goScene(0)">3EAS<!-- ═══ A.I. BABY trigger — styles in #aib-style, logic + panel markup near </body> ═══ --><button id="aibTrigger" type="button" hidden aria-controls="aibPanel" aria-expanded="false" aria-label="Open A.I. Baby chat"><span class="aib-dot"></span></button></div>
   <div class="tb-links">
     <a href="#" class="tb-link" onclick="goScene(1);return false"><span class="n">01</span>TRANSMISSIONS</a>
     <a href="#" class="tb-link" onclick="goScene(2);return false"><span class="n">02</span>VISUALS</a>
@@ -6421,7 +6418,9 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   // slam it shut mid-crossing.
   trig.addEventListener('mouseenter',openPanel);
   trig.addEventListener('focus',openPanel);
-  trig.addEventListener('click',openPanel);
+  // Trigger now lives inside .tb-brand (onclick="goScene(0)") -- stop the
+  // click from bubbling up and also jumping the site to the HOME scene.
+  trig.addEventListener('click',e=>{e.stopPropagation();openPanel()});
   closeBtn.addEventListener('click',closePanel);
   function openPanel(){
     if(panel.classList.contains('open'))return;
