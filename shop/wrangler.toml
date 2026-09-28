@@ -1,0 +1,41 @@
+# 3EAS SHOP — Cloudflare Worker
+# Sells TRANSMISSIONS directly: Stripe Checkout in, private R2 download out.
+# Deployed separately from the Pages site:  cd shop && npx wrangler deploy
+# Secrets (never in this file):
+#   npx wrangler secret put STRIPE_SECRET_KEY   # sk_test_... first, sk_live_... when ready
+#   npx wrangler secret put DL_SECRET           # openssl rand -hex 32
+# Local dev values go in shop/.dev.vars (gitignored) — see .dev.vars.example
+
+name = "3eas-shop"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+
+[vars]
+# "true" = no Stripe calls. /checkout jumps straight to a fake paid order so the
+# whole buy -> download loop can be tested with zero accounts. Flip to "false"
+# only after STRIPE_SECRET_KEY and DL_SECRET are set as secrets.
+MOCK_MODE = "true"
+
+# Where Stripe sends the buyer back after paying.
+SITE_URL = "https://3eascortex.com"
+
+# Browser origins allowed to call /checkout and /order (comma-separated, exact match).
+ALLOWED_ORIGINS = "https://3eascortex.com,https://www.3eascortex.com,http://localhost:8080,http://127.0.0.1:8080"
+
+CURRENCY = "usd"
+
+# How long each signed download link works. The buyer's order link
+# (3eascortex.com/?order=cs_...) mints fresh ones any time, so this can be short.
+LINK_TTL_SECONDS = "3600"
+
+# Private bucket: sale masters + catalog.json (prices and file list).
+# Nothing in it is publicly reachable; only /file with a valid signature can read it.
+[[r2_buckets]]
+binding = "VAULT"
+bucket_name = "3eas-vault"
+
+# Per-IP burst limit on /checkout and /order (period must be 10 or 60).
+[[ratelimits]]
+name = "RL_SHOP"
+namespace_id = "3101"
+simple = { limit = 20, period = 60 }

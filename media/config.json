@@ -1,0 +1,20 @@
+{
+  "publicBase": "https://media.3eascortex.com",
+  "publicBucket": "3eas-media",
+  "vaultBucket": "3eas-vault",
+  "defaultPrice": 500,
+  "jukebox": {
+    "lufs": -12,
+    "truePeak": -1,
+    "bitrate": "320k",
+    "gain": 2.14
+  },
+  "preview": {
+    "seconds": 90,
+    "start": 30,
+    "fadeIn": 2,
+    "fadeOut": 4,
+    "lufs": -12,
+    "bitrate": "192k"
+  }
+}

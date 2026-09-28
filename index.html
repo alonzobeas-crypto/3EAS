@@ -1056,6 +1056,26 @@ body{
 @media (prefers-reduced-motion: reduce) {
   #signal-glitch-canvas.sg-cutting-hard { animation: none; }
 }
+
+/* ── SHOP: order / download panel (see the SHOP script block) ── */
+#shopPanel{position:fixed;inset:0;z-index:8500;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:rgba(0,0,0,.88)}
+#shopPanel .sp-box{width:100%;max-width:560px;max-height:100%;overflow:auto;border:1px solid var(--accent);background:var(--bg);padding:28px 26px;display:flex;flex-direction:column;gap:16px;font-family:var(--mono);box-shadow:0 0 40px rgba(184,168,120,.12)}
+#shopPanel .sp-tag{font-size:10px;letter-spacing:5px;color:var(--dim2);text-transform:uppercase}
+#shopPanel .sp-title{font-size:26px;letter-spacing:4px;line-height:1.25;color:var(--hot);text-transform:uppercase;overflow-wrap:anywhere}
+#shopPanel .sp-note{font-size:11px;letter-spacing:1.5px;line-height:1.8;color:var(--dim2)}
+#shopPanel .sp-err{font-size:12px;letter-spacing:1.5px;line-height:1.8;color:#a8695a}
+#shopPanel .sp-files{display:flex;flex-direction:column;border-top:1px solid var(--dimmer)}
+#shopPanel .sp-file{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--dimmer)}
+#shopPanel .sp-file b{display:block;font-weight:400;font-size:12px;letter-spacing:2px;color:var(--fg)}
+#shopPanel .sp-file small{display:block;margin-top:3px;font-size:10px;letter-spacing:1px;color:var(--dim2)}
+#shopPanel .sp-dl{flex-shrink:0;font-size:10px;letter-spacing:3px;color:var(--bg);background:var(--accent);padding:9px 14px;text-decoration:none;text-transform:uppercase}
+#shopPanel .sp-dl:hover,#shopPanel .sp-dl:focus-visible{background:var(--hot);outline:none}
+#shopPanel .sp-link{display:flex;gap:8px;align-items:stretch}
+#shopPanel .sp-link input{flex:1;min-width:0;background:transparent;border:1px solid var(--dimmer);color:var(--fg);font-family:var(--mono);font-size:10px;letter-spacing:1px;padding:8px}
+#shopPanel .sp-btn{background:none;border:1px solid var(--dim);color:var(--fg);font-family:var(--mono);font-size:10px;letter-spacing:3px;padding:8px 12px;text-transform:uppercase}
+#shopPanel .sp-btn:hover,#shopPanel .sp-btn:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+#shopPanel .sp-actions{display:flex;justify-content:flex-end}
+#pbuy[disabled]{opacity:.45}
 </style>
 <style id="aib-style">
 /* ═══ A.I. BABY — pirate-carrier chat panel ═══
@@ -1332,7 +1352,7 @@ body{
           <button class="pb pb-play" id="pbtn" onclick="togPlay()">▶</button>
           <button class="pb" onclick="nextT()">▶▶</button>
           <span style="flex:1"></span>
-          <button class="pb" style="font-size:9px;letter-spacing:2px">↓ DL</button>
+          <button class="pb" id="pbuy" style="font-size:9px;letter-spacing:2px" onclick="buyT()" hidden>BUY</button>
         </div>
       </div>
     </div>
@@ -2501,6 +2521,8 @@ setTimeout(()=>{
 
 /* ─── TRACKS ─── */
 const TRACKS=[
+  /* ▼ MEDIA PIPELINE: transmissions (generated from media/catalog.json, do not hand-edit) ▼ */
+  /* ▲ MEDIA PIPELINE: transmissions ▲ */
   {id:1,title:"IF IT WASN'T FOR YOU",artist:'COMING SOON',type:'pending',dur:0,src:null},
   {id:2,title:'WAR WITHIN A BREATH',artist:'3EAS',type:'release',dur:0,src:'uploads/3EAS - War Within a Breath (Remix).mp3'},
   {id:3,title:'COMING SOON',artist:'3EAS',type:'pending',dur:0,src:null},
@@ -2566,7 +2588,7 @@ function renderTL(){
       <div class="tart"><span class="tart-ph">SIG</span></div>
       <div><div class="tt">${t.title}</div><div class="tmeta">${t.artist}</div></div>
       <span class="ttype${t.type==='exclusive'?' excl':''}">${t.type.replace('-',' ')}</span>
-      <span class="tdur"></span>
+      <span class="tdur">${t.buy?'$'+(t.buy.price/100).toFixed(t.buy.price%100?2:0):''}</span>
     </div>`).join('');
 }
 
@@ -2576,7 +2598,8 @@ function selT(id){
   cur2=t;wdata=[];
   renderTL();
   document.getElementById('ptitle').textContent=cur2.title;
-  document.getElementById('partist').textContent=cur2.artist;
+  document.getElementById('partist').textContent=cur2.buy?cur2.artist+' · PREVIEW':cur2.artist;
+  if(window.shopSyncBuy)window.shopSyncBuy(cur2);
   document.getElementById('pbtn').textContent='…';
   document.getElementById('pcur').textContent='0:00';
   document.getElementById('ptot').textContent='0:00';
@@ -2903,6 +2926,127 @@ loadDispatch();
   }
 })();
 
+/* ─── SHOP: buy TRANSMISSIONS, deliver files after Stripe ───
+   Talks to the 3eas-shop Worker (shop/ in this repo). While SHOP_PROD_URL is
+   empty the BUY button reads SIGNAL PENDING on the live site and nothing is
+   sold. After paying, Stripe sends the buyer to /?order=<session id>. That
+   link is their receipt: reopening it any time mints fresh download links. */
+(function(){
+  const SHOP_PROD_URL=''; // e.g. https://3eas-shop.<you>.workers.dev
+  const LOCAL=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  const SHOP=(LOCAL?'http://127.0.0.1:8788':SHOP_PROD_URL).replace(/\/$/,'');
+  const money=c=>'$'+(c/100).toFixed(c%100?2:0);
+  const mb=b=>b?(b/1048576).toFixed(b>104857600?0:1)+' MB':'';
+  let busy=false,lastFocus=null;
+
+  function shopFetch(path,opts){
+    const ctrl=new AbortController();
+    const t=setTimeout(()=>ctrl.abort(),15000);
+    return fetch(SHOP+path,Object.assign({},opts,{signal:ctrl.signal})).finally(()=>clearTimeout(t));
+  }
+
+  window.shopSyncBuy=function(t){
+    const b=document.getElementById('pbuy');
+    if(!b)return;
+    if(!t||!t.buy){b.hidden=true;return;}
+    b.hidden=false;
+    b.disabled=!SHOP;
+    b.textContent=SHOP?'BUY '+money(t.buy.price):'SIGNAL PENDING';
+  };
+
+  window.buyT=async function(){
+    if(busy||!SHOP||!cur2||!cur2.buy)return;
+    const b=document.getElementById('pbuy');
+    busy=true;b.textContent='CONNECTING…';
+    try{
+      const r=await shopFetch('/checkout',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({productId:cur2.buy.id})});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok||!d.url)throw new Error((d.error&&d.error.message)||'Checkout could not start. Try again in a minute.');
+      location.href=d.url;
+    }catch(e){
+      window.shopSyncBuy(cur2);
+      render({error:e.name==='AbortError'?'The shop did not answer. Try again in a minute.':e.message});
+    }finally{busy=false;}
+  };
+
+  function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!=null)n.textContent=text;return n;}
+
+  function close(){
+    const p=document.getElementById('shopPanel');
+    if(p)p.remove();
+    document.removeEventListener('keydown',onKey);
+    if(lastFocus&&lastFocus.focus)lastFocus.focus();
+  }
+  function onKey(e){if(e.key==='Escape')close();}
+
+  function render(state){
+    let p=document.getElementById('shopPanel');
+    if(!p){
+      lastFocus=document.activeElement;
+      p=el('div');p.id='shopPanel';
+      p.setAttribute('role','dialog');p.setAttribute('aria-modal','true');p.setAttribute('aria-labelledby','shopPanelTitle');
+      p.addEventListener('click',e=>{if(e.target===p)close();});
+      document.addEventListener('keydown',onKey);
+      document.body.appendChild(p);
+    }
+    p.textContent='';
+    const box=el('div','sp-box');
+    box.appendChild(el('span','sp-tag','// TRANSMISSION // ACQUIRED'));
+    if(state.loading){
+      const t=el('div','sp-title','VERIFYING ORDER…');t.id='shopPanelTitle';box.appendChild(t);
+      box.appendChild(el('p','sp-note','Checking your payment with the vault.'));
+    }else if(state.error){
+      const t=el('div','sp-title','SIGNAL LOST');t.id='shopPanelTitle';box.appendChild(t);
+      box.appendChild(el('p','sp-err',state.error));
+    }else{
+      const t=el('div','sp-title',state.product.title);t.id='shopPanelTitle';box.appendChild(t);
+      box.appendChild(el('p','sp-note','Paid. Your files are below.'));
+      const list=el('div','sp-files');
+      state.files.forEach(f=>{
+        const row=el('div','sp-file');
+        const info=el('div');info.appendChild(el('b',null,f.label));info.appendChild(el('small',null,[f.name,mb(f.bytes)].filter(Boolean).join(' · ')));
+        const a=el('a','sp-dl','DOWNLOAD');a.href=f.url;a.rel='noopener';
+        row.appendChild(info);row.appendChild(a);list.appendChild(row);
+      });
+      box.appendChild(list);
+      box.appendChild(el('p','sp-note','Download links work for one hour. This page is your receipt: bookmark it or copy the link below, and open it again any time for fresh links.'));
+      const link=el('div','sp-link');
+      const inp=el('input');inp.id='shopOrderLink';inp.readOnly=true;inp.value=location.href;inp.setAttribute('aria-label','Your order link');
+      const cp=el('button','sp-btn','COPY');cp.type='button';
+      cp.addEventListener('click',()=>{
+        const done=()=>{cp.textContent='COPIED';setTimeout(()=>cp.textContent='COPY',1600);};
+        if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(inp.value).then(done,()=>{inp.select();});}
+        else inp.select();
+      });
+      link.appendChild(inp);link.appendChild(cp);box.appendChild(link);
+    }
+    if(!state.loading){
+      const acts=el('div','sp-actions');
+      const x=el('button','sp-btn','CLOSE');x.type='button';x.addEventListener('click',close);
+      acts.appendChild(x);box.appendChild(acts);
+    }
+    p.appendChild(box);
+    const focusable=p.querySelector('.sp-dl,.sp-btn');
+    if(focusable)focusable.focus();
+  }
+
+  async function checkOrder(id){
+    if(!SHOP){render({error:'The shop is offline right now. Your payment is safe. Open this same link again later to download.'});return;}
+    render({loading:true});
+    try{
+      const r=await shopFetch('/order?session_id='+encodeURIComponent(id),{});
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok)throw new Error((d.error&&d.error.message)||'Could not load this order.');
+      render(d);
+    }catch(e){
+      render({error:(e.name==='AbortError'?'The shop did not answer.':e.message)+' If you paid and this keeps happening, email passwordpills@pm.me with this link.'});
+    }
+  }
+
+  const orderId=new URLSearchParams(location.search).get('order');
+  if(orderId)checkOrder(orderId);
+})();
+
 /* ─── SITE PLAYLIST ─── */
 const SP_TRACKS=[
   {title:'AHS - PALESTINE',src:'uploads/AHS-Palestine-ABAI1.wav',gain:2.14},
@@ -2932,6 +3076,8 @@ const SP_TRACKS=[
   {title:'3EAS - RIVER VIPER',src:'https://3eascortex-media.sfo3.cdn.digitaloceanspaces.com/3EAS%20Cortex%20-%20Jukebox%20Tracks/3EAS%20-%20River%20Viper.mp3',gain:2.14},
   {title:'3EAS - CRAVINGS 2012',src:'https://3eascortex-media.sfo3.cdn.digitaloceanspaces.com/3EAS%20Cortex%20-%20Jukebox%20Tracks/Cravings%202012.wav',gain:2.14},
   {title:'3EAS - A MOMENT BY RITA',src:'https://3eascortex-media.sfo3.cdn.digitaloceanspaces.com/3EAS%20Cortex%20-%20Jukebox%20Tracks/3EAS%20-%20A%20Moment%20by%20Rita.mp3',gain:2.14},
+  /* ▼ MEDIA PIPELINE: jukebox (generated from media/catalog.json, do not hand-edit) ▼ */
+  /* ▲ MEDIA PIPELINE: jukebox ▲ */
 ];
 let spIdx=0,spMuted=false,spStarted=false,spUnlocked=false;
 let spBag=[],spBagPos=0;
