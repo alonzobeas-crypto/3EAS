@@ -1062,10 +1062,14 @@ body{
    Everything here is namespaced #aib* / .aib-* so it can't collide with the
    rest of the site. Talks to the Cloudflare Worker in /worker. */
 #aibTrigger{
-  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
-  width:18px;height:18px;margin-left:2px;vertical-align:middle;
-  background:none;border:none;padding:0;cursor:none;position:relative;
+  position:fixed;top:0;left:0;z-index:900; /* top/left tracked to the hero title in JS */
+  display:flex;align-items:center;justify-content:center;
+  width:22px;height:22px;transform:translateY(-50%);
+  background:none;border:none;padding:0;cursor:none;
+  transition:opacity .3s;
 }
+#aibTrigger[hidden]{display:none}
+#aibTrigger.aib-unplaced{opacity:0;pointer-events:none} /* hidden until first positioned, avoids a top-left flash */
 #aibTrigger .aib-dot{
   width:4px;height:4px;border-radius:50%;
   background:#a8695a;box-shadow:0 0 4px #a8695a;
@@ -1220,7 +1224,7 @@ body{
 
 <!-- TOPBAR -->
 <nav id="topnav">
-  <div class="tb-brand" onclick="goScene(0)">3EAS<!-- ═══ A.I. BABY trigger — styles in #aib-style, logic + panel markup near </body> ═══ --><button id="aibTrigger" type="button" hidden aria-controls="aibPanel" aria-expanded="false" aria-label="Open A.I. Baby chat"><span class="aib-dot"></span></button></div>
+  <div class="tb-brand" onclick="goScene(0)">3EAS</div>
   <div class="tb-links">
     <a href="#" class="tb-link" onclick="goScene(1);return false"><span class="n">01</span>TRANSMISSIONS</a>
     <a href="#" class="tb-link" onclick="goScene(2);return false"><span class="n">02</span>VISUALS</a>
@@ -1244,6 +1248,8 @@ body{
     </svg>
   </a>
 </nav>
+<!-- ═══ A.I. BABY trigger — fixed on screen, JS-positioned beside the hero "3EAS" title (#hw1); styles in #aib-style, logic + panel markup near </body> ═══ -->
+<button id="aibTrigger" class="aib-unplaced" type="button" hidden aria-controls="aibPanel" aria-expanded="false" aria-label="Open A.I. Baby chat"><span class="aib-dot"></span></button>
 
 <!-- VERTICAL NAV -->
 <div id="vnav">
@@ -6399,6 +6405,30 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
         scope=$('aibScope'),freqEl=$('aibFreq');
   trig.hidden=false;
 
+  // ── TRIGGER POSITION ─────────────────────────────────────────────────────
+  // The trigger sits fixed on screen (reachable from every scene) but its
+  // spot is set to hug the right edge of the hero "3EAS" title (#hw1) --
+  // measured live off that element rather than duplicated as fixed
+  // coordinates, since its size/position are all viewport-relative clamps.
+  // Only re-measured while the hero title is actually on screen, so a
+  // resize while parked on another scene can't snap it to a bogus spot.
+  const heroTitle=$('hw1');
+  let heroInView=false;
+  function positionTrigger(){
+    const r=heroTitle.getBoundingClientRect();
+    if(!r.width&&!r.height)return;
+    trig.style.top=Math.max(14,r.top+r.height/2)+'px';
+    trig.style.left=Math.min(r.right+14,window.innerWidth-28)+'px';
+    trig.classList.remove('aib-unplaced');
+  }
+  if(heroTitle){
+    new IntersectionObserver(es=>{
+      es.forEach(e=>{heroInView=e.isIntersecting});
+      if(heroInView)positionTrigger();
+    },{threshold:.3}).observe(heroTitle);
+    window.addEventListener('resize',()=>{if(heroInView)positionTrigger()});
+  }
+
   // Keys/touches inside the panel must not drive the site's scene navigation.
   ['keydown','keyup'].forEach(t=>panel.addEventListener(t,e=>{
     if(e.key==='Escape'){closePanel();return}
@@ -6418,9 +6448,7 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   // slam it shut mid-crossing.
   trig.addEventListener('mouseenter',openPanel);
   trig.addEventListener('focus',openPanel);
-  // Trigger now lives inside .tb-brand (onclick="goScene(0)") -- stop the
-  // click from bubbling up and also jumping the site to the HOME scene.
-  trig.addEventListener('click',e=>{e.stopPropagation();openPanel()});
+  trig.addEventListener('click',openPanel);
   closeBtn.addEventListener('click',closePanel);
   function openPanel(){
     if(panel.classList.contains('open'))return;
