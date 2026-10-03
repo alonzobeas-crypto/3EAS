@@ -1693,10 +1693,7 @@ function initHP(){
   hpart=Array.from({length:count},()=>({x:Math.random()*hw,y:Math.random()*hh,vx:(Math.random()-.5)*.072,vy:(Math.random()-.5)*.072,r:Math.random()*.8+.3,wa:Math.random()*Math.PI*2}));
   // One particle in the field is "the signal" -- pulses the site's own
   // legacy red/blue instead of ambient tan. Click it to stop it.
-  // Disabled for now (LEGACY_EGG=false): with no legacy particle assigned,
-  // the click handler, vanish/respawn timer and message all no-op. Flip to
-  // true to bring the easter egg back.
-  const LEGACY_EGG=false;
+  const LEGACY_EGG=true;
   if(!LEGACY_EGG){legacyParticle=null;return;}
   legacyParticle=hpart[Math.floor(Math.random()*hpart.length)];
   legacyParticle.legacy=true;
