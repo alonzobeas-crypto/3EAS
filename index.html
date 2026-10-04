@@ -509,7 +509,10 @@ body{
 .player{border-left:1px solid var(--dimmer);padding:28px 24px;display:flex;flex-direction:column}
 .p-label{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--dim2);text-transform:uppercase;margin-bottom:10px}
 .p-title{font-family:var(--vt);font-size:28px;letter-spacing:2px;color:var(--fg);line-height:1.1;min-height:32px;text-transform:uppercase}
-.p-artist{font-family:var(--mono);font-size:10px;color:var(--dim2);letter-spacing:2px;margin-top:4px;margin-bottom:24px}
+.p-artist{font-family:var(--mono);font-size:10px;color:var(--dim2);letter-spacing:2px;margin-top:4px;margin-bottom:16px}
+.p-buy-top{display:block;width:100%;background:none;border:1px solid var(--accent);color:var(--accent);cursor:none;font-family:var(--mono);font-size:12px;letter-spacing:3px;padding:10px;margin-bottom:20px;transition:background .15s,color .15s}
+.p-buy-top:hover{background:var(--accent);color:var(--bg)}
+.p-buy-top[disabled]{opacity:.45}
 
 /* Signal dots (like original) */
 .sig-dots{display:flex;flex-direction:column;gap:4px;margin-bottom:20px}
@@ -1372,14 +1375,13 @@ body{
         <div class="p-label">NOW PLAYING</div>
         <div class="p-title" id="ptitle">— SELECT A TRANSMISSION —</div>
         <div class="p-artist" id="partist">&nbsp;</div>
+        <button class="p-buy-top" id="pbuy" onclick="buyT()" hidden>BUY</button>
         <div class="p-wave-wrap"><canvas id="pwav"></canvas></div>
         <div class="p-times"><span id="pcur">0:00</span><span id="ptot">0:00</span></div>
         <div class="pctrl">
           <button class="pb" onclick="prevT()">◀◀</button>
           <button class="pb pb-play" id="pbtn" onclick="togPlay()">▶</button>
           <button class="pb" onclick="nextT()">▶▶</button>
-          <span style="flex:1"></span>
-          <button class="pb" id="pbuy" style="font-size:9px;letter-spacing:2px" onclick="buyT()" hidden>BUY</button>
         </div>
       </div>
     </div>
