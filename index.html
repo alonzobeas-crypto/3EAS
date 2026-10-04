@@ -3864,6 +3864,13 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     const t=Date.parse(d+'T12:00:00-07:00');
     return !isNaN(t)&&Date.now()-t<TICKER_FRESH_DAYS*864e5;
   }
+  // Outbound links get picked roughly TWICE as often as a uniform-random
+  // draw would give them (see TICKER_LINK_SHARE below, in nextTickerBatch).
+  // Expressed as a multiple of the pool's own link ratio rather than a flat
+  // percentage, so "2x" stays true as links are added/removed over time.
+  function tickerIsLink(item){
+    return typeof item==='string'&&item.indexOf('<a href=')>=0;
+  }
   // ── PREVIEW ── ?ticker=webb shows only lines containing "webb" (case-
   // insensitive, HTML ignored); ?ticker=new shows only fresh lines. For
   // checking a batch after a push. Doesn't touch the visitor's seen-state.
@@ -3903,13 +3910,25 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
   // just quietly drops out of the seen set. Editing the ticker no longer
   // resets everyone's progress toward "seen everything once."
   const TICKER_SEEN_KEY='tickerSeenState';
-  let tickerSeen=new Set(),tickerSeenLoaded=false;
-  function saveTickerSeen(){try{localStorage.setItem(TICKER_SEEN_KEY,JSON.stringify(Array.from(tickerSeen)));}catch(e){}}
+  const TICKER_LINKSHOWN_KEY='tickerLinkShownState';
+  // Links get TICKER_LINK_REPEATS turns per lap before counting as "seen",
+  // instead of one -- see the comment in nextTickerBatch for why this (and
+  // not a per-batch quota) is what actually raises their overall rate.
+  const TICKER_LINK_REPEATS=2;
+  let tickerSeen=new Set(),tickerLinkShown=new Map(),tickerSeenLoaded=false;
+  function saveTickerSeen(){
+    try{
+      localStorage.setItem(TICKER_SEEN_KEY,JSON.stringify(Array.from(tickerSeen)));
+      localStorage.setItem(TICKER_LINKSHOWN_KEY,JSON.stringify(Array.from(tickerLinkShown)));
+    }catch(e){}
+  }
   function loadTickerSeen(){
     tickerSeenLoaded=true;
     try{
       const arr=JSON.parse(localStorage.getItem(TICKER_SEEN_KEY));
       if(Array.isArray(arr))tickerSeen=new Set(arr);
+      const ls=JSON.parse(localStorage.getItem(TICKER_LINKSHOWN_KEY));
+      if(Array.isArray(ls))tickerLinkShown=new Map(ls);
     }catch(e){}
   }
   // A fixed batch size every cycle was mechanically predictable — same
@@ -3973,6 +3992,7 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
       // draw of the new lap, so the lap boundary can't put the same line
       // on screen twice in a row.
       tickerSeen=new Set();
+      tickerLinkShown=new Map();
       const justShown=new Set(tickerLastBatch);
       unseen=pool.filter(item=>!justShown.has(item));
       if(!unseen.length)unseen=pool.slice();
@@ -4001,7 +4021,30 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     }else{
       batch=pickSpread(unseen,n,tickerLastBatch,pool);
     }
-    batch.forEach(item=>tickerSeen.add(item));
+    // Links get shown TICKER_LINK_REPEATS times per lap instead of once --
+    // not marked fully "seen" (and so still eligible to be redrawn) until
+    // they've come up that many times. Everything else is still
+    // shown-once-per-lap, same guarantee as before.
+    //
+    // A quota reserved out of each individual batch (the first approach
+    // tried here) can't actually change a link's OVERALL frequency: this
+    // system guarantees every pool item is shown exactly once before a lap
+    // resets, which pins the average link-to-total ratio at the pool's own
+    // proportion no matter how picks are ordered WITHIN a lap -- a
+    // front-loaded batch quota only moves WHEN links show up, not how
+    // often, since the lap still can't end until every non-link has also
+    // had its one turn. Giving links extra turns per lap, instead of
+    // reordering a fixed one-turn-each allowance, is what actually raises
+    // the rate.
+    batch.forEach(item=>{
+      if(tickerIsLink(item)){
+        const c=(tickerLinkShown.get(item)||0)+1;
+        tickerLinkShown.set(item,c);
+        if(c>=TICKER_LINK_REPEATS)tickerSeen.add(item);
+      }else{
+        tickerSeen.add(item);
+      }
+    });
     tickerLastBatch=batch;
     saveTickerSeen();
     return batch;
