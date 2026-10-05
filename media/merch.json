@@ -5,5 +5,16 @@
     "print": { "us": 7, "intl": 20 }
   },
   "intlCountries": ["CA", "MX", "GB", "IE", "FR", "DE", "ES", "IT", "NL", "BE", "PT", "AT", "CH", "SE", "NO", "DK", "FI", "PL", "CZ", "GR", "JP", "KR", "AU", "NZ", "BR", "AR", "CL", "CO", "PE"],
-  "products": []
+  "products": [
+    {
+      "title": "THE UNIFORM — CAPTURE DON'T KILL TEE",
+      "category": "apparel",
+      "price": 30,
+      "description": "White tee, screen printed.",
+      "fulfillment": "self",
+      "shipping": "apparel",
+      "images": ["merch-photos/capture-dont-kill-tee-front.jpg"],
+      "sizes": { "S": 25, "M": 25, "L": 25, "XL": 25, "XXL": 25, "XXXL": 25 }
+    }
+  ]
 }
