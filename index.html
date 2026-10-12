@@ -4323,7 +4323,7 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
   // place that needs to match the CSS animation's actual duration (the
   // render-cycle interval, the mid-scroll jump glitch) reads this same
   // constant instead of a hardcoded 80, so they can't drift out of sync.
-  const TICKER_DUR=window.innerWidth>900?42:80;
+  const TICKER_DUR=window.innerWidth>900?42:68;
   window.TICKER_DUR=TICKER_DUR; // the separate hover-handler IIFE further down needs this too
   // Lines get added to the pool in themed runs (a batch about one topic, or
   // a sentence split into fragments), so neighbors in the source array are
