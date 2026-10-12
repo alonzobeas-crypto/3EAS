@@ -5215,7 +5215,16 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     els.forEach(el=>{
       if(!el)return;
       const dur=TICKER_DUR;
-      const jumpTo=-(Math.random()*dur);
+      // This fires at a fixed 25% offset into each content cycle (see the
+      // scheduling below), so the ticker has naturally already scrolled
+      // ~0.25*dur by the time we get here. Picking the jump target from the
+      // FULL 0..dur range let it land earlier than that ~25% mark roughly a
+      // quarter of the time — a visible rewind into content the viewer had
+      // just watched scroll by, read as "items repeating immediately."
+      // Restricting the range to [elapsed, dur) keeps every jump strictly
+      // forward, so it can skip ahead but never replay what's already shown.
+      const elapsed=dur*0.25;
+      const jumpTo=-(elapsed+Math.random()*(dur-elapsed));
       el.style.animation='none';
       // A synchronous getBoundingClientRect() forces a reflow on desktop
       // browsers, but mobile Safari doesn't reliably commit the "animation:
