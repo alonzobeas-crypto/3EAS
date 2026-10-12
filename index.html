@@ -5279,6 +5279,11 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     // ticker completely outside the affected subtree.
     const el=document.getElementById('scroll')||document.documentElement;
     el.style.transition='none';
+    // Pause the ticker scroll for the duration of the glitch so the whole
+    // broadcast stutters together instead of the ticker sailing on
+    // unaffected while everything else distorts.
+    const tickerEls=[document.getElementById('ti1'),document.getElementById('ti2')];
+    tickerEls.forEach(t=>{if(t)t.style.animationPlayState='paused';});
     let flickers=0;
     const TOTAL=48;        // was 28 (~2s) — now ~3.4s of active flicker
     const TAIL_START=34;   // last 14 frames taper amplitude down to 0
@@ -5304,6 +5309,7 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
         el.style.textShadow='';
         const tv=document.getElementById('tvglitch');if(tv)tv.classList.remove('on');
         setTimeout(()=>{el.style.transition='none';},520);
+        tickerEls.forEach(t=>{if(t)t.style.animationPlayState='';});
       }
     },70);
   }
