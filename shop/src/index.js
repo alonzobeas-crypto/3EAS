@@ -5,6 +5,7 @@
 //   GET  /file?k=&n=&e=&s=                         -> a file streamed from the private VAULT bucket
 //   GET  /stock                                    -> units left per merch size (ship-from-studio items)
 //   POST /stripe-webhook                           -> Stripe calls this when a merch order is paid
+//   POST /commission {name,email,...}              -> { ok } ACQUISITIONS services intake form
 //   GET  /health                                   -> { ok, mock }
 //
 // Two kinds of product, both listed in VAULT/catalog.json (written by media/pipeline.mjs):
@@ -61,6 +62,11 @@ export default {
         case '/stripe-webhook':
           requireMethod(req, 'POST');
           return json(await webhook(req, env), 200, {});
+        case '/commission':
+          requireMethod(req, 'POST');
+          requireOrigin(cors);
+          await rateLimit(req, env);
+          return json(await commission(req, env), 200, cors.headers);
         default:
           throw new HttpError(404, 'not_found', 'No such route.');
       }
@@ -219,6 +225,40 @@ async function stock(env) {
     }
   }
   return { products: out };
+}
+
+// Commission / services intake form (ACQUISITIONS -> COMMISSIONS, ALL
+// CHANNELS). Stored as a JSON object in the VAULT bucket, same one
+// everything else already uses -- no new bucket or account to provision.
+// TODO: wire up a real notification so these don't just sit in R2 waiting
+// to be noticed -- e.g. an email via Buttondown/Resend/etc, or a Discord/
+// Slack webhook, read from an env var such as COMMISSION_NOTIFY_URL once
+// you've picked one. Left out for now per "no new accounts/dashboards".
+async function commission(req, env) {
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    throw new HttpError(400, 'bad_json', 'Send JSON: {"name":"...","email":"...","message":"..."}');
+  }
+  const str = (v, max) => String((body && body[v]) || '').trim().slice(0, max);
+  const name = str('name', 150);
+  const email = str('email', 200);
+  const service = str('service', 300);
+  const budget = str('budget', 300);
+  const timeline = str('timeline', 300);
+  const links = str('links', 500);
+  const message = str('message', 4000);
+  if (!name) throw new HttpError(400, 'bad_name', 'Name is required.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new HttpError(400, 'bad_email', 'A valid email is required.');
+  if (!message) throw new HttpError(400, 'bad_message', 'Message is required.');
+
+  const id = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+  const record = { id, name, email, service, budget, timeline, links, message, receivedAt: new Date().toISOString() };
+  await env.VAULT.put(`commissions/${id}.json`, JSON.stringify(record, null, 2), {
+    httpMetadata: { contentType: 'application/json' },
+  });
+  return { ok: true };
 }
 
 // Stripe → us, once per paid checkout. Only merch needs it: counts the sale

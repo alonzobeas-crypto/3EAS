@@ -1105,6 +1105,11 @@ body{
 #shopPanel .mx-chip{background:none;border:1px solid var(--dim);color:var(--fg);font-family:var(--mono);font-size:10px;letter-spacing:2px;padding:7px 10px;min-width:40px}
 #shopPanel .mx-chip[aria-checked="true"]{border-color:var(--accent);color:var(--bg);background:var(--accent)}
 #shopPanel .mx-chip:hover:not([disabled]),#shopPanel .mx-chip:focus-visible{border-color:var(--accent);outline:none}
+#shopPanel .sp-form{display:flex;flex-direction:column;gap:14px}
+#shopPanel .sp-field{display:flex;flex-direction:column;gap:6px}
+#shopPanel .sp-field input,#shopPanel .sp-field textarea{background:transparent;border:1px solid var(--dimmer);color:var(--fg);font-family:var(--mono);font-size:12px;letter-spacing:1px;padding:10px}
+#shopPanel .sp-field textarea{min-height:90px;resize:vertical}
+#shopPanel .sp-field input:focus,#shopPanel .sp-field textarea:focus{border-color:var(--accent);outline:none}
 #shopPanel .mx-chip[disabled]{opacity:.35;text-decoration:line-through}
 #shopPanel .mx-left{margin:0;font-size:10px;letter-spacing:3px;color:#a8695a}
 #shopPanel .mx-buy{margin-top:auto;background:var(--accent);color:var(--bg);border:none;font-family:var(--mono);font-size:11px;letter-spacing:4px;padding:12px;text-transform:uppercase}
@@ -1470,7 +1475,7 @@ body{
         <div class="ac-cat">SERVICES // BY COMMISSION</div>
         <div class="ac-name">COMMISSIONS</div>
         <div class="ac-desc">Custom beats. Production.<br>Guitar, keys, Ableton sessions.<br>Tune your own frequency.</div>
-        <div class="ac-foot"><div class="ac-price">INTAKE</div><button class="ac-btn" onclick="requestCommission()" style="color:var(--accent);border-color:rgba(184,168,120,.3)">REQUEST →</button></div>
+        <div class="ac-foot"><div class="ac-price"><!-- TODO: set a real starting price -->FROM $___</div><button class="ac-btn" onclick="openCommission('BEATS / PRODUCTION / GUITAR / ABLETON')" style="color:var(--accent);border-color:rgba(184,168,120,.3)">REQUEST →</button></div>
         <div class="ac-stat">— CHANNEL OPEN</div>
       </div>
       <div class="ac" style="grid-column:1/-1">
@@ -1478,7 +1483,7 @@ body{
         <div class="ac-cat">SERVICES // FULL SPECTRUM</div>
         <div class="ac-name">ALL CHANNELS</div>
         <div class="ac-desc">Web design & prompt curation.<br>Mixing, recording &amp; production for bands and artists. Lyric writing.<br>Multi-instrumentalist session player. Merch design, set decoration, live sound, live DJ.</div>
-        <div class="ac-foot"><div class="ac-price">INTAKE</div><button class="ac-btn" onclick="requestCommission('SERVICES REQUEST — (web design / prompt curation / mixing &amp; recording / production / lyrics / session player / merch design / set decoration / live sound / live DJ): ')" style="color:var(--accent);border-color:rgba(184,168,120,.3)">REQUEST →</button></div>
+        <div class="ac-foot"><div class="ac-price"><!-- TODO: set a real starting price -->FROM $___</div><button class="ac-btn" onclick="openCommission('WEB DESIGN / PROMPT CURATION / MIXING &amp; RECORDING / PRODUCTION / LYRICS / SESSION PLAYER / MERCH DESIGN / SET DECORATION / LIVE SOUND / LIVE DJ')" style="color:var(--accent);border-color:rgba(184,168,120,.3)">REQUEST →</button></div>
         <div class="ac-stat">— CHANNEL OPEN</div>
       </div>
     </div>
@@ -2689,30 +2694,6 @@ renderTL();drawWavePl();
 
 /* ─── INTERACTIONS ─── */
 function nfy(b){if(b.classList.contains('done'))return;b.classList.add('done');b.textContent='NOTIFIED ✓'}
-function requestCommission(line){
-  goScene(7);
-  setTimeout(()=>{
-    // The contact form was redesigned into click-to-reveal-email at some
-    // point, orphaning this function's old target (#fm, a form field that
-    // no longer exists) — it was silently no-op'ing. Reveal the email and
-    // copy the commission-request line to the clipboard instead.
-    const el=document.getElementById('emailReveal');
-    if(el&&el.onclick)revealEmail(el);
-    line=line||'COMMISSION REQUEST — (beats / production / guitar / ableton): ';
-    if(navigator.clipboard&&navigator.clipboard.writeText){
-      navigator.clipboard.writeText(line).then(()=>{
-        const wrap=document.getElementById('emailReveal');
-        if(wrap&&!document.getElementById('commissionHint')){
-          const hint=document.createElement('div');
-          hint.id='commissionHint';
-          hint.style.cssText='margin-top:8px;font-size:9px;color:var(--dim2);letter-spacing:2px';
-          hint.textContent='▸ COMMISSION LINE COPIED — PASTE IT INTO YOUR EMAIL';
-          wrap.parentElement.appendChild(hint);
-        }
-      }).catch(()=>{});
-    }
-  },800);
-}
 
 /* ─── DISPATCH (BLOG) ─── */
 let dispatchPosts=[],dispatchActive=null;
@@ -3166,6 +3147,59 @@ const BEATLAB=[
         if(r.ok){stock=(await r.json()).products||{};document.querySelectorAll('.mx-card').forEach(c=>c._sync&&c._sync());}
       }catch(e){}
     }
+  };
+
+  // ── Commission intake ──
+  window.openCommission=function(context){
+    const box=shell();
+    heading(box,'// 04 // SERVICES INTAKE',context?'REQUEST — '+context:'COMMISSION REQUEST');
+    const form=el('form','sp-form');
+    function field(label,name,type,placeholder,required,value){
+      const wrap=el('div','sp-field');
+      wrap.appendChild(el('span','mx-lbl',label));
+      const input=type==='textarea'?el('textarea'):el('input');
+      if(type!=='textarea')input.type=type;
+      input.name=name;if(placeholder)input.placeholder=placeholder;if(required)input.required=true;
+      if(value)input.value=value;
+      wrap.appendChild(input);form.appendChild(wrap);
+      return input;
+    }
+    const nameIn=field('NAME','name','text',null,true);
+    const emailIn=field('EMAIL','email','email',null,true);
+    const serviceIn=field('SERVICE TYPE','service','text','beats / production / mixing / etc',false,context);
+    const budgetIn=field('BUDGET','budget','text','e.g. $500-1000, or TBD',false);
+    const timelineIn=field('TIMELINE','timeline','text','e.g. 2 weeks, ASAP, flexible',false);
+    const linksIn=field('REFERENCE LINKS','links','text','optional',false);
+    const msgIn=field('MESSAGE','message','textarea',null,true);
+    const err=el('p','sp-err');err.hidden=true;form.appendChild(err);
+    const actions=el('div','sp-actions');
+    const submit=el('button','sp-btn','SEND →');submit.type='submit';
+    actions.appendChild(submit);form.appendChild(actions);
+    box.appendChild(form);
+    closeRow(box);
+    form.addEventListener('submit',async e=>{
+      e.preventDefault();
+      if(busy)return;
+      err.hidden=true;
+      if(!SHOP){err.textContent='Intake is not connected yet — use the email link below instead.';err.hidden=false;return;}
+      busy=true;submit.textContent='SENDING…';submit.disabled=true;
+      try{
+        const payload={
+          name:nameIn.value.trim(),email:emailIn.value.trim(),service:serviceIn.value.trim(),
+          budget:budgetIn.value.trim(),timeline:timelineIn.value.trim(),links:linksIn.value.trim(),
+          message:msgIn.value.trim(),
+        };
+        const r=await shopFetch('/commission',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
+        const d=await r.json().catch(()=>({}));
+        if(!r.ok)throw new Error((d.error&&d.error.message)||'Could not send. Try again in a minute.');
+        form.replaceChildren(el('p','sp-note','▸ SIGNAL RECEIVED — WE WILL BE IN TOUCH.'));
+      }catch(ex){
+        err.textContent=ex.name==='AbortError'?'The shop did not answer. Try again in a minute.':ex.message;
+        err.hidden=false;
+        submit.textContent='SEND →';submit.disabled=false;
+      }finally{busy=false;}
+    });
+    nameIn.focus();
   };
 
   function chips(label,opts,onPick){
