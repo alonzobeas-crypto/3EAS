@@ -2974,6 +2974,10 @@ const MERCH=[
   /* ▼ MEDIA PIPELINE: merch (generated from media/merch.json, do not hand-edit) ▼ */
   /* ▲ MEDIA PIPELINE: merch ▲ */
 ];
+const BEATLAB=[
+  /* ▼ MEDIA PIPELINE: beatlab (generated from media/catalog.json, do not hand-edit) ▼ */
+  /* ▲ MEDIA PIPELINE: beatlab ▲ */
+];
 (function(){
   const SHOP_PROD_URL=''; // e.g. https://3eas-shop.<you>.workers.dev
   const LOCAL=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
@@ -6188,16 +6192,20 @@ function spToggleCollapse(){
   }catch(e){}
 })();
 
-/* ─── BEAT LAB (Phase 1: sequencer core) ───
+/* ─── BEAT LAB (Phase 2: real sample playback) ───
    8 tracks x 16 steps. Timing uses the standard Web Audio lookahead
    scheduler (schedule notes by absolute AudioContext time a little
    ahead of "now", rather than trusting setInterval/setTimeout's own
    timing) -- this is what keeps it drift-free under tab throttling,
-   GC pauses, etc. Placeholder synth click per active cell for now;
-   Phase 2 swaps this for real sample playback per track. */
+   GC pauses, etc. Each track plays whatever one-shot media/pipeline.mjs
+   assigned it (media/inbox/beatlab/, "[T1]".."[T8]" filename tags); a
+   track with nothing assigned yet falls back to a synthesized click so
+   the grid is still audible before any samples exist. */
 (function(){
   const NUM_TRACKS=8, NUM_STEPS=16;
   const pattern=Array.from({length:NUM_TRACKS},()=>Array(NUM_STEPS).fill(false));
+  const trackBuffers=Array(NUM_TRACKS).fill(null);
+  let samplesLoaded=false;
 
   let audioCtx=null;
   let isPlaying=false;
@@ -6216,11 +6224,26 @@ function spToggleCollapse(){
     if(audioCtx.state==='suspended')audioCtx.resume();
   }
 
-  // Placeholder hit sound -- a short synthesized click, no sample asset
-  // needed yet. Every trigger gets its own oscillator+gain node (Web
-  // Audio source nodes are one-shot by nature), so overlapping hits
-  // never cut each other off. That same one-node-per-hit shape carries
-  // straight into Phase 2's real sample playback.
+  // Fetched once the lab is actually unlocked (called from the access-gate
+  // IIFE further down, via window.loadBeatlabSamples) rather than on every
+  // page load -- most visitors never open Beat Lab, no reason to make them
+  // download drum samples for it.
+  function loadBeatlabSamples(){
+    if(samplesLoaded||!BEATLAB.length)return;
+    samplesLoaded=true;
+    ensureAudioCtx();
+    BEATLAB.forEach(b=>{
+      fetch(b.src).then(r=>r.arrayBuffer()).then(buf=>audioCtx.decodeAudioData(buf))
+        .then(decoded=>{trackBuffers[b.track]=decoded;})
+        .catch(()=>{}); // leave that track on the placeholder click if a fetch/decode fails
+    });
+  }
+  window.loadBeatlabSamples=loadBeatlabSamples;
+
+  // Placeholder hit sound -- used for any track with no sample assigned
+  // yet. Every trigger gets its own oscillator+gain node (Web Audio source
+  // nodes are one-shot by nature), so overlapping hits never cut each
+  // other off; real samples below follow the same one-node-per-hit shape.
   function playClick(time){
     const osc=audioCtx.createOscillator();
     const gain=audioCtx.createGain();
@@ -6234,9 +6257,18 @@ function spToggleCollapse(){
     osc.stop(time+0.05);
   }
 
+  function playHit(track,time){
+    const buf=trackBuffers[track];
+    if(!buf){playClick(time);return;}
+    const src=audioCtx.createBufferSource();
+    src.buffer=buf;
+    src.connect(audioCtx.destination);
+    src.start(time);
+  }
+
   function scheduleStep(step,time){
     for(let t=0;t<NUM_TRACKS;t++){
-      if(pattern[t][step])playClick(time);
+      if(pattern[t][step])playHit(t,time);
     }
     stepQueue.push({step,time});
   }
@@ -6425,6 +6457,7 @@ function spToggleCollapse(){
     // hard-disable interaction with the real sequencer while locked.
     const dw=document.getElementById('devWrap');
     if(dw)dw.style.pointerEvents=isUnlocked()?'':'none';
+    if(isUnlocked()&&window.loadBeatlabSamples)window.loadBeatlabSamples();
   }
   function wire(){
     const btn=document.getElementById('labCsAccessBtn');

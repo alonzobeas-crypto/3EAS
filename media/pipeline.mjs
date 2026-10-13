@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 // 3EAS MEDIA PIPELINE
 //
-// Drop audio into one of two folders and run this script:
+// Drop audio into one of three folders and run this script:
 //
 //   media/inbox/jukebox/        free, full-length, plays in the site-wide shuffle
 //   media/inbox/transmissions/  for sale: public preview clip + private files for buyers
+//   media/inbox/beatlab/        one-shots for the Beat Lab sequencer's 8 tracks
 //
 //   node media/pipeline.mjs              process the inbox and upload to Cloudflare R2
 //   node media/pipeline.mjs --dry-run    show what would happen; encode into media/.build, upload nothing
@@ -16,6 +17,14 @@
 // Filename tags (optional, stripped from the title):
 //   "3EAS - River Viper [$7].wav"      sell for $7 instead of the default price
 //   "3EAS - River Viper [@1:15].wav"   start the preview at 1:15
+//
+// Beat Lab filename tag (required, stripped from the title):
+//   "808 Kick [T1].wav"   assigns this one-shot to Beat Lab track 1 (T1-T8).
+//   Re-running with a new file tagged for a track already in use replaces it.
+//   Beat Lab samples are kept as WAV, not re-encoded to MP3 -- MP3 encoders
+//   pad the start of every file with a few dozen milliseconds of silence
+//   (encoder delay), which is inaudible on a song but throws off a drum
+//   machine triggering samples on exact 16th-note boundaries.
 //
 // Merch lives in media/merch.json (see media/merch.example.json). Photos go in
 // media/merch-photos/. Every run, including --sync, re-checks merch.json,
@@ -60,6 +69,7 @@ function main() {
   const catalog = readJson(CATALOG);
   catalog.jukebox ||= [];
   catalog.transmissions ||= [];
+  catalog.beatlab ||= [];
 
   const results = { added: [], skipped: [], failed: [] };
   if (!SYNC) {
@@ -84,8 +94,28 @@ function main() {
         }
       }
     }
+    {
+      const dir = path.join(MEDIA, 'inbox', 'beatlab');
+      fs.mkdirSync(dir, { recursive: true });
+      const files = fs.readdirSync(dir).filter((f) => AUDIO_EXT.has(path.extname(f).toLowerCase())).sort();
+      for (const f of files) {
+        const src = path.join(dir, f);
+        try {
+          const entry = processBeatlabFile(src, catalog);
+          results.added.push(`beatlab: ${entry.title} -> track ${entry.track + 1}`);
+          if (!DRY) {
+            const done = path.join(MEDIA, 'done', 'beatlab');
+            fs.mkdirSync(done, { recursive: true });
+            fs.renameSync(src, path.join(done, f));
+          }
+        } catch (e) {
+          results.failed.push(`beatlab/${f}: ${e.message}`);
+          console.error(`  ✗ ${f}: ${e.message}`);
+        }
+      }
+    }
     if (!results.added.length && !results.failed.length) {
-      console.log('Inbox is empty. Drop audio into media/inbox/jukebox or media/inbox/transmissions.');
+      console.log('Inbox is empty. Drop audio into media/inbox/jukebox, media/inbox/transmissions or media/inbox/beatlab.');
     }
   }
 
@@ -119,7 +149,7 @@ function main() {
   for (const s of results.skipped) console.log(`  = skipped (already in catalog): ${s}`);
   for (const f of results.failed) console.log(`  ✗ ${f}`);
   if (!DRY) {
-    console.log(`\nJukebox: ${catalog.jukebox.length} pipeline tracks · Transmissions for sale: ${catalog.transmissions.length} · Merch items: ${merch.site.length}`);
+    console.log(`\nJukebox: ${catalog.jukebox.length} pipeline tracks · Transmissions for sale: ${catalog.transmissions.length} · Merch items: ${merch.site.length} · Beat Lab tracks loaded: ${catalog.beatlab.length}/8`);
     if (LOCAL) console.log('Local test run: index.html now points at localhost. Do NOT commit it; `git checkout index.html media/catalog.json` to undo.');
     else console.log('Next: commit and push index.html and media/catalog.json.');
   }
@@ -199,6 +229,43 @@ function processFile(section, src, catalog) {
 
   if (existing !== -1) list.splice(existing, 1, entry);
   else list.push(entry);
+  return entry;
+}
+
+// ── Beat Lab ────────────────────────────────────────────────────────────────
+
+function parseBeatlabName(stem) {
+  let track = null;
+  const title = stem.replace(/\[\s*T\s*([1-8])\s*\]/i, (_, n) => { track = Number(n) - 1; return ''; })
+    .replace(/[<>]/g, '').replace(/\s+/g, ' ').trim();
+  if (track === null) throw new Error('needs a [T1]-[T8] tag to say which Beat Lab track it goes on, e.g. "808 Kick [T1].wav"');
+  return { title, track };
+}
+
+function processBeatlabFile(src, catalog) {
+  const { title, track } = parseBeatlabName(path.basename(src, path.extname(src)));
+  const id = slugify(title);
+  if (!id) throw new Error('could not make a name from this filename');
+  console.log(`\n▶ beatlab: ${title} -> track ${track + 1}`);
+  const hash = sha1(src).slice(0, 8);
+  probe(src); // just a sanity check that ffprobe can read it
+  const work = path.join(BUILD, 'beatlab', `${id}-${hash}`);
+  fs.mkdirSync(work, { recursive: true });
+
+  // Kept as WAV, not MP3 -- see the header comment on why one-shots stay
+  // uncompressed. Only the sample rate/bit depth get normalized.
+  const out = path.join(work, 'sample.wav');
+  encode(src, out, ['-ar', '44100', '-c:a', 'pcm_s16le'], title);
+  const key = `beatlab/${id}-${hash}.wav`;
+  upload('public', key, out, 'audio/wav', 'public, max-age=31536000, immutable');
+
+  const entry = { id, title: title.toUpperCase(), track, src: `${PUBLIC_BASE}/${key}`, added: today() };
+  // One sample per track -- a new upload tagged for a track already in use
+  // replaces it, rather than piling up unused entries no track points at.
+  const existing = catalog.beatlab.findIndex((b) => b.track === track);
+  if (existing !== -1) catalog.beatlab.splice(existing, 1, entry);
+  else catalog.beatlab.push(entry);
+  catalog.beatlab.sort((a, b) => a.track - b.track);
   return entry;
 }
 
@@ -372,6 +439,8 @@ const TX_OPEN = '/* ▼ MEDIA PIPELINE: transmissions (generated from media/cata
 const TX_CLOSE = '/* ▲ MEDIA PIPELINE: transmissions ▲ */';
 const MX_OPEN = '/* ▼ MEDIA PIPELINE: merch (generated from media/merch.json, do not hand-edit) ▼ */';
 const MX_CLOSE = '/* ▲ MEDIA PIPELINE: merch ▲ */';
+const BL_OPEN = '/* ▼ MEDIA PIPELINE: beatlab (generated from media/catalog.json, do not hand-edit) ▼ */';
+const BL_CLOSE = '/* ▲ MEDIA PIPELINE: beatlab ▲ */';
 
 function updateIndex(catalog, merchSite) {
   let html = fs.readFileSync(INDEX, 'utf8');
@@ -382,8 +451,10 @@ function updateIndex(catalog, merchSite) {
   html = replaceBlock(html, TX_OPEN, TX_CLOSE, tx);
   const mx = (merchSite || []).map((m) => `  ${JSON.stringify(m).replace(/</g, '\\u003c')},`);
   html = replaceBlock(html, MX_OPEN, MX_CLOSE, mx);
+  const bl = catalog.beatlab.map((b) => `  {track:${b.track},title:${js(b.title)},src:${js(b.src)}},`);
+  html = replaceBlock(html, BL_OPEN, BL_CLOSE, bl);
   fs.writeFileSync(INDEX, html);
-  console.log(`\nindex.html updated: ${jb.length} jukebox + ${tx.length} transmissions + ${mx.length} merch from the pipeline.`);
+  console.log(`\nindex.html updated: ${jb.length} jukebox + ${tx.length} transmissions + ${mx.length} merch + ${bl.length} beatlab tracks from the pipeline.`);
 }
 
 function replaceBlock(html, open, close, lines) {
