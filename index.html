@@ -3202,6 +3202,49 @@ const BEATLAB=[
     nameIn.focus();
   };
 
+  // ── Email-gated free download ──
+  // Not wired to any button yet -- there's no free file to gate until
+  // something real gets uploaded to VAULT under free/ (see shop/README.md
+  // and media/pipeline.mjs for how paid files get there; a free one would
+  // need the same upload step, just not listed as a product). Call it like:
+  //   openEmailGate('free/sample-pack-vol1.zip','SOURCE SIGNAL VOL. 1')
+  // once there's a real key to point at.
+  window.openEmailGate=function(fileKey,title){
+    const box=shell();
+    heading(box,'// SOURCE SIGNAL // EMAIL GATE',title||'FREE DOWNLOAD');
+    box.appendChild(el('p','sp-note','Give us your email and we\'ll send you straight to the download.'));
+    const form=el('form','sp-form');
+    const wrap=el('div','sp-field');
+    wrap.appendChild(el('span','mx-lbl','EMAIL'));
+    const emailIn=el('input');emailIn.type='email';emailIn.name='email';emailIn.required=true;
+    wrap.appendChild(emailIn);form.appendChild(wrap);
+    const err=el('p','sp-err');err.hidden=true;form.appendChild(err);
+    const actions=el('div','sp-actions');
+    const submit=el('button','sp-btn','GET THE DOWNLOAD →');submit.type='submit';
+    actions.appendChild(submit);form.appendChild(actions);
+    box.appendChild(form);
+    closeRow(box);
+    form.addEventListener('submit',async e=>{
+      e.preventDefault();
+      if(busy)return;
+      err.hidden=true;
+      if(!SHOP){err.textContent='Downloads are not connected yet.';err.hidden=false;return;}
+      busy=true;submit.textContent='SENDING…';submit.disabled=true;
+      try{
+        const r=await shopFetch('/download-gate',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:emailIn.value.trim(),fileKey})});
+        const d=await r.json().catch(()=>({}));
+        if(!r.ok||!d.url)throw new Error((d.error&&d.error.message)||'Could not get that link. Try again in a minute.');
+        form.replaceChildren(el('p','sp-note','▸ SIGNAL RECEIVED — YOUR DOWNLOAD IS STARTING.'));
+        location.href=d.url;
+      }catch(ex){
+        err.textContent=ex.name==='AbortError'?'The shop did not answer. Try again in a minute.':ex.message;
+        err.hidden=false;
+        submit.textContent='GET THE DOWNLOAD →';submit.disabled=false;
+      }finally{busy=false;}
+    });
+    emailIn.focus();
+  };
+
   function chips(label,opts,onPick){
     const wrap=el('div','mx-opt');
     wrap.appendChild(el('span','mx-lbl',label));

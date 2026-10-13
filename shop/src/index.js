@@ -6,6 +6,7 @@
 //   GET  /stock                                    -> units left per merch size (ship-from-studio items)
 //   POST /stripe-webhook                           -> Stripe calls this when a merch order is paid
 //   POST /commission {name,email,...}              -> { ok } ACQUISITIONS services intake form
+//   POST /download-gate {email,fileKey,fileName}   -> { url } signed link to a free/ VAULT file
 //   GET  /health                                   -> { ok, mock }
 //
 // Two kinds of product, both listed in VAULT/catalog.json (written by media/pipeline.mjs):
@@ -20,6 +21,10 @@ const VARIANT_RE = /^[a-z0-9][a-z0-9-]{0,19}$/;
 const SESSION_RE = /^cs_(test|live)_[A-Za-z0-9]{10,200}$/;
 const MOCK_SESSION_RE = /^mock_([a-z0-9][a-z0-9-]{0,79})(?:~([a-z0-9][a-z0-9-]{0,19}))?$/;
 const FILE_KEY_RE = /^(masters|mp3)\/[A-Za-z0-9._-]{1,160}$/;
+// Free, email-gated downloads (sample packs etc.) live under their own
+// prefix in VAULT, kept separate from paid order files (masters/mp3 above)
+// so the two are never confusable by key alone.
+const FREE_KEY_RE = /^free\/[A-Za-z0-9._-]{1,160}$/;
 
 class HttpError extends Error {
   constructor(status, code, message, extra) {
@@ -67,6 +72,11 @@ export default {
           requireOrigin(cors);
           await rateLimit(req, env);
           return json(await commission(req, env), 200, cors.headers);
+        case '/download-gate':
+          requireMethod(req, 'POST');
+          requireOrigin(cors);
+          await rateLimit(req, env);
+          return json(await downloadGate(req, env, url), 200, cors.headers);
         default:
           throw new HttpError(404, 'not_found', 'No such route.');
       }
@@ -261,6 +271,53 @@ async function commission(req, env) {
   return { ok: true };
 }
 
+// Email-gated free downloads (e.g. a sample pack under ACQUISITIONS ->
+// SOURCE SIGNAL). The file itself isn't sold -- giving an email just earns
+// a signed link to it, same signing mechanism (sign()/the /file route) paid
+// order downloads already use, scoped to the free/ prefix in VAULT so it
+// can never accidentally hand out a masters/ or mp3/ paid file.
+//
+// TODO: Buttondown isn't connected yet -- set BUTTONDOWN_API_KEY (secret)
+// and BUTTONDOWN_TAG (optional, [vars] in wrangler.toml) once you have an
+// account, then uncomment the fetch() call below. Until then this just
+// records the signup in VAULT so nothing is lost while that's pending.
+async function downloadGate(req, env, url) {
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    throw new HttpError(400, 'bad_json', 'Send JSON: {"email":"...","fileKey":"free/..."}');
+  }
+  const email = String((body && body.email) || '').trim().slice(0, 200);
+  const fileKey = String((body && body.fileKey) || '').trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new HttpError(400, 'bad_email', 'A valid email is required.');
+  if (!FREE_KEY_RE.test(fileKey)) throw new HttpError(400, 'bad_file', 'Unknown download.');
+  const head = await env.VAULT.head(fileKey);
+  if (!head) throw new HttpError(404, 'missing', 'That download is not available right now.');
+
+  const id = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+  await env.VAULT.put(`free-signups/${id}.json`, JSON.stringify({ id, email, fileKey, receivedAt: new Date().toISOString() }, null, 2), {
+    httpMetadata: { contentType: 'application/json' },
+  });
+
+  // if (env.BUTTONDOWN_API_KEY) {
+  //   try {
+  //     await fetch('https://api.buttondown.email/v1/subscribers', {
+  //       method: 'POST',
+  //       headers: { Authorization: `Token ${env.BUTTONDOWN_API_KEY}`, 'content-type': 'application/json' },
+  //       body: JSON.stringify({ email, tags: env.BUTTONDOWN_TAG ? [env.BUTTONDOWN_TAG] : [] }),
+  //     });
+  //   } catch (e) { console.error('buttondown subscribe failed', e); } // never block the download over this
+  // }
+
+  const ttl = Math.max(60, Math.min(86400, Number(env.LINK_TTL_SECONDS) || 3600));
+  const exp = Math.floor(Date.now() / 1000) + ttl;
+  const name = safeName(String((body && body.fileName) || fileKey.split('/').pop()));
+  const s = await sign(env, `${fileKey}\n${name}\n${exp}`);
+  const q = new URLSearchParams({ k: fileKey, n: name, e: String(exp), s });
+  return { url: `${url.origin}/file?${q}` };
+}
+
 // Stripe → us, once per paid checkout. Only merch needs it: counts the sale
 // against stock, or hands the order to Printful. Answering non-2xx makes
 // Stripe retry for up to three days, so failures are loud, not lost.
@@ -421,7 +478,7 @@ async function file(url, env) {
   const n = url.searchParams.get('n') || '';
   const e = Number(url.searchParams.get('e'));
   const s = url.searchParams.get('s') || '';
-  if (!FILE_KEY_RE.test(k) || !n || n !== safeName(n) || !Number.isFinite(e) || !s) {
+  if (!(FILE_KEY_RE.test(k) || FREE_KEY_RE.test(k)) || !n || n !== safeName(n) || !Number.isFinite(e) || !s) {
     throw new HttpError(400, 'bad_link', 'That download link is broken.');
   }
   if (e < Math.floor(Date.now() / 1000)) {
