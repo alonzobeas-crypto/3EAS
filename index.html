@@ -274,6 +274,10 @@ body{
 @keyframes tick{from{transform:translateX(0) translateZ(0)}to{transform:translateX(-100%) translateZ(0)}}
 @keyframes flashRG{0%,100%{color:#e5342e}50%{color:#3ec84a}}
 .ti .flash-rg{animation:flashRG 1s step-end infinite;text-decoration:underline;cursor:pointer}
+@keyframes glowRY{0%,100%{color:#e5342e;text-shadow:0 0 6px rgba(229,52,46,.6)}50%{color:#f5c518;text-shadow:0 0 10px rgba(245,197,24,.8)}}
+.ti .glow-ry{animation:glowRY 2.4s ease-in-out infinite;text-decoration:underline;cursor:pointer}
+@keyframes glowRG{0%,100%{color:#e5342e;text-shadow:0 0 6px rgba(229,52,46,.6)}50%{color:#3ec84a;text-shadow:0 0 10px rgba(62,200,74,.8)}}
+.ti .glow-rg{animation:glowRG 2.4s ease-in-out infinite;text-decoration:underline;cursor:pointer}
 
 /* ══════════════════════════════
    SCENE 01 — HERO
@@ -4225,8 +4229,8 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     "I'M ADDICTED TO ADDICTION.",
     'I STILL HAVE THOSE SONGS FOR YOU DUMILE. STOP (DOOM) SCROLLING AND HIT ME BACK...',
     '@2026-10-12',
-    '<a href="https://youtu.be/qDO6HV6xTmI?is=17WkgP-EelPdyKyQ" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">ANYONE HAVING WATCH PARTIES FOR THAT PUBLIC EXECUTION?</a>',
-    '<a href="https://youtu.be/1aR4droRmvo?is=LHpZqTIQqsXfpPJ-" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">PLACE YOUR BET ON KALSHI OR POLYMARKET ON WHO GETS EXCLUSIVE STREAMING RIGHTS. SKYDANCE? NETFLIX? DISNEY? AMAZON?</a>',
+    '<a href="https://youtu.be/qDO6HV6xTmI?is=17WkgP-EelPdyKyQ" target="_blank" rel="noopener" class="glow-ry">ANYONE HAVING WATCH PARTIES FOR THAT PUBLIC EXECUTION?</a>',
+    '<a href="https://youtu.be/1aR4droRmvo?is=LHpZqTIQqsXfpPJ-" target="_blank" rel="noopener" class="glow-rg">PLACE YOUR BET ON KALSHI OR POLYMARKET ON WHO GETS EXCLUSIVE STREAMING RIGHTS. SKYDANCE? NETFLIX? DISNEY? AMAZON?</a>',
     '@'
   ];
   // ── DATE MARKERS ── A '@YYYY-MM-DD' entry in TICKER_RAW dates every line
