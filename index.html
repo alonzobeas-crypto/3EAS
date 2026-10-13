@@ -1811,6 +1811,11 @@ document.addEventListener('click',e=>{
   if(Math.sqrt(dx*dx+dy*dy)<22){
     legacyParticle.legacyFrozen=true;
     showLegacyMessage();
+    // Caught the signal -- open the same A.I. Baby chat panel the trigger
+    // dot does. window.openAibPanel is set by that panel's own IIFE, much
+    // further down the page, but it's already run by the time anyone's had
+    // a chance to actually catch this particle.
+    if(window.openAibPanel)window.openAibPanel();
   }
 });
 // Vanishes and respawns elsewhere every so often instead of always sitting
@@ -6771,6 +6776,9 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     trig.classList.remove('aib-active');trig.setAttribute('aria-expanded','false');
     stopVoice();stopScope();
   }
+  // Exposed so the legacy particle easter egg (defined earlier in the page,
+  // long before this IIFE runs) can open the same chat panel when caught.
+  window.openAibPanel=openPanel;
   voxBtn.addEventListener('click',()=>{
     vox=!vox;voxBtn.textContent=vox?'VOX ON':'VOX OFF';
     voxBtn.classList.toggle('on',vox);voxBtn.setAttribute('aria-pressed',String(vox));
