@@ -7115,5 +7115,222 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
   setInterval(()=>{if(!panel.classList.contains('open')&&Math.random()<.35){trig.classList.remove('aib-nudge');void trig.offsetWidth;trig.classList.add('aib-nudge')}},6000);
 })();
 </script>
+<!-- ═══ LIVE BOX — when the Owncast stream is online, the hero "3EAS" title (#hw1)
+     gets a pulsing signal halo + LIVE tag, and a video box opens out of it.
+     Polls CX.OWNCAST/api/status. Preview without a server: ?live=test
+     Ducks the jukebox (spDuck/spUnduck) while the box is open. ═══ -->
+<style id="cx-live-style">
+  #cx-halo{
+    position:fixed;z-index:8498;display:none;pointer-events:none;
+    border-radius:50%;mix-blend-mode:screen;
+    background:radial-gradient(closest-side,rgba(217,68,58,.38),rgba(217,68,58,.12) 55%,transparent 75%);
+    animation:cxHalo 1.6s ease-in-out infinite;
+  }
+  @keyframes cxHalo{0%,100%{opacity:.35;transform:scale(.96)}50%{opacity:1;transform:scale(1.04)}}
+
+  #cx-live-tag{
+    all:unset;position:fixed;z-index:8499;display:none;
+    font-family:var(--mono);font-size:11px;line-height:1;letter-spacing:4px;
+    color:#000;background:#d9443a;padding:5px 7px 5px 9px;
+    transform:translate(-50%,0);
+    box-shadow:0 0 18px rgba(217,68,58,.55);
+  }
+  #cx-live-tag.cx-corner{transform:none}
+  #cx-live-tag .cx-blink{animation:cxBlink 1s steps(2,start) infinite}
+  @keyframes cxBlink{to{opacity:.25}}
+
+  #cx-live-box{
+    position:fixed;z-index:8500;display:none;overflow:hidden;
+    background:#000;color:var(--fg);
+    border:1px solid var(--border-hi);
+    box-shadow:0 0 0 1px rgba(217,68,58,.25),0 0 60px rgba(217,68,58,.25),0 30px 80px rgba(0,0,0,.8);
+    transition:left .6s cubic-bezier(.7,0,.2,1),top .6s cubic-bezier(.7,0,.2,1),
+               width .6s cubic-bezier(.7,0,.2,1),height .6s cubic-bezier(.7,0,.2,1),opacity .3s linear;
+  }
+  #cx-live-box.cx-glitch{animation:cxGlitch .45s steps(1) 1}
+  @keyframes cxGlitch{
+    0%  {clip-path:inset(10% 0 60% 0);transform:translateX(-6px)}
+    20% {clip-path:inset(50% 0 20% 0);transform:translateX(6px)}
+    40% {clip-path:inset(0 0 85% 0);transform:translateX(-3px)}
+    60% {clip-path:inset(70% 0 5% 0);transform:translateX(4px)}
+    80% {clip-path:inset(30% 0 40% 0);transform:translateX(-2px)}
+    100%{clip-path:inset(0);transform:none}
+  }
+  .cx-bar{
+    display:flex;align-items:center;gap:10px;height:32px;padding:0 6px 0 12px;
+    border-bottom:1px solid var(--border);
+    font-family:var(--mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;
+  }
+  .cx-dot{width:8px;height:8px;border-radius:50%;background:#d9443a;flex:none;
+          box-shadow:0 0 8px #d9443a;animation:cxBlink 1s steps(2,start) infinite}
+  .cx-title{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--hot)}
+  .cx-viewers{color:var(--dim2);white-space:nowrap}
+  .cx-close{all:unset;width:28px;height:28px;display:grid;place-items:center;
+            font-family:var(--mono);font-size:16px;color:var(--dim2)}
+  .cx-close:hover,.cx-close:focus-visible{color:#d9443a}
+  .cx-screen{position:relative;width:100%;aspect-ratio:16/9;background:#000}
+  .cx-screen iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .cx-wait{
+    position:absolute;inset:0;display:grid;place-items:center;
+    font-family:var(--vt);font-size:clamp(18px,4.5vw,28px);letter-spacing:.3em;text-align:center;color:#d9443a;
+    background:repeating-linear-gradient(0deg,rgba(232,224,192,.04) 0 1px,transparent 1px 3px),
+               radial-gradient(circle at 50% 50%,#1a0605,#000 70%);
+  }
+  .cx-scan{position:absolute;inset:0;pointer-events:none;mix-blend-mode:overlay;
+           background:repeating-linear-gradient(0deg,rgba(0,0,0,.25) 0 1px,transparent 1px 3px)}
+  @media (prefers-reduced-motion:reduce){
+    #cx-live-box{transition:opacity .2s linear}
+    #cx-live-box.cx-glitch,#cx-halo,#cx-live-tag .cx-blink,.cx-dot{animation:none}
+  }
+</style>
+<div id="cx-halo" aria-hidden="true"></div>
+<button id="cx-live-tag" type="button" aria-label="Open live transmission"><span class="cx-blink">◉</span> LIVE</button>
+<div id="cx-live-box" role="dialog" aria-label="3EAS live transmission" aria-hidden="true">
+  <div class="cx-bar">
+    <span class="cx-dot"></span>
+    <span class="cx-title">Transmission // Live</span>
+    <span class="cx-viewers" id="cx-viewers"></span>
+    <button class="cx-close" id="cx-close" type="button" aria-label="Minimize live stream">✕</button>
+  </div>
+  <div class="cx-screen">
+    <div class="cx-wait">AWAITING SIGNAL</div>
+    <iframe id="cx-frame" title="3EAS live stream" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+    <div class="cx-scan"></div>
+  </div>
+</div>
+<script>
+(()=>{
+  const CX={
+    OWNCAST:'https://live.3eascortex.com', // Owncast server (must be https)
+    POLL_MS:30000,                         // how often to check for a live stream
+    AUTO_OPEN:true                         // open the box automatically when you go live
+  };
+  const $=id=>document.getElementById(id);
+  const logo=$('hw1'),box=$('cx-live-box'),tag=$('cx-live-tag'),halo=$('cx-halo'),
+        frame=$('cx-frame'),views=$('cx-viewers'),closeB=$('cx-close');
+  if(!logo||!box)return;
+  const mode=new URLSearchParams(location.search).get('live'); // 'test' = preview
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let live=false,isOpen=false,dismissed=false,raf=null,ducked=false;
+
+  // Logo rect, or null when the hero isn't on screen (visitor is on another scene).
+  function logoRect(){
+    const r=logo.getBoundingClientRect();
+    if(!r.width||r.bottom<0||r.top>innerHeight||r.right<0||r.left>innerWidth)return null;
+    return {l:r.left,t:r.top,w:r.width,h:r.height};
+  }
+  function originRect(){ // where the box grows from / collapses into
+    const r=logoRect();if(r)return r;
+    const t=tag.getBoundingClientRect();
+    return {l:t.left,t:t.top,w:t.width||60,h:t.height||22};
+  }
+  const place=r=>Object.assign(box.style,{left:r.l+'px',top:r.t+'px',width:r.w+'px',height:r.h+'px'});
+  function targetRect(){
+    const vw=innerWidth,vh=innerHeight,bar=33;
+    let w=Math.min(820,vw*(vw<700?.94:.72)),h=w*9/16+bar;
+    if(h>vh*.85){h=vh*.85;w=(h-bar)*16/9}
+    return {l:(vw-w)/2,t:(vh-h)/2,w,h};
+  }
+
+  // Halo + tag follow the title; off the hero scene the tag parks in the corner.
+  function track(){
+    const r=logoRect();
+    if(r){
+      tag.classList.remove('cx-corner');
+      tag.style.left=(r.l+r.w/2)+'px';tag.style.top=(r.t+r.h+10)+'px';tag.style.right='auto';
+      const s=Math.max(r.w,r.h)*1.6;
+      Object.assign(halo.style,{display:'block',width:s+'px',height:s+'px',
+        left:(r.l+r.w/2-s/2)+'px',top:(r.t+r.h/2-s/2)+'px'});
+    }else{
+      tag.classList.add('cx-corner');
+      tag.style.left='auto';tag.style.right='18px';tag.style.top='18px';
+      halo.style.display='none';
+    }
+    raf=requestAnimationFrame(track);
+  }
+
+  // Jukebox hand-off: the site's own duck/unduck (main script globals).
+  function duck(){
+    try{ if(typeof audio!=='undefined')audio.pause(); }catch(e){}
+    if(typeof spDuck==='function'){spDuck();ducked=true}
+  }
+  function unduck(){
+    if(ducked&&typeof spUnduck==='function')spUnduck();
+    ducked=false;
+  }
+  // If anything restarts the jukebox while the box is open, push it back down.
+  try{[spA,spB].forEach(a=>a.addEventListener('play',()=>{if(isOpen)setTimeout(duck,0)}))}catch(e){}
+
+  function open(){
+    if(isOpen)return;
+    isOpen=true;
+    if(mode!=='test')frame.src=CX.OWNCAST+'/embed/video';
+    duck();
+    window.dispatchEvent(new CustomEvent('cortex:live-open'));
+    box.style.display='block';box.setAttribute('aria-hidden','false');
+    box.style.opacity='0';place(originRect());
+    void box.offsetWidth; // reflow so the transition starts at the logo
+    box.style.opacity='1';place(targetRect());
+    if(!reduce){box.classList.remove('cx-glitch');setTimeout(()=>box.classList.add('cx-glitch'),600)}
+  }
+  function close(byUser){
+    if(!isOpen)return;
+    isOpen=false;
+    if(byUser)dismissed=true;
+    place(originRect());box.style.opacity='0';
+    setTimeout(()=>{
+      if(isOpen)return;
+      box.style.display='none';box.setAttribute('aria-hidden','true');
+      frame.src='about:blank'; // drop the stream when minimized
+      unduck();
+      window.dispatchEvent(new CustomEvent('cortex:live-close'));
+    },620);
+  }
+
+  function setLive(online,viewers){
+    views.textContent=online&&viewers?viewers+' tuned in':'';
+    if(online&&!live){
+      live=true;
+      tag.style.display='block';track();
+      // Let the hero intro land first: wait for the title reveal (.vis), max ~6s.
+      if(CX.AUTO_OPEN&&!dismissed){
+        let n=0;
+        (function go(){
+          if(!live||dismissed)return;
+          if(logo.classList.contains('vis')||++n>30)setTimeout(open,900);
+          else setTimeout(go,200);
+        })();
+      }
+    }else if(!online&&live){
+      live=false;dismissed=false;
+      close(false);
+      tag.style.display='none';halo.style.display='none';
+      cancelAnimationFrame(raf);
+    }
+  }
+  async function check(){
+    if(mode==='test')return setLive(true,0);
+    try{
+      const r=await fetch(CX.OWNCAST+'/api/status',{cache:'no-store'});
+      const j=await r.json();
+      setLive(!!j.online,j.viewerCount||0);
+    }catch(e){setLive(false,0)} // unreachable = offline
+  }
+
+  // Clicks here must not bubble to the jukebox's first-gesture listeners.
+  const own=fn=>e=>{e.preventDefault();e.stopPropagation();fn()};
+  logo.addEventListener('click',e=>{if(!live)return;own(()=>isOpen?close(true):open())(e)},true);
+  tag.addEventListener('click',own(()=>isOpen?close(true):open()));
+  closeB.addEventListener('click',own(()=>close(true)));
+  box.addEventListener('click',e=>e.stopPropagation());
+  ['keydown','keyup'].forEach(t=>box.addEventListener(t,e=>{if(e.key==='Escape'){close(true);return}e.stopPropagation()}));
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&isOpen)close(true)});
+  addEventListener('resize',()=>{if(isOpen)place(targetRect())});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)check()});
+
+  check();
+  setInterval(check,CX.POLL_MS);
+})();
+</script>
 </body>
 </html>
