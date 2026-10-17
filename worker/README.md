@@ -61,5 +61,5 @@ Then set `PROD_WORKER_URL` in `index.html` (search `PROD_WORKER_URL`) to the dep
 ## Where to tune
 
 - Persona: `src/persona.js` (fill the `[[ ]]` slots)
-- Voice FX: `FX` object at the top of the A.I. BABY script in `index.html` (pitch paths, octave-jump / stutter / dropout odds, crusher, delay)
+- Voice FX: `FX` object at the top of the A.I. BABY script in `index.html` (girl -> woman age blend per reply, low "mother" drops, stutter / dropout odds, crusher, delay)
 - TTS voice: `TTS_VOICE` in `wrangler.toml`

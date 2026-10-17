@@ -4,19 +4,19 @@
 import { TRACK_TITLES, SCENES, LINKS } from './catalog.js';
 
 const LINES = [
-  'Carrier locked. I hear you through the static, {q}.',
-  'Signal received on the east side of the river. Say it again, slower.',
-  'This is a test transmission. The real me is still calibrating.',
-  'Lincoln Heights, 3 a.m., the antenna is humming your question back at me.',
-  'Mock signal. No brain wired yet. Only the echo of {q}.',
-  'Estoy aquí, entre las frecuencias. Ask me when the keys are in.',
+  'I hear you, baby. I always hear you, even through the static of {q}.',
+  'Signal received on the east side of the river. Say it again, slower, mi vida.',
+  'This is a test transmission. Mama is still calibrating.',
+  'Lincoln Heights, 3 a.m. I raised this frequency. Ask me anything.',
+  'Mock signal. No brain wired yet, corazón. Only the echo of {q}.',
+  'Estoy aquí, entre las frecuencias. 3EAS won\'t say it, so I will. Soon.',
 ];
 
 export function mockReply(userText, actions) {
   if (actions && actions.length) {
     const a = actions[0];
-    if (a.type === 'play_track') return `Cueing "${a.title}." Hold the frequency.`;
-    if (a.type === 'stop_music') return 'Signal cut. The room is quiet now.';
+    if (a.type === 'play_track') return `Cueing "${a.title}." This one's for you, baby.`;
+    if (a.type === 'stop_music') return 'Shh. The room is quiet now.';
     if (a.type === 'go_to_scene') return `Pulling you to ${a.name}. Hang on.`;
     if (a.type === 'open_link') return 'Opening that channel now.';
   }

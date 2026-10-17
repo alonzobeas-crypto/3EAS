@@ -6710,11 +6710,17 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
 
   const TONE_SRC='https://cdn.jsdelivr.net/npm/tone@15.1.22/build/Tone.js';
   // Voice character — tweak by ear.
+  // Age blend: every reply starts as a little girl and grows into a woman in
+  // her mid-thirties by the last word. Each segment picks a stage from its
+  // position in the reply, with ageBlur letting neighbours bleed into each
+  // other so the morph flickers instead of stepping.
   const FX={
-    basePitch:3,        // semitones on the main path (younger/brighter)
-    upPitch:15,         // octave-jump-up path (+12 over base)
-    downPitch:-9,       // octave-drop path (-12 under base)
-    pUp:.12, pDown:.07, // per-segment odds of jumping to those paths
+    agePitches:[8,5,2,0], // semitones per stage: girl -> teen -> young woman -> mid-30s (TTS voice is already adult)
+    ageBlur:.35,          // how far a segment can wander off its stage (0 = clean steps)
+    downPitch:-7,         // the occasional drop — the low, knowing mother
+    pDown:.06,            // per-segment odds of dropping
+    pDownTail:.18,        // per-reply odds the final stretch sinks low and stays there
+    downTailFrom:.78,     // ...starting this far through the reply
     pStutter:.16,       // per-segment odds of a re-triggered buffer chunk
     pDrop:.04,          // per-segment odds of a dropout gap
     segMin:.09, segMax:.25,
@@ -7015,17 +7021,17 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     if(chain)return chain;
     T=window.Tone;
     const ps=p=>new T.PitchShift({pitch:p,windowSize:.05});
-    const main=ps(FX.basePitch),up=ps(FX.upPitch),down=ps(FX.downPitch);
+    const ages=FX.agePitches.map(ps),down=ps(FX.downPitch);
     const crush=new T.BitCrusher(FX.crushBits);crush.wet.value=FX.crushWet;
     const delay=new T.FeedbackDelay({delayTime:FX.delayTime,feedback:FX.delayFb,wet:FX.delayWet});
     const hp=new T.Filter({type:'highpass',frequency:FX.hp});
     const lp=new T.Filter({type:'lowpass',frequency:FX.lp});
     const out=new T.Gain(FX.gain);
     const analyser=new T.Analyser('waveform',1024);
-    [main,up,down].forEach(n=>n.connect(crush));
+    ages.concat(down).forEach(n=>n.connect(crush));
     crush.chain(delay,hp,lp,out);
     out.connect(analyser);out.toDestination();
-    chain={main,up,down,analyser};
+    chain={ages,down,analyser};
     return chain;
   }
   async function fetchVoice(text,speak){
@@ -7038,8 +7044,9 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     const raw=await Tone.getContext().rawContext.decodeAudioData(ab);
     return new Tone.ToneAudioBuffer(raw);
   }
-  // Chop the buffer into short segments and schedule each one on a randomly
-  // chosen pitch path, with re-triggered stutter chunks and dropout gaps.
+  // Chop the buffer into short segments and schedule each one on a pitch path
+  // chosen by how far into the reply it is (girl -> woman), with occasional
+  // drops low, re-triggered stutter chunks and dropout gaps.
   // Returns total duration in seconds (before the delay tail).
   function playVoice(buf){
     if(!vox||!window.Tone)return 0;
@@ -7053,10 +7060,16 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
       s.onended=()=>{s.dispose();liveSources=liveSources.filter(x=>x!==s)};
       s.start(when,off,len);liveSources.push(s);
     };
+    const n=c.ages.length,sinkTail=Math.random()<FX.pDownTail;
     while(pos<dur-.005){
       const seg=Math.min(dur-pos,FX.segMin+Math.random()*(FX.segMax-FX.segMin));
-      const r=Math.random();
-      const dest=r<FX.pUp?c.up:r<FX.pUp+FX.pDown?c.down:c.main;
+      const prog=pos/dur;
+      let dest;
+      if((sinkTail&&prog>=FX.downTailFrom)||Math.random()<FX.pDown)dest=c.down;
+      else{
+        const a=prog+(Math.random()*2-1)*FX.ageBlur;
+        dest=c.ages[Math.max(0,Math.min(n-1,Math.floor(a*n)))];
+      }
       if(Math.random()<FX.pDrop)t+=.03+Math.random()*.06;
       if(Math.random()<FX.pStutter){
         const chunk=Math.min(seg,.03+Math.random()*.05),reps=2+Math.floor(Math.random()*3);
