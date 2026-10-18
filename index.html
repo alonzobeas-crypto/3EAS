@@ -310,13 +310,13 @@ body{
 
 .s1-eye{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 1.4s ease}
 .s1-eye.vis{opacity:1}
-.s1-eye video{position:absolute;top:50%;left:50%;width:100%;height:100%;object-fit:cover;transform:translate(-50%,-50%);mix-blend-mode:screen;opacity:.8;animation:eyeBreathe 11s ease-in-out infinite}
+.s1-eye video{position:absolute;top:var(--eye-y,50%);left:var(--eye-x,50%);width:var(--eye-w,100%);height:var(--eye-h,100%);object-fit:cover;transform:translate(-50%,-50%);mix-blend-mode:screen;opacity:.8;animation:eyeBreathe 11s ease-in-out infinite}
 .s1-eye video.v-r{filter:grayscale(1) sepia(1) hue-rotate(-50deg) saturate(4);animation:eyeBreathe 11s ease-in-out infinite,eyeChromaR 1.6s ease-in-out infinite}
 .s1-eye video.v-b{filter:grayscale(1) sepia(1) hue-rotate(180deg) saturate(4);animation:eyeBreathe 11s ease-in-out infinite,eyeChromaB 1.9s ease-in-out infinite}
-.s1-eye::before{content:'';position:absolute;top:50%;left:50%;width:min(26vw,420px);aspect-ratio:1;transform:translate(-50%,-50%) rotate(0deg);border-radius:50%;background:conic-gradient(from 0deg,transparent 0deg,rgba(232,201,138,.5) 25deg,transparent 70deg,transparent 180deg,rgba(232,201,138,.35) 205deg,transparent 250deg,transparent 360deg);mix-blend-mode:screen;animation:eyeRingSpin 6s linear infinite}
+.s1-eye::before{content:'';position:absolute;top:var(--eye-y,50%);left:var(--eye-x,50%);width:min(26vw,420px);aspect-ratio:1;transform:translate(-50%,-50%) rotate(0deg);border-radius:50%;background:conic-gradient(from 0deg,transparent 0deg,rgba(232,201,138,.5) 25deg,transparent 70deg,transparent 180deg,rgba(232,201,138,.35) 205deg,transparent 250deg,transparent 360deg);mix-blend-mode:screen;animation:eyeRingSpin 6s linear infinite}
 .s1-eye::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.5) 0px,rgba(0,0,0,.5) 1px,transparent 1px,transparent 4px);opacity:.55;animation:eyeScan 2.6s linear infinite}
-.s1-ring2{position:absolute;top:50%;left:50%;width:min(40vw,620px);aspect-ratio:1;transform:translate(-50%,-50%) rotate(0deg);border-radius:50%;background:conic-gradient(from 90deg,transparent 0deg,rgba(232,201,138,.35) 20deg,transparent 55deg,transparent 160deg,rgba(232,201,138,.3) 190deg,transparent 230deg,transparent 300deg,rgba(232,201,138,.25) 330deg,transparent 360deg);mix-blend-mode:screen;animation:eyeRingSpin2 9s linear infinite}
-.s1-ring3{position:absolute;top:50%;left:50%;width:min(15vw,240px);aspect-ratio:1;transform:translate(-50%,-50%) rotate(0deg);border-radius:50%;background:conic-gradient(from 200deg,transparent 0deg,rgba(232,201,138,.55) 15deg,transparent 45deg,transparent 140deg,rgba(232,201,138,.4) 165deg,transparent 200deg);mix-blend-mode:screen;animation:eyeRingSpin 4s linear infinite reverse}
+.s1-ring2{position:absolute;top:var(--eye-y,50%);left:var(--eye-x,50%);width:min(40vw,620px);aspect-ratio:1;transform:translate(-50%,-50%) rotate(0deg);border-radius:50%;background:conic-gradient(from 90deg,transparent 0deg,rgba(232,201,138,.35) 20deg,transparent 55deg,transparent 160deg,rgba(232,201,138,.3) 190deg,transparent 230deg,transparent 300deg,rgba(232,201,138,.25) 330deg,transparent 360deg);mix-blend-mode:screen;animation:eyeRingSpin2 9s linear infinite}
+.s1-ring3{position:absolute;top:var(--eye-y,50%);left:var(--eye-x,50%);width:min(15vw,240px);aspect-ratio:1;transform:translate(-50%,-50%) rotate(0deg);border-radius:50%;background:conic-gradient(from 200deg,transparent 0deg,rgba(232,201,138,.55) 15deg,transparent 45deg,transparent 140deg,rgba(232,201,138,.4) 165deg,transparent 200deg);mix-blend-mode:screen;animation:eyeRingSpin 4s linear infinite reverse}
 @keyframes eyeBreathe{0%,100%{transform:translate(-50%,-50%) scale(1,1)}50%{transform:translate(-50%,-50%) scale(1.035,1.035)}92%{transform:translate(-50%,-50%) scale(1,1)}93%{transform:translate(-50%,-50%) scale(1,.04)}94%{transform:translate(-50%,-50%) scale(1,1)}}
 @keyframes eyeRingSpin{0%{transform:translate(-50%,-50%) rotate(0deg) scale(1)}50%{transform:translate(-50%,-50%) rotate(180deg) scale(1.15)}100%{transform:translate(-50%,-50%) rotate(360deg) scale(1)}}
 @keyframes eyeRingSpin2{0%{transform:translate(-50%,-50%) rotate(360deg) scale(1)}50%{transform:translate(-50%,-50%) rotate(180deg) scale(.92)}100%{transform:translate(-50%,-50%) rotate(0deg) scale(1)}}
@@ -2007,14 +2007,34 @@ const dreamScanVideo2 = initDreamScan(document.getElementById('video2-src'), doc
 // Eye and face never show at once -- whichever fires while the other is
 // up just retries shortly after instead of stacking on top of it.
 let s1OverlayBusy = false;
+// Pins the eye's pupil (video centre + rings) onto the middle SELEXIONES
+// bar. The videos grow by twice the offset so the circuitry still covers
+// the whole hero instead of leaving a hard edge on one side.
+function aimEyeAtSelexiones(){
+  const el = document.getElementById('s1eye');
+  const mid = document.querySelector('.s1-radio-mid');
+  if (!el || !mid) return;
+  const box = el.getBoundingClientRect(), m = mid.getBoundingClientRect();
+  if (!box.width || !m.width) return;
+  const x = m.left + m.width/2 - box.left, y = m.top + m.height/2 - box.top;
+  el.style.setProperty('--eye-x', x + 'px');
+  el.style.setProperty('--eye-y', y + 'px');
+  el.style.setProperty('--eye-w', (box.width + 2*Math.abs(x - box.width/2)) + 'px');
+  el.style.setProperty('--eye-h', (box.height + 2*Math.abs(y - box.height/2)) + 'px');
+}
+window.addEventListener('resize', () => {
+  const el = document.getElementById('s1eye');
+  if (el && el.classList.contains('vis')) aimEyeAtSelexiones();
+});
 function showEyeSigil(){
   const el = document.getElementById('s1eye');
   if (!el) return;
   if (s1OverlayBusy){ setTimeout(showEyeSigil, 1500); return; }
   s1OverlayBusy = true;
+  aimEyeAtSelexiones();
   el.classList.add('vis');
   dreamScanEye.start();
-  setTimeout(() => { el.classList.remove('vis'); dreamScanEye.stop(); s1OverlayBusy = false; }, 12000);
+  setTimeout(() => { el.classList.remove('vis'); dreamScanEye.stop(); s1OverlayBusy = false; }, 22000);
 }
 
 // Breaks up the face video's playback with hard stutter/freeze snaps so
