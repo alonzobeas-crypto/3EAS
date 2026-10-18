@@ -5751,6 +5751,9 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     setInterval(runMatrixRain,55000);
     setInterval(hackedScreenGlitch,140000);
     scheduleGlitchPair();
+    // ?eye in the URL: show the eye 2s after the first tap, for checking
+    // its placement without waiting out the ~2 min scheduler.
+    if(new URLSearchParams(location.search).has('eye'))setTimeout(showEyeSigil,2000);
     if(typeof window.__armSignalGlitch==='function')window.__armSignalGlitch();
     if(typeof window.__armTitleFlash==='function')window.__armTitleFlash();
   }
