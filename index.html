@@ -2032,9 +2032,17 @@ function showEyeSigil(){
   if (s1OverlayBusy){ setTimeout(showEyeSigil, 1500); return; }
   s1OverlayBusy = true;
   aimEyeAtSelexiones();
+  // The red/blue chroma copies loop on their own clocks; the clip pulses the
+  // eye's size, so any drift stacks two different-sized eyes. Restart all
+  // three together and keep the copies locked to the main video's frame.
+  const vids = [...el.querySelectorAll('video')], lead = vids[0];
+  vids.forEach(v => { v.currentTime = 0; v.play().catch(() => {}); });
+  const sync = setInterval(() => {
+    vids.slice(1).forEach(v => { if (Math.abs(v.currentTime - lead.currentTime) > .06) v.currentTime = lead.currentTime; });
+  }, 250);
   el.classList.add('vis');
   dreamScanEye.start();
-  setTimeout(() => { el.classList.remove('vis'); dreamScanEye.stop(); s1OverlayBusy = false; }, 22000);
+  setTimeout(() => { el.classList.remove('vis'); dreamScanEye.stop(); clearInterval(sync); s1OverlayBusy = false; }, 22000);
 }
 
 // Breaks up the face video's playback with hard stutter/freeze snaps so
