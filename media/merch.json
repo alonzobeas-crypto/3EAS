@@ -1,10 +1,49 @@
 {
   "shipping": {
-    "apparel": { "us": 6, "intl": 18 },
-    "media": { "us": 5, "intl": 22 },
-    "print": { "us": 7, "intl": 20 }
+    "apparel": {
+      "us": 6,
+      "intl": 18
+    },
+    "media": {
+      "us": 5,
+      "intl": 22
+    },
+    "print": {
+      "us": 7,
+      "intl": 20
+    }
   },
-  "intlCountries": ["CA", "MX", "GB", "IE", "FR", "DE", "ES", "IT", "NL", "BE", "PT", "AT", "CH", "SE", "NO", "DK", "FI", "PL", "CZ", "GR", "JP", "KR", "AU", "NZ", "BR", "AR", "CL", "CO", "PE"],
+  "intlCountries": [
+    "CA",
+    "MX",
+    "GB",
+    "IE",
+    "FR",
+    "DE",
+    "ES",
+    "IT",
+    "NL",
+    "BE",
+    "PT",
+    "AT",
+    "CH",
+    "SE",
+    "NO",
+    "DK",
+    "FI",
+    "PL",
+    "CZ",
+    "GR",
+    "JP",
+    "KR",
+    "AU",
+    "NZ",
+    "BR",
+    "AR",
+    "CL",
+    "CO",
+    "PE"
+  ],
   "products": [
     {
       "title": "THE UNIFORM — CAPTURE DON'T KILL TEE",
@@ -13,8 +52,55 @@
       "description": "White tee, screen printed.",
       "fulfillment": "self",
       "shipping": "apparel",
-      "images": ["merch-photos/capture-dont-kill-tee-front.jpg"],
-      "sizes": { "S": 25, "M": 25, "L": 25, "XL": 25, "XXL": 25, "XXXL": 25 }
+      "images": [
+        "merch-photos/capture-dont-kill-tee-front.jpg"
+      ],
+      "sizes": {
+        "S": 25,
+        "M": 25,
+        "L": 25,
+        "XL": 25,
+        "XXL": 25,
+        "XXXL": 25
+      }
+    },
+    {
+      "title": "THE UNIFORM — 3EAS CORTEX TEE",
+      "category": "apparel",
+      "price": 30,
+      "description": "Distressed block wordmark. Artwork preview, photos of the printed shirt coming soon.",
+      "fulfillment": "self",
+      "shipping": "apparel",
+      "images": [
+        "merch-photos/3eas-cortex-tee-art.png"
+      ],
+      "sizes": {
+        "S": 25,
+        "M": 25,
+        "L": 25,
+        "XL": 25,
+        "XXL": 25,
+        "XXXL": 25
+      }
+    },
+    {
+      "title": "THE UNIFORM — 3EAS CIPHER TEE",
+      "category": "apparel",
+      "price": 30,
+      "description": "3EAS encoded in signal bars, four times over. Artwork preview, photos of the printed shirt coming soon.",
+      "fulfillment": "self",
+      "shipping": "apparel",
+      "images": [
+        "merch-photos/3eas-cipher-tee-art.png"
+      ],
+      "sizes": {
+        "S": 25,
+        "M": 25,
+        "L": 25,
+        "XL": 25,
+        "XXL": 25,
+        "XXXL": 25
+      }
     }
   ]
 }

@@ -1090,7 +1090,7 @@ body{
 #shopPanel .mx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 #shopPanel .mx-card{background:var(--bg);border:1px solid var(--dimmer);padding:16px;display:flex;flex-direction:column;gap:10px}
 #shopPanel .mx-img{aspect-ratio:1/1;max-width:100%;background:#0b0a09;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--dimmer)}
-#shopPanel .mx-img img{width:100%;height:100%;object-fit:cover;display:block}
+#shopPanel .mx-img img{width:100%;height:100%;object-fit:contain;display:block}
 #shopPanel .mx-noimg{font-size:10px;letter-spacing:3px;color:var(--dim2)}
 #shopPanel .mx-thumbs{display:flex;gap:6px;flex-wrap:wrap}
 #shopPanel .mx-thumb{width:44px;height:44px;padding:0;border:1px solid var(--dimmer);background:none;overflow:hidden}
@@ -2984,6 +2984,9 @@ loadDispatch();
    download links for anything digital. */
 const MERCH=[
   /* ▼ MEDIA PIPELINE: merch (generated from media/merch.json, do not hand-edit) ▼ */
+  {"id":"the-uniform-capture-don-t-kill-tee","title":"THE UNIFORM — CAPTURE DON'T KILL TEE","category":"apparel","price":3000,"desc":"White tee, screen printed.","images":["media/merch-photos/web/the-uniform-capture-don-t-kill-tee-53c845d0.jpg"],"fulfillment":"self","ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
+  {"id":"the-uniform-3eas-cortex-tee","title":"THE UNIFORM — 3EAS CORTEX TEE","category":"apparel","price":3000,"desc":"Distressed block wordmark. Artwork preview, photos of the printed shirt coming soon.","images":["media/merch-photos/web/the-uniform-3eas-cortex-tee-84db0cf0.jpg"],"fulfillment":"self","ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
+  {"id":"the-uniform-3eas-cipher-tee","title":"THE UNIFORM — 3EAS CIPHER TEE","category":"apparel","price":3000,"desc":"3EAS encoded in signal bars, four times over. Artwork preview, photos of the printed shirt coming soon.","images":["media/merch-photos/web/the-uniform-3eas-cipher-tee-19689d14.jpg"],"fulfillment":"self","ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
   /* ▲ MEDIA PIPELINE: merch ▲ */
 ];
 const BEATLAB=[

@@ -53,10 +53,15 @@ const DRY = args.has('--dry-run');
 const LOCAL = args.has('--local');
 const SYNC = args.has('--sync');
 const REPLACE = args.has('--replace');
+// --site-only: merch only. Rebuilds the site's MERCH list without touching
+// Cloudflare (no vault catalog upload). For while the shop isn't deployed;
+// run a normal --sync once it is, or the shop won't know the products.
+const SITE_ONLY = args.has('--site-only');
 for (const a of args) {
-  if (!['--dry-run', '--local', '--sync', '--replace'].includes(a)) die(`Unknown option ${a}`);
+  if (!['--dry-run', '--local', '--sync', '--replace', '--site-only'].includes(a)) die(`Unknown option ${a}`);
 }
 if (DRY && LOCAL) die('Pick one of --dry-run or --local.');
+if (SITE_ONLY && !SYNC) die('--site-only only works with --sync.');
 
 const cfg = readJson(path.join(MEDIA, 'config.json'));
 const PUBLIC_BASE = LOCAL ? 'http://localhost:8080/media/.local-public' : cfg.publicBase.replace(/\/$/, '');
@@ -139,7 +144,8 @@ function main() {
   if (DRY) {
     console.log('\n[dry run] Would upload catalog.json to the vault and update index.html.');
   } else {
-    upload('vault', 'catalog.json', vaultPath, 'application/json', 'no-store');
+    if (SITE_ONLY) console.log('\n--site-only: vault catalog NOT uploaded. Run a full --sync once the shop is deployed.');
+    else upload('vault', 'catalog.json', vaultPath, 'application/json', 'no-store');
     writeJson(CATALOG, catalog);
     updateIndex(catalog, merch.site);
   }
@@ -355,8 +361,21 @@ function buildMerch(catalog) {
 
 // Photos are resized to 1400px JPEGs and uploaded once; the key includes a
 // hash of the original, so swapping a photo publishes a new URL.
+// With "merchImagesInRepo": true in config.json they go to media/merch-photos/web/
+// instead and are served by GitHub Pages: no Cloudflare needed. Commit that
+// folder. Flip it to false once R2 is set up and re-run --sync.
 function merchImage(catalog, id, src) {
   const hash = sha1(src).slice(0, 8);
+  if (cfg.merchImagesInRepo) {
+    const rel = `media/merch-photos/web/${id}-${hash}.jpg`;
+    const out = path.join(ROOT, rel);
+    if (!DRY && !fs.existsSync(out)) {
+      fs.mkdirSync(path.dirname(out), { recursive: true });
+      run('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', src, '-vf', "scale='min(1400,iw)':-2", '-q:v', '4', '-frames:v', '1', out]);
+      console.log(`  → repo ${rel}`);
+    }
+    return rel;
+  }
   const key = `merch/${id}-${hash}.jpg`;
   const cacheKey = `${PUBLIC_BASE}|${key}`;
   if (catalog.merchImages[cacheKey]) return catalog.merchImages[cacheKey];
@@ -472,7 +491,7 @@ function preflight() {
   for (const bin of ['ffmpeg', 'ffprobe']) {
     if (spawnSync(bin, ['-version']).status !== 0) die(`${bin} not found. Install it first (Mac: brew install ffmpeg).`);
   }
-  if (!DRY && !fs.existsSync(path.join(SHOP, 'node_modules', 'wrangler'))) {
+  if (!DRY && !SITE_ONLY && !fs.existsSync(path.join(SHOP, 'node_modules', 'wrangler'))) {
     die('Wrangler is not installed yet. Run: cd shop && npm install && npx wrangler login');
   }
 }

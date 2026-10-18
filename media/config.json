@@ -3,6 +3,7 @@
   "publicBucket": "3eas-media",
   "vaultBucket": "3eas-vault",
   "defaultPrice": 500,
+  "merchImagesInRepo": true,
   "jukebox": {
     "lufs": -12,
     "truePeak": -1,
