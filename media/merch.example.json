@@ -1,0 +1,50 @@
+{
+  "shipping": {
+    "apparel": { "us": 6, "intl": 18 },
+    "media": { "us": 5, "intl": 22 },
+    "print": { "us": 7, "intl": 20 }
+  },
+  "intlCountries": ["CA", "MX", "GB", "JP"],
+  "products": [
+    {
+      "title": "THE UNIFORM — SIGNAL TEE",
+      "category": "apparel",
+      "price": 35,
+      "description": "Heavyweight black tee. Screen printed in Lincoln Heights.",
+      "fulfillment": "self",
+      "shipping": "apparel",
+      "images": ["merch-photos/signal-tee-front.jpg", "merch-photos/signal-tee-back.jpg"],
+      "sizes": { "S": 10, "M": 20, "L": 20, "XL": 10 }
+    },
+    {
+      "title": "THE UNIFORM — CAPTURE DON'T KILL HOODIE",
+      "category": "apparel",
+      "price": 65,
+      "description": "Printed and shipped on demand.",
+      "fulfillment": "pod",
+      "shipping": "apparel",
+      "images": ["merch-photos/cdk-hoodie.jpg"],
+      "sizes": { "M": 4012345671, "L": 4012345672, "XL": 4012345673 }
+    },
+    {
+      "title": "WAR WITHIN A BREATH — 12\" LATHE CUT",
+      "category": "media",
+      "price": 40,
+      "description": "Numbered. No restock. Comes with the digital download.",
+      "fulfillment": "self",
+      "shipping": "media",
+      "images": ["merch-photos/wwab-lathe.jpg"],
+      "stock": 25,
+      "bundle": "3eas-war-within-a-breath-remix"
+    },
+    {
+      "title": "PIRATE SIGNAL — 18x24 PRINT",
+      "category": "print",
+      "price": 25,
+      "fulfillment": "self",
+      "shipping": "print",
+      "images": ["merch-photos/pirate-signal-print.jpg"],
+      "stock": 30
+    }
+  ]
+}
