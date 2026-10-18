@@ -1972,7 +1972,11 @@ document.addEventListener('keydown',e=>{
    Namespaced dreamScan/initDreamScan so nothing here can collide with
    the particle/glitch/grain systems already in this file. */
 const dreamScanReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-function initDreamScan(video, canvas){
+function initDreamScan(video, canvas, opts){
+  // drawFrame:false keeps the motion-driven dots but skips painting the video
+  // frame itself -- the eye overlay already shows its video full-size, and a
+  // second stretched copy read as a smaller second eye.
+  const drawFrame = !opts || opts.drawFrame !== false;
   const ctx = canvas.getContext('2d');
   const DIFF_W = 40, DIFF_H = 30;
   const diffCanvas = document.createElement('canvas');
@@ -2015,11 +2019,13 @@ function initDreamScan(video, canvas){
 
     ctx.fillStyle = 'rgba(0,0,0,.09)'; ctx.fillRect(0, 0, w, h); // trail via partial clear, not stored frames -- slower fade = more visible trail
 
-    ctx.save();
-    ctx.filter = 'grayscale(1) sepia(1) saturate(1.15)';
-    ctx.globalAlpha = .5; ctx.globalCompositeOperation = 'screen';
-    ctx.drawImage(video, 0, 0, w, h);
-    ctx.restore();
+    if (drawFrame){
+      ctx.save();
+      ctx.filter = 'grayscale(1) sepia(1) saturate(1.15)';
+      ctx.globalAlpha = .5; ctx.globalCompositeOperation = 'screen';
+      ctx.drawImage(video, 0, 0, w, h);
+      ctx.restore();
+    }
 
     nodes.forEach(n => {
       n.x += n.vx; n.y += n.vy;
@@ -2048,6 +2054,7 @@ function initDreamScan(video, canvas){
   function start(){
     resize();
     if (dreamScanReduced){ // static fallback, no animation
+      if (!drawFrame) return;
       ctx.filter = 'grayscale(1) sepia(1) saturate(1.1)'; ctx.globalAlpha = .4;
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       return;
@@ -2063,7 +2070,7 @@ function initDreamScan(video, canvas){
   }
   return { start, stop };
 }
-const dreamScanEye = initDreamScan(document.getElementById('eye-src'), document.getElementById('dreamscan-eye'));
+const dreamScanEye = initDreamScan(document.getElementById('eye-src'), document.getElementById('dreamscan-eye'), { drawFrame: false });
 const dreamScanVideo2 = initDreamScan(document.getElementById('video2-src'), document.getElementById('dreamscan-video2'));
 
 // Eye and face never show at once -- whichever fires while the other is
