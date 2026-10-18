@@ -932,6 +932,11 @@ body{
   .s1-sub,.s1-status{justify-content:center;flex-wrap:wrap}
   .s1-title{font-size:clamp(90px,26vw,160px)}
   .s1-sub{margin-top:0;row-gap:10px}
+  /* Desktop nudges the UNO|SELEXIONES|DOS row 8px left to balance the uneven
+     side texts on its line; once the row wraps onto its own line that nudge
+     just pushes it (and the eye pinned to its middle bar) off center. */
+  .s1-radio{transform:none}
+  .s1-sub{flex-direction:column;align-items:center}
   .s1-status{margin-top:2px;padding-top:2px;gap:6px 8px;row-gap:6px}
   .s1-title{line-height:.9}
   .s1-scroll,.s1-coords{display:none}
