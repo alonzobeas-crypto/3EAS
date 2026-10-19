@@ -316,6 +316,11 @@ body{
 
 .s1-eye{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 1.4s ease}
 .s1-eye.vis{opacity:1}
+/* Phones only: a second eye dead-centre on the screen, alongside the one
+   pinned to the SELEXIONES bar. Plain 50/50 positioning, sized in JS. */
+.s1-eye2{display:none;position:absolute;inset:0}
+.s1-eye.eye-small .s1-eye2{display:block}
+.s1-eye .s1-eye2 video{top:50%;left:50%;width:var(--eye2-w,100%);height:var(--eye2-h,100%)}
 .s1-eye.eye-small video{-webkit-mask-image:linear-gradient(to bottom,transparent,#000 18%,#000 82%,transparent);mask-image:linear-gradient(to bottom,transparent,#000 18%,#000 82%,transparent)}
 .s1-eye video{position:absolute;top:var(--eye-y,50%);left:var(--eye-x,50%);width:var(--eye-w,100%);height:var(--eye-h,100%);object-fit:cover;transform:translate(-50%,-50%);mix-blend-mode:screen;opacity:.8;animation:eyeBreathe 11s ease-in-out infinite}
 .s1-eye video.v-r{filter:grayscale(1) sepia(1) hue-rotate(-50deg) saturate(4);animation:eyeBreathe 11s ease-in-out infinite,eyeChromaR 1.6s ease-in-out infinite}
@@ -1352,7 +1357,7 @@ body{
     <div class="tech-cross tc-top"></div><div class="tech-cross tc-mid"></div><div class="tech-cross tc-bot"></div>
     <div class="tech-bracket-tr"></div><div class="tech-bracket-br"></div>
     <div class="tech-hazard"></div>
-    <div class="s1-eye" id="s1eye"><video id="eye-src" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><video class="v-r" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><video class="v-b" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><div class="s1-ring2"></div><div class="s1-ring3"></div><canvas class="dreamscan-canvas" id="dreamscan-eye"></canvas></div>
+    <div class="s1-eye" id="s1eye"><video id="eye-src" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><video class="v-r" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><video class="v-b" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><div class="s1-eye2"><video src="uploads/eye-glitch.mp4" muted loop playsinline preload="none"></video></div><div class="s1-ring2"></div><div class="s1-ring3"></div><canvas class="dreamscan-canvas" id="dreamscan-eye"></canvas></div>
     <div class="s1-video2" id="s1video2"><video id="video2-src" src="uploads/hero-overlay.mp4" muted playsinline preload="auto"></video><canvas class="dreamscan-canvas" id="dreamscan-video2"></canvas></div>
     <div class="s1-coords">SYS// 3EAS-001 // LINCOLN HEIGHTS, NELA // 34.0590°N 118.2321°W // ▮</div>
     <div class="s1-main" style="padding:0 60px;position:relative;z-index:10">
@@ -2105,6 +2110,11 @@ function aimEyeAtSelexiones(){
   }
   el.style.setProperty('--eye-w', w + 'px');
   el.style.setProperty('--eye-h', h + 'px');
+  if (small){ // centred second eye: same scaling, no offset to cover
+    const h2 = Math.max(box.height, box.width*9/16) * EYE_PHONE_SCALE;
+    el.style.setProperty('--eye2-w', h2*16/9 + 'px');
+    el.style.setProperty('--eye2-h', h2 + 'px');
+  }
 }
 window.addEventListener('resize', () => {
   const el = document.getElementById('s1eye');
@@ -2119,7 +2129,8 @@ function showEyeSigil(){
   // The red/blue chroma copies loop on their own clocks; the clip pulses the
   // eye's size, so any drift stacks two different-sized eyes. Restart all
   // three together and keep the copies locked to the main video's frame.
-  const vids = [...el.querySelectorAll('video')], lead = vids[0];
+  const lead = el.querySelector('video');
+  const vids = [...el.querySelectorAll('video')].filter(v => v === lead || v.offsetParent !== null);
   vids.forEach(v => { v.currentTime = 0; v.play().catch(() => {}); });
   const sync = setInterval(() => {
     vids.slice(1).forEach(v => { if (Math.abs(v.currentTime - lead.currentTime) > .06) v.currentTime = lead.currentTime; });
