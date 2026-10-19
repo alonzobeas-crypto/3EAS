@@ -310,6 +310,7 @@ body{
 
 .s1-eye{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;opacity:0;transition:opacity 1.4s ease}
 .s1-eye.vis{opacity:1}
+.s1-eye.eye-small video{-webkit-mask-image:linear-gradient(to bottom,transparent,#000 18%,#000 82%,transparent);mask-image:linear-gradient(to bottom,transparent,#000 18%,#000 82%,transparent)}
 .s1-eye video{position:absolute;top:var(--eye-y,50%);left:var(--eye-x,50%);width:var(--eye-w,100%);height:var(--eye-h,100%);object-fit:cover;transform:translate(-50%,-50%);mix-blend-mode:screen;opacity:.8;animation:eyeBreathe 11s ease-in-out infinite}
 .s1-eye video.v-r{filter:grayscale(1) sepia(1) hue-rotate(-50deg) saturate(4);animation:eyeBreathe 11s ease-in-out infinite,eyeChromaR 1.6s ease-in-out infinite}
 .s1-eye video.v-b{filter:grayscale(1) sepia(1) hue-rotate(180deg) saturate(4);animation:eyeBreathe 11s ease-in-out infinite,eyeChromaB 1.9s ease-in-out infinite}
@@ -2076,6 +2077,7 @@ let s1OverlayBusy = false;
 // Pins the eye's pupil (video centre + rings) onto the middle SELEXIONES
 // bar. The videos grow by twice the offset so the circuitry still covers
 // the whole hero instead of leaving a hard edge on one side.
+const EYE_PHONE_SCALE = .65; // eye size on phones, relative to filling the screen
 function aimEyeAtSelexiones(){
   const el = document.getElementById('s1eye');
   const mid = document.querySelector('.s1-radio-mid');
@@ -2085,8 +2087,18 @@ function aimEyeAtSelexiones(){
   const x = m.left + m.width/2 - box.left, y = m.top + m.height/2 - box.top;
   el.style.setProperty('--eye-x', x + 'px');
   el.style.setProperty('--eye-y', y + 'px');
-  el.style.setProperty('--eye-w', (box.width + 2*Math.abs(x - box.width/2)) + 'px');
-  el.style.setProperty('--eye-h', (box.height + 2*Math.abs(y - box.height/2)) + 'px');
+  let w = box.width + 2*Math.abs(x - box.width/2), h = box.height + 2*Math.abs(y - box.height/2);
+  // Phones: covering a tall screen blows the 16:9 clip up ~2.5x the screen
+  // width. Size it to the clip's own shape and shrink it instead; the
+  // .eye-small mask fades the top/bottom edges this leaves on screen.
+  const small = box.width <= 768;
+  el.classList.toggle('eye-small', small);
+  if (small){
+    h = Math.max(h, w*9/16); w = h*16/9;
+    w *= EYE_PHONE_SCALE; h *= EYE_PHONE_SCALE;
+  }
+  el.style.setProperty('--eye-w', w + 'px');
+  el.style.setProperty('--eye-h', h + 'px');
 }
 window.addEventListener('resize', () => {
   const el = document.getElementById('s1eye');
