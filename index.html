@@ -281,6 +281,12 @@ body{
 .ti .glow-ry{animation:glowRY 2.4s ease-in-out infinite;text-decoration:underline;cursor:pointer}
 @keyframes glowRG{0%,100%{color:#c32c27;text-shadow:0 0 6px rgba(195,44,39,.6)}50%{color:#3ec84a;text-shadow:0 0 10px rgba(62,200,74,.8)}}
 .ti .glow-rg{animation:glowRG 2.4s ease-in-out infinite;text-decoration:underline;cursor:pointer}
+/* Constant-glitch ticker line: wrap the text in <em class="tk-perma" data-t="same text">.
+   The letters re-scramble non-stop (see tkPerma in the ticker script) and the
+   colour split + jitter never stops, unlike the random 2s glitch on other lines. */
+.ti .tk-perma{font-style:normal;display:inline-block;animation:tkPermaJit .9s steps(1,end) infinite;text-shadow:2px 0 var(--accent),-2px 0 #0ff}
+@keyframes tkPermaJit{0%{transform:translateX(0)}12%{transform:translateX(-2px) skewX(6deg);text-shadow:-3px 0 var(--accent),3px 0 #0ff}24%{transform:translateX(1px)}46%{transform:translateX(0);text-shadow:2px 0 var(--accent),-2px 0 #0ff}58%{transform:translateX(3px) skewX(-4deg);opacity:.75}64%{transform:translateX(0);opacity:1}82%{transform:translateY(-1px) translateX(-1px);text-shadow:-2px 0 #0ff,2px 1px var(--accent)}}
+@media (prefers-reduced-motion:reduce){.ti .tk-perma{animation:none}}
 
 /* ══════════════════════════════
    SCENE 01 — HERO
@@ -4397,7 +4403,7 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     'POST-MODERN TECHNOCRACY',
     "SHOOT ME A TEXT ON <a href=\"https://en.wikipedia.org/wiki/Meshtastic\" target=\"_blank\" rel=\"noopener\" style=\"color:#a8695a;text-decoration:underline\">MESHTASTIC</a>. WAIT, YOU DON'T KNOW WHAT THAT IS? ALL GOOD. THEY WANT IT THAT WAY...",
     'WHAT DO YOU WANT FOR DINNER? BASS OR RAMEN? THEY BOTH TASTE LIKE SHIT IF NOT COOKED RIGHT. GO VOTE YOUR LITTLE HEART OUT FOR THE SAME TEAM.',
-    "I'M AN ALCOHOLIC AND A DRUG ADDICT. FUNCTIONING. KINDA....",
+    '<em class="tk-perma" data-t="I&#39;M AN ALCOHOLIC AND A DRUG ADDICT. FUNCTIONING. KINDA....">I&#39;M AN ALCOHOLIC AND A DRUG ADDICT. FUNCTIONING. KINDA....</em>',
     '@'
   ];
   // ── DATE MARKERS ── A '@YYYY-MM-DD' entry in TICKER_RAW dates every line
@@ -5797,6 +5803,23 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
   // that read as near-identical Latin lookalikes.
   const HOMOGLYPH={A:'А',B:'В',C:'С',D:'Ꭰ',E:'Е',F:'Ϝ',G:'Ԍ',H:'Н',I:'І',J:'Ј',K:'К',L:'Ꮮ',M:'М',N:'Ν',O:'О',P:'Р',Q:'Ԛ',R:'Ꭱ',S:'Ѕ',T:'Т',U:'Ս',V:'Ѵ',W:'Ѡ',X:'Х',Y:'Υ',Z:'Ζ'};
   const GLITCH_SYMBOLS=['`','~','!','@','#','$','%','^','&','*','(',')','-','_','=','+','[',']','{','}','\\','|',';',':','\'','"',',','.','<','>','/','?'];
+  // Constant-glitch lines (.tk-perma): re-scramble from the clean copy in
+  // data-t every 130ms, forever. Queried fresh each tick because the ticker
+  // rebuilds ti1/ti2 from scratch on every reshuffle.
+  if(!matchMedia('(prefers-reduced-motion:reduce)').matches)setInterval(function tkPerma(){
+    document.querySelectorAll('#ti1 .tk-perma,#ti2 .tk-perma').forEach(el=>{
+      const orig=el.dataset.t||'';
+      el.textContent=orig.split('').map(c=>{
+        if(!/[a-zA-Z]/.test(c)||Math.random()>=0.12)return c;
+        const up=c.toUpperCase(),roll=Math.random();
+        if(roll<0.35&&LEET[up])return LEET[up];
+        if(roll<0.65&&HOMOGLYPH[up])return HOMOGLYPH[up];
+        if(roll<0.75&&BACKWARDS[up])return BACKWARDS[up];
+        if(roll<0.8)return GLITCH_SYMBOLS[Math.floor(Math.random()*GLITCH_SYMBOLS.length)];
+        return c===up?c.toLowerCase():up;
+      }).join('');
+    });
+  },130);
   glitchCorrupt=function(){
     [document.getElementById('ti1'),document.getElementById('ti2')].forEach(el=>{
       if(!el)return;
@@ -5804,6 +5827,7 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
       spans.forEach(sp=>{
         if(sp.querySelector('a'))return; // links never glitch — only plain text
         if(sp.querySelector('span'))return; // skip items with a nested live-clock span
+        if(sp.querySelector('.tk-perma'))return; // constant-glitch lines run their own loop (tkPerma)
         if(GLITCH_EXEMPT.has(sp.textContent))return; // this one always stays clean
         if(Math.random()>0.35)return;
         const orig=sp.textContent;
