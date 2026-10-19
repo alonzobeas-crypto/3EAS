@@ -46,25 +46,6 @@
   ],
   "products": [
     {
-      "title": "THE UNIFORM — CAPTURE DON'T KILL TEE",
-      "category": "apparel",
-      "price": 30,
-      "description": "White tee, screen printed.",
-      "fulfillment": "self",
-      "shipping": "apparel",
-      "images": [
-        "merch-photos/capture-dont-kill-tee-front.jpg"
-      ],
-      "sizes": {
-        "S": 25,
-        "M": 25,
-        "L": 25,
-        "XL": 25,
-        "XXL": 25,
-        "XXXL": 25
-      }
-    },
-    {
       "title": "THE UNIFORM — 3EAS CORTEX TEE",
       "category": "apparel",
       "price": 30,

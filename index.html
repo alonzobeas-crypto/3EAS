@@ -1460,7 +1460,7 @@ body{
         <div class="ac-name">THE UNIFORM</div>
         <div class="ac-desc">Apparel & accessories.<br>The signal has a dress code.<br>Wear the frequency.</div>
         <div class="ac-foot"><div class="ac-price">INCOMING</div><button class="ac-btn" data-merch="apparel" onclick="openMerch(this.dataset.merch)" style="color:var(--accent);border-color:rgba(184,168,120,.3)" hidden>VIEW →</button></div>
-        <div class="ac-stat">— SIGNAL PENDING</div>
+        <div class="ac-stat">— COMING SOON</div>
       </div>
       <div class="ac">
         <div class="ac-idx">02</div>
@@ -1476,7 +1476,7 @@ body{
         <div class="ac-name">ARTIFACTS</div>
         <div class="ac-desc">Vinyl. Tapes. Prints. Zines.<br>Limited pressings. No restock.<br>The object IS the signal.</div>
         <div class="ac-foot"><div class="ac-price">INCOMING</div><button class="ac-btn" data-merch="media,print" onclick="openMerch(this.dataset.merch)" style="color:var(--accent);border-color:rgba(184,168,120,.3)" hidden>VIEW →</button></div>
-        <div class="ac-stat">— SIGNAL PENDING</div>
+        <div class="ac-stat">— COMING SOON</div>
       </div>
       <div class="ac">
         <div class="ac-idx">04</div>
@@ -2996,7 +2996,6 @@ loadDispatch();
    download links for anything digital. */
 const MERCH=[
   /* ▼ MEDIA PIPELINE: merch (generated from media/merch.json, do not hand-edit) ▼ */
-  {"id":"the-uniform-capture-don-t-kill-tee","title":"THE UNIFORM — CAPTURE DON'T KILL TEE","category":"apparel","price":3000,"desc":"White tee, screen printed.","images":["media/merch-photos/web/the-uniform-capture-don-t-kill-tee-53c845d0.jpg"],"fulfillment":"self","ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
   {"id":"the-uniform-3eas-cortex-tee","title":"THE UNIFORM — 3EAS CORTEX TEE","category":"apparel","price":3000,"desc":"Distressed block wordmark. Artwork preview, photos of the printed shirt coming soon.","images":["media/merch-photos/web/the-uniform-3eas-cortex-tee-84db0cf0.jpg"],"fulfillment":"self","ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
   {"id":"the-uniform-3eas-cipher-tee","title":"THE UNIFORM — 3EAS CIPHER TEE","category":"apparel","price":3000,"desc":"3EAS encoded in signal bars, four times over. Artwork preview, photos of the printed shirt coming soon.","images":["media/merch-photos/web/the-uniform-3eas-cipher-tee-19689d14.jpg"],"fulfillment":"self","ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
   /* ▲ MEDIA PIPELINE: merch ▲ */
@@ -3041,7 +3040,7 @@ const BEATLAB=[
     if(!t||!t.buy){b.hidden=true;return;}
     b.hidden=false;
     b.disabled=!SHOP;
-    b.textContent=SHOP?'BUY '+money(t.buy.price):'SIGNAL PENDING';
+    b.textContent=SHOP?'BUY '+money(t.buy.price):'COMING SOON';
   };
   window.buyT=function(){
     if(!cur2||!cur2.buy)return;
@@ -3057,7 +3056,7 @@ const BEATLAB=[
       const card=btn.closest('.ac');
       const low=Math.min(...items.map(m=>m.price));
       card.querySelector('.ac-price').textContent=(items.length>1?'FROM ':'')+money(low);
-      card.querySelector('.ac-stat').textContent='— '+items.length+(items.length===1?' ITEM':' ITEMS')+' // '+(SHOP?'TRANSMITTING':'SIGNAL PENDING');
+      card.querySelector('.ac-stat').textContent='— '+items.length+(items.length===1?' ITEM':' ITEMS')+' // '+(SHOP?'TRANSMITTING':'COMING SOON');
       btn.hidden=false;
     });
   }
@@ -3354,7 +3353,7 @@ const BEATLAB=[
       const allOut=m.fulfillment==='self'&&stock&&stock[m.id]&&m.variants.every(v=>leftFor(v.id)===0);
       left.textContent=allOut?'SOLD OUT // NO RESTOCK':(n!=null&&n<=10?n+' LEFT':(m.fulfillment==='pod'?'PRINTED TO ORDER':''));
       left.hidden=!left.textContent;
-      if(!SHOP){buy.textContent='SIGNAL PENDING';buy.disabled=true;}
+      if(!SHOP){buy.textContent='COMING SOON';buy.disabled=true;}
       else if(allOut||(size&&n===0)){buy.textContent='SOLD OUT';buy.disabled=true;}
       else{buy.textContent=size?'BUY '+money(m.price):'PICK A SIZE';buy.disabled=false;}
     }
