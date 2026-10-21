@@ -5830,6 +5830,8 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     document.removeEventListener('click',armAutoGlitches);
     document.removeEventListener('keydown',armAutoGlitches);
     document.removeEventListener('touchstart',armAutoGlitches);
+    document.removeEventListener('wheel',armAutoGlitches);
+    document.removeEventListener('pointerdown',armAutoGlitches);
     setInterval(siteGlitch,84000);
     setInterval(runMatrixRain,55000);
     setInterval(hackedScreenGlitch,140000);
@@ -5843,6 +5845,11 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
   document.addEventListener('click',armAutoGlitches,{once:true});
   document.addEventListener('keydown',armAutoGlitches,{once:true});
   document.addEventListener('touchstart',armAutoGlitches,{once:true});
+  // Desktop visitors mostly scroll-wheel through the scenes and may never
+  // click. A wheel event (unlike 'scroll') only ever comes from a real hand
+  // on the wheel/trackpad, so it counts as a gesture.
+  document.addEventListener('wheel',armAutoGlitches,{once:true,passive:true});
+  document.addEventListener('pointerdown',armAutoGlitches,{once:true});
 
   // Character-level corruption: randomly flip letter case and swap a few
   // letters for leetspeak-style numbers, briefly, on visible ticker spans.
