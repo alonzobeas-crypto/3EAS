@@ -281,6 +281,7 @@ body{
 .ti .glow-ry{animation:glowRY 2.4s ease-in-out infinite;text-decoration:underline;cursor:pointer}
 @keyframes glowRG{0%,100%{color:#c32c27;text-shadow:0 0 6px rgba(195,44,39,.6)}50%{color:#3ec84a;text-shadow:0 0 10px rgba(62,200,74,.8)}}
 .ti .glow-rg{animation:glowRG 2.4s ease-in-out infinite;text-decoration:underline;cursor:pointer}
+.ti .tk-dyor{font-weight:inherit;color:var(--accent)}
 /* Constant-glitch ticker line: wrap the text in <em class="tk-perma" data-t="same text">.
    The letters re-scramble non-stop (see tkPerma in the ticker script) and the
    colour split + jitter never stops, unlike the random 2s glitch on other lines. */
@@ -5370,12 +5371,16 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
       if(el)el.textContent=LIVE[id];
     });
   }
+  const TICKER_DISCLAIMER='<b class="tk-dyor">DISCLAIMER: THIS IS A PIRATE SIGNAL, NOT THE NEWS. DO YOUR OWN RESEARCH.</b>';
   function renderTickerCycle(force){
     // Background tab: nobody is watching, so don't draw a batch and mark it
     // "seen". Skipping keeps the swap on the animation's loop boundary.
     if(!force&&document.hidden)return;
     const [h1,h2]=nextTickerHalves(items);
-    render('ti1',localize(h1));
+    // Disclaimer leads every batch so it comes around every cycle instead of
+    // once per lap of the whole pool. Added after localize() so it always
+    // reads in English; glitchCorrupt skips it so it stays legible.
+    render('ti1',[TICKER_DISCLAIMER].concat(localize(h1)));
     render('ti2',localize(h2));
     applyLiveVals();
   }
@@ -5858,6 +5863,7 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
         if(sp.querySelector('a'))return; // links never glitch — only plain text
         if(sp.querySelector('span'))return; // skip items with a nested live-clock span
         if(sp.querySelector('.tk-perma'))return; // constant-glitch lines run their own loop (tkPerma)
+        if(sp.querySelector('.tk-dyor'))return; // the disclaimer always reads clean
         if(GLITCH_EXEMPT.has(sp.textContent))return; // this one always stays clean
         if(Math.random()>0.35)return;
         const orig=sp.textContent;
