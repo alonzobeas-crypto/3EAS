@@ -282,9 +282,9 @@ body{
 @keyframes glowRG{0%,100%{color:#c32c27;text-shadow:0 0 6px rgba(195,44,39,.6)}50%{color:#3ec84a;text-shadow:0 0 10px rgba(62,200,74,.8)}}
 .ti .glow-rg{animation:glowRG 2.4s ease-in-out infinite;text-decoration:underline;cursor:pointer}
 /* The disclaimer leads ti1, which restarts at the left edge every cycle, so
-   it used to appear already half-gone. A lead-in gap starts it a third of the
-   way across the screen, giving it a few seconds to be read. */
-#ti1>span:first-child{margin-left:35vw}
+   it used to appear already half-gone. A lead-in gap starts it past the middle of the
+   screen, giving it several seconds to be read. */
+#ti1>span:first-child{margin-left:55vw}
 .ti .tk-dyor{font-weight:inherit;color:#ffe600!important;animation:tkDyorPulse 3.2s ease-in-out infinite}
 @keyframes tkDyorPulse{0%,100%{opacity:1;text-shadow:0 0 10px rgba(255,230,0,.75)}50%{opacity:.55;text-shadow:0 0 2px rgba(255,230,0,.2)}}
 @media (prefers-reduced-motion:reduce){.ti .tk-dyor{animation:none}}
