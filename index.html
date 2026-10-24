@@ -287,7 +287,10 @@ body{
 #ti1>span:first-child{margin-left:55vw}
 .ti .tk-dyor{font-weight:inherit;color:#ffe600!important;animation:tkDyorPulse 3.2s ease-in-out infinite}
 @keyframes tkDyorPulse{0%,100%{opacity:1;text-shadow:0 0 10px rgba(255,230,0,.75)}50%{opacity:.55;text-shadow:0 0 2px rgba(255,230,0,.2)}}
-@media (prefers-reduced-motion:reduce){.ti .tk-dyor{animation:none}}
+/* Just the word DISCLAIMER: hard on/off blink, red-hot on the off beat. */
+.ti .tk-flash{font-style:normal;animation:tkFlash 1s steps(1,end) infinite}
+@keyframes tkFlash{0%{opacity:1;color:#ffe600}50%{opacity:.15;color:#ff3b2f}}
+@media (prefers-reduced-motion:reduce){.ti .tk-dyor,.ti .tk-flash{animation:none}}
 /* Constant-glitch ticker line: wrap the text in <em class="tk-perma" data-t="same text">.
    The letters re-scramble non-stop (see tkPerma in the ticker script) and the
    colour split + jitter never stops, unlike the random 2s glitch on other lines. */
@@ -5397,7 +5400,7 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
       if(el)el.textContent=LIVE[id];
     });
   }
-  const TICKER_DISCLAIMER='<b class="tk-dyor">DISCLAIMER: THIS IS A PIRATE SIGNAL, NOT THE NEWS. DO YOUR OWN RESEARCH.</b>';
+  const TICKER_DISCLAIMER='<b class="tk-dyor"><i class="tk-flash">DISCLAIMER:</i> THIS IS A PIRATE SIGNAL, NOT THE NEWS. DO YOUR OWN RESEARCH.</b>';
   function renderTickerCycle(force){
     // Background tab: nobody is watching, so don't draw a batch and mark it
     // "seen". Skipping keeps the swap on the animation's loop boundary.
