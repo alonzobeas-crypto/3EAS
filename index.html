@@ -287,9 +287,9 @@ body{
 #ti1>span:first-child{margin-left:55vw}
 .ti .tk-dyor{font-weight:inherit;color:#ffe600!important;animation:tkDyorPulse 3.2s ease-in-out infinite}
 @keyframes tkDyorPulse{0%,100%{opacity:1;text-shadow:0 0 10px rgba(255,230,0,.75)}50%{opacity:.55;text-shadow:0 0 2px rgba(255,230,0,.2)}}
-/* Just the word DISCLAIMER: hard on/off blink, red-hot on the off beat. */
+/* Just the word DISCLAIMER: hard yellow on/off blink. */
 .ti .tk-flash{font-style:normal;animation:tkFlash 1s steps(1,end) infinite}
-@keyframes tkFlash{0%{opacity:1;color:#ffe600}50%{opacity:.15;color:#ff3b2f}}
+@keyframes tkFlash{0%{opacity:1}50%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.ti .tk-dyor,.ti .tk-flash{animation:none}}
 /* Constant-glitch ticker line: wrap the text in <em class="tk-perma" data-t="same text">.
    The letters re-scramble non-stop (see tkPerma in the ticker script) and the
