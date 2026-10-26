@@ -5914,10 +5914,12 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
         if(sp.querySelector('span'))return; // skip items with a nested live-clock span
         if(sp.querySelector('.tk-perma'))return; // constant-glitch lines run their own loop (tkPerma)
         if(sp.querySelector('.tk-dyor'))return; // the disclaimer always reads clean
-        if(sp.querySelector('.tk-rnd'))return; // colour-cycling words keep their letter markup
         if(GLITCH_EXEMPT.has(sp.textContent))return; // this one always stays clean
         if(Math.random()>0.35)return;
         const orig=sp.textContent;
+        // Lines with inline markup (the .tk-rnd colour letters) get their
+        // markup back afterwards, not just the plain text.
+        const origHTML=sp.querySelector('.tk-rnd')?sp.innerHTML:null;
         // Re-roll the corruption on an interval instead of swapping once and
         // holding it static for 2.2s — the corrupted characters should keep
         // shifting/flickering the whole time, not freeze into one look.
@@ -5940,7 +5942,7 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
         corruptOnce();
         sp.style.textShadow='2px 0 var(--accent),-2px 0 #0ff';
         const flicker=setInterval(corruptOnce,130);
-        setTimeout(()=>{clearInterval(flicker);sp.textContent=orig;sp.style.textShadow='';},2200);
+        setTimeout(()=>{clearInterval(flicker);if(origHTML!==null)sp.innerHTML=origHTML;else sp.textContent=orig;sp.style.textShadow='';},2200);
       });
     });
   };
