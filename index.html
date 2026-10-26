@@ -3585,9 +3585,9 @@ audio.addEventListener('playing',msShowTx);
 // Progress bar on the lock screen / Android notification (read-only: there
 // is no seekto handler). Throttled; whichever player owns the session reports.
 let msPosT=0;
-function msPos(el){
+function msPos(el,force){
   if(!('mediaSession' in navigator)||!navigator.mediaSession.setPositionState)return;
-  const now=Date.now();if(now-msPosT<1000)return;msPosT=now;
+  const now=Date.now();if(!force&&now-msPosT<1000)return;msPosT=now;
   const d=el.duration;if(!isFinite(d)||d<=0)return;
   try{navigator.mediaSession.setPositionState({duration:d,position:Math.min(el.currentTime,d),playbackRate:1})}catch(e){}
 }
@@ -3603,6 +3603,9 @@ function msArt(src){
   const m=navigator.mediaSession.metadata;if(!m)return;
   navigator.mediaSession.metadata=new MediaMetadata({title:m.title,artist:m.artist,album:m.album,
     artwork:src?[{src,sizes:'512x512',type:'image/png'}]:MS_ART});
+  // iOS treats a metadata swap as a possible new track and resets the
+  // progress bar; re-send the real position in the same tick so it holds.
+  msPos(msTxPlaying()?audio:spActive,true);
 }
 function msGlitchTick(){
   if(!MS_GLITCH_OK||!('mediaSession' in navigator))return;
@@ -3769,7 +3772,7 @@ let sgLastTitle=null;
 function spSetTitle(t){
   document.getElementById('sp-title').textContent=t;
   msJukeTitle=t;
-  if('mediaSession' in navigator&&!msTxPlaying())navigator.mediaSession.metadata=new MediaMetadata({title:t,artist:'3EAS',album:'3EASCORTEX',artwork:MS_ART});
+  if('mediaSession' in navigator&&!msTxPlaying()){navigator.mediaSession.metadata=new MediaMetadata({title:t,artist:'3EAS',album:'3EASCORTEX',artwork:MS_ART});msPos(spActive,true);}
   spBuildTitleGlitch(t);
   // Fire the signal-glitch effect on real track changes only — skip the
   // interim "TrackA ⇢ TrackB" crossfade title and redundant re-sets of the
