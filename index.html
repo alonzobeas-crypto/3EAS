@@ -3528,7 +3528,10 @@ function spSyncFlash(){
 // over while it plays (the jukebox is paused then, see spDuck), then hands
 // it back. Without the hand-off the lock screen kept showing the jukebox's
 // last track and its buttons drove the jukebox, not what was playing.
-const MS_ART=[{src:'assets/nowplaying-crtx-512.jpg',sizes:'512x512',type:'image/jpeg'}]; // 3EAS / CRTX stacked, fills the box (the 3E favicon read as just "3E")
+// Lock-screen artwork: 3EAS / CRTX stacked, filling the box. PNGs with full
+// absolute URLs in two sizes. iOS showed a blank box for the relative JPEG,
+// and once artwork is named iOS no longer falls back to the site icon.
+const MS_ART=[512,256].map(n=>({src:new URL('assets/nowplaying-'+n+'.png',location.href).href,sizes:n+'x'+n,type:'image/png'}));
 let msJukeTitle='';
 function msTxPlaying(){return !!cur2&&!audio.paused&&!audio.ended}
 function msSet(action,fn){try{navigator.mediaSession.setActionHandler(action,fn)}catch(e){}}
