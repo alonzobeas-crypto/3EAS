@@ -3516,14 +3516,43 @@ function spSyncFlash(){
   // — without it, audio can get suspended the moment the display turns off.
   // Piggybacking on this existing play/pause/ended listener keeps the
   // reported state accurate with no extra wiring.
-  if('mediaSession' in navigator)navigator.mediaSession.playbackState=anyPlaying?'playing':'paused';
+  if('mediaSession' in navigator&&!msTxPlaying())navigator.mediaSession.playbackState=anyPlaying?'playing':'paused';
 }
 [spA,spB].forEach(a=>{['play','pause','ended'].forEach(ev=>a.addEventListener(ev,spSyncFlash))});
-if('mediaSession' in navigator){
-  navigator.mediaSession.setActionHandler('play',()=>spPlay());
-  navigator.mediaSession.setActionHandler('pause',()=>spStop());
-  navigator.mediaSession.setActionHandler('nexttrack',()=>spSkip());
+// Lock screen / Control Center (Media Session). Two players share it: the
+// site jukebox owns it by default, and the TRANSMISSIONS player takes it
+// over while it plays (the jukebox is paused then, see spDuck), then hands
+// it back. Without the hand-off the lock screen kept showing the jukebox's
+// last track and its buttons drove the jukebox, not what was playing.
+const MS_ART=[{src:'assets/favicon-512.png',sizes:'512x512',type:'image/png'}];
+let msJukeTitle='';
+function msTxPlaying(){return !!cur2&&!audio.paused&&!audio.ended}
+function msSet(action,fn){try{navigator.mediaSession.setActionHandler(action,fn)}catch(e){}}
+function msShowTx(){
+  if(!('mediaSession' in navigator)||!cur2)return;
+  navigator.mediaSession.metadata=new MediaMetadata({title:cur2.title,artist:cur2.artist||'3EAS',album:'3EASCORTEX // TRANSMISSIONS',artwork:MS_ART});
+  msSet('play',()=>togPlay());
+  msSet('pause',()=>togPlay());
+  msSet('nexttrack',()=>nextT());
+  msSet('previoustrack',()=>prevT());
+  navigator.mediaSession.playbackState='playing';
 }
+function msShowJuke(){
+  if(!('mediaSession' in navigator)||msTxPlaying())return;
+  if(msJukeTitle)navigator.mediaSession.metadata=new MediaMetadata({title:msJukeTitle,artist:'3EAS',album:'3EASCORTEX',artwork:MS_ART});
+  msSet('play',()=>spPlay());
+  msSet('pause',()=>spStop());
+  msSet('nexttrack',()=>spSkip());
+  msSet('previoustrack',null);
+  // spSyncFlash reads jukebox state declared further down; on the initial
+  // call below that isn't set up yet, and the jukebox reports its own state
+  // once it starts anyway.
+  try{spSyncFlash()}catch(e){}
+}
+audio.addEventListener('playing',msShowTx);
+audio.addEventListener('pause',msShowJuke);
+audio.addEventListener('ended',msShowJuke);
+msShowJuke();
 let spActive=spA,spIdle=spB,spFading=false;
 
 /* ─── AUDIO-REACTIVE PARTICLES ───
@@ -3669,7 +3698,8 @@ function spBuildTitleGlitch(t){
 let sgLastTitle=null;
 function spSetTitle(t){
   document.getElementById('sp-title').textContent=t;
-  if('mediaSession' in navigator)navigator.mediaSession.metadata=new MediaMetadata({title:t,artist:'3EAS',album:'3EASCORTEX'});
+  msJukeTitle=t;
+  if('mediaSession' in navigator&&!msTxPlaying())navigator.mediaSession.metadata=new MediaMetadata({title:t,artist:'3EAS',album:'3EASCORTEX',artwork:MS_ART});
   spBuildTitleGlitch(t);
   // Fire the signal-glitch effect on real track changes only — skip the
   // interim "TrackA ⇢ TrackB" crossfade title and redundant re-sets of the
