@@ -3591,39 +3591,8 @@ function msPos(el,force){
   const d=el.duration;if(!isFinite(d)||d<=0)return;
   try{navigator.mediaSession.setPositionState({duration:d,position:Math.min(el.currentTime,d),playbackRate:1})}catch(e){}
 }
-// Lock-screen artwork glitch: the artwork is a still image, so short bursts
-// swap in pre-rendered glitched frames (assets/nowplaying-g1..6.png: tears,
-// colour split, leet letters) and snap back to the clean art. Driven by the
-// players' own timeupdate events, which keep firing with the screen locked
-// (timers don't). Only the artwork changes; title/artist stay put.
-const MS_GLITCH=[1,2,3,4,5,6].map(i=>new URL('assets/nowplaying-g'+i+'.png',location.href).href);
-const MS_GLITCH_OK=!matchMedia('(prefers-reduced-motion:reduce)').matches;
-let msGlitchNext=Date.now()+12000,msGlitchQueue=[],msGlitchUntil=0,msGlitchOn=false;
-function msArt(src){
-  const m=navigator.mediaSession.metadata;if(!m)return;
-  navigator.mediaSession.metadata=new MediaMetadata({title:m.title,artist:m.artist,album:m.album,
-    artwork:src?[{src,sizes:'512x512',type:'image/png'}]:MS_ART});
-  // iOS treats a metadata swap as a possible new track and resets the
-  // progress bar; re-send the real position in the same tick so it holds.
-  msPos(msTxPlaying()?audio:spActive,true);
-  navigator.mediaSession.playbackState=(msTxPlaying()||(spActive&&!spActive.paused))?'playing':'paused';
-}
-function msGlitchTick(){
-  if(!MS_GLITCH_OK||!('mediaSession' in navigator))return;
-  const now=Date.now();
-  if(msGlitchOn){
-    if(now<msGlitchUntil)return;
-    if(msGlitchQueue.length){msArt(msGlitchQueue.shift());msGlitchUntil=now+250+Math.random()*350;}
-    else{msGlitchOn=false;msArt(null);msGlitchNext=now+20000+Math.random()*10000;} // one burst every 20-30s
-    return;
-  }
-  if(now<msGlitchNext)return;
-  const pool=MS_GLITCH.slice().sort(()=>Math.random()-.5);
-  msGlitchQueue=pool.slice(0,1+Math.floor(Math.random()*3));
-  msGlitchOn=true;msGlitchUntil=0;msGlitchTick();
-}
-audio.addEventListener('timeupdate',()=>{if(msTxPlaying()){msPos(audio);msGlitchTick()}});
-[spA,spB].forEach(a=>a.addEventListener('timeupdate',()=>{if(a===spActive&&!msTxPlaying()){msPos(a);msGlitchTick()}}));
+audio.addEventListener('timeupdate',()=>{if(msTxPlaying())msPos(audio)});
+[spA,spB].forEach(a=>a.addEventListener('timeupdate',()=>{if(a===spActive&&!msTxPlaying())msPos(a)}));
 audio.addEventListener('pause',msShowJuke);
 audio.addEventListener('ended',msShowJuke);
 msShowJuke();
@@ -3773,7 +3742,9 @@ let sgLastTitle=null;
 function spSetTitle(t){
   document.getElementById('sp-title').textContent=t;
   msJukeTitle=t;
-  if('mediaSession' in navigator&&!msTxPlaying()){navigator.mediaSession.metadata=new MediaMetadata({title:t,artist:'3EAS',album:'3EASCORTEX',artwork:MS_ART});msPos(spActive,true);}
+  // Lock screen: real song titles only. The on-site 'A  ⇢  B' crossfade title
+  // would flash on the lock screen for 2.5s at every transition.
+  if('mediaSession' in navigator&&!msTxPlaying()&&!t.includes('⇢')){navigator.mediaSession.metadata=new MediaMetadata({title:t,artist:'3EAS',album:'3EASCORTEX',artwork:MS_ART});msPos(spActive,true);}
   spBuildTitleGlitch(t);
   // Fire the signal-glitch effect on real track changes only — skip the
   // interim "TrackA ⇢ TrackB" crossfade title and redundant re-sets of the
