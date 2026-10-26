@@ -3591,8 +3591,35 @@ function msPos(el){
   const d=el.duration;if(!isFinite(d)||d<=0)return;
   try{navigator.mediaSession.setPositionState({duration:d,position:Math.min(el.currentTime,d),playbackRate:1})}catch(e){}
 }
-audio.addEventListener('timeupdate',()=>{if(msTxPlaying())msPos(audio)});
-[spA,spB].forEach(a=>a.addEventListener('timeupdate',()=>{if(a===spActive&&!msTxPlaying())msPos(a)}));
+// Lock-screen artwork glitch: the artwork is a still image, so short bursts
+// swap in pre-rendered glitched frames (assets/nowplaying-g1..6.png: tears,
+// colour split, leet letters) and snap back to the clean art. Driven by the
+// players' own timeupdate events, which keep firing with the screen locked
+// (timers don't). Only the artwork changes; title/artist stay put.
+const MS_GLITCH=[1,2,3,4,5,6].map(i=>new URL('assets/nowplaying-g'+i+'.png',location.href).href);
+const MS_GLITCH_OK=!matchMedia('(prefers-reduced-motion:reduce)').matches;
+let msGlitchNext=Date.now()+6000,msGlitchQueue=[],msGlitchUntil=0,msGlitchOn=false;
+function msArt(src){
+  const m=navigator.mediaSession.metadata;if(!m)return;
+  navigator.mediaSession.metadata=new MediaMetadata({title:m.title,artist:m.artist,album:m.album,
+    artwork:src?[{src,sizes:'512x512',type:'image/png'}]:MS_ART});
+}
+function msGlitchTick(){
+  if(!MS_GLITCH_OK||!('mediaSession' in navigator))return;
+  const now=Date.now();
+  if(msGlitchOn){
+    if(now<msGlitchUntil)return;
+    if(msGlitchQueue.length){msArt(msGlitchQueue.shift());msGlitchUntil=now+250+Math.random()*350;}
+    else{msGlitchOn=false;msArt(null);msGlitchNext=now+4000+Math.random()*6000;}
+    return;
+  }
+  if(now<msGlitchNext)return;
+  const pool=MS_GLITCH.slice().sort(()=>Math.random()-.5);
+  msGlitchQueue=pool.slice(0,1+Math.floor(Math.random()*3));
+  msGlitchOn=true;msGlitchUntil=0;msGlitchTick();
+}
+audio.addEventListener('timeupdate',()=>{if(msTxPlaying()){msPos(audio);msGlitchTick()}});
+[spA,spB].forEach(a=>a.addEventListener('timeupdate',()=>{if(a===spActive&&!msTxPlaying()){msPos(a);msGlitchTick()}}));
 audio.addEventListener('pause',msShowJuke);
 audio.addEventListener('ended',msShowJuke);
 msShowJuke();
