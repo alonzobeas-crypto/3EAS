@@ -3598,7 +3598,7 @@ function msPos(el,force){
 // (timers don't). Only the artwork changes; title/artist stay put.
 const MS_GLITCH=[1,2,3,4,5,6].map(i=>new URL('assets/nowplaying-g'+i+'.png',location.href).href);
 const MS_GLITCH_OK=!matchMedia('(prefers-reduced-motion:reduce)').matches;
-let msGlitchNext=Date.now()+6000,msGlitchQueue=[],msGlitchUntil=0,msGlitchOn=false;
+let msGlitchNext=Date.now()+12000,msGlitchQueue=[],msGlitchUntil=0,msGlitchOn=false;
 function msArt(src){
   const m=navigator.mediaSession.metadata;if(!m)return;
   navigator.mediaSession.metadata=new MediaMetadata({title:m.title,artist:m.artist,album:m.album,
@@ -3613,7 +3613,7 @@ function msGlitchTick(){
   if(msGlitchOn){
     if(now<msGlitchUntil)return;
     if(msGlitchQueue.length){msArt(msGlitchQueue.shift());msGlitchUntil=now+250+Math.random()*350;}
-    else{msGlitchOn=false;msArt(null);msGlitchNext=now+4000+Math.random()*6000;}
+    else{msGlitchOn=false;msArt(null);msGlitchNext=now+20000+Math.random()*10000;} // one burst every 20-30s
     return;
   }
   if(now<msGlitchNext)return;
