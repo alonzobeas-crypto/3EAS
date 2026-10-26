@@ -3524,7 +3524,7 @@ function spSyncFlash(){
 // over while it plays (the jukebox is paused then, see spDuck), then hands
 // it back. Without the hand-off the lock screen kept showing the jukebox's
 // last track and its buttons drove the jukebox, not what was playing.
-const MS_ART=[{src:'assets/favicon-512.png',sizes:'512x512',type:'image/png'}];
+const MS_ART=[{src:'assets/nowplaying-512.jpg',sizes:'512x512',type:'image/jpeg'}]; // full 3EAS wordmark (the 3E favicon read as just "3E")
 let msJukeTitle='';
 function msTxPlaying(){return !!cur2&&!audio.paused&&!audio.ended}
 function msSet(action,fn){try{navigator.mediaSession.setActionHandler(action,fn)}catch(e){}}
