@@ -3606,6 +3606,7 @@ function msArt(src){
   // iOS treats a metadata swap as a possible new track and resets the
   // progress bar; re-send the real position in the same tick so it holds.
   msPos(msTxPlaying()?audio:spActive,true);
+  navigator.mediaSession.playbackState=(msTxPlaying()||(spActive&&!spActive.paused))?'playing':'paused';
 }
 function msGlitchTick(){
   if(!MS_GLITCH_OK||!('mediaSession' in navigator))return;
@@ -3834,7 +3835,14 @@ function spPlayDeck(deck,track){
   });
 }
 
+// Fades are cancellable per deck: starting a new fade on a deck, or
+// spCancelFades() (pause/skip/stop), kills the old ramp. Uncancelled ramps
+// kept running after a skip or pause, fading the resumed song to silence or
+// pushing a freshly-loaded deck to full volume over the other one (two
+// songs at once).
+function spCancelFades(){[spA,spB].forEach(d=>d._fadeCancel&&d._fadeCancel())}
 function spFadeTo(deck,target,dur){
+  if(deck._fadeCancel)deck._fadeCancel();
   return new Promise(res=>{
     const start=performance.now(),from=deck.volume;
     // requestAnimationFrame stops entirely when the tab/phone is backgrounded
@@ -3853,8 +3861,16 @@ function spFadeTo(deck,target,dur){
       deck.volume=target;
       clearInterval(iv);
       clearTimeout(safety);
+      if(deck._fadeCancel===cancel)deck._fadeCancel=null;
       res();
     }
+    function cancel(){
+      clearInterval(iv);
+      clearTimeout(safety);
+      if(deck._fadeCancel===cancel)deck._fadeCancel=null;
+      res();
+    }
+    deck._fadeCancel=cancel;
     step();
   });
 }
@@ -6466,6 +6482,7 @@ function spPlay(){
     const dot=document.getElementById('sp-dot');
     if(dot){dot.style.background='var(--accent)';dot.style.animation='blink 1.3s infinite'}
     if(spActive){spActive.volume=spVol(spIdx);spActive.play().catch(()=>{})}
+    if('mediaSession' in navigator)navigator.mediaSession.playbackState='playing';
     return;
   }
   if(spStopped){
@@ -6506,7 +6523,7 @@ function spSkip(){
   // skip do nothing at all). Bump spGen too, so the old attempt's promise
   // (which may still be loading in the background) recognizes on arrival
   // that it's been superseded and quietly bails instead of racing this one.
-  if(spFading){spFading=false;spGen++;}
+  if(spFading){spFading=false;spGen++;spCancelFades();if(spIdle){spIdle.pause();spIdle.volume=0;}}
   spCrossfade();
 }
 // Stop = halt the jukebox until user explicitly resumes (skip or refresh).
@@ -6517,7 +6534,11 @@ function spPause(){
   spPaused=true;
   // A crossfade caught mid-flight is abandoned like Stop does (spGen bump),
   // so it can't restart a deck behind the pause; the audible deck resumes.
-  if(spFading){spFading=false;spGen++;spIdle&&spIdle.pause();}
+  if(spFading){
+    spFading=false;spGen++;spCancelFades();
+    if(spIdle){spIdle.pause();spIdle.volume=0;}
+    spSetTitle(SP_TRACKS[spIdx]?.title||'—');
+  }
   spActive&&spActive.pause();
   const dot=document.getElementById('sp-dot');
   if(dot){dot.style.background='var(--accent)';dot.style.animation='none'}
@@ -6533,7 +6554,7 @@ function spStop(){
   // otherwise see both decks paused here, mistake that for a blocked play,
   // and start retrying on its own — fighting Stop/Play right after. Bumping
   // spGen and clearing spFading marks it stale so it quietly backs off.
-  spFading=false;spGen++;
+  spFading=false;spGen++;spCancelFades();
   spA.pause();spB.pause();
   spSetTitle('STOPPED');
   const dot=document.getElementById('sp-dot');
