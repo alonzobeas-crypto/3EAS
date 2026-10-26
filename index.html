@@ -2700,7 +2700,7 @@ function spDuck(){
 }
 function spUnduck(){
   spDucked=false;
-  if(!spStarted||spMuted||spStopped)return;
+  if(!spStarted||spMuted||spStopped||spPaused)return;
   if(!spActive)return;
   // Restore volume in case the fade-in got interrupted by a duck
   if(!spFading)spActive.volume=spVol(spIdx);
@@ -3457,6 +3457,10 @@ const SP_TRACKS=[
   }
 })();
 let spIdx=0,spMuted=false,spStarted=false,spUnlocked=false;
+// Paused (lock screen / headphones pause): hold the place in the song. Unlike
+// spStopped, the title stays and Play resumes the same track mid-song. Every
+// auto-resume path below checks it so a pause isn't undone by the stall watchdog.
+let spPaused=false;
 let spBag=[],spBagPos=0;
 function spShuffle(){
   spBag=SP_TRACKS.map((_,i)=>i);
@@ -3487,10 +3491,10 @@ const spA=new Audio(),spB=new Audio();
 // 'ended' handler ever runs, sounding like the song "cut off". Detect this
 // and resume the same deck automatically rather than let it sit silent.
 [spA,spB].forEach(a=>{
-  a.addEventListener('stalled',()=>{if(a===spActive&&spStarted&&!spStopped&&!spDucked)a.play().catch(()=>{})});
-  a.addEventListener('waiting',()=>{if(a===spActive&&spStarted&&!spStopped&&!spDucked)a.play().catch(()=>{})});
+  a.addEventListener('stalled',()=>{if(a===spActive&&spStarted&&!spStopped&&!spDucked&&!spPaused)a.play().catch(()=>{})});
+  a.addEventListener('waiting',()=>{if(a===spActive&&spStarted&&!spStopped&&!spDucked&&!spPaused)a.play().catch(()=>{})});
   a.addEventListener('suspend',()=>{
-    if(a===spActive&&spStarted&&a.paused&&!spFading&&!spStopped&&!spDucked)a.play().catch(()=>{});
+    if(a===spActive&&spStarted&&a.paused&&!spFading&&!spStopped&&!spDucked&&!spPaused)a.play().catch(()=>{});
   });
 });
 function revealEmail(el){
@@ -3535,21 +3539,43 @@ function msShowTx(){
   msSet('pause',()=>togPlay());
   msSet('nexttrack',()=>nextT());
   msSet('previoustrack',()=>prevT());
+  msSet('stop',()=>{if(!audio.paused)togPlay()});
+  msSet('seekbackward',null);
+  msSet('seekforward',null);
+  msSet('seekto',null);
   navigator.mediaSession.playbackState='playing';
 }
 function msShowJuke(){
   if(!('mediaSession' in navigator)||msTxPlaying())return;
   if(msJukeTitle)navigator.mediaSession.metadata=new MediaMetadata({title:msJukeTitle,artist:'3EAS',album:'3EASCORTEX',artwork:MS_ART});
+  // Radio-style controls, like a station in Spotify/Apple Music: play,
+  // pause (holds your place), skip and stop. No previous track, no seeking:
+  // null handlers make iOS grey out the back button and lock the scrubber.
   msSet('play',()=>spPlay());
-  msSet('pause',()=>spStop());
+  msSet('pause',()=>spPause());
+  msSet('stop',()=>spStop());
   msSet('nexttrack',()=>spSkip());
   msSet('previoustrack',null);
+  msSet('seekbackward',null);
+  msSet('seekforward',null);
+  msSet('seekto',null);
   // spSyncFlash reads jukebox state declared further down; on the initial
   // call below that isn't set up yet, and the jukebox reports its own state
   // once it starts anyway.
   try{spSyncFlash()}catch(e){}
 }
 audio.addEventListener('playing',msShowTx);
+// Progress bar on the lock screen / Android notification (read-only: there
+// is no seekto handler). Throttled; whichever player owns the session reports.
+let msPosT=0;
+function msPos(el){
+  if(!('mediaSession' in navigator)||!navigator.mediaSession.setPositionState)return;
+  const now=Date.now();if(now-msPosT<1000)return;msPosT=now;
+  const d=el.duration;if(!isFinite(d)||d<=0)return;
+  try{navigator.mediaSession.setPositionState({duration:d,position:Math.min(el.currentTime,d),playbackRate:1})}catch(e){}
+}
+audio.addEventListener('timeupdate',()=>{if(msTxPlaying())msPos(audio)});
+[spA,spB].forEach(a=>a.addEventListener('timeupdate',()=>{if(a===spActive&&!msTxPlaying())msPos(a)}));
 audio.addEventListener('pause',msShowJuke);
 audio.addEventListener('ended',msShowJuke);
 msShowJuke();
@@ -6388,6 +6414,13 @@ document.getElementById('ticker')?.addEventListener('pointerdown',e=>{
 function spPlay(){
   if(audio&&!audio.paused){audio.pause();playing=false;const b=document.getElementById('pbtn');if(b)b.textContent='▶';}
   if(!spStarted){spStart();return;}
+  if(spPaused){
+    spPaused=false;
+    const dot=document.getElementById('sp-dot');
+    if(dot){dot.style.background='var(--accent)';dot.style.animation='blink 1.3s infinite'}
+    if(spActive){spActive.volume=spVol(spIdx);spActive.play().catch(()=>{})}
+    return;
+  }
   if(spStopped){
     spStopped=false;
     const dot=document.getElementById('sp-dot');
@@ -6404,6 +6437,7 @@ function spPlay(){
 // Skip = crossfade to a new random track immediately.
 function spSkip(){
   if(!spStarted){spStart();return;}
+  if(spPaused){spPaused=false;const dot=document.getElementById('sp-dot');if(dot){dot.style.background='var(--accent)';dot.style.animation='blink 1.3s infinite'}}
   if(spStopped){
     // Was previously routed through spStart(), which no-ops here because
     // spStop() never resets spStarted — that left Stop-then-Skip as a dead
@@ -6430,9 +6464,22 @@ function spSkip(){
 }
 // Stop = halt the jukebox until user explicitly resumes (skip or refresh).
 let spStopped=false;
+// Pause in place (lock screen, headphones, Bluetooth). See spPaused.
+function spPause(){
+  if(!spStarted||spStopped||spPaused)return;
+  spPaused=true;
+  // A crossfade caught mid-flight is abandoned like Stop does (spGen bump),
+  // so it can't restart a deck behind the pause; the audible deck resumes.
+  if(spFading){spFading=false;spGen++;spIdle&&spIdle.pause();}
+  spActive&&spActive.pause();
+  const dot=document.getElementById('sp-dot');
+  if(dot){dot.style.background='var(--accent)';dot.style.animation='none'}
+  if('mediaSession' in navigator)navigator.mediaSession.playbackState='paused';
+}
 function spStop(){
   if(!spStarted)return;
   spStopped=true;
+  spPaused=false;
   spDucked=false;
   // If a crossfade was still loading in the background when Stop was
   // pressed (e.g. right after a skip), its promise keeps running and would
