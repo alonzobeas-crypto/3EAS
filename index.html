@@ -3885,14 +3885,17 @@ function spCrossfade(attempt){
     // and leaving both decks silent with nothing left to recover them. If
     // we've been superseded, quietly stop the deck we were loading into and
     // don't touch any shared state.
-    if(myGen!==spGen){spIdle&&spIdle.pause();return;}
+    // Superseded. Only tidy up the idle deck if no newer crossfade owns it:
+    // a fast skip reuses the same idle deck, and pausing it here used to
+    // kill the NEW song right as it took over (silence after the swap).
+    if(myGen!==spGen){if(!spFading)spIdle&&spIdle.pause();return;}
     // If the play call was blocked (stalled file, network hiccup, etc.) don't
     // just give up — the jukebox must never go silent on its own. Retry with
     // another track from the bag, a few times, before falling back to a hard
     // (non-crossfaded) switch.
     if(spIdle.paused){
       spWaitForPlay(spIdle,myGen,()=>spGen).then(started=>{
-        if(myGen!==spGen){spIdle&&spIdle.pause();return;}
+        if(myGen!==spGen){if(!spFading)spIdle&&spIdle.pause();return;}
         if(started){
           spCrossfadeCommit(nextIdx,nextTrack,myGen);
           return;
