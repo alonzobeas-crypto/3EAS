@@ -285,6 +285,9 @@ body{
    it used to appear already half-gone. A lead-in gap starts it past the middle of the
    screen, giving it several seconds to be read. */
 #ti1>span:first-child{margin-left:55vw}
+/* Per-letter random colour cycling (see tkRnd in the ticker script): wrap a
+   word as <em class="tk-rnd"><i>B</i><i>A</i>...</em>. */
+.ti .tk-rnd{font-style:normal}.ti .tk-rnd i{font-style:normal;transition:color .12s}
 .ti .tk-dyor{font-weight:inherit;color:#ffe600!important;animation:tkDyorPulse 3.2s ease-in-out infinite}
 @keyframes tkDyorPulse{0%,100%{opacity:1;text-shadow:0 0 10px rgba(255,230,0,.75)}50%{opacity:.55;text-shadow:0 0 2px rgba(255,230,0,.2)}}
 /* Just the word DISCLAIMER: hard yellow on/off blink. */
@@ -4464,6 +4467,8 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     '@2026-10-24',
     "OH NOW IT'S PHP?",
     'IF YOU DATE ME YOU WILL LOSE YOUR SECURITY CLEARANCE.',
+    '@2026-10-26',
+    'WOULD YOU DANCE IN HIS <em class="tk-rnd"><i>B</i><i>A</i><i>A</i><i>L</i><i>R</i><i>O</i><i>O</i><i>M</i></em>?',
     '@'
   ];
   // ── DATE MARKERS ── A '@YYYY-MM-DD' entry in TICKER_RAW dates every line
@@ -5877,6 +5882,15 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
   // Constant-glitch lines (.tk-perma): re-scramble from the clean copy in
   // data-t every 130ms, forever. Queried fresh each tick because the ticker
   // rebuilds ti1/ti2 from scratch on every reshuffle.
+  // .tk-rnd words: every letter jumps to a random colour from the ticker's
+  // own palette (link rust, glow red/yellow/green, accent gold, glitch cyan,
+  // disclaimer yellow, base cream) a few times a second.
+  const TK_COLORS=['#a8695a','#c32c27','#f5c518','#3ec84a','#b8a878','#0ff','#ffe600','#d8d4c8'];
+  if(!matchMedia('(prefers-reduced-motion:reduce)').matches)setInterval(function tkRnd(){
+    document.querySelectorAll('#ti1 .tk-rnd i,#ti2 .tk-rnd i').forEach(l=>{
+      if(Math.random()<0.6)l.style.color=TK_COLORS[Math.floor(Math.random()*TK_COLORS.length)];
+    });
+  },280);
   if(!matchMedia('(prefers-reduced-motion:reduce)').matches)setInterval(function tkPerma(){
     document.querySelectorAll('#ti1 .tk-perma,#ti2 .tk-perma').forEach(el=>{
       const orig=el.dataset.t||'';
@@ -5900,6 +5914,7 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
         if(sp.querySelector('span'))return; // skip items with a nested live-clock span
         if(sp.querySelector('.tk-perma'))return; // constant-glitch lines run their own loop (tkPerma)
         if(sp.querySelector('.tk-dyor'))return; // the disclaimer always reads clean
+        if(sp.querySelector('.tk-rnd'))return; // colour-cycling words keep their letter markup
         if(GLITCH_EXEMPT.has(sp.textContent))return; // this one always stays clean
         if(Math.random()>0.35)return;
         const orig=sp.textContent;
