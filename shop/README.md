@@ -58,6 +58,18 @@ Open `http://localhost:8080`, go to TRANSMISSIONS, pick the track, hit BUY. Mock
 
 Until step 8, the live site shows SIGNAL PENDING and sells nothing. If the Worker is ever deployed with `MOCK_MODE` still `"true"`, it refuses every order instead of giving files away.
 
+## Email alerts (orders and requests to your Proton inbox)
+
+Every paid merch order and every request-form message (commissions, custom orders like a 4XL or a custom cut) is emailed to `passwordpills@pm.me`. Order emails carry the item, size, amount paid, full ship-to address, buyer email and phone; hit Reply to answer the buyer directly. Requests are also saved in the vault, and orders are always in Stripe, so a missed email never loses anything.
+
+It uses Cloudflare Email Routing (free). Once, after the domain is on Cloudflare:
+
+1. Cloudflare dashboard → 3eascortex.com → **Email** → **Email Routing** → Enable (it adds the DNS records itself).
+2. **Destination addresses** → Add `passwordpills@pm.me` → click the verification link Proton receives.
+3. Deploy the shop as usual. The sender is `shop@3eascortex.com` (`NOTIFY_FROM` in `wrangler.toml`); to send somewhere else, change `NOTIFY_TO` and `destination_address` there and verify that address too.
+
+Stripe can email you as well: Stripe → Settings → Communication preferences → Successful payments, and set your account email to the Proton address.
+
 ## Merch
 
 Merch shows up in ACQUISITIONS: apparel under THE UNIFORM, vinyl/tapes/CDs and prints/posters/zines under ARTIFACTS. Each item gets its own card with photos, sizes, US or international shipping, and a BUY button. Sizes that sell out cross themselves off.
@@ -82,6 +94,7 @@ Per item:
 | `stock` / `printful` | same thing for one-size items |
 | `bundle` | a transmission id from `media/catalog.json`; buyers get its download on the receipt page |
 | `available` | `false` hides it |
+| `customOrder` | `true` adds a REQUEST A CUSTOM ORDER button that opens the request form pre-filled with the item; requests are emailed to you |
 
 **Stock** is the total number of each size you've ever had for sale; the shop subtracts what's sold. To restock, add the new units to that number and `--sync`. Two people buying the very last unit at the same second can both get through; you'd refund one.
 

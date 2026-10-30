@@ -16,6 +16,8 @@
 //             to Printful (fulfillment "pod": they print and ship it).
 // The browser only ever sends ids; prices, stock and shipping always come from the catalog.
 
+import { EmailMessage } from 'cloudflare:email';
+
 const PRODUCT_ID_RE = /^[a-z0-9][a-z0-9-]{0,79}$/;
 const VARIANT_RE = /^[a-z0-9][a-z0-9-]{0,19}$/;
 const SESSION_RE = /^cs_(test|live)_[A-Za-z0-9]{10,200}$/;
@@ -268,6 +270,10 @@ async function commission(req, env) {
   await env.VAULT.put(`commissions/${id}.json`, JSON.stringify(record, null, 2), {
     httpMetadata: { contentType: 'application/json' },
   });
+  await notify(env, `NEW REQUEST: ${service || 'commission'} — ${name}`, [
+    `From: ${name} <${email}>`, service ? `Service: ${service}` : null, budget ? `Budget: ${budget}` : null,
+    timeline ? `Timeline: ${timeline}` : null, links ? `Links: ${links}` : null, '', message, '', `Reply straight to ${email}.`,
+  ], email);
   return { ok: true };
 }
 
@@ -357,6 +363,7 @@ async function webhook(req, env) {
     result = { counted: true, sold: sold[variant.id] };
   }
   await env.STOCK.put(doneKey, JSON.stringify({ at: new Date().toISOString(), product: product.id, variant: variant.id, ...result }), { expirationTtl: 60 * 60 * 24 * 90 });
+  await notifyOrder(env, session, product, variant);
   return { ok: true, ...result };
 }
 
@@ -641,4 +648,62 @@ function json(data, status, headers) {
     status,
     headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', ...headers },
   });
+}
+
+// ── Owner email alerts ───────────────────────────────────────────────────────
+// Every paid merch order and every request-form message (commissions, custom
+// orders) is emailed to the shop owner via Cloudflare Email Routing's
+// send_email binding (free; see shop/README.md "Email alerts"). Never throws:
+// a mail hiccup must not fail an order or a request, which are already saved
+// (orders in Stripe, requests in VAULT). Without the binding (local/mock) the
+// message is just logged.
+async function notify(env, subject, lines, replyTo) {
+  const text = lines.filter((l) => l !== false && l != null).join('\n');
+  if (!env.NOTIFY || !env.NOTIFY_FROM || !env.NOTIFY_TO) {
+    console.log('[notify]', subject, '\n' + text);
+    return;
+  }
+  const clean = (s) => String(s).replace(/[\r\n]+/g, ' ').slice(0, 200);
+  const enc = (s) => '=?UTF-8?B?' + btoa(unescape(encodeURIComponent(clean(s)))) + '?=';
+  const raw = [
+    `From: 3EAS SHOP <${env.NOTIFY_FROM}>`,
+    `To: <${env.NOTIFY_TO}>`,
+    replyTo && /^[^\s@<>]+@[^\s@<>]+$/.test(replyTo) ? `Reply-To: <${replyTo}>` : null,
+    `Subject: ${enc(subject)}`,
+    `Date: ${new Date().toUTCString()}`,
+    `Message-ID: <${crypto.randomUUID()}@${env.NOTIFY_FROM.split('@')[1]}>`,
+    'MIME-Version: 1.0',
+    'Content-Type: text/plain; charset=UTF-8',
+    'Content-Transfer-Encoding: base64',
+    '',
+    btoa(unescape(encodeURIComponent(text))).replace(/(.{76})/g, '$1\r\n'),
+  ].filter((l) => l !== null).join('\r\n');
+  try {
+    await env.NOTIFY.send(new EmailMessage(env.NOTIFY_FROM, env.NOTIFY_TO, raw));
+  } catch (e) {
+    console.error('[notify] send failed', e && e.message);
+  }
+}
+
+async function notifyOrder(env, session, product, variant) {
+  // Stripe has moved the shipping block between API versions; read both.
+  const ship = (session.collected_information && session.collected_information.shipping_details)
+    || session.shipping_details || {};
+  const cust = session.customer_details || {};
+  const a = ship.address || cust.address || {};
+  const total = typeof session.amount_total === 'number' ? `$${(session.amount_total / 100).toFixed(2)}` : '';
+  await notify(env, `NEW ORDER: ${product.title} — ${variant.label}`, [
+    `Item: ${product.title}`,
+    `Size: ${variant.label}`,
+    total ? `Paid: ${total}` : null,
+    product.fulfillment === 'pod' ? 'Fulfillment: Printful (check the draft there)' : 'Fulfillment: ship from the studio',
+    '',
+    'SHIP TO',
+    ship.name || cust.name || '(no name)',
+    a.line1, a.line2, [a.city, a.state, a.postal_code].filter(Boolean).join(', '), a.country,
+    '',
+    cust.email ? `Buyer email: ${cust.email}` : null,
+    cust.phone ? `Phone: ${cust.phone}` : null,
+    `Stripe session: ${session.id}`,
+  ], cust.email);
 }

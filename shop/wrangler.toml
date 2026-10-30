@@ -26,6 +26,14 @@ ALLOWED_ORIGINS = "https://3eascortex.com,https://www.3eascortex.com,http://loca
 
 CURRENCY = "usd"
 
+# Owner email alerts: every paid merch order (with ship-to address) and every
+# request-form message (commissions, custom orders). Sent through Cloudflare
+# Email Routing (free). NOTIFY_FROM must be an address on 3eascortex.com;
+# NOTIFY_TO must be verified under Email Routing -> Destination addresses.
+# See README "Email alerts".
+NOTIFY_FROM = "shop@3eascortex.com"
+NOTIFY_TO = "passwordpills@pm.me"
+
 # How long each signed download link works. The buyer's order link
 # (3eascortex.com/?order=cs_...) mints fresh ones any time, so this can be short.
 LINK_TTL_SECONDS = "3600"
@@ -54,3 +62,8 @@ id = "PASTE_KV_NAMESPACE_ID_HERE"
 name = "RL_SHOP"
 namespace_id = "3101"
 simple = { limit = 20, period = 60 }
+
+# Lets the Worker send the alerts above (and only to that address).
+[[send_email]]
+name = "NOTIFY"
+destination_address = "passwordpills@pm.me"

@@ -349,7 +349,7 @@ function buildMerch(catalog) {
     const bundle = p.bundle ? catalog.transmissions.find((t) => t.id === p.bundle) : null;
     site.push({
       id, title: title.toUpperCase(), category: p.category, price, desc: String(p.description || ''),
-      images: urls, fulfillment: p.fulfillment,
+      images: urls, fulfillment: p.fulfillment, custom: p.customOrder === true,
       ship: shipping[p.shipping],
       variants: variants.map((v) => ({ id: v.id, label: v.label })),
       bundle: bundle ? bundle.title : null,

@@ -1170,6 +1170,8 @@ body{
 #shopPanel .sp-field input:focus,#shopPanel .sp-field textarea:focus{border-color:var(--accent);outline:none}
 #shopPanel .mx-chip[disabled]{opacity:.35;text-decoration:line-through}
 #shopPanel .mx-left{margin:0;font-size:10px;letter-spacing:3px;color:#a8695a}
+#shopPanel .mx-custom{margin-top:8px;background:none;border:1px solid var(--dimmer);color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:3px;padding:10px;text-transform:uppercase;cursor:pointer}
+#shopPanel .mx-custom:hover{border-color:var(--accent)}
 #shopPanel .mx-buy{margin-top:auto;background:var(--accent);color:var(--bg);border:none;font-family:var(--mono);font-size:11px;letter-spacing:4px;padding:12px;text-transform:uppercase}
 #shopPanel .mx-buy:hover:not([disabled]),#shopPanel .mx-buy:focus-visible{background:var(--hot);outline:none}
 #shopPanel .mx-buy[disabled]{background:none;border:1px solid var(--dimmer);color:var(--dim2)}
@@ -3055,9 +3057,10 @@ loadDispatch();
    download links for anything digital. */
 const MERCH=[
   /* ▼ MEDIA PIPELINE: merch (generated from media/merch.json, do not hand-edit) ▼ */
-  {"id":"the-uniform-3eas-cortex-tee","title":"THE UNIFORM — 3EAS CORTEX TEE","category":"apparel","price":3000,"desc":"Distressed block wordmark. Artwork preview, photos of the printed shirt coming soon.","images":["media/merch-photos/web/the-uniform-3eas-cortex-tee-84db0cf0.jpg"],"fulfillment":"self","ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
-  {"id":"the-uniform-3eas-cipher-tee","title":"THE UNIFORM — 3EAS CIPHER TEE","category":"apparel","price":3000,"desc":"3EAS encoded in signal bars, four times over. Artwork preview, photos of the printed shirt coming soon.","images":["media/merch-photos/web/the-uniform-3eas-cipher-tee-19689d14.jpg"],"fulfillment":"self","ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
-  {"id":"the-uniform-selexiones-tee","title":"THE UNIFORM — SELEXIONES TEE","category":"apparel","price":3000,"desc":"Black tee. The SELEXIONES tower, broadcasting. Pirate radio uniform.","images":["media/merch-photos/web/the-uniform-selexiones-tee-768d6e14.jpg","media/merch-photos/web/the-uniform-selexiones-tee-35a7ae61.jpg","media/merch-photos/web/the-uniform-selexiones-tee-0d9b3944.jpg"],"fulfillment":"self","ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
+  {"id":"the-uniform-3eas-cortex-tee","title":"THE UNIFORM — 3EAS CORTEX TEE","category":"apparel","price":3000,"desc":"Distressed block wordmark. Artwork preview, photos of the printed shirt coming soon.","images":["media/merch-photos/web/the-uniform-3eas-cortex-tee-84db0cf0.jpg"],"fulfillment":"self","custom":false,"ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
+  {"id":"the-uniform-3eas-cipher-tee","title":"THE UNIFORM — 3EAS CIPHER TEE","category":"apparel","price":3000,"desc":"3EAS encoded in signal bars, four times over. Artwork preview, photos of the printed shirt coming soon.","images":["media/merch-photos/web/the-uniform-3eas-cipher-tee-19689d14.jpg"],"fulfillment":"self","custom":false,"ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
+  {"id":"the-uniform-selexiones-tee","title":"THE UNIFORM — SELEXIONES TEE","category":"apparel","price":3000,"desc":"Black tee. The SELEXIONES tower, broadcasting. Pirate radio uniform.","images":["media/merch-photos/web/the-uniform-selexiones-tee-768d6e14.jpg","media/merch-photos/web/the-uniform-selexiones-tee-35a7ae61.jpg","media/merch-photos/web/the-uniform-selexiones-tee-0d9b3944.jpg"],"fulfillment":"self","custom":true,"ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
+  {"id":"the-uniform-selexiones-cut-off-tee","title":"THE UNIFORM — SELEXIONES CUT-OFF TEE","category":"apparel","price":5000,"desc":"Same print, hand-cut: raw neck, sleeves and hem. Each one cut to order, so no two match. Ships a few days later than the standard tee.","images":["media/merch-photos/web/the-uniform-selexiones-cut-off-tee-768d6e14.jpg","media/merch-photos/web/the-uniform-selexiones-cut-off-tee-35a7ae61.jpg","media/merch-photos/web/the-uniform-selexiones-cut-off-tee-0d9b3944.jpg"],"fulfillment":"self","custom":true,"ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
   /* ▲ MEDIA PIPELINE: merch ▲ */
 ];
 const BEATLAB=[
@@ -3398,6 +3401,14 @@ const BEATLAB=[
       if(!size){flash('Pick a size first.');return;}
       startCheckout({productId:m.id,variant:size,region},buy,sync);
     });
+    // Items flagged customOrder in media/merch.json get a second button that
+    // opens the request form pre-filled with the item (other sizes, custom
+    // cuts, etc). Requests are emailed to the shop owner, see shop/README.md.
+    if(m.custom){
+      const req=el('button','mx-custom','REQUEST A CUSTOM ORDER →');req.type='button';
+      req.addEventListener('click',()=>{if(window.openCommission)openCommission('CUSTOM ORDER — '+m.title.replace(/^THE UNIFORM — /,'')+' (size / cut / details): ')});
+      card.appendChild(req);
+    }
     function leftFor(v){return stock&&stock[m.id]&&stock[m.id][v]!=null?stock[m.id][v]:null;}
     function sync(){
       shipTxt.textContent='+ '+money(m.ship[region])+' shipping';

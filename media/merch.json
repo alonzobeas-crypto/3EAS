@@ -102,7 +102,30 @@
         "XL": 25,
         "XXL": 25,
         "XXXL": 25
-      }
+      },
+      "customOrder": true
+    },
+    {
+      "title": "THE UNIFORM — SELEXIONES CUT-OFF TEE",
+      "category": "apparel",
+      "price": 50,
+      "description": "Same print, hand-cut: raw neck, sleeves and hem. Each one cut to order, so no two match. Ships a few days later than the standard tee.",
+      "fulfillment": "self",
+      "shipping": "apparel",
+      "images": [
+        "merch-photos/selexiones-tee-flat.jpg",
+        "merch-photos/selexiones-tee-print.jpg",
+        "merch-photos/selexiones-tee-angle.jpg"
+      ],
+      "sizes": {
+        "S": 25,
+        "M": 25,
+        "L": 25,
+        "XL": 25,
+        "XXL": 25,
+        "XXXL": 25
+      },
+      "customOrder": true
     }
   ]
 }
