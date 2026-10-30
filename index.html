@@ -3434,6 +3434,16 @@ const BEATLAB=[
   }
 
   const orderId=new URLSearchParams(location.search).get('order');
+  // Store deep link: 3eascortex.com/?shop=apparel (or media,print) opens the
+  // merch panel on load (shareable, e.g. IG bio). On-site links marked
+  // data-shop open it in place instead, so the jukebox keeps playing.
+  const shopParam=new URLSearchParams(location.search).get('shop');
+  if(shopParam&&!orderId)setTimeout(()=>window.openMerch(shopParam),600);
+  document.addEventListener('click',e=>{
+    const a=e.target.closest&&e.target.closest('a[data-shop]');
+    if(!a||e.defaultPrevented)return;
+    e.preventDefault();window.openMerch(a.dataset.shop);
+  });
   if(orderId)checkOrder(orderId);
 })();
 
@@ -4581,6 +4591,8 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     "<a href=\"https://en.wikipedia.org/wiki/Safari_Club\" target=\"_blank\" rel=\"noopener\" style=\"color:#a8695a;text-decoration:underline\">THE SAFARI CLUB</a>. WANNA JOIN?",
     '@2026-10-28',
     '<a href="https://www.simondixon.com" target="_blank" rel="noopener" style="color:#c32c27;text-decoration:underline">FOLLOW THE <b style="color:#3ec84a;font-weight:inherit">MONEY</b> - SIMON DIXON</a>',
+    '@2026-10-30',
+    '<a href="/?shop=apparel" data-shop="apparel" class="glow-rg">NEW UNIFORM: SELEXIONES — FIND THE SIGNAL TEE. $30 / HAND-CUT CUT-OFF $50. DROPPING SOON. CUSTOM ORDERS OPEN →</a>',
     '@'
   ];
   // ── DATE MARKERS ── A '@YYYY-MM-DD' entry in TICKER_RAW dates every line
