@@ -82,6 +82,27 @@
         "XXL": 25,
         "XXXL": 25
       }
+    },
+    {
+      "title": "THE UNIFORM — SELEXIONES TEE",
+      "category": "apparel",
+      "price": 30,
+      "description": "Black tee. The SELEXIONES tower, broadcasting. Pirate radio uniform.",
+      "fulfillment": "self",
+      "shipping": "apparel",
+      "images": [
+        "merch-photos/selexiones-tee-flat.jpg",
+        "merch-photos/selexiones-tee-print.jpg",
+        "merch-photos/selexiones-tee-angle.jpg"
+      ],
+      "sizes": {
+        "S": 25,
+        "M": 25,
+        "L": 25,
+        "XL": 25,
+        "XXL": 25,
+        "XXXL": 25
+      }
     }
   ]
 }
