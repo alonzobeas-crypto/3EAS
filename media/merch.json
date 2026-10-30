@@ -84,7 +84,8 @@
       }
     },
     {
-      "title": "THE UNIFORM — SELEXIONES TEE",
+      "id": "the-uniform-selexiones-tee",
+      "title": "THE UNIFORM — SELEXIONES: FIND THE SIGNAL TEE",
       "category": "apparel",
       "price": 30,
       "description": "Black tee. The SELEXIONES tower, broadcasting. Pirate radio uniform.",
@@ -106,7 +107,8 @@
       "customOrder": true
     },
     {
-      "title": "THE UNIFORM — SELEXIONES CUT-OFF TEE",
+      "id": "the-uniform-selexiones-cut-off-tee",
+      "title": "THE UNIFORM — SELEXIONES: FIND THE SIGNAL CUT-OFF TEE",
       "category": "apparel",
       "price": 50,
       "description": "Same print, hand-cut: raw neck, sleeves and hem. Each one cut to order, so no two match. Ships a few days later than the standard tee.",
