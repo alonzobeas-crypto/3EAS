@@ -1160,7 +1160,7 @@ body{
    a <button>, which some browsers drew as an empty box); dark base if a photo
    is slow or fails, so it never shows as a blank light square. */
 #shopPanel .mx-thumb{width:44px;height:44px;padding:0;border:1px solid var(--dimmer);background-color:#0b0a09;background-size:cover;background-position:center;background-repeat:no-repeat;overflow:hidden;-webkit-appearance:none;appearance:none}
-#shopPanel .mx-thumb[aria-current="true"],#shopPanel .mx-thumb:focus-visible{border-color:var(--accent);outline:none}
+#shopPanel .mx-thumb:hover,#shopPanel .mx-thumb:focus-visible{border-color:var(--accent);outline:none}
 #shopPanel .mx-title{margin:0;font-weight:400;font-size:15px;letter-spacing:3px;line-height:1.4;color:var(--hot);overflow-wrap:anywhere}
 #shopPanel .mx-desc{margin:0;font-size:11px;letter-spacing:1px;line-height:1.7;color:var(--dim2)}
 #shopPanel .mx-bundle{margin:0;font-size:10px;letter-spacing:2px;color:var(--accent)}
@@ -3416,14 +3416,18 @@ const BEATLAB=[
     const fig=el('div','mx-img');
     const pic=el('img');pic.alt=m.title;pic.loading='lazy';
     if(m.images[0])pic.src=m.images[0];else fig.appendChild(el('span','mx-noimg','NO IMAGE // SIGNAL PENDING'));
-    if(m.images[0]){fig.appendChild(pic);pic.style.cursor='zoom-in';pic.addEventListener('click',()=>mxLightbox(m.images,img,m.title));}
+    if(m.images[0]){fig.appendChild(pic);pic.style.cursor='zoom-in';pic.addEventListener('click',()=>mxLightbox(m.images,0,m.title));}
     card.appendChild(fig);
     if(m.images.length>1){
       const th=el('div','mx-thumbs');
+      // Small boxes only for the extra photos: the first photo is already the
+      // main image (tap it to pop out), so a box repeating it was redundant.
+      // Each box pops its photo out; the main image stays put.
       m.images.forEach((u,i)=>{
-        const b=el('button','mx-thumb');b.type='button';b.setAttribute('aria-label','Photo '+(i+1));
+        if(i===0)return;
+        const b=el('button','mx-thumb');b.type='button';b.setAttribute('aria-label','View photo '+(i+1));
         b.style.backgroundImage='url("'+u+'")';
-        b.addEventListener('click',()=>{img=i;pic.src=u;sync();mxLightbox(m.images,i,m.title);});
+        b.addEventListener('click',()=>mxLightbox(m.images,i,m.title));
         th.appendChild(b);
       });
       card.appendChild(th);
@@ -3463,7 +3467,6 @@ const BEATLAB=[
         c.setAttribute('aria-checked',String(c.dataset.v===size));
       });
       regionChips.querySelectorAll('.mx-chip').forEach(c=>c.setAttribute('aria-checked',String(c.dataset.v===region)));
-      card.querySelectorAll('.mx-thumb').forEach((b,i)=>b.setAttribute('aria-current',String(i===img)));
       const n=size?leftFor(size):null;
       const allOut=m.fulfillment==='self'&&stock&&stock[m.id]&&m.variants.every(v=>leftFor(v.id)===0);
       left.textContent=allOut?'SOLD OUT // NO RESTOCK':(n!=null&&n<=10?n+' LEFT':(m.fulfillment==='pod'?'PRINTED TO ORDER':''));
