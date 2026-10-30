@@ -1123,6 +1123,14 @@ body{
 }
 
 /* ── SHOP: order / download panel (see the SHOP script block) ── */
+#mxLight{position:fixed;inset:0;z-index:8600;background:rgba(0,0,0,.95);display:flex;align-items:center;justify-content:center;cursor:zoom-out;padding:16px}
+#mxLight img{max-width:100%;max-height:100%;object-fit:contain;display:block;box-shadow:0 0 0 1px var(--dimmer)}
+#mxLight button{position:absolute;background:rgba(0,0,0,.6);border:1px solid var(--dimmer);color:var(--accent);font-family:var(--mono);cursor:pointer}
+#mxLight button:hover{border-color:var(--accent);color:var(--hot)}
+#mxLight .mxl-x{top:16px;right:16px;width:44px;height:44px;font-size:18px}
+#mxLight .mxl-nav{top:50%;transform:translateY(-50%);width:48px;height:72px;font-size:34px;line-height:1}
+#mxLight .mxl-prev{left:12px}#mxLight .mxl-next{right:12px}
+#mxLight .mxl-count{position:absolute;bottom:18px;left:0;right:0;text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:4px;color:var(--dim2)}
 #shopPanel{position:fixed;inset:0;z-index:8500;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:rgba(0,0,0,.88)}
 #shopPanel .sp-box{width:100%;max-width:560px;max-height:100%;overflow:auto;border:1px solid var(--accent);background:var(--bg);padding:28px 26px;display:flex;flex-direction:column;gap:16px;font-family:var(--mono);box-shadow:0 0 40px rgba(184,168,120,.12)}
 #shopPanel .sp-tag{font-size:10px;letter-spacing:5px;color:var(--dim2);text-transform:uppercase}
@@ -3135,7 +3143,41 @@ const BEATLAB=[
     document.removeEventListener('keydown',onKey);
     if(lastFocus&&lastFocus.focus)lastFocus.focus();
   }
-  function onKey(e){if(e.key==='Escape')close();}
+  function onKey(e){if(e.key==='Escape'&&!document.getElementById('mxLight'))close();}
+  // Photo pop-out: full-screen view of a product photo over the store panel.
+  // Tap/click anywhere or ✕ or Esc closes; arrows, arrow keys or a swipe step
+  // through that product's photos.
+  function mxLightbox(images,start,title){
+    const old=document.getElementById('mxLight');if(old)old.remove();
+    let i=start||0;
+    const box=el('div');box.id='mxLight';box.setAttribute('role','dialog');box.setAttribute('aria-label',title+' photos');
+    const im=el('img');im.alt=title;box.appendChild(im);
+    const x=el('button','mxl-x','✕');x.type='button';x.setAttribute('aria-label','Close');box.appendChild(x);
+    let prev,next,count;
+    if(images.length>1){
+      prev=el('button','mxl-nav mxl-prev','‹');prev.type='button';prev.setAttribute('aria-label','Previous photo');
+      next=el('button','mxl-nav mxl-next','›');next.type='button';next.setAttribute('aria-label','Next photo');
+      count=el('div','mxl-count');box.append(prev,next,count);
+    }
+    const show=()=>{im.src=images[i];if(count)count.textContent=(i+1)+' / '+images.length;};
+    const step=d=>{i=(i+d+images.length)%images.length;show();};
+    const shut=()=>{box.remove();document.removeEventListener('keydown',key,true);};
+    function key(e){
+      if(e.key==='Escape'){e.stopPropagation();shut();}
+      else if(e.key==='ArrowRight'&&images.length>1){e.stopPropagation();e.preventDefault();step(1);}
+      else if(e.key==='ArrowLeft'&&images.length>1){e.stopPropagation();e.preventDefault();step(-1);}
+    }
+    box.addEventListener('click',e=>{
+      if(e.target===prev){step(-1);return;}
+      if(e.target===next){step(1);return;}
+      shut();
+    });
+    let sx=null;
+    box.addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});
+    box.addEventListener('touchend',e=>{if(sx===null||images.length<2)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>40){e.preventDefault();step(dx<0?1:-1);}});
+    document.addEventListener('keydown',key,true);
+    show();document.body.appendChild(box);x.focus();
+  }
   function shell(wide){
     let p=document.getElementById('shopPanel');
     if(!p){
@@ -3374,14 +3416,14 @@ const BEATLAB=[
     const fig=el('div','mx-img');
     const pic=el('img');pic.alt=m.title;pic.loading='lazy';
     if(m.images[0])pic.src=m.images[0];else fig.appendChild(el('span','mx-noimg','NO IMAGE // SIGNAL PENDING'));
-    if(m.images[0])fig.appendChild(pic);
+    if(m.images[0]){fig.appendChild(pic);pic.style.cursor='zoom-in';pic.addEventListener('click',()=>mxLightbox(m.images,img,m.title));}
     card.appendChild(fig);
     if(m.images.length>1){
       const th=el('div','mx-thumbs');
       m.images.forEach((u,i)=>{
         const b=el('button','mx-thumb');b.type='button';b.setAttribute('aria-label','Photo '+(i+1));
         b.style.backgroundImage='url("'+u+'")';
-        b.addEventListener('click',()=>{img=i;pic.src=u;sync();});
+        b.addEventListener('click',()=>{img=i;pic.src=u;sync();mxLightbox(m.images,i,m.title);});
         th.appendChild(b);
       });
       card.appendChild(th);
