@@ -92,9 +92,9 @@
       "fulfillment": "self",
       "shipping": "apparel",
       "images": [
-        "merch-photos/selexiones-tee-flat.jpg",
-        "merch-photos/selexiones-tee-print.jpg",
-        "merch-photos/selexiones-tee-angle.jpg"
+        "merch-photos/selexiones-tee-main-bright.jpg",
+        "merch-photos/selexiones-tee-print-bright.jpg",
+        "merch-photos/selexiones-tee-flat-bright.jpg"
       ],
       "sizes": {
         "S": 25,
@@ -115,9 +115,9 @@
       "fulfillment": "self",
       "shipping": "apparel",
       "images": [
-        "merch-photos/selexiones-tee-flat.jpg",
-        "merch-photos/selexiones-tee-print.jpg",
-        "merch-photos/selexiones-tee-angle.jpg"
+        "merch-photos/selexiones-tee-main-bright.jpg",
+        "merch-photos/selexiones-tee-print-bright.jpg",
+        "merch-photos/selexiones-tee-flat-bright.jpg"
       ],
       "sizes": {
         "S": 25,
