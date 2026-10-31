@@ -1156,10 +1156,7 @@ body{
 #shopPanel .mx-img img{width:100%;height:100%;object-fit:contain;display:block}
 #shopPanel .mx-noimg{font-size:10px;letter-spacing:3px;color:var(--dim2)}
 #shopPanel .mx-thumbs{display:flex;gap:6px;flex-wrap:wrap}
-/* Thumbnails are the photo as the button's own background (no <img> nested in
-   a <button>, which some browsers drew as an empty box); dark base if a photo
-   is slow or fails, so it never shows as a blank light square. */
-#shopPanel .mx-thumb{width:44px;height:44px;padding:0;border:1px solid var(--dimmer);background-color:#0b0a09;background-size:cover;background-position:center;background-repeat:no-repeat;overflow:hidden;-webkit-appearance:none;appearance:none}
+#shopPanel .mx-thumb{width:56px;height:56px;padding:0;border:1px solid var(--dimmer);background:#0b0a09;object-fit:cover;display:block;cursor:zoom-in}
 #shopPanel .mx-thumb:hover,#shopPanel .mx-thumb:focus-visible{border-color:var(--accent);outline:none}
 #shopPanel .mx-title{margin:0;font-weight:400;font-size:15px;letter-spacing:3px;line-height:1.4;color:var(--hot);overflow-wrap:anywhere}
 #shopPanel .mx-desc{margin:0;font-size:11px;letter-spacing:1px;line-height:1.7;color:var(--dim2)}
@@ -3424,9 +3421,12 @@ const BEATLAB=[
       // Each box pops its photo out; the main image stays put.
       m.images.forEach((u,i)=>{
         if(i===0)return;
-        const b=el('button','mx-thumb');b.type='button';b.setAttribute('aria-label','View photo '+(i+1));
-        b.style.backgroundImage='url("'+u+'")';
+        // A plain tappable <img> (no <button> wrapper, no CSS background):
+        // the simplest thing every browser draws.
+        const b=el('img','mx-thumb');b.src=u;b.alt='View photo '+(i+1);
+        b.setAttribute('role','button');b.tabIndex=0;
         b.addEventListener('click',()=>mxLightbox(m.images,i,m.title));
+        b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();mxLightbox(m.images,i,m.title);}});
         th.appendChild(b);
       });
       card.appendChild(th);
