@@ -3508,8 +3508,7 @@ const BEATLAB=[
       left.textContent=allOut?'SOLD OUT // NO RESTOCK':(n!=null&&n<=10?n+' LEFT':(m.fulfillment==='pod'?'PRINTED TO ORDER':''));
       left.hidden=!left.textContent;
       if(m.soon){buy.textContent='COMING SOON';buy.disabled=true;}
-      else if(!SHOP&&payLink(m)){buy.textContent=size?'BUY':'PICK A SIZE';buy.disabled=false;}
-      else if(!SHOP){buy.textContent=size?'BUY':'PICK A SIZE';buy.disabled=false;}
+      else if(!SHOP){buy.textContent='BUY';buy.disabled=false;}
       else if(allOut||(size&&n===0)){buy.textContent='SOLD OUT';buy.disabled=true;}
       else{buy.textContent=size?'BUY '+money(m.price):'PICK A SIZE';buy.disabled=false;}
     }
