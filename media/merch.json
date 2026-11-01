@@ -46,6 +46,28 @@
   ],
   "products": [
     {
+      "id": "the-uniform-selexiones-tee",
+      "title": "THE UNIFORM — SELEXIONES: FIND THE SIGNAL TEE",
+      "category": "apparel",
+      "price": 30,
+      "description": "Black tee. The SELEXIONES tower, broadcasting. Pirate radio uniform. Available November 2nd. Order by email now to reserve yours.",
+      "fulfillment": "self",
+      "shipping": "apparel",
+      "images": [
+        "merch-photos/selexiones-tee-main-bright.jpg",
+        "merch-photos/selexiones-tee-print-bright.jpg"
+      ],
+      "sizes": {
+        "S": 25,
+        "M": 25,
+        "L": 25,
+        "XL": 25,
+        "XXL": 25,
+        "XXXL": 25
+      },
+      "customOrder": true
+    },
+    {
       "title": "THE UNIFORM — 3EAS CORTEX TEE",
       "category": "apparel",
       "price": 30,
@@ -84,28 +106,6 @@
         "XXXL": 25
       },
       "comingSoon": true
-    },
-    {
-      "id": "the-uniform-selexiones-tee",
-      "title": "THE UNIFORM — SELEXIONES: FIND THE SIGNAL TEE",
-      "category": "apparel",
-      "price": 30,
-      "description": "Black tee. The SELEXIONES tower, broadcasting. Pirate radio uniform. Available November 2nd. Order by email now to reserve yours.",
-      "fulfillment": "self",
-      "shipping": "apparel",
-      "images": [
-        "merch-photos/selexiones-tee-main-bright.jpg",
-        "merch-photos/selexiones-tee-print-bright.jpg"
-      ],
-      "sizes": {
-        "S": 25,
-        "M": 25,
-        "L": 25,
-        "XL": 25,
-        "XXL": 25,
-        "XXXL": 25
-      },
-      "customOrder": true
     }
   ]
 }
