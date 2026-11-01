@@ -3308,8 +3308,10 @@ const BEATLAB=[
     const grid=el('div','mx-grid');grid.id='merchGrid';box.appendChild(grid);
     items.forEach(m=>grid.appendChild(merchCard(m)));
     closeRow(box);
-    const first=box.querySelector('.mx-chip:not([disabled]),.mx-buy');
-    if(first)first.focus();
+    // Focus the box itself (not a size button, which would look pre-selected)
+    // without scrolling, so it opens at its top: photo + title first.
+    box.tabIndex=-1;box.style.outline='none';box.focus({preventScroll:true});
+    box.scrollTop=0;box.parentNode.scrollTop=0;
     if(SHOP&&!stock){
       try{
         const r=await shopFetch('/stock',{});
