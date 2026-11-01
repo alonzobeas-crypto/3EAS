@@ -50,7 +50,7 @@
       "title": "THE UNIFORM — SELEXIONES: FIND THE SIGNAL TEE",
       "category": "apparel",
       "price": 30,
-      "description": "Black tee. The SELEXIONES tower, broadcasting. Pirate radio uniform. Available November 2nd. Order by email now to reserve yours.",
+      "description": "Black tee. The SELEXIONES tower, broadcasting. Pirate radio uniform. Available November 2nd.",
       "fulfillment": "self",
       "shipping": "apparel",
       "images": [
@@ -66,7 +66,8 @@
         "XXXL": 25
       },
       "customOrder": true,
-      "paymentLinkTest": "https://buy.stripe.com/test_9B64gr9sMbS7cywd860RG00"
+      "paymentLinkTest": "https://buy.stripe.com/test_9B64gr9sMbS7cywd860RG00",
+      "paymentLink": "https://buy.stripe.com/9B64gr9sMbS7cywd860RG00"
     },
     {
       "title": "THE UNIFORM — 3EAS CORTEX TEE",
