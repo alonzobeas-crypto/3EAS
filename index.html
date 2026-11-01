@@ -3125,7 +3125,7 @@ const BEATLAB=[
       const card=btn.closest('.ac');
       const low=Math.min(...items.map(m=>m.price));
       card.querySelector('.ac-price').textContent=(items.length>1?'FROM ':'')+money(low);
-      card.querySelector('.ac-stat').textContent='— '+items.length+(items.length===1?' ITEM':' ITEMS')+' // '+(SHOP?'TRANSMITTING':'COMING SOON');
+      card.querySelector('.ac-stat').textContent='— '+items.length+(items.length===1?' ITEM':' ITEMS')+' // '+(SHOP?'TRANSMITTING':'OPEN');
       btn.hidden=false;
     });
   }
@@ -3140,6 +3140,21 @@ const BEATLAB=[
     if(lastFocus&&lastFocus.focus)lastFocus.focus();
   }
   function onKey(e){if(e.key==='Escape'&&!document.getElementById('mxLight'))close();}
+  // Email ordering: until the Stripe checkout backend (SHOP_PROD_URL) is live,
+  // ORDER opens the visitor's email app with the item, size, shipping region
+  // and price filled in; the owner replies with payment details. Once
+  // SHOP_PROD_URL is set, the same buttons switch to real checkout.
+  const ORDER_EMAIL='passwordpills@pm.me';
+  function mailTo(subject,body){location.href='mailto:'+ORDER_EMAIL+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);}
+  function mailOrder(m,size,region){
+    const v=m.variants.find(x=>x.id===size),label=v?v.label:size;
+    const ship=m.ship[region],title=m.title.replace(/^THE UNIFORM — /,'');
+    mailTo('ORDER: '+title+' — '+label,[
+      'ITEM: '+title,'SIZE: '+label,'SHIP TO: '+(region==='intl'?'INTERNATIONAL':'US'),
+      'PRICE: '+money(m.price)+' + '+money(ship)+' shipping = '+money(m.price+ship),'',
+      'Your name:','Shipping address:','','We will reply with payment details. Thank you.'].join('\n'));
+    flash('Your email app should open with the order filled in. Nothing opened? Email '+ORDER_EMAIL);
+  }
   // Photo pop-out: full-screen view of a product photo over the store panel.
   // Tap/click anywhere or ✕ or Esc closes; arrows, arrow keys or a swipe step
   // through that product's photos.
@@ -3329,7 +3344,15 @@ const BEATLAB=[
       e.preventDefault();
       if(busy)return;
       err.hidden=true;
-      if(!SHOP){err.textContent='Intake is not connected yet — use the email link below instead.';err.hidden=false;return;}
+      if(!SHOP){
+        // No shop backend yet: hand the request to the visitor's email app.
+        const f=[['NAME',nameIn],['EMAIL',emailIn],['SERVICE',serviceIn],['BUDGET',budgetIn],['TIMELINE',timelineIn],['LINKS',linksIn]]
+          .filter(([,i])=>i.value.trim()).map(([k,i])=>k+': '+i.value.trim());
+        if(!nameIn.value.trim()||!emailIn.value.trim()||!msgIn.value.trim()){err.textContent='Name, email and message are required.';err.hidden=false;return;}
+        mailTo('REQUEST: '+(serviceIn.value.trim()||'commission')+' — '+nameIn.value.trim(),f.join('\n')+'\n\n'+msgIn.value.trim());
+        form.replaceChildren(el('p','sp-note','▸ YOUR EMAIL APP SHOULD OPEN WITH THIS REQUEST. HIT SEND. NOTHING OPENED? EMAIL '+ORDER_EMAIL));
+        return;
+      }
       busy=true;submit.textContent='SENDING…';submit.disabled=true;
       try{
         const payload={
@@ -3446,6 +3469,7 @@ const BEATLAB=[
     const buy=el('button','mx-buy');buy.type='button';card.appendChild(buy);
     buy.addEventListener('click',()=>{
       if(!size){flash('Pick a size first.');return;}
+      if(!SHOP){mailOrder(m,size,region);return;}
       startCheckout({productId:m.id,variant:size,region},buy,sync);
     });
     // Items flagged customOrder in media/merch.json get a second button that
@@ -3470,7 +3494,7 @@ const BEATLAB=[
       const allOut=m.fulfillment==='self'&&stock&&stock[m.id]&&m.variants.every(v=>leftFor(v.id)===0);
       left.textContent=allOut?'SOLD OUT // NO RESTOCK':(n!=null&&n<=10?n+' LEFT':(m.fulfillment==='pod'?'PRINTED TO ORDER':''));
       left.hidden=!left.textContent;
-      if(!SHOP){buy.textContent='COMING SOON';buy.disabled=true;}
+      if(!SHOP){buy.textContent=size?'ORDER BY EMAIL — '+money(m.price):'PICK A SIZE';buy.disabled=false;}
       else if(allOut||(size&&n===0)){buy.textContent='SOLD OUT';buy.disabled=true;}
       else{buy.textContent=size?'BUY '+money(m.price):'PICK A SIZE';buy.disabled=false;}
     }
@@ -4638,13 +4662,13 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     '@2026-10-28',
     '<a href="https://www.simondixon.com" target="_blank" rel="noopener" style="color:#c32c27;text-decoration:underline">FOLLOW THE <b style="color:#3ec84a;font-weight:inherit">MONEY</b> - SIMON DIXON</a>',
     '@2026-10-30',
-    '<a href="/?shop=apparel" data-shop="apparel" class="glow-rg">NEW UNIFORM: SELEXIONES — FIND THE SIGNAL TEE. $30. DROPPING SOON. CUSTOM ORDERS OPEN →</a>',
     '@2026-10-31',
     "WHAT'S THE PERCENTAGE OF AMERICANS THAT HAVE 90 DAYS OF FOOD STORED??",
     "DON'T LET THEM KILL YOUR HOPE. WE ARE GOING TO BE OK.",
     "IT'S OK TO BE SCARED. REALLY, IT'S OK.",
     "IT'S THEIR APOCALYPSE, NOT OURS. SURVIVE IT...",
     'SOUNDS HERE WILL SURVIVE THE APOCALYPSE.',
+    '<a href="/?shop=apparel" data-shop="apparel" class="glow-rg">OUT NOW 10.31 — SELEXIONES: FIND THE SIGNAL TEE. $30. ORDER NOW →</a>',
     '@'
   ];
   // ── DATE MARKERS ── A '@YYYY-MM-DD' entry in TICKER_RAW dates every line
