@@ -3293,11 +3293,14 @@ const BEATLAB=[
 
   // ── Merch browser ──
   window.openMerch=async function(cats){
-    const want=String(cats||'').split(',');
-    const items=MERCH.filter(m=>want.includes(m.category));
+    const want=String(cats||'').toLowerCase().split(',');
+    let items=MERCH.filter(m=>want.includes(m.category));
+    // Single-item link: ?shop=selexiones matches a product id instead of a category.
+    const one=!items.length;
+    if(one)items=MERCH.filter(m=>want.some(w=>w&&(m.id===w||m.id.includes(w)))).slice(0,1);
     if(!items.length)return;
     const box=shell(true);
-    heading(box,'// 03 // OBTAIN ARTIFACTS',want.includes('apparel')?'THE UNIFORM':'ARTIFACTS');
+    heading(box,'// 03 // OBTAIN ARTIFACTS',one?items[0].title.replace(/^THE UNIFORM — /,''):want.includes('apparel')?'THE UNIFORM':'ARTIFACTS');
     const fl=el('p','sp-err');fl.id='merchFlash';fl.hidden=true;box.appendChild(fl);
     const grid=el('div','mx-grid');grid.id='merchGrid';box.appendChild(grid);
     items.forEach(m=>grid.appendChild(merchCard(m)));
@@ -4668,7 +4671,7 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     "IT'S OK TO BE SCARED. REALLY, IT'S OK.",
     "IT'S THEIR APOCALYPSE, NOT OURS. SURVIVE IT...",
     'SOUNDS HERE WILL SURVIVE THE APOCALYPSE.',
-    '<a href="/?shop=apparel" data-shop="apparel" class="glow-rg">OUT NOW 10.31 — SELEXIONES: FIND THE SIGNAL TEE. $30. ORDER NOW →</a>',
+    '<a href="/?shop=selexiones" data-shop="selexiones" class="glow-rg">OUT NOW 10.31 — SELEXIONES: FIND THE SIGNAL TEE. $30. ORDER NOW →</a>',
     '@'
   ];
   // ── DATE MARKERS ── A '@YYYY-MM-DD' entry in TICKER_RAW dates every line
