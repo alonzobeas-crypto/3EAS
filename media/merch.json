@@ -65,7 +65,8 @@
         "XXL": 25,
         "XXXL": 25
       },
-      "customOrder": true
+      "customOrder": true,
+      "paymentLinkTest": "https://buy.stripe.com/test_9B64gr9sMbS7cywd860RG00"
     },
     {
       "title": "THE UNIFORM — 3EAS CORTEX TEE",

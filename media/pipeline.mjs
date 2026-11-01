@@ -353,6 +353,10 @@ function buildMerch(catalog) {
     site.push({
       id, title: title.toUpperCase(), category: p.category, price, desc: String(p.description || ''),
       images: urls, fulfillment: p.fulfillment, custom: p.customOrder === true, soon,
+      // Stripe Payment Links (no shop backend needed). paymentLinkTest is used
+      // only on 3eascortex.com/?shop=...&stripetest=1, so the public never sees it.
+      pay: /^https:\/\/buy\.stripe\.com\//.test(p.paymentLink || '') ? p.paymentLink : null,
+      payTest: /^https:\/\/buy\.stripe\.com\/test_/.test(p.paymentLinkTest || '') ? p.paymentLinkTest : null,
       ship: shipping[p.shipping],
       variants: variants.map((v) => ({ id: v.id, label: v.label })),
       bundle: bundle ? bundle.title : null,
