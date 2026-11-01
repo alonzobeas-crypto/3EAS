@@ -1132,54 +1132,59 @@ body{
 #mxLight .mxl-prev{left:12px}#mxLight .mxl-next{right:12px}
 #mxLight .mxl-count{position:absolute;bottom:18px;left:0;right:0;text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:4px;color:var(--dim2)}
 #shopPanel{position:fixed;inset:0;z-index:8500;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:rgba(0,0,0,.88)}
-#shopPanel .sp-box{width:100%;max-width:560px;max-height:100%;overflow:auto;border:1px solid var(--accent);background:var(--bg);padding:28px 26px;display:flex;flex-direction:column;gap:16px;font-family:var(--mono);box-shadow:0 0 40px rgba(184,168,120,.12)}
-#shopPanel .sp-tag{font-size:10px;letter-spacing:5px;color:var(--dim2);text-transform:uppercase}
+#shopPanel .sp-box{width:100%;max-width:560px;max-height:100%;overflow:auto;border:1px solid var(--accent);background:var(--bg);padding:var(--spy) var(--spx);--spy:28px;--spx:26px;display:flex;flex-direction:column;gap:16px;font-family:var(--mono);box-shadow:0 0 40px rgba(184,168,120,.12)}
+#shopPanel .sp-head{position:sticky;top:calc(-1 * var(--spy));z-index:3;margin:calc(-1 * var(--spy)) calc(-1 * var(--spx)) 0;padding:12px 12px 12px var(--spx);display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(var(--bg) 78%,rgba(0,0,0,0))}
+#shopPanel .sp-x{flex-shrink:0;width:48px;height:48px;display:grid;place-items:center;background:none;border:1px solid var(--dim);color:var(--accent);font-family:var(--mono);font-size:22px;line-height:1;cursor:pointer;transition:transform .25s,border-color .2s,color .2s}
+#shopPanel .sp-x:hover,#shopPanel .sp-x:focus-visible{border-color:var(--hot);color:var(--hot);transform:rotate(90deg);outline:none}
+@media(max-width:520px){#shopPanel{padding:12px 10px}#shopPanel .sp-box{--spy:22px;--spx:16px}#shopPanel .mx-card{padding:14px}#shopPanel .sp-title{font-size:20px;letter-spacing:3px}#shopPanel .sp-tag{font-size:11px;letter-spacing:3px}}
+#shopPanel .sp-tag{font-size:12px;letter-spacing:4px;color:var(--dim2);text-transform:uppercase}
 #shopPanel .sp-title{font-size:26px;letter-spacing:4px;line-height:1.25;color:var(--hot);text-transform:uppercase;overflow-wrap:anywhere}
-#shopPanel .sp-note{font-size:11px;letter-spacing:1.5px;line-height:1.8;color:var(--dim2)}
-#shopPanel .sp-err{font-size:12px;letter-spacing:1.5px;line-height:1.8;color:#a8695a}
+#shopPanel .sp-note{font-size:13px;letter-spacing:1px;line-height:1.8;color:var(--dim2)}
+#shopPanel .sp-err{font-size:14px;letter-spacing:1.5px;line-height:1.8;color:#a8695a}
 #shopPanel .sp-files{display:flex;flex-direction:column;border-top:1px solid var(--dimmer)}
 #shopPanel .sp-file{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px solid var(--dimmer)}
 #shopPanel .sp-file b{display:block;font-weight:400;font-size:12px;letter-spacing:2px;color:var(--fg)}
-#shopPanel .sp-file small{display:block;margin-top:3px;font-size:10px;letter-spacing:1px;color:var(--dim2)}
-#shopPanel .sp-dl{flex-shrink:0;font-size:10px;letter-spacing:3px;color:var(--bg);background:var(--accent);padding:9px 14px;text-decoration:none;text-transform:uppercase}
+#shopPanel .sp-file small{display:block;margin-top:3px;font-size:12px;letter-spacing:1px;color:var(--dim2)}
+#shopPanel .sp-dl{flex-shrink:0;font-size:12px;letter-spacing:3px;color:var(--bg);background:var(--accent);padding:12px 16px;text-decoration:none;text-transform:uppercase}
 #shopPanel .sp-dl:hover,#shopPanel .sp-dl:focus-visible{background:var(--hot);outline:none}
 #shopPanel .sp-link{display:flex;gap:8px;align-items:stretch}
-#shopPanel .sp-link input{flex:1;min-width:0;background:transparent;border:1px solid var(--dimmer);color:var(--fg);font-family:var(--mono);font-size:10px;letter-spacing:1px;padding:8px}
-#shopPanel .sp-btn{background:none;border:1px solid var(--dim);color:var(--fg);font-family:var(--mono);font-size:10px;letter-spacing:3px;padding:8px 12px;text-transform:uppercase}
+#shopPanel .sp-link input{flex:1;min-width:0;background:transparent;border:1px solid var(--dimmer);color:var(--fg);font-family:var(--mono);font-size:13px;letter-spacing:1px;padding:8px}
+#shopPanel .sp-btn{background:none;border:1px solid var(--dim);color:var(--fg);font-family:var(--mono);font-size:13px;letter-spacing:3px;padding:12px 18px;min-height:44px;cursor:pointer;text-transform:uppercase}
 #shopPanel .sp-btn:hover,#shopPanel .sp-btn:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
 #shopPanel .sp-actions{display:flex;justify-content:flex-end}
 #pbuy[disabled]{opacity:.45}
 #shopPanel .sp-box.sp-wide{max-width:980px}
+#shopPanel .sp-box:not(.sp-wide) .mx-grid{grid-template-columns:1fr}
 #shopPanel .mx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 #shopPanel .mx-card{background:var(--bg);border:1px solid var(--dimmer);padding:16px;display:flex;flex-direction:column;gap:10px}
 #shopPanel .mx-img{aspect-ratio:1/1;max-width:100%;background:#0b0a09;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--dimmer)}
 #shopPanel .mx-img img{width:100%;height:100%;object-fit:contain;display:block}
-#shopPanel .mx-noimg{font-size:10px;letter-spacing:3px;color:var(--dim2)}
+#shopPanel .mx-noimg{font-size:12px;letter-spacing:3px;color:var(--dim2)}
 #shopPanel .mx-thumbs{display:flex;gap:6px;flex-wrap:wrap}
 #shopPanel .mx-thumb{width:56px;height:56px;padding:0;border:1px solid var(--dimmer);background:#0b0a09;object-fit:cover;display:block;cursor:zoom-in}
 #shopPanel .mx-thumb:hover,#shopPanel .mx-thumb:focus-visible{border-color:var(--accent);outline:none}
-#shopPanel .mx-title{margin:0;font-weight:400;font-size:15px;letter-spacing:3px;line-height:1.4;color:var(--hot);overflow-wrap:anywhere}
-#shopPanel .mx-desc{margin:0;font-size:11px;letter-spacing:1px;line-height:1.7;color:var(--dim2)}
-#shopPanel .mx-bundle{margin:0;font-size:10px;letter-spacing:2px;color:var(--accent)}
+#shopPanel .mx-title{margin:0;font-weight:400;font-size:18px;letter-spacing:3px;line-height:1.4;color:var(--hot);overflow-wrap:anywhere}
+#shopPanel .mx-desc{margin:0;font-size:14px;letter-spacing:.5px;line-height:1.65;color:var(--dim2)}
+#shopPanel .mx-bundle{margin:0;font-size:12px;letter-spacing:2px;color:var(--accent)}
 #shopPanel .mx-price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-#shopPanel .mx-price span{font-family:var(--vt);font-size:26px;letter-spacing:2px;color:var(--accent)}
-#shopPanel .mx-price small{font-size:10px;letter-spacing:1px;color:var(--dim2)}
+#shopPanel .mx-price span{font-family:var(--vt);font-size:36px;letter-spacing:2px;color:var(--accent)}
+#shopPanel .mx-price small{font-size:13px;letter-spacing:1px;color:var(--dim2)}
 #shopPanel .mx-opt{display:flex;flex-direction:column;gap:6px}
-#shopPanel .mx-lbl{font-size:9px;letter-spacing:4px;color:var(--dim2)}
-#shopPanel .mx-chips{display:flex;gap:6px;flex-wrap:wrap}
-#shopPanel .mx-chip{background:none;border:1px solid var(--dim);color:var(--fg);font-family:var(--mono);font-size:10px;letter-spacing:2px;padding:7px 10px;min-width:40px}
-#shopPanel .mx-chip[aria-checked="true"]{border:2px solid var(--accent);color:var(--accent);background:none;font-weight:700;padding:6px 9px}
+#shopPanel .mx-lbl{font-size:12px;letter-spacing:4px;color:var(--dim2)}
+#shopPanel .mx-chips{display:flex;gap:8px;flex-wrap:wrap}
+#shopPanel .mx-chip{background:none;border:1px solid var(--dim);color:var(--fg);font-family:var(--mono);font-size:14px;letter-spacing:2px;padding:11px 12px;min-width:52px;min-height:44px;cursor:pointer}
+#shopPanel .mx-chip[aria-checked="true"]{border:2px solid var(--accent);color:var(--accent);background:none;font-weight:700;padding:10px 11px}
 #shopPanel .mx-chip:hover:not([disabled]),#shopPanel .mx-chip:focus-visible{border-color:var(--accent);outline:none}
 #shopPanel .sp-form{display:flex;flex-direction:column;gap:14px}
 #shopPanel .sp-field{display:flex;flex-direction:column;gap:6px}
-#shopPanel .sp-field input,#shopPanel .sp-field textarea{background:transparent;border:1px solid var(--dimmer);color:var(--fg);font-family:var(--mono);font-size:12px;letter-spacing:1px;padding:10px}
+#shopPanel .sp-field input,#shopPanel .sp-field textarea{background:transparent;border:1px solid var(--dimmer);color:var(--fg);font-family:var(--mono);font-size:16px;letter-spacing:.5px;padding:12px}
 #shopPanel .sp-field textarea{min-height:90px;resize:vertical}
 #shopPanel .sp-field input:focus,#shopPanel .sp-field textarea:focus{border-color:var(--accent);outline:none}
 #shopPanel .mx-chip[disabled]{opacity:.35;text-decoration:line-through}
-#shopPanel .mx-left{margin:0;font-size:10px;letter-spacing:3px;color:#a8695a}
-#shopPanel .mx-custom{margin-top:8px;background:none;border:1px solid var(--dimmer);color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:3px;padding:10px;text-transform:uppercase;cursor:pointer}
+#shopPanel .mx-left{margin:0;font-size:12px;letter-spacing:3px;color:#a8695a}
+#shopPanel .mx-custom{margin-top:8px;background:none;border:1px solid var(--dimmer);color:var(--accent);font-family:var(--mono);font-size:12px;letter-spacing:3px;padding:14px 10px;min-height:44px;text-transform:uppercase;cursor:pointer}
 #shopPanel .mx-custom:hover{border-color:var(--accent)}
-#shopPanel .mx-buy{margin-top:auto;background:none;color:var(--accent);border:2px solid var(--accent);font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:5px;padding:12px;text-transform:uppercase;cursor:pointer}
+#shopPanel .mx-buy{margin-top:auto;background:none;color:var(--accent);border:2px solid var(--accent);font-family:var(--mono);font-size:16px;font-weight:700;letter-spacing:6px;padding:16px 12px;text-transform:uppercase;cursor:pointer}
 #shopPanel .mx-buy:hover:not([disabled]),#shopPanel .mx-buy:focus-visible{border-color:var(--hot);color:var(--hot);outline:none}
 #shopPanel .mx-buy[disabled]{background:none;border:1px solid var(--dimmer);color:var(--dim2)}
 </style>
@@ -3208,7 +3213,10 @@ const BEATLAB=[
     return box;
   }
   function heading(box,tag,title){
-    box.appendChild(el('span','sp-tag',tag));
+    // Pinned header: tag + a big ✕ that stays reachable while the box scrolls.
+    const head=el('div','sp-head');head.appendChild(el('span','sp-tag',tag));
+    const x=el('button','sp-x','✕');x.type='button';x.setAttribute('aria-label','Close');x.addEventListener('click',close);
+    head.appendChild(x);box.appendChild(head);
     const t=el('div','sp-title',title);t.id='shopPanelTitle';box.appendChild(t);
   }
   function closeRow(box){
@@ -3302,7 +3310,7 @@ const BEATLAB=[
     const one=!items.length;
     if(one)items=MERCH.filter(m=>want.some(w=>w&&(m.id===w||m.id.includes(w)))).slice(0,1);
     if(!items.length)return;
-    const box=shell(true);
+    const box=shell(items.length>1);
     heading(box,'// 03 // OBTAIN ARTIFACTS',one?items[0].title.replace(/^THE UNIFORM — /,''):want.includes('apparel')?'THE UNIFORM':'ARTIFACTS');
     const fl=el('p','sp-err');fl.id='merchFlash';fl.hidden=true;box.appendChild(fl);
     const grid=el('div','mx-grid');grid.id='merchGrid';box.appendChild(grid);
