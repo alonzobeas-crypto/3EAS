@@ -296,7 +296,8 @@ function buildMerch(catalog) {
   const txIds = new Set(catalog.transmissions.map((t) => t.id));
   const seen = new Set();
   const items = [];
-  (m.products || []).forEach((p, i) => {
+  // "hidden": true parks a product: kept in merch.json, left off the site and shop.
+  (m.products || []).filter((p) => !(p && p.hidden === true)).forEach((p, i) => {
     const where = `product ${i + 1}${p && p.title ? ` (${p.title})` : ''}`;
     const title = String((p && p.title) || '').replace(/[<>]/g, '').trim();
     if (!title) { errors.push(`${where}: needs a "title"`); return; }

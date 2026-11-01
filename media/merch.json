@@ -62,7 +62,8 @@
         "XL": 25,
         "XXL": 25,
         "XXXL": 25
-      }
+      },
+      "hidden": true
     },
     {
       "title": "THE UNIFORM — 3EAS CIPHER TEE",
@@ -81,7 +82,8 @@
         "XL": 25,
         "XXL": 25,
         "XXXL": 25
-      }
+      },
+      "hidden": true
     },
     {
       "id": "the-uniform-selexiones-tee",
