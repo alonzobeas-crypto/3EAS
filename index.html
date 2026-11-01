@@ -3064,9 +3064,9 @@ loadDispatch();
    download links for anything digital. */
 const MERCH=[
   /* ▼ MEDIA PIPELINE: merch (generated from media/merch.json, do not hand-edit) ▼ */
-  {"id":"the-uniform-3eas-cortex-tee","title":"THE UNIFORM — 3EAS CORTEX TEE","category":"apparel","price":3000,"desc":"Distressed block wordmark. Artwork preview, photos of the printed shirt coming soon.","images":["media/merch-photos/web/the-uniform-3eas-cortex-tee-84db0cf0.jpg"],"fulfillment":"self","custom":false,"ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
-  {"id":"the-uniform-3eas-cipher-tee","title":"THE UNIFORM — 3EAS CIPHER TEE","category":"apparel","price":3000,"desc":"3EAS encoded in signal bars, four times over. Artwork preview, photos of the printed shirt coming soon.","images":["media/merch-photos/web/the-uniform-3eas-cipher-tee-19689d14.jpg"],"fulfillment":"self","custom":false,"ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
-  {"id":"the-uniform-selexiones-tee","title":"THE UNIFORM — SELEXIONES: FIND THE SIGNAL TEE","category":"apparel","price":3000,"desc":"Black tee. The SELEXIONES tower, broadcasting. Pirate radio uniform. Available November 2nd. Order by email now to reserve yours.","images":["media/merch-photos/web/the-uniform-selexiones-tee-5ee3fb1a.jpg","media/merch-photos/web/the-uniform-selexiones-tee-3ead9ba1.jpg"],"fulfillment":"self","custom":true,"ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
+  {"id":"the-uniform-3eas-cortex-tee","title":"THE UNIFORM — 3EAS CORTEX TEE","category":"apparel","price":3000,"desc":"Distressed block wordmark. Artwork preview, photos of the printed shirt coming soon.","images":["media/merch-photos/web/the-uniform-3eas-cortex-tee-84db0cf0.jpg"],"fulfillment":"self","custom":false,"soon":true,"ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
+  {"id":"the-uniform-3eas-cipher-tee","title":"THE UNIFORM — 3EAS CIPHER TEE","category":"apparel","price":3000,"desc":"3EAS encoded in signal bars, four times over. Artwork preview, photos of the printed shirt coming soon.","images":["media/merch-photos/web/the-uniform-3eas-cipher-tee-19689d14.jpg"],"fulfillment":"self","custom":false,"soon":true,"ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
+  {"id":"the-uniform-selexiones-tee","title":"THE UNIFORM — SELEXIONES: FIND THE SIGNAL TEE","category":"apparel","price":3000,"desc":"Black tee. The SELEXIONES tower, broadcasting. Pirate radio uniform. Available November 2nd. Order by email now to reserve yours.","images":["media/merch-photos/web/the-uniform-selexiones-tee-5ee3fb1a.jpg","media/merch-photos/web/the-uniform-selexiones-tee-3ead9ba1.jpg"],"fulfillment":"self","custom":true,"soon":false,"ship":{"us":600,"intl":1800},"variants":[{"id":"s","label":"S"},{"id":"m","label":"M"},{"id":"l","label":"L"},{"id":"xl","label":"XL"},{"id":"xxl","label":"XXL"},{"id":"xxxl","label":"XXXL"}],"bundle":null},
   /* ▲ MEDIA PIPELINE: merch ▲ */
 ];
 const BEATLAB=[
@@ -3471,6 +3471,7 @@ const BEATLAB=[
     const left=el('p','mx-left');card.appendChild(left);
     const buy=el('button','mx-buy');buy.type='button';card.appendChild(buy);
     buy.addEventListener('click',()=>{
+      if(m.soon)return;
       if(!size){flash('Pick a size first.');return;}
       if(!SHOP){mailOrder(m,size,region);return;}
       startCheckout({productId:m.id,variant:size,region},buy,sync);
@@ -3497,7 +3498,8 @@ const BEATLAB=[
       const allOut=m.fulfillment==='self'&&stock&&stock[m.id]&&m.variants.every(v=>leftFor(v.id)===0);
       left.textContent=allOut?'SOLD OUT // NO RESTOCK':(n!=null&&n<=10?n+' LEFT':(m.fulfillment==='pod'?'PRINTED TO ORDER':''));
       left.hidden=!left.textContent;
-      if(!SHOP){buy.textContent=size?'ORDER BY EMAIL — '+money(m.price):'PICK A SIZE';buy.disabled=false;}
+      if(m.soon){buy.textContent='COMING SOON';buy.disabled=true;}
+      else if(!SHOP){buy.textContent=size?'ORDER BY EMAIL — '+money(m.price):'PICK A SIZE';buy.disabled=false;}
       else if(allOut||(size&&n===0)){buy.textContent='SOLD OUT';buy.disabled=true;}
       else{buy.textContent=size?'BUY '+money(m.price):'PICK A SIZE';buy.disabled=false;}
     }

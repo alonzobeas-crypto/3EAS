@@ -339,8 +339,10 @@ function buildMerch(catalog) {
   for (const { p, id, title, price, variants, images } of items) {
     const urls = images.map((img) => merchImage(catalog, id, path.join(MEDIA, img)));
     const available = p.available !== false;
+    // "comingSoon": true lists it on the site with a COMING SOON button; the shop won't sell it yet.
+    const soon = p.comingSoon === true;
     vault.push({
-      id, kind: 'physical', title: title.toUpperCase(), category: p.category, price, available,
+      id, kind: 'physical', title: title.toUpperCase(), category: p.category, price, available: available && !soon,
       fulfillment: p.fulfillment, shipping: p.shipping, bundle: p.bundle || null, image: urls[0] || null,
       variants: variants.map((v) => (p.fulfillment === 'self'
         ? { id: v.id, label: v.label, stock: v.n }
@@ -350,7 +352,7 @@ function buildMerch(catalog) {
     const bundle = p.bundle ? catalog.transmissions.find((t) => t.id === p.bundle) : null;
     site.push({
       id, title: title.toUpperCase(), category: p.category, price, desc: String(p.description || ''),
-      images: urls, fulfillment: p.fulfillment, custom: p.customOrder === true,
+      images: urls, fulfillment: p.fulfillment, custom: p.customOrder === true, soon,
       ship: shipping[p.shipping],
       variants: variants.map((v) => ({ id: v.id, label: v.label })),
       bundle: bundle ? bundle.title : null,
