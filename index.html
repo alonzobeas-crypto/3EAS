@@ -1200,6 +1200,9 @@ body{
 #shopPanel .mx-thumbs{display:flex;gap:6px;flex-wrap:wrap}
 #shopPanel .mx-thumb{width:56px;height:56px;padding:0;border:1px solid var(--dimmer);background:#0b0a09;object-fit:cover;display:block;cursor:zoom-in}
 #shopPanel .mx-thumb:hover,#shopPanel .mx-thumb:focus-visible{border-color:var(--accent);outline:none}
+#shopPanel .mx-thumb.on{border:2px solid var(--accent)}
+#shopPanel .mx-thumbs{gap:8px}
+#shopPanel .mx-thumb{width:72px;height:72px}
 #shopPanel .mx-title{margin:0;font-weight:400;font-size:18px;letter-spacing:3px;line-height:1.4;color:var(--hot);overflow-wrap:anywhere}
 #shopPanel .mx-desc{margin:0;font-size:14px;letter-spacing:.5px;line-height:1.65;color:var(--dim2)}
 #shopPanel .mx-bundle{margin:0;font-size:12px;letter-spacing:2px;color:var(--accent)}
@@ -3495,22 +3498,23 @@ const BEATLAB=[
     const fig=el('div','mx-img');
     const pic=el('img');pic.alt=m.title;pic.loading='lazy';
     if(m.images[0])pic.src=m.images[0];else fig.appendChild(el('span','mx-noimg','NO IMAGE // SIGNAL PENDING'));
-    if(m.images[0]){fig.appendChild(pic);pic.style.cursor='zoom-in';pic.addEventListener('click',()=>mxLightbox(m.images,0,m.title));}
+    let cur=0;
+    if(m.images[0]){fig.appendChild(pic);pic.style.cursor='zoom-in';pic.addEventListener('click',()=>mxLightbox(m.images,cur,m.title));}
     card.appendChild(fig);
     if(m.images.length>1){
       const th=el('div','mx-thumbs');
-      // Small boxes only for the extra photos: the first photo is already the
-      // main image (tap it to pop out), so a box repeating it was redundant.
-      // Each box pops its photo out; the main image stays put.
+      // One small box per photo (all of them, so it's obvious how many there
+      // are). Tapping a box swaps the big photo; tapping the big photo pops
+      // the current one out full screen. Plain tappable <img>s: the simplest
+      // thing every browser draws.
+      const boxes=[];
+      const show=i=>{cur=i;pic.src=m.images[i];boxes.forEach((x,k)=>x.classList.toggle('on',k===i));};
       m.images.forEach((u,i)=>{
-        if(i===0)return;
-        // A plain tappable <img> (no <button> wrapper, no CSS background):
-        // the simplest thing every browser draws.
-        const b=el('img','mx-thumb');b.src=u;b.alt='View photo '+(i+1);
+        const b=el('img','mx-thumb'+(i===0?' on':''));b.src=u;b.alt='Show photo '+(i+1);
         b.setAttribute('role','button');b.tabIndex=0;
-        b.addEventListener('click',()=>mxLightbox(m.images,i,m.title));
-        b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();mxLightbox(m.images,i,m.title);}});
-        th.appendChild(b);
+        b.addEventListener('click',()=>show(i));
+        b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show(i);}});
+        boxes.push(b);th.appendChild(b);
       });
       card.appendChild(th);
     }
