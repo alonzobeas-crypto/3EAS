@@ -287,7 +287,13 @@ body{
    the same inset on phones, so the two stay stacked. Browser view unchanged. */
 @media (display-mode:standalone){#ticker{box-sizing:border-box;height:calc(38px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom)}}
 .ti{display:flex;animation:tick var(--tdur,80s) linear infinite;white-space:nowrap;animation-play-state:running;will-change:transform;transform:translateZ(0);backface-visibility:hidden}
+.ti{align-items:center}
 .ti span{font-family:var(--mono);font-size:17px;letter-spacing:3px;color:var(--fg);padding-right:56px}
+/* Lock every ticker item to one fixed line so glitch glyphs from fallback fonts
+   (Cyrillic/Greek homoglyphs, symbols) can never push a word up or down. */
+.ti>span{line-height:26px;height:26px;overflow:visible}
+.ti>span *{line-height:inherit;vertical-align:baseline}
+.ti>span .tk-perma{height:26px;line-height:26px;vertical-align:top;overflow:visible}
 .ti .sep{color:var(--accent)}
 @keyframes tick{from{transform:translateX(0) translateZ(0)}to{transform:translateX(-100%) translateZ(0)}}
 @keyframes flashRG{0%,100%{color:#c32c27}50%{color:#3ec84a}}
@@ -336,13 +342,13 @@ body{
 /* LINAJE names on the ticker: pigment ink + constant glitch (tk-perma), with a
    thinner, translucent colour split so the pigment itself stays readable. */
 .ti .tk-perma.tk-lin{font-weight:700;text-shadow:1px 0 rgba(0,255,255,.35),-1px 0 rgba(255,0,80,.3);animation:tkLinJit .9s steps(1,end) infinite}
-@keyframes tkLinJit{0%{transform:translateX(0)}12%{transform:translateX(-2px) skewX(6deg);text-shadow:-2px 0 rgba(0,255,255,.4),2px 0 rgba(255,0,80,.3)}24%{transform:translateX(1px)}46%{transform:translateX(0);text-shadow:1px 0 rgba(0,255,255,.35),-1px 0 rgba(255,0,80,.3)}58%{transform:translateX(2px) skewX(-4deg);opacity:.8}64%{transform:translateX(0);opacity:1}82%{transform:translateY(-1px) translateX(-1px);text-shadow:-1px 0 rgba(0,255,255,.4),1px 1px rgba(255,0,80,.3)}}
+@keyframes tkLinJit{0%{transform:translateX(0)}12%{transform:translateX(-2px);text-shadow:-2px 0 rgba(0,255,255,.4),2px 0 rgba(255,0,80,.3)}24%{transform:translateX(1px)}46%{transform:translateX(0);text-shadow:1px 0 rgba(0,255,255,.35),-1px 0 rgba(255,0,80,.3)}58%{transform:translateX(2px);opacity:.8}64%{transform:translateX(0);opacity:1}82%{transform:translateX(-1px);text-shadow:-1px 0 rgba(0,255,255,.4),1px 1px rgba(255,0,80,.3)}}
 @media (prefers-reduced-motion:reduce){.ti .tk-perma.tk-lin{animation:none}}
 /* Constant-glitch ticker line: wrap the text in <em class="tk-perma" data-t="same text">.
    The letters re-scramble non-stop (see tkPerma in the ticker script) and the
    colour split + jitter never stops, unlike the random 2s glitch on other lines. */
 .ti .tk-perma{font-style:normal;display:inline-block;animation:tkPermaJit .9s steps(1,end) infinite;text-shadow:2px 0 var(--accent),-2px 0 #0ff}
-@keyframes tkPermaJit{0%{transform:translateX(0)}12%{transform:translateX(-2px) skewX(6deg);text-shadow:-3px 0 var(--accent),3px 0 #0ff}24%{transform:translateX(1px)}46%{transform:translateX(0);text-shadow:2px 0 var(--accent),-2px 0 #0ff}58%{transform:translateX(3px) skewX(-4deg);opacity:.75}64%{transform:translateX(0);opacity:1}82%{transform:translateY(-1px) translateX(-1px);text-shadow:-2px 0 #0ff,2px 1px var(--accent)}}
+@keyframes tkPermaJit{0%{transform:translateX(0)}12%{transform:translateX(-2px);text-shadow:-3px 0 var(--accent),3px 0 #0ff}24%{transform:translateX(1px)}46%{transform:translateX(0);text-shadow:2px 0 var(--accent),-2px 0 #0ff}58%{transform:translateX(3px);opacity:.75}64%{transform:translateX(0);opacity:1}82%{transform:translateX(-1px);text-shadow:-2px 0 #0ff,2px 1px var(--accent)}}
 @media (prefers-reduced-motion:reduce){.ti .tk-perma{animation:none}}
 
 /* ══════════════════════════════
