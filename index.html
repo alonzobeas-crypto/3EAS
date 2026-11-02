@@ -309,6 +309,35 @@ body{
 .ti .tk-flash{font-style:normal;animation:tkFlash 1s steps(1,end) infinite}
 @keyframes tkFlash{0%{opacity:1}50%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.ti .tk-dyor,.ti .tk-flash{animation:none}}
+:root {
+  /* LINAJE pigments: true hex / readable ink on dark */
+  --pg-red-ochre:        #9C4A2A; --ink-red-ochre:        #D9774F;
+  --pg-sacred-yellow:    #E2B23A; --ink-sacred-yellow:    #E2B23A;
+  --pg-shell-white:      #F3EFE6; --ink-shell-white:      #F3EFE6;
+  --pg-wampum-purple:    #5B3A6B; --ink-wampum-purple:    #A784C2;
+  --pg-dine-turquoise:   #3FB1A6; --ink-dine-turquoise:   #3FB1A6;
+  --pg-blue-corn:        #3D4677; --ink-blue-corn:        #8592D6;
+  --pg-xiuhuitl:         #2BB3A8; --ink-xiuhuitl:         #2BB3A8;
+  --pg-cempasuchil:      #F2A007; --ink-cempasuchil:      #F2A007;
+  --pg-maya-blue:        #3A8FB7; --ink-maya-blue:        #5FB0D8;
+  --pg-jade:             #2E8B57; --ink-jade:             #4FBF83;
+  --pg-grana:            #9E1B32; --ink-grana:            #E0485F;
+  --pg-anil:             #24305E; --ink-anil:             #7584CC;
+  --pg-obsidian:         #16161A; --ink-obsidian:         #A9A9B4;
+  --pg-urucum:           #C93A1F; --ink-urucum:           #EE6040;
+  --pg-huito:            #1C2233; --ink-huito:            #8E9AB8;
+  --pg-caona-gold:       #C9962B; --ink-caona-gold:       #E3B44E;
+  --pg-andean-crimson:   #B0243A; --ink-andean-crimson:   #E34A60;
+  --pg-qolle-yellow:     #E3B32E; --ink-qolle-yellow:     #E3B32E;
+  --pg-andean-magenta:   #C93C77; --ink-andean-magenta:   #E8689B;
+  --pg-chillca-green:    #6E8A3A; --ink-chillca-green:    #A3C062;
+  --pg-mapuche-blue:     #1F3A7A; --ink-mapuche-blue:     #6A8BDB;
+}
+/* LINAJE names on the ticker: pigment ink + constant glitch (tk-perma), with a
+   thinner, translucent colour split so the pigment itself stays readable. */
+.ti .tk-perma.tk-lin{font-weight:700;text-shadow:1px 0 rgba(0,255,255,.35),-1px 0 rgba(255,0,80,.3);animation:tkLinJit .9s steps(1,end) infinite}
+@keyframes tkLinJit{0%{transform:translateX(0)}12%{transform:translateX(-2px) skewX(6deg);text-shadow:-2px 0 rgba(0,255,255,.4),2px 0 rgba(255,0,80,.3)}24%{transform:translateX(1px)}46%{transform:translateX(0);text-shadow:1px 0 rgba(0,255,255,.35),-1px 0 rgba(255,0,80,.3)}58%{transform:translateX(2px) skewX(-4deg);opacity:.8}64%{transform:translateX(0);opacity:1}82%{transform:translateY(-1px) translateX(-1px);text-shadow:-1px 0 rgba(0,255,255,.4),1px 1px rgba(255,0,80,.3)}}
+@media (prefers-reduced-motion:reduce){.ti .tk-perma.tk-lin{animation:none}}
 /* Constant-glitch ticker line: wrap the text in <em class="tk-perma" data-t="same text">.
    The letters re-scramble non-stop (see tkPerma in the ticker script) and the
    colour split + jitter never stops, unlike the random 2s glitch on other lines. */
@@ -4298,57 +4327,60 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
   // ── LINAJE // RESISTENCIA ── Indigenous leaders of the Americas.
   // Each entry runs on the ticker as one linked line:
   // NAME // NATION // YEAR // LINE  (see ...LINAJE_TICKER inside TICKER_RAW).
+  // ink: one of the LINAJE pigments (--ink-* in CSS); the name glitches non-stop in that colour.
   // ind/col: where well documented, the name in their own language and the
   // colonized / baptismal / settler name, shown as "IND / COL".
   const LINAJE = [
     // NORTH AMERICA
-    { name: "TECUMSEH",         nation: "SHAWNEE",          yr: "1813", line: "PAN-TRIBAL CONFEDERACY",            url: "https://en.wikipedia.org/wiki/Tecumseh" },
-    { ind: "TȞATȞÁŊKA ÍYOTAKE", col: "SITTING BULL", name: "SITTING BULL",     nation: "HUNKPAPA LAKOTA",  yr: "1876", line: "LITTLE BIGHORN",                    url: "https://en.wikipedia.org/wiki/Sitting_Bull" },
-    { ind: "TȞAŠÚŊKE WITKÓ", col: "CRAZY HORSE", name: "CRAZY HORSE",      nation: "OGLALA LAKOTA",    yr: "1876", line: "NEVER PHOTOGRAPHED / NEVER SIGNED", url: "https://en.wikipedia.org/wiki/Crazy_Horse" },
-    { ind: "MAȞPÍYA LÚTA", col: "RED CLOUD", name: "RED CLOUD",        nation: "OGLALA LAKOTA",    yr: "1868", line: "WON A WAR VS THE U.S.",             url: "https://en.wikipedia.org/wiki/Red_Cloud" },
-    { ind: "GOYAAŁÉ", col: "GERONIMO", name: "GERONIMO",         nation: "CHIRICAHUA APACHE",yr: "1886", line: "BORDERLESS GUERRILLA",              url: "https://en.wikipedia.org/wiki/Geronimo" },
-    { name: "COCHISE",          nation: "CHOKONEN APACHE",  yr: "1872", line: "DRAGOON MOUNTAINS",                 url: "https://en.wikipedia.org/wiki/Cochise" },
-    { ind: "BIDU-YA", col: "VICTORIO", name: "VICTORIO",         nation: "CHIHENNE APACHE",  yr: "1880", line: "BOTH SIDES OF THE LINE",            url: "https://en.wikipedia.org/wiki/Victorio" },
-    { name: "LOZEN",            nation: "CHIHENNE APACHE",  yr: "1880", line: "WARRIOR / PROPHET",                 url: "https://en.wikipedia.org/wiki/Lozen" },
-    { ind: "HINMATÓOWYALAHTQ̓IT", col: "CHIEF JOSEPH", name: "CHIEF JOSEPH",     nation: "NEZ PERCE",        yr: "1877", line: "1,170-MILE FIGHTING RETREAT",       url: "https://en.wikipedia.org/wiki/Chief_Joseph" },
-    { ind: "PO'PAY", col: "POPÉ", name: "POPÉ",             nation: "OHKAY OWINGEH",    yr: "1680", line: "PUEBLO REVOLT",                     url: "https://en.wikipedia.org/wiki/Pop%C3%A9" },
-    { ind: "TOYPURINA", col: "BAPTIZED REGINA JOSEFA", name: "TOYPURINA",        nation: "TONGVA",           yr: "1785", line: "SAN GABRIEL MISSION REVOLT / L.A.", url: "https://en.wikipedia.org/wiki/Toypurina" },
-    { ind: "OBWANDIYAG", col: "PONTIAC", name: "PONTIAC",          nation: "ODAWA",            yr: "1763", line: "SIEGE OF FORT DETROIT",             url: "https://en.wikipedia.org/wiki/Pontiac_(Odawa_leader)" },
+    { name: "TECUMSEH", ink: "wampum-purple",         nation: "SHAWNEE",          yr: "1813", line: "PAN-TRIBAL CONFEDERACY",            url: "https://en.wikipedia.org/wiki/Tecumseh" },
+    { ind: "TȞATȞÁŊKA ÍYOTAKE", col: "SITTING BULL", name: "SITTING BULL", ink: "red-ochre",     nation: "HUNKPAPA LAKOTA",  yr: "1876", line: "LITTLE BIGHORN",                    url: "https://en.wikipedia.org/wiki/Sitting_Bull" },
+    { ind: "TȞAŠÚŊKE WITKÓ", col: "CRAZY HORSE", name: "CRAZY HORSE", ink: "red-ochre",      nation: "OGLALA LAKOTA",    yr: "1876", line: "NEVER PHOTOGRAPHED / NEVER SIGNED", url: "https://en.wikipedia.org/wiki/Crazy_Horse" },
+    { ind: "MAȞPÍYA LÚTA", col: "RED CLOUD", name: "RED CLOUD", ink: "red-ochre",        nation: "OGLALA LAKOTA",    yr: "1868", line: "WON A WAR VS THE U.S.",             url: "https://en.wikipedia.org/wiki/Red_Cloud" },
+    { ind: "GOYAAŁÉ", col: "GERONIMO", name: "GERONIMO", ink: "dine-turquoise",         nation: "CHIRICAHUA APACHE",yr: "1886", line: "BORDERLESS GUERRILLA",              url: "https://en.wikipedia.org/wiki/Geronimo" },
+    { name: "COCHISE", ink: "dine-turquoise",          nation: "CHOKONEN APACHE",  yr: "1872", line: "DRAGOON MOUNTAINS",                 url: "https://en.wikipedia.org/wiki/Cochise" },
+    { ind: "BIDU-YA", col: "VICTORIO", name: "VICTORIO", ink: "dine-turquoise",         nation: "CHIHENNE APACHE",  yr: "1880", line: "BOTH SIDES OF THE LINE",            url: "https://en.wikipedia.org/wiki/Victorio" },
+    { name: "LOZEN", ink: "dine-turquoise",            nation: "CHIHENNE APACHE",  yr: "1880", line: "WARRIOR / PROPHET",                 url: "https://en.wikipedia.org/wiki/Lozen" },
+    { ind: "HINMATÓOWYALAHTQ̓IT", col: "CHIEF JOSEPH", name: "CHIEF JOSEPH", ink: "blue-corn",     nation: "NEZ PERCE",        yr: "1877", line: "1,170-MILE FIGHTING RETREAT",       url: "https://en.wikipedia.org/wiki/Chief_Joseph" },
+    { ind: "PO'PAY", col: "POPÉ", name: "POPÉ", ink: "blue-corn",             nation: "OHKAY OWINGEH",    yr: "1680", line: "PUEBLO REVOLT",                     url: "https://en.wikipedia.org/wiki/Pop%C3%A9" },
+    { ind: "TOYPURINA", col: "BAPTIZED REGINA JOSEFA", name: "TOYPURINA", ink: "shell-white",        nation: "TONGVA",           yr: "1785", line: "SAN GABRIEL MISSION REVOLT / L.A.", url: "https://en.wikipedia.org/wiki/Toypurina" },
+    { ind: "OBWANDIYAG", col: "PONTIAC", name: "PONTIAC", ink: "wampum-purple",          nation: "ODAWA",            yr: "1763", line: "SIEGE OF FORT DETROIT",             url: "https://en.wikipedia.org/wiki/Pontiac_(Odawa_leader)" },
     // BLACKFOOT CONFEDERACY / NIITSITAPI (CANADA)
-    { ind: "ISAPO-MUXIKA", col: "CROWFOOT", name: "CROWFOOT", nation: "SIKSIKA", yr: "1877", line: "HEAD CHIEF / TREATY 7", url: "https://en.wikipedia.org/wiki/Crowfoot" },
-    { ind: "MÍ'KAI'STOOWA", col: "RED CROW", name: "RED CROW", nation: "KAINAI", yr: "1877", line: "HEAD CHIEF OF THE BLOODS / TREATY 7", url: "https://en.wikipedia.org/wiki/Red_Crow" },
-    { ind: "NATOSAPI", col: "OLD SUN", name: "OLD SUN", nation: "SIKSIKA", yr: "1877", line: "MEDICINE MAN / TREATY 7", url: "https://www.biographi.ca/en/bio/natos_api_12E.html" },
+    { ind: "ISAPO-MUXIKA", col: "CROWFOOT", name: "CROWFOOT", ink: "sacred-yellow", nation: "SIKSIKA", yr: "1877", line: "HEAD CHIEF / TREATY 7", url: "https://en.wikipedia.org/wiki/Crowfoot" },
+    { ind: "MÍ'KAI'STOOWA", col: "RED CROW", name: "RED CROW", ink: "sacred-yellow", nation: "KAINAI", yr: "1877", line: "HEAD CHIEF OF THE BLOODS / TREATY 7", url: "https://en.wikipedia.org/wiki/Red_Crow" },
+    { ind: "NATOSAPI", col: "OLD SUN", name: "OLD SUN", ink: "sacred-yellow", nation: "SIKSIKA", yr: "1877", line: "MEDICINE MAN / TREATY 7", url: "https://www.biographi.ca/en/bio/natos_api_12E.html" },
 
     // MESOAMERICA
-    { name: "CUAUHTÉMOC",       nation: "MEXICA",           yr: "1521", line: "LAST TLATOANI OF TENOCHTITLAN",     url: "https://en.wikipedia.org/wiki/Cuauht%C3%A9moc" },
-    { name: "NEZAHUALCÓYOTL",   nation: "ACOLHUA",          yr: "1431", line: "POET-KING OF TEXCOCO",              url: "https://en.wikipedia.org/wiki/Nezahualcoyotl_(tlatoani)" },
-    { ind: "CAJEMÉ", col: "JOSÉ MARÍA LEYVA", name: "CAJEMÉ",           nation: "YAQUI / YOEME",    yr: "1887", line: "YAQUI AUTONOMOUS REPUBLIC",         url: "https://en.wikipedia.org/wiki/Cajem%C3%A9" },
-    { ind: "CANEK", col: "JACINTO UC DE LOS SANTOS", name: "JACINTO CANEK",    nation: "MAYA",             yr: "1761", line: "YUCATÁN UPRISING",                  url: "https://en.wikipedia.org/wiki/Jacinto_Canek" },
-    { name: "TECÚN UMÁN",       nation: "K'ICHE'",          yr: "1524", line: "QUETZALTENANGO",                    url: "https://en.wikipedia.org/wiki/Tecun_Uman" },
-    { name: "LEMPIRA",          nation: "LENCA",            yr: "1537", line: "LORD OF THE MOUNTAIN",              url: "https://en.wikipedia.org/wiki/Lempira_(Lenca_ruler)" },
-    { name: "BENITO JUÁREZ",    nation: "ZAPOTEC",          yr: "1867", line: "EXPELLED THE FRENCH",               url: "https://en.wikipedia.org/wiki/Benito_Ju%C3%A1rez" },
-    { name: "COMANDANTA RAMONA",nation: "TZOTZIL / EZLN",   yr: "1994", line: "SAN CRISTÓBAL",                     url: "https://en.wikipedia.org/wiki/Comandanta_Ramona" },
-    { name: "RIGOBERTA MENCHÚ", nation: "K'ICHE'",          yr: "1992", line: "NOBEL PEACE PRIZE",                 url: "https://en.wikipedia.org/wiki/Rigoberta_Mench%C3%BA" },
+    { name: "CUAUHTÉMOC", ink: "xiuhuitl",       nation: "MEXICA",           yr: "1521", line: "LAST TLATOANI OF TENOCHTITLAN",     url: "https://en.wikipedia.org/wiki/Cuauht%C3%A9moc" },
+    { name: "NEZAHUALCÓYOTL", ink: "jade",   nation: "ACOLHUA",          yr: "1431", line: "POET-KING OF TEXCOCO",              url: "https://en.wikipedia.org/wiki/Nezahualcoyotl_(tlatoani)" },
+    { ind: "CAJEMÉ", col: "JOSÉ MARÍA LEYVA", name: "CAJEMÉ", ink: "cempasuchil",           nation: "YAQUI / YOEME",    yr: "1887", line: "YAQUI AUTONOMOUS REPUBLIC",         url: "https://en.wikipedia.org/wiki/Cajem%C3%A9" },
+    { ind: "CANEK", col: "JACINTO UC DE LOS SANTOS", name: "JACINTO CANEK", ink: "maya-blue",    nation: "MAYA",             yr: "1761", line: "YUCATÁN UPRISING",                  url: "https://en.wikipedia.org/wiki/Jacinto_Canek" },
+    { name: "TECÚN UMÁN", ink: "jade",       nation: "K'ICHE'",          yr: "1524", line: "QUETZALTENANGO",                    url: "https://en.wikipedia.org/wiki/Tecun_Uman" },
+    { name: "LEMPIRA", ink: "grana",          nation: "LENCA",            yr: "1537", line: "LORD OF THE MOUNTAIN",              url: "https://en.wikipedia.org/wiki/Lempira_(Lenca_ruler)" },
+    { name: "BENITO JUÁREZ", ink: "anil",    nation: "ZAPOTEC",          yr: "1867", line: "EXPELLED THE FRENCH",               url: "https://en.wikipedia.org/wiki/Benito_Ju%C3%A1rez" },
+    { name: "COMANDANTA RAMONA", ink: "obsidian",nation: "TZOTZIL / EZLN",   yr: "1994", line: "SAN CRISTÓBAL",                     url: "https://en.wikipedia.org/wiki/Comandanta_Ramona" },
+    { name: "RIGOBERTA MENCHÚ", ink: "maya-blue", nation: "K'ICHE'",          yr: "1992", line: "NOBEL PEACE PRIZE",                 url: "https://en.wikipedia.org/wiki/Rigoberta_Mench%C3%BA" },
 
     // CARIBBEAN
-    { name: "HATUEY",           nation: "TAÍNO",            yr: "1512", line: "BURNED, NEVER BOWED",               url: "https://en.wikipedia.org/wiki/Hatuey" },
-    { name: "ANACAONA",         nation: "TAÍNO",            yr: "1503", line: "QUEEN / POET OF XARAGUÁ",           url: "https://en.wikipedia.org/wiki/Anacaona" },
-    { ind: "GUAROCUYA", col: "ENRIQUILLO", name: "ENRIQUILLO",       nation: "TAÍNO",            yr: "1533", line: "14-YEAR REBELLION",                 url: "https://en.wikipedia.org/wiki/Enriquillo" },
+    { name: "HATUEY", ink: "urucum",           nation: "TAÍNO",            yr: "1512", line: "BURNED, NEVER BOWED",               url: "https://en.wikipedia.org/wiki/Hatuey" },
+    { name: "ANACAONA", ink: "caona-gold",         nation: "TAÍNO",            yr: "1503", line: "QUEEN / POET OF XARAGUÁ",           url: "https://en.wikipedia.org/wiki/Anacaona" },
+    { ind: "GUAROCUYA", col: "ENRIQUILLO", name: "ENRIQUILLO", ink: "huito",       nation: "TAÍNO",            yr: "1533", line: "14-YEAR REBELLION",                 url: "https://en.wikipedia.org/wiki/Enriquillo" },
 
     // SOUTH AMERICA
-    { ind: "TÚPAC AMARU II", col: "JOSÉ GABRIEL CONDORCANQUI", name: "TÚPAC AMARU II",   nation: "QUECHUA",          yr: "1780", line: "GREAT REBELLION OF PERU",           url: "https://en.wikipedia.org/wiki/T%C3%BApac_Amaru_II" },
-    { ind: "TÚPAC KATARI", col: "JULIÁN APAZA", name: "TÚPAC KATARI",     nation: "AYMARA",           yr: "1781", line: "SIEGE OF LA PAZ",                   url: "https://en.wikipedia.org/wiki/T%C3%BApac_Katari" },
-    { name: "BARTOLINA SISA",   nation: "AYMARA",           yr: "1781", line: "COMMANDER / SIEGE OF LA PAZ",       url: "https://en.wikipedia.org/wiki/Bartolina_Sisa" },
-    { name: "MANCO INCA",       nation: "INCA",             yr: "1536", line: "SIEGE OF CUSCO / VILCABAMBA",       url: "https://en.wikipedia.org/wiki/Manco_Inca_Yupanqui" },
-    { ind: "LEFTRARU", col: "LAUTARO", name: "LAUTARO",          nation: "MAPUCHE",          yr: "1553", line: "ARAUCO WAR",                        url: "https://en.wikipedia.org/wiki/Lautaro" },
-    { name: "CAUPOLICÁN",       nation: "MAPUCHE",          yr: "1558", line: "TOQUI OF ARAUCO",                   url: "https://en.wikipedia.org/wiki/Caupolic%C3%A1n" },
-    { name: "RAONI",            nation: "KAYAPÓ",           yr: "NOW",  line: "DEFENDER OF THE AMAZON",            url: "https://en.wikipedia.org/wiki/Raoni_Metuktire" },
-    { name: "EVO MORALES",      nation: "AYMARA",           yr: "2006", line: "FIRST INDIGENOUS PRESIDENT / BOLIVIA", url: "https://en.wikipedia.org/wiki/Evo_Morales" },
+    { ind: "TÚPAC AMARU II", col: "JOSÉ GABRIEL CONDORCANQUI", name: "TÚPAC AMARU II", ink: "andean-crimson",   nation: "QUECHUA",          yr: "1780", line: "GREAT REBELLION OF PERU",           url: "https://en.wikipedia.org/wiki/T%C3%BApac_Amaru_II" },
+    { ind: "TÚPAC KATARI", col: "JULIÁN APAZA", name: "TÚPAC KATARI", ink: "qolle-yellow",     nation: "AYMARA",           yr: "1781", line: "SIEGE OF LA PAZ",                   url: "https://en.wikipedia.org/wiki/T%C3%BApac_Katari" },
+    { name: "BARTOLINA SISA", ink: "andean-magenta",   nation: "AYMARA",           yr: "1781", line: "COMMANDER / SIEGE OF LA PAZ",       url: "https://en.wikipedia.org/wiki/Bartolina_Sisa" },
+    { name: "MANCO INCA", ink: "chillca-green",       nation: "INCA",             yr: "1536", line: "SIEGE OF CUSCO / VILCABAMBA",       url: "https://en.wikipedia.org/wiki/Manco_Inca_Yupanqui" },
+    { ind: "LEFTRARU", col: "LAUTARO", name: "LAUTARO", ink: "mapuche-blue",          nation: "MAPUCHE",          yr: "1553", line: "ARAUCO WAR",                        url: "https://en.wikipedia.org/wiki/Lautaro" },
+    { name: "CAUPOLICÁN", ink: "mapuche-blue",       nation: "MAPUCHE",          yr: "1558", line: "TOQUI OF ARAUCO",                   url: "https://en.wikipedia.org/wiki/Caupolic%C3%A1n" },
+    { name: "RAONI", ink: "urucum",            nation: "KAYAPÓ",           yr: "NOW",  line: "DEFENDER OF THE AMAZON",            url: "https://en.wikipedia.org/wiki/Raoni_Metuktire" },
+    { name: "EVO MORALES", ink: "andean-magenta",      nation: "AYMARA",           yr: "2006", line: "FIRST INDIGENOUS PRESIDENT / BOLIVIA", url: "https://en.wikipedia.org/wiki/Evo_Morales" },
   ];
   const linajeEsc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
   const LINAJE_TICKER = LINAJE.map(p =>
     '<a href="'+linajeEsc(p.url)+'" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">'
-    + linajeEsc([p.ind?p.ind+' / '+p.col:p.name,p.nation,p.yr,p.line].join(' // ')) + '</a>');
+    + (()=>{const nm=linajeEsc(p.ind?p.ind+' / '+p.col:p.name);
+        return '<em class="tk-perma tk-lin" data-t="'+nm+'" style="color:var(--ink-'+p.ink+')">'+nm+'</em>';})()
+    + linajeEsc(' // '+[p.nation,p.yr,p.line].join(' // ')) + '</a>');
   const TICKER_RAW=[
     '3EAS-001','LINCOLN HEIGHTS, NELA','34.0590°N 118.2321°W','SIGNAL ACTIVE',
     "CAPTURE DON'T KILL",'YOU HAVE RECEIVED THE SIGNAL','THEY ARE JUST A RITUAL','AMERICA IS ONLY AN EXPERIMENT','NEW MUSIC COMING SOON','@2026-09-27','SATELLITES ORBITING EARTH: ~16,900 ACTIVE','@','PARA TODOS TODO, NADA PARA NOSOTROS','\u00a1YA BASTA!','DO YOU SMELL THE GRAPHENE?','ARE YOU HUNGRY?',"DON'T OBEY",'WORSHIP THE MUSIC, NOT THE MAN','@2026-09-27','ICE REMOVALS ('+ICE_FY_LABEL+'): <span id="deportclock">0</span>','@','BTC: $<span id="btcclock">--</span>','ETH: $<span id="ethclock">--</span>','GOLD: $<span id="goldclock">--</span>/oz','SILVER: $<span id="silverclock">--</span>/oz','OIL (WTI): $<span id="oilclock">--</span>/bbl','LINCOLN HEIGHTS WEATHER: <span id="weatherclock">--</span>','<a href="https://ko-fi.com/3eascortex" target="_blank" rel="noopener" class="flash-rg">SUPPORT THE SIGNAL, HELP KEEP THE TRANSMISSION ALIVE</a>','STOP ATTENDING RITUALS','CAN YOU PAY THE RENT?','PENTAGON BUDGET FY26: $839.2 BILLION (ENACTED)','PENTAGON BUDGET FY25: $831.5 BILLION','PENTAGON BUDGET FY27 (REQUESTED): $1.5 TRILLION','ARE YOU CON(CERN)ED?','PSYOP AFTER PSYOP','<a href="https://youtu.be/UsCMEMijnWw?is=BMNVYbW13o-c1-rX" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">DISCLOSURE?</a>','DIVEST FROM THEIR ALGORITHM','<a href="https://unlimitedhangout.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">UNLIMITED HANGOUT</a>','<a href="https://earthsgreatestenemy.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">EARTH\'S GREATEST ENEMY</a>','<a href="https://www.bennjordan.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">BENN JORDAN</a>','<a href="https://nym.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">NYM</a>','<a href="https://thesecretteachings.info/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE SECRET TEACHINGS</a>','<a href="https://www.kpfk.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">KPFK</a>','<a href="https://www.trackaipac.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">TRACK AIPAC</a>','<a href="https://schoolsforchiapas.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SCHOOLS FOR CHIAPAS</a>','<a href="https://cultivateelevate.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">CULTIVATE ELEVATE</a>','<a href="https://www.acallforanuprising.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">A CALL FOR AN UPRISING</a>','<a href="https://www.thehighersidechats.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE HIGHERSIDE CHATS</a>','<a href="https://corbettreport.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE CORBETT REPORT</a>','<a href="https://www.onnoticemusic.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">ON/NOTICE</a>','<a href="https://dherbs.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">DHERBS</a>','<a href="https://ai-2027.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">AI 2027</a>','<a href="https://blog.redwoodresearch.org/p/ai-futurism-reading-list" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">AI FUTURISM READING LIST</a>','<a href="https://youtu.be/77f_xr6RBwM" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">TRUTH STREAM MEDIA</a>','<a href="https://selexiones.com" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SELEXIONES</a>','<a href="https://sacredlessons.com" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SACRED LESSONS</a>','<a href="https://www.forbes.com/profile/daniel-ek/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SPOTIFY IS YOUR ENEMY</a>','<a href="https://sloptracker.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">SLOPTRACKER</a>','<a href="https://deoxy.xyz/mirror/deoxy.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">DEOXY ARCHIVE</a>','<a href="https://www.topmusicattorney.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">TOP MUSIC ATTORNEY</a>','<a href="https://musically.com/blog/2025/04/28/poisonify/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">POISONIFY</a>','<a href="https://www.instagram.com/gevity?igsh=NTc4MTIwNjQ2YQ==" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE KEY TO LONGEVITY</a>','20 YEARS OF DATA WILL LIVE HERE ONLY','GROW FOOD','YOU ARE PAYING FOR THEIR PORTALS. RIGHT PEGASUS?','ARE YOU ADDICTED TO FEAR?','ARE YOU SCARED TO BE JUDGED?','FUCK YOU - CANCEL ME','IM TOO HUMAN SOMETIMES','LOS ANGELES GAVE ME PERMANENT PTSD','THEY WILL SACRIFICE YOU, IF YOU LET THEM','BUBBLES. ARE YOU IN ONE?','MICRO COMPLIANCE IS YOUR WHOLE DAY',"DON'T INGEST THE D.A.R.P.A. TECH",'STATUS: TRANSMITTING','YOUR ONLY CULTURE IS CONSPIRACY','<a href="https://www.instagram.com/oneloveomar" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">I MISS YOU OMAR</a>','I\'M WAITING FOR YOU CEDRIC','IT\'S NOT YOUR TIME YET HUITZIL','I LEFT AZTLAN CUZ I WAS BORED. NO MORE NO LESS.','KITSIKAKOMIMMO IITSIKI\'TSAIYIO\'KAA','GUN VIOLENCE HAS CHASED ME AROUND LIVING IN THIS CITY','<a href="https://youtu.be/S3MQLlMbS-Y?is=-ZzUWiKfyLjCntEn" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">FLOCK YOU!</a>','<a href="https://youtu.be/3LniPn_MwVo?is=9FqqfXwUyGwXacTh" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">HOE ROGAN</a>','<a href="https://jmail.world/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">COMPOSE : Hi Jeffery.</a>','<a href="https://www.dropsitenews.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">DROP SITE NEWS</a>','<a href="https://ground.news/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">GROUND NEWS</a>','<a href="https://groundzeroplus.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">GROUND ZERO+</a>','<a href="https://www.democracynow.org/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">DEMOCRACY NOW</a>','<a href="https://youtube.com/@miltonwilliambillcooper-mx4ie?si=jIMfmWGD5G61DvUw" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">THE HOUR OF OUR TIME</a>','<a href="https://youtube.com/@mediamonarchyplus?si=YYE11fVegqyYNnm6" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">MEDIA MONARCHY</a>','THERE\'S A MONOPOLY ON MAGIC','SYNCROMYSTIC EXAMPLES ARE EVERYWHERE','GREEN PILLED','<a href="https://runesoup.com/" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">GORDON WHITE</a>','RITUAL BIRTHS','CUT OUT THE MIDDLE MAN','ALL YOUR BOOMER ROCKSTARS ARE MILITARY','THE RELIGION OF SELF WORSHIP','<a href="https://youtu.be/AiBSHcZ5lkI?is=upTFx2YQHPh2iQFL" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">WHO\'S UP FOR A LITTLE SEX MAGIC?</a>','FREE ENERGY WILL HAVE TO BE DISCLOSED IN ORDER TO RUN THE DATA CENTERS','FIX NEWS','MY IG ALGORITHM IS ASS, CATS AND SYNTHS','YOU GOT THAT OZEMPIC BREATH: IT\'S ALL THAT SEMAGLUTIDE','<a href="https://digital.library.cornell.edu/catalog/ss:34227574" target="_blank" rel="noopener" style="color:#a8695a;text-decoration:underline">TECHNATE OF AMERICA</a>','@2026-09-27','TOTAL INCARCERATED IN THE US: ~2,000,000','@','EARTHQUAKE = DATA CENTERS','YELLOW JOURNALISM COMING IN HOT','THE OLYMPIAN COUNCIL','THE NATIONAL RECONNAISSANCE OFFICE',
