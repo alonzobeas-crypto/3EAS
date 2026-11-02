@@ -76,6 +76,10 @@ export const LINKS = [
     "url": "https://instagram.com/zo.losangeles"
   },
   {
+    "key": "TIKTOK",
+    "url": "https://www.tiktok.com/@3eascortex"
+  },
+  {
     "key": "SELEXIONES_COM",
     "url": "https://selexiones.com"
   },

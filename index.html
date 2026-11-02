@@ -216,10 +216,11 @@ body{
   animation:glitch 7s infinite;
 }
 @keyframes glitch{0%,88%,100%{transform:translateX(0)}89%{transform:translateX(-4px) skewX(.5deg)}90%{transform:translateX(4px)}91%{transform:translateX(-2px)}92%{transform:translateX(0)}}
-.tb-links{display:flex;flex:1}
+/* links squeeze (padding/tracking, then ellipsis) so the IG + TikTok icons never get pushed off-screen */
+.tb-links{display:flex;flex:1;min-width:0;overflow:hidden}
 .tb-link{
-  font-family:var(--mono);font-size:12px;letter-spacing:3px;
-  color:var(--dim2);padding:0 20px;
+  font-family:var(--mono);font-size:12px;letter-spacing:clamp(1.5px,.21vw,3px);
+  color:var(--dim2);padding:0 clamp(9px,1.25vw,20px);min-width:0;overflow:hidden;text-overflow:ellipsis;
   display:flex;align-items:center;text-decoration:none;
   border-right:1px solid var(--dimmer);
   transition:color .15s,background .15s;white-space:nowrap;cursor:none;
@@ -1003,13 +1004,13 @@ body{
      those two visible in the topbar instead of hiding the whole row. */
   .tb-links{display:flex}
   .tb-link:not(.tb-support):not(.tb-subscribe){display:none}
-  .tb-support,.tb-subscribe{padding:0 14px;font-size:12px;letter-spacing:1.5px;overflow:hidden;text-overflow:ellipsis}
+  .tb-support,.tb-subscribe{padding:0 9px;font-size:12px;letter-spacing:1.5px;overflow:hidden;text-overflow:ellipsis}
   .tb-support .n,.tb-subscribe .n{display:none}
   #topnav{padding:0;height:62px}
   .tb-brand{font-size:18px;padding:0 14px;letter-spacing:2px}
   .tb-right{font-size:12px;letter-spacing:1px;padding:0 8px;gap:5px}
-  a[title="Instagram"]{width:38px!important}
-  a[title="Instagram"] svg{width:14px;height:14px}
+  a[title="Instagram"],a[title="TikTok"]{width:38px!important}
+  a[title="Instagram"] svg,a[title="TikTok"] svg{width:14px;height:14px}
   .ti span{color:#f5efd8!important}
   .s1-main{padding:0 18px}
   /* center hero on phone, kill dead space top/bottom */
@@ -1414,6 +1415,12 @@ body{
       <circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/>
     </svg>
   </a>
+  <a href="https://www.tiktok.com/@3eascortex" target="_blank" rel="noopener" title="TikTok" aria-label="TikTok" style="display:flex;align-items:center;justify-content:center;width:52px;flex-shrink:0;border-left:1px solid var(--dimmer);color:var(--dim2);transition:color .15s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--dim2)'">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/>
+      <path d="M14 3c.4 2.6 2.2 4.4 5 4.6"/>
+    </svg>
+  </a>
 </nav>
 <!-- ═══ A.I. BABY trigger — fixed on screen, JS-positioned beside the hero "3EAS" title (#hw1); styles in #aib-style, logic + panel markup near </body> ═══ -->
 <button id="aibTrigger" class="aib-unplaced" type="button" hidden aria-controls="aibPanel" aria-expanded="false" aria-label="Open A.I. Baby chat"><span class="aib-dot"></span></button>
@@ -1675,6 +1682,7 @@ body{
       <div class="llinks">
         <a href="https://www.mixcloud.com/SELEXIONES/" target="_blank" class="lrow" data-aib-key="MIXCLOUD">MIXCLOUD <span class="larr">→</span></a>
         <a href="https://instagram.com/zo.losangeles" target="_blank" class="lrow" data-aib-key="INSTAGRAM">INSTAGRAM <span class="larr">→</span></a>
+        <a href="https://www.tiktok.com/@3eascortex" target="_blank" class="lrow" data-aib-key="TIKTOK">TIKTOK <span class="larr">→</span></a>
         <a href="https://selexiones.com" target="_blank" class="lrow" data-aib-key="SELEXIONES_COM">SELEXIONES.COM <span class="larr">→</span></a>
         <a href="https://www.onnoticemusic.com/" target="_blank" class="lrow" data-aib-key="ONNOTICEMUSIC_COM">ONNOTICEMUSIC.COM <span class="larr">→</span></a>
         <a href="https://sacredlessons.com" target="_blank" class="lrow" data-aib-key="SACREDLESSONS_COM">SACREDLESSONS.COM <span class="larr">→</span></a>

@@ -52,6 +52,7 @@ function findSceneMention(lower) {
 function findLinkMention(lower) {
   const aliases = {
     INSTAGRAM: ['instagram', 'ig'],
+    TIKTOK: ['tiktok', 'tik tok'],
     MIXCLOUD: ['mixcloud'],
     SELEXIONES_COM: ['selexiones'],
     ONNOTICEMUSIC_COM: ['on/notice', 'onnotice', 'on notice'],
