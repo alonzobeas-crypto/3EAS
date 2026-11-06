@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ALONZO BEAS // ALL CHANNELS</title>
+<meta name="description" content="3EAS · SELEXIONES · ON/NOTICE — every transmission in one place.">
+<meta name="theme-color" content="#09080a">
+<meta property="og:title" content="ALONZO BEAS // ALL CHANNELS">
+<meta property="og:description" content="3EAS · SELEXIONES · ON/NOTICE — every transmission in one place.">
+<meta property="og:url" content="https://3eascortex.com/links/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@200;300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* 3EAS × SELEXIONES blend */
+    --bg:#09080a;
+    --pink:#ff2e88;      /* 3EAS */
+    --amber:#ffb000;     /* SELEXIONES */
+    --ember:#ff5a3c;     /* the blend: pink → amber midpoint */
+    --teal:#9fe3dc;      /* 3EAS terminal accent */
+    --cream:#f3ead7;
+    --dim:rgba(243,234,215,.42);
+    --faint:rgba(243,234,215,.1);
+    --grad:linear-gradient(90deg,var(--pink),var(--ember) 50%,var(--amber));
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--cream);min-height:100%}
+  body{
+    font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-weight:300;font-feature-settings:"zero" 1,"ss01" 1;
+    padding:max(28px,env(safe-area-inset-top)) 18px max(40px,env(safe-area-inset-bottom));
+    display:flex;justify-content:center;overflow-x:hidden;
+    background:
+      radial-gradient(120% 60% at 0% 0%,rgba(255,46,136,.10),transparent 60%),
+      radial-gradient(120% 60% at 100% 100%,rgba(255,176,0,.08),transparent 60%),
+      var(--bg);
+    background-attachment:fixed;
+  }
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:5;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px)}
+  canvas#static{position:fixed;inset:0;width:100%;height:100%;opacity:.035;pointer-events:none;z-index:0}
+  main{position:relative;z-index:2;width:100%;max-width:440px}
+  ::selection{background:var(--pink);color:var(--bg)}
+
+  /* ---------- header ---------- */
+  .sys{font-size:10px;line-height:1.75;color:var(--dim);letter-spacing:.04em;margin-bottom:22px}
+  .sys .ok{color:var(--teal)}
+  .sys .warn{color:var(--amber)}
+  .sys .p{color:var(--pink)}
+  h1{
+    font-weight:200;font-size:42px;letter-spacing:-.02em;line-height:1;
+    background:var(--grad);-webkit-background-clip:text;padding-bottom:.12em;background-clip:text;color:transparent;
+    position:relative;display:inline-block;
+  }
+  h1 .cur{display:inline-block;width:.5em;height:.9em;margin-left:6px;vertical-align:-2px;background:var(--amber);animation:blink 1s steps(2) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .tag{font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-top:10px}
+  .rule{height:1px;background:var(--grad);opacity:.6;margin:22px 0 0}
+
+  /* tuner */
+  .tuner{display:grid;grid-template-columns:repeat(3,1fr);margin-top:-1px;
+    position:sticky;top:max(0px,env(safe-area-inset-top));z-index:4;
+    background:rgba(9,8,10,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--faint)}
+  .tuner a{text-decoration:none;color:var(--cream);font-size:10.5px;letter-spacing:.1em;padding:12px 4px 11px;text-align:center;font-weight:400;position:relative}
+  .tuner a span{display:block;font-size:8.5px;color:var(--dim);margin-bottom:3px;letter-spacing:.2em}
+  .tuner a::after{content:"";position:absolute;left:22%;right:22%;bottom:-1px;height:1px;background:var(--acc)}
+  .tuner a+a{border-left:1px solid var(--faint)}
+
+  /* ---------- channels ---------- */
+  .ch{margin-top:34px;scroll-margin-top:64px}
+  #ch1{--acc:var(--pink)}
+  #ch2{--acc:var(--amber)}
+  #ch3{--acc:var(--ember)}
+  .tuner a[href="#ch1"]{--acc:var(--pink)}
+  .tuner a[href="#ch2"]{--acc:var(--amber)}
+  .tuner a[href="#ch3"]{--acc:var(--ember)}
+
+  .ch-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .ch-name{font-weight:200;font-size:30px;letter-spacing:-.01em;color:var(--cream)}
+  .ch-name b{font-weight:200;color:var(--acc)}
+  .ch-no{font-size:9.5px;letter-spacing:.25em;color:var(--acc)}
+  .ch-cmd{font-size:10.5px;color:var(--dim);margin:6px 0 14px;letter-spacing:.02em}
+  .ch-cmd::before{content:"$ ";color:var(--acc)}
+
+  a.link{
+    display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:10px;
+    padding:13px 14px 13px 12px;margin-bottom:6px;text-decoration:none;color:var(--cream);
+    border:1px solid var(--faint);background:rgba(243,234,215,.015);
+    font-size:13px;font-weight:400;letter-spacing:.01em;
+    transition:border-color .15s,background .15s,transform .1s;
+  }
+  a.link .idx{font-size:9.5px;color:var(--acc);opacity:.8}
+  a.link small{display:block;font-size:10px;font-weight:300;color:var(--dim);margin-top:3px;letter-spacing:.03em}
+  a.link .arr{color:var(--dim);font-size:12px;transition:color .15s,transform .15s}
+  a.link:hover,a.link:focus-visible{border-color:var(--acc);outline:none;background:color-mix(in srgb,var(--acc) 7%,transparent)}
+  a.link:hover .arr,a.link:focus-visible .arr{color:var(--acc);transform:translateX(3px)}
+  a.link:active{transform:scale(.988)}
+  a.link.hot{border-color:color-mix(in srgb,var(--acc) 55%,transparent)}
+  a.link.hot .arr{color:var(--acc)}
+  .live{font-size:8.5px;letter-spacing:.2em;color:var(--bg);background:var(--grad);padding:2px 6px;margin-left:8px;vertical-align:1px;font-weight:600}
+
+  /* SELEXIONES modules */
+  .box{border:1px solid var(--faint);margin-bottom:8px;font-size:12px}
+  .box .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:10px 13px}
+  .box .row+.row{border-top:1px dashed var(--faint)}
+  .box .k{font-size:9.5px;letter-spacing:.2em;color:var(--amber);flex-shrink:0}
+  .box .v{text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400}
+  .box small{color:var(--dim);font-size:10px}
+  .onair{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--pink);margin-right:7px;box-shadow:0 0 8px var(--pink);animation:blink 1.2s steps(2) infinite}
+  .label{font-size:9px;letter-spacing:.3em;color:var(--dim);margin:16px 0 7px}
+  #np{display:none}#np.on{display:block}
+
+  /* contact */
+  .contact{margin-top:36px;--acc:var(--teal)}
+  button.save{
+    width:100%;padding:15px;font:inherit;font-size:11.5px;font-weight:600;letter-spacing:.24em;
+    color:var(--bg);background:var(--grad);border:0;cursor:pointer;margin-top:4px;
+  }
+  button.save:active{transform:scale(.988)}
+
+  footer{margin-top:28px;display:flex;justify-content:space-between;font-size:9px;letter-spacing:.2em;color:var(--dim)}
+  footer b{font-weight:400;color:var(--teal)}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<canvas id="static"></canvas>
+<main>
+  <header>
+    <div class="sys" id="sys">
+      <div><span class="ok">[ ok ]</span> carrier locked · 34.07°N 118.21°W</div>
+      <div><span class="ok">[ ok ]</span> handshake · lincoln heights node</div>
+      <div><span class="warn">[ ** ]</span> unlicensed frequencies detected: <span class="p">3</span></div>
+    </div>
+    <h1>alonzo_beas<span class="cur"></span></h1>
+    <p class="tag">producer · multi-instrumentalist</p>
+    <div class="rule"></div>
+  </header>
+
+  <nav class="tuner">
+    <a href="#ch1"><span>CH.01</span>3EAS</a>
+    <a href="#ch2"><span>CH.02</span>SELEXIONES</a>
+    <a href="#ch3"><span>CH.03</span>ON/NOTICE</a>
+  </nav>
+
+  <section class="ch" id="ch1">
+    <div class="ch-head"><div class="ch-name">3EAS</div><div class="ch-no">CH.01</div></div>
+    <p class="ch-cmd">./transmit --solo --chicano-futurism</p>
+    <div data-links="3eas"></div>
+  </section>
+
+  <section class="ch" id="ch2">
+    <div class="ch-head"><div class="ch-name">SELEXIONES</div><div class="ch-no">CH.02</div></div>
+    <p class="ch-cmd">./tune --uno --dos --24-7</p>
+    <div class="box" id="np"></div>
+    <div data-links="selexiones"></div>
+  </section>
+
+  <section class="ch" id="ch3">
+    <div class="ch-head"><div class="ch-name">ON<b>/</b>NOTICE</div><div class="ch-no">CH.03</div></div>
+    <p class="ch-cmd">./industrial --post-punk --no-spotify</p>
+    <div data-links="onnotice"></div>
+  </section>
+
+  <div class="contact">
+    <div data-links="contact"></div>
+    <button class="save" id="save">+ SAVE CONTACT</button>
+  </div>
+
+  <footer><span>EOF</span><span><b>//</b> 3EASCORTEX.COM</span></footer>
+</main>
+
+<script>
+/* ============================================================
+   EDIT EVERYTHING HERE, then push. The NFC band never changes.
+   Blank url = hidden.  hot:true = highlighted.  live:true = LIVE badge.
+   ============================================================ */
+const LINKS = {
+  "3eas": [
+    { title: "3EAS CORTEX", sub: "jukebox · transmissions · merch", url: "https://3eascortex.com", hot: true },
+    { title: "Instagram",   sub: "", url: "" },                                   // TODO
+    { title: "Join the list", sub: "drops before anyone else", url: "https://buttondown.com/3EASCORTEX" },
+    { title: "Support on Ko-fi", sub: "fuel the signal", url: "https://ko-fi.com/3eascortex" },
+  ],
+  "selexiones": [
+    { title: "Listen live — UNO / DOS", sub: "selexiones.com", url: "https://selexiones.com", hot: true, live: true },
+    { title: "Mixcloud archive", sub: "past shows + DJ mixes", url: "" },        // TODO
+    { title: "Instagram", sub: "@selexionesradio", url: "https://www.instagram.com/selexionesradio/" },
+    { title: "Booking · sponsors · guest DJs", sub: "passwordpills@pm.me", url: "mailto:passwordpills@pm.me" },
+  ],
+  "onnotice": [
+    { title: "onnoticemusic.com", sub: "music · merch · direct", url: "https://onnoticemusic.com", hot: true },
+    { title: "Bandcamp", sub: "", url: "" },                                      // TODO
+    { title: "Instagram", sub: "@onnoticemusic", url: "https://www.instagram.com/onnoticemusic/" },
+    { title: "Live video", sub: "", url: "" },                                    // TODO
+  ],
+  "contact": [
+    { title: "Booking", sub: "passwordpills@pm.me", url: "mailto:passwordpills@pm.me" },
+  ],
+};
+
+const AZURACAST = "https://stream.selexiones.com";
+
+const CONTACT = {
+  name: "Alonzo Beas", nick: "Zo", org: "3EAS / SELEXIONES / ON/NOTICE",
+  title: "Producer · Multi-instrumentalist",
+  email: "passwordpills@pm.me", phone: "",
+  url: "https://3eascortex.com/links/"
+};
+
+/* ---------- render ---------- */
+document.querySelectorAll("[data-links]").forEach(box=>{
+  let i=0;
+  for (const l of LINKS[box.dataset.links] || []) {
+    if (!l.url) continue;
+    const a=document.createElement("a");
+    a.className="link"+(l.hot?" hot":""); a.href=l.url;
+    if (/^https?:/.test(l.url)) { a.target="_blank"; a.rel="noopener"; }
+    a.innerHTML=`<span class="idx">${String(++i).padStart(2,"0")}</span><span>${l.title}${l.live?'<span class="live">LIVE</span>':""}${l.sub?`<small>${l.sub}</small>`:""}</span><span class="arr">→</span>`;
+    box.appendChild(a);
+  }
+});
+
+/* ---------- SELEXIONES now playing ---------- */
+async function nowPlaying(){
+  try{
+    const r=await fetch(AZURACAST+"/api/nowplaying",{cache:"no-store"}); if(!r.ok) throw 0;
+    const d=await r.json();
+    const rows=(Array.isArray(d)?d:[d]).filter(s=>s.station&&s.now_playing).map(s=>{
+      const artist=s.now_playing.song?.artist||s.now_playing.song?.text||"—";
+      return `<div class="row"><span class="k"><span class="onair"></span>${s.station.name.toUpperCase()}</span><span class="v">${artist}</span></div>`;
+    });
+    if(!rows.length) throw 0;
+    const np=document.getElementById("np"); np.innerHTML=rows.join(""); np.classList.add("on");
+  }catch(e){}
+}
+nowPlaying(); setInterval(nowPlaying,30000);
+
+/* ---------- boot-log reveal ---------- */
+if(!matchMedia("(prefers-reduced-motion: reduce)").matches){
+  [...document.getElementById("sys").children].forEach((l,i)=>{
+    l.style.opacity=0; setTimeout(()=>l.style.opacity=1, 180+i*260);
+  });
+}
+
+/* ---------- vCard ---------- */
+document.getElementById("save").onclick=()=>{
+  const c=CONTACT, v=["BEGIN:VCARD","VERSION:3.0",`FN:${c.name}`,`N:Beas;Alonzo;;;`,`NICKNAME:${c.nick}`,`ORG:${c.org}`,`TITLE:${c.title}`,
+    c.email&&`EMAIL:${c.email}`,c.phone&&`TEL:${c.phone}`,`URL:${c.url}`,"END:VCARD"].filter(Boolean).join("\r\n");
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([v],{type:"text/vcard"})); a.download="AlonzoBeas.vcf";
+  document.body.appendChild(a); a.click(); a.remove();
+};
+
+/* ---------- static ---------- */
+const cv=document.getElementById("static"),cx=cv.getContext("2d");let img;
+function size(){cv.width=innerWidth/3|0;cv.height=innerHeight/3|0;img=cx.createImageData(cv.width,cv.height);}
+size(); addEventListener("resize",size);
+if(!matchMedia("(prefers-reduced-motion: reduce)").matches)(function loop(){
+  const d=img.data; for(let i=0;i<d.length;i+=4){const v=Math.random()*255|0;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255;}
+  cx.putImageData(img,0,0); setTimeout(()=>requestAnimationFrame(loop),80);
+})();
+</script>
+</body>
+</html>
