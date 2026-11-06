@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ALONZO BEAS // ALL CHANNELS</title>
+<title>3EAS CORTEX // ALL CHANNELS</title>
 <meta name="description" content="3EAS · SELEXIONES · ON/NOTICE — every transmission in one place.">
 <meta name="theme-color" content="#09080a">
-<meta property="og:title" content="ALONZO BEAS // ALL CHANNELS">
+<meta property="og:title" content="3EAS CORTEX // ALL CHANNELS">
 <meta property="og:description" content="3EAS · SELEXIONES · ON/NOTICE — every transmission in one place.">
 <meta property="og:url" content="https://3eascortex.com/links/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -135,7 +135,7 @@
       <div><span class="ok">[ ok ]</span> handshake · lincoln heights node</div>
       <div><span class="warn">[ ** ]</span> unlicensed frequencies detected: <span class="p">3</span></div>
     </div>
-    <h1>alonzo_beas<span class="cur"></span></h1>
+    <h1>3EAS_CORTEX<span class="cur"></span></h1>
     <p class="tag">producer · multi-instrumentalist</p>
     <div class="rule"></div>
   </header>
@@ -205,7 +205,7 @@ const LINKS = {
 const AZURACAST = "https://stream.selexiones.com";
 
 const CONTACT = {
-  name: "Alonzo Beas", nick: "Zo", org: "3EAS / SELEXIONES / ON/NOTICE",
+  name: "3EAS CORTEX", org: "3EAS / SELEXIONES / ON/NOTICE",
   title: "Producer · Multi-instrumentalist",
   email: "passwordpills@pm.me", phone: "",
   url: "https://3eascortex.com/links/"
@@ -248,10 +248,10 @@ if(!matchMedia("(prefers-reduced-motion: reduce)").matches){
 
 /* ---------- vCard ---------- */
 document.getElementById("save").onclick=()=>{
-  const c=CONTACT, v=["BEGIN:VCARD","VERSION:3.0",`FN:${c.name}`,`N:Beas;Alonzo;;;`,`NICKNAME:${c.nick}`,`ORG:${c.org}`,`TITLE:${c.title}`,
+  const c=CONTACT, v=["BEGIN:VCARD","VERSION:3.0",`FN:${c.name}`,`ORG:${c.org}`,`TITLE:${c.title}`,
     c.email&&`EMAIL:${c.email}`,c.phone&&`TEL:${c.phone}`,`URL:${c.url}`,"END:VCARD"].filter(Boolean).join("\r\n");
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([v],{type:"text/vcard"})); a.download="AlonzoBeas.vcf";
+  a.href=URL.createObjectURL(new Blob([v],{type:"text/vcard"})); a.download="3EAS-CORTEX.vcf";
   document.body.appendChild(a); a.click(); a.remove();
 };
 
