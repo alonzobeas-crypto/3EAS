@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="author" content="3EAS CORTEX · 3eascortex.com">
+<!-- Designed & built by 3EAS CORTEX · https://3eascortex.com · © 2026 -->
+<title>KURIOUS // THE MAJICIAN — SIGNAL 97/AMS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sedgwick+Ave+Display&family=Sedgwick+Ave&family=Chakra+Petch:wght@600;700&family=Share+Tech+Mono&family=VT323&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#040406; --deep:#0a0a10; --panel:#0d0d15cc; --line:#ffffff14;
+  --gold:#f0b63c; --gold2:#ffdd8a; --cyan:#4ef2e0; --red:#ff3b3b; --txt:#d9d4c7; --dim:#6f6a7a;
+  --tag:'Sedgwick Ave Display',Impact,sans-serif; --hand:'Sedgwick Ave',cursive; --display:'Chakra Petch',sans-serif; --hud:'Share Tech Mono',ui-monospace,monospace; --eas:'VT323',ui-monospace,monospace; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--void);color:var(--txt);font-family:var(--mono);font-size:13px;line-height:1.65;overflow-x:hidden;font-weight:300}
+a{color:var(--gold);text-decoration:none}
+::selection{background:var(--gold);color:var(--void)}
+#field{position:fixed;inset:0;z-index:0;pointer-events:none}
+.scan{position:fixed;inset:0;z-index:70;pointer-events:none;background:repeating-linear-gradient(0deg,#0000 0 2px,#00000038 2px 3px);mix-blend-mode:multiply}
+.vig{position:fixed;inset:0;z-index:69;pointer-events:none;background:radial-gradient(ellipse at center,#0000 55%,#000c 100%)}
+main{position:relative;z-index:2}
+
+/* BOOT */
+#boot{position:fixed;inset:0;z-index:100;background:var(--void);padding:8vh 7vw;font-family:var(--hud);font-size:13px;color:var(--gold);cursor:pointer;transition:opacity .6s}
+#boot.off{opacity:0;pointer-events:none}
+#boot p{white-space:pre;opacity:.9}
+#boot .ok{color:var(--cyan)}
+#boot .skip{position:absolute;bottom:5vh;left:7vw;color:var(--dim);font-size:10px;letter-spacing:.3em}
+
+/* TICKER */
+.ticker{position:fixed;top:0;left:0;right:0;z-index:60;height:26px;background:#000;border-bottom:1px solid var(--gold);overflow:hidden;display:flex;align-items:center}
+.ticker .tag{flex:none;background:var(--red);color:#000;font-weight:600;font-size:10px;letter-spacing:.2em;padding:0 10px;height:100%;display:flex;align-items:center;animation:blink 1.2s steps(1) infinite}
+@keyframes blink{50%{background:#7a1010;color:#fff}}
+.ticker .run{font-family:var(--hud);display:flex;gap:42px;white-space:nowrap;animation:tk 70s linear infinite;font-size:11px;letter-spacing:.08em;padding-left:20px}
+.ticker .run b{color:var(--gold);font-weight:600}
+.ticker .run i{color:var(--cyan);font-style:normal}
+@keyframes tk{to{transform:translateX(-50%)}}
+
+/* HUD NAV */
+nav{position:fixed;top:26px;left:0;right:0;z-index:55;display:flex;justify-content:space-between;align-items:center;padding:12px 4vw;
+  background:linear-gradient(#040406ee,#04040600)}
+.logo{font-family:var(--tag);font-weight:400;font-size:26px;letter-spacing:.02em;transform:rotate(-3deg);color:var(--txt);cursor:pointer}
+.logo span{color:var(--gold)}
+nav ul{display:flex;gap:4px;list-style:none}
+nav a{font-family:var(--hud);color:var(--dim);font-size:10px;letter-spacing:.2em;padding:6px 10px;border:1px solid transparent}
+nav a:hover{color:var(--gold);border-color:#f0b63c55}
+nav a::before{content:"/";color:#f0b63c88;margin-right:4px}
+.live{font-size:10px;letter-spacing:.2em;color:var(--cyan);display:flex;align-items:center;gap:6px}
+.live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.mbtn{display:none;font-family:var(--hud);font-size:11px;letter-spacing:.2em;color:var(--gold);background:none;border:1px solid #f0b63c66;padding:6px 10px;cursor:pointer}
+@media(max-width:820px){.mbtn{display:block}.live{display:none}nav ul{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;background:#040406f5;padding:8px 4vw 14px;border-bottom:1px solid var(--gold)}nav.open ul{display:flex}nav ul a{display:block;font-size:13px;padding:12px 6px}}
+
+/* corner brackets util */
+.hud{position:relative}
+.hud::before,.hud::after{content:"";position:absolute;width:14px;height:14px;border-color:var(--gold);border-style:solid;pointer-events:none}
+.hud::before{top:-1px;left:-1px;border-width:1px 0 0 1px}
+.hud::after{bottom:-1px;right:-1px;border-width:0 1px 1px 0}
+
+/* HERO */
+.hero{min-height:100vh;display:grid;place-items:center;text-align:center;padding:120px 4vw 80px;position:relative}
+.coords{position:absolute;font-family:var(--hud);font-size:10px;letter-spacing:.2em;color:var(--dim);line-height:1.8}
+.coords.tl{top:90px;left:4vw;text-align:left}.coords.tr{top:90px;right:4vw;text-align:right}
+.coords.bl{bottom:30px;left:4vw;text-align:left}.coords.br{bottom:30px;right:4vw;text-align:right}
+.coords b{color:var(--gold);font-weight:400}
+@media(max-width:700px){.coords.tr,.coords.br{display:none}}
+.eye{width:min(220px,52vw);display:block;margin:0 auto 6px;filter:drop-shadow(0 0 14px #f0b63c66);cursor:pointer}
+.eye .pupil{transition:transform .12s ease-out}
+.eye path,.eye circle{transition:stroke .25s,fill .25s}
+.eye.see{filter:drop-shadow(0 0 22px #4ef2e0cc)}
+.eye.see path,.eye.see .ring circle{stroke:var(--cyan)}
+.eye.see #iris{fill:var(--cyan)}
+#jam.hit{color:var(--cyan)!important;text-shadow:0 0 10px var(--cyan)}
+.monk{display:block;width:46px;margin-bottom:8px;cursor:pointer;opacity:.85;transition:.2s}
+.monk:hover{opacity:1;filter:drop-shadow(0 0 8px #f0b63c88);transform:rotate(-6deg)}
+.eye .ring{transform-origin:120px 54px;animation:spin 18s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pre{font-family:var(--hud);font-size:11px;letter-spacing:.5em;color:var(--cyan);margin-bottom:28px}
+.glitch{font-family:var(--tag);font-weight:400;font-size:clamp(66px,15vw,220px);line-height:.9;letter-spacing:0;position:relative;color:var(--gold2);transform:rotate(-4deg);
+  -webkit-text-stroke:2px #040406;text-shadow:3px 3px 0 #040406,6px 6px 0 var(--red),9px 9px 0 #040406,0 0 40px #f0b63c44}
+.glitch::before,.glitch::after{content:attr(data-t);position:absolute;inset:0;overflow:hidden}
+.glitch::before{color:var(--red);transform:translate(-3px,0);mix-blend-mode:screen;clip-path:inset(0 0 100% 0);animation:g1 3.2s infinite steps(1)}
+.glitch::after{color:var(--cyan);transform:translate(3px,0);mix-blend-mode:screen;clip-path:inset(100% 0 0 0);animation:g2 2.7s infinite steps(1)}
+@keyframes g1{0%,88%{clip-path:inset(0 0 100% 0)}89%{clip-path:inset(12% 0 58% 0);transform:translate(-8px,2px)}92%{clip-path:inset(60% 0 12% 0);transform:translate(6px,-2px)}95%{clip-path:inset(35% 0 40% 0)}}
+@keyframes g2{0%,84%{clip-path:inset(100% 0 0 0)}85%{clip-path:inset(70% 0 5% 0);transform:translate(9px,0)}90%{clip-path:inset(20% 0 66% 0);transform:translate(-6px,1px)}}
+.tagline{font-family:var(--hand);font-size:clamp(26px,3.6vw,42px);color:var(--cyan);margin-top:22px;transform:rotate(-2deg);text-shadow:0 0 14px #4ef2e066}
+.tagline span{font-family:var(--hud);transform:rotate(2deg);font-style:normal;font-size:11px;letter-spacing:.3em;color:var(--dim);display:block;margin-top:6px}
+.cta{display:flex;gap:10px;justify-content:center;margin-top:30px;flex-wrap:wrap}
+.btn{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;padding:11px 18px;border:1px solid var(--gold);color:var(--gold);background:#f0b63c0d;cursor:pointer;transition:.2s}
+.btn:hover,.btn.solid{background:var(--gold);color:var(--void)}
+.btn.solid:hover{background:var(--gold2)}
+
+/* SECTIONS */
+section{padding:110px 4vw;position:relative}
+.sh{display:flex;align-items:baseline;gap:16px;margin-bottom:34px;flex-wrap:wrap}
+.sh .id{font-family:var(--hud);font-size:11px;letter-spacing:.3em;color:var(--cyan)}
+.sh h2{font-family:var(--tag);font-weight:400;font-size:clamp(42px,7vw,96px);line-height:.95;text-transform:uppercase;transform:rotate(-2deg);text-shadow:3px 3px 0 #7a1010}
+.sh h2 em{font-family:var(--hand);font-style:normal;text-transform:none;color:var(--gold);font-size:.62em;text-shadow:none}
+.sh .rule{flex:1;min-width:60px;height:1px;background:linear-gradient(90deg,var(--gold),#0000);align-self:center}
+.panel{background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+
+/* INTERCEPT */
+.memo{max-width:900px;padding:30px 32px 110px;font-family:var(--hud);font-size:14px;line-height:1.9;position:relative;border-color:#ff3b3b55}
+.memo .hd{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:11px;letter-spacing:.2em;color:var(--red);border-bottom:1px dashed #ff3b3b44;padding-bottom:12px;margin-bottom:16px}
+.memo .meta{color:var(--dim);font-size:12px;margin-bottom:14px}
+.memo ol{padding-left:22px;color:#c9c3b6}
+.memo li{margin:6px 0}
+.memo li.sub{color:var(--gold2)}
+.rx{background:#000;color:transparent;padding:0 4px;cursor:pointer;border-bottom:1px solid #ff3b3b66;transition:.25s;user-select:none}
+.rx:hover,.rx.show{color:var(--red);background:#ff3b3b14}
+.stamp{position:absolute;right:26px;bottom:22px;font-family:var(--tag);font-size:clamp(26px,4vw,44px);color:var(--red);border:3px solid var(--red);padding:2px 14px;transform:rotate(-9deg);opacity:.85;mix-blend-mode:screen}
+.reply{margin-top:30px;font-family:var(--hand);font-size:clamp(24px,3.4vw,38px);color:var(--cyan);transform:rotate(-2deg);max-width:900px;text-shadow:0 0 14px #4ef2e055}
+.reply small{display:block;font-family:var(--hud);font-size:11px;letter-spacing:.3em;color:var(--dim);margin-top:6px;transform:rotate(2deg)}
+@media(max-width:620px){.memo{padding-bottom:30px}.stamp{position:static;display:inline-block;margin-top:18px}}
+
+/* DOSSIER */
+.dossier{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;max-width:1240px}
+@media(max-width:900px){.dossier{grid-template-columns:1fr}}
+.dossier .txt{padding:28px;font-size:14px;line-height:1.8}
+.dossier .txt p+p{margin-top:14px}
+.dossier .txt b{color:var(--gold);font-weight:600}
+.spec{padding:6px 0}
+.spec div{display:flex;justify-content:space-between;gap:12px;padding:11px 20px;border-bottom:1px dashed var(--line);font-size:12px}
+.spec dt{color:var(--dim);letter-spacing:.15em;font-size:10px;text-transform:uppercase}
+.spec dd{text-align:right;color:var(--txt)}
+.spec .hl{color:var(--gold)}
+
+/* JUKEBOX */
+.deck-player{max-width:1240px;display:grid;grid-template-columns:320px 1fr}
+@media(max-width:820px){.deck-player{grid-template-columns:1fr}}
+.scope{position:relative;aspect-ratio:1;border-right:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
+.scope canvas{position:absolute;inset:0;width:100%;height:100%}
+.scope .lbl{position:absolute;left:14px;bottom:12px;font-family:var(--tag);font-weight:400;font-size:30px;transform:rotate(-3deg);text-shadow:2px 2px 0 #7a1010}
+.scope .lbl small{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.3em;color:var(--dim);font-weight:300}
+.pl{padding:22px 24px;display:flex;flex-direction:column;gap:14px}
+.now{font-size:10px;letter-spacing:.3em;color:var(--cyan)}
+.title{font-family:var(--display);font-weight:700;font-size:clamp(30px,4vw,44px);line-height:.95;text-transform:uppercase}
+.row{display:flex;align-items:center;gap:12px;font-size:11px;color:var(--dim)}
+.bar{flex:1;height:2px;background:#ffffff1f;position:relative;cursor:pointer}
+.bar i{position:absolute;inset:0 auto 0 0;width:0;background:var(--gold);box-shadow:0 0 10px var(--gold)}
+.tracks{list-style:none;border-top:1px solid var(--line);counter-reset:t}
+.tracks li{display:grid;grid-template-columns:34px 1fr auto;gap:10px;padding:9px 4px;border-bottom:1px solid #ffffff0a;cursor:pointer;font-size:12px;transition:.15s}
+.tracks li::before{counter-increment:t;content:counter(t,decimal-leading-zero);color:var(--dim)}
+.tracks li:hover{background:#f0b63c0d;color:var(--gold2)}
+.tracks li.on{color:var(--gold)}.tracks li.on::before{content:"▶";color:var(--gold)}
+.tracks li span:last-child{color:var(--dim);font-size:10px;letter-spacing:.1em}
+.note{font-size:10px;color:var(--dim);letter-spacing:.05em}
+.note label{color:var(--cyan);cursor:pointer;border-bottom:1px dashed var(--cyan)}
+
+/* LOG / TIMELINE */
+.log{max-width:1100px;font-size:13px}
+.entry{display:grid;grid-template-columns:130px 1fr;gap:22px;padding:18px 20px;border-bottom:1px solid var(--line);opacity:0;transform:translateX(-14px);transition:.6s cubic-bezier(.2,.7,.2,1)}
+.entry.in{opacity:1;transform:none}
+.entry:hover{background:#f0b63c08}
+.ts{color:var(--gold);font-weight:600;letter-spacing:.06em}
+.ts small{display:block;color:var(--dim);font-weight:300;font-size:9px;letter-spacing:.25em;margin-top:2px}
+.entry h3{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.03em;text-transform:uppercase;line-height:1.05;margin-bottom:4px;color:var(--txt)}
+.entry p{color:#b9b3a6;max-width:700px}
+.flag{display:inline-block;margin-top:8px;font-size:9px;letter-spacing:.25em;padding:2px 7px;border:1px solid currentColor}
+.flag.doom{color:var(--red)}.flag.jam{color:#000;background:var(--red);border-color:var(--red)}.flag.key{color:var(--cyan)}.flag.now{color:var(--gold)}
+@media(max-width:620px){.entry{grid-template-columns:1fr;gap:6px}}
+
+/* ARCANA */
+.arcana{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px;max-width:1240px}
+.card{perspective:1200px;aspect-ratio:7/12;cursor:pointer}
+.ci{position:relative;width:100%;height:100%;transition:transform .9s cubic-bezier(.2,.7,.2,1);transform-style:preserve-3d}
+.card.flip .ci{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid #f0b63c66;
+  background:linear-gradient(170deg,#12121c,#060609);padding:14px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+.face::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,#0000 0 3px,#f0b63c08 3px 4px);pointer-events:none}
+.face .top{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.2em;color:var(--dim)}
+.face .top b{color:var(--gold);font-weight:600}
+.face svg{width:70%;margin:0 auto;filter:drop-shadow(0 0 8px #f0b63c55)}
+.face .nm{font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:.14em;text-align:center;text-transform:uppercase}
+.card:hover .face:not(.back){border-color:var(--gold);box-shadow:0 0 24px #f0b63c33 inset}
+.back{transform:rotateY(180deg);border-color:var(--cyan);justify-content:flex-start;gap:10px}
+.back .meta{font-size:9px;letter-spacing:.2em;color:var(--cyan)}
+.back h4{font-family:var(--display);font-weight:700;font-size:28px;line-height:.92;text-transform:uppercase}
+.back p{font-size:12px;color:#c9c3b6}
+.hint{margin-top:16px;font-size:10px;letter-spacing:.3em;color:var(--dim)}
+
+/* VAULT */
+.vault{max-width:1240px;display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.vault div{background:var(--deep);padding:18px 20px;transition:.2s;position:relative}
+.vault div:hover{background:#140f0a}
+.vault div:hover::after{content:"◉ REC";position:absolute;top:14px;right:16px;font-size:9px;letter-spacing:.2em;color:var(--red)}
+.vault .y{font-size:10px;letter-spacing:.25em;color:var(--cyan)}
+.vault .s{font-family:var(--display);font-weight:700;font-size:21px;text-transform:uppercase;line-height:1.05;margin:3px 0;color:var(--txt)}
+.vault .a{color:var(--dim);font-size:11px}
+
+/* CREW */
+.crew{max-width:1240px;padding:30px}
+.crew p{font-size:14px;max-width:760px;line-height:1.8}
+.nodes{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.nodes span{font-size:11px;letter-spacing:.15em;padding:7px 12px;border:1px solid var(--line);text-transform:uppercase}
+.nodes span.k{border-color:var(--gold);color:var(--gold)}
+.nodes span.add{border-style:dashed;color:var(--dim)}
+
+/* UPLINK */
+.up{max-width:1240px;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:900px){.up{grid-template-columns:1fr}}
+.links a{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line);
+  font-family:var(--display);font-weight:700;font-size:28px;text-transform:uppercase;color:var(--txt);transition:.2s}
+.links a small{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--dim);font-weight:300}
+.links a:hover{color:var(--gold);padding-left:28px;background:#f0b63c08}
+form{padding:24px;display:grid;gap:4px}
+form .lb{font-size:9px;letter-spacing:.3em;color:var(--cyan);margin-top:10px}
+input,textarea,select{background:#0000;border:0;border-bottom:1px solid #ffffff2a;color:var(--txt);font-family:var(--mono);font-size:13px;padding:9px 0;outline:none;font-weight:300;width:100%}
+input:focus,textarea:focus,select:focus{border-color:var(--gold)}
+select option{background:var(--void)}
+form .btn{margin-top:18px;justify-self:start}
+.sent{display:none;color:var(--cyan);font-size:11px;margin-top:10px}
+
+footer{position:relative;z-index:2;padding:28px 4vw;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:10px;letter-spacing:.2em;color:var(--dim)}
+footer b{color:var(--gold);font-weight:400}
+footer .credit{font-family:var(--hud);letter-spacing:.25em}
+footer .credit a{font-family:var(--eas);font-size:22px;letter-spacing:.14em;color:var(--cyan);display:inline-block;margin-left:6px;text-shadow:0 0 10px #4ef2e088}
+footer .credit a:hover{color:var(--gold2);animation:hj .3s steps(3) 1}
+footer .legal{flex-basis:100%;font-size:9px;letter-spacing:.12em;color:#4a4655;line-height:1.7}
+
+/* glyph rain overlay */
+#rain{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:0;transition:opacity .3s}
+#rain.on{opacity:.85}
+
+/* EXTRA GLITCH */
+.sh h2.gl{animation:hj .32s steps(3) 1}
+@keyframes hj{0%{transform:rotate(-2deg)}33%{transform:rotate(-2deg) translate(-5px,1px) skewX(10deg);text-shadow:-4px 0 var(--red),4px 0 var(--cyan);clip-path:inset(10% 0 35% 0)}66%{transform:rotate(-2deg) translate(4px,-1px);text-shadow:3px 0 var(--red),-3px 0 var(--cyan);clip-path:inset(45% 0 5% 0)}100%{transform:rotate(-2deg)}}
+body.tear main{transform:translateX(7px) skewX(-1.5deg);filter:hue-rotate(14deg) saturate(1.5) contrast(1.1)}
+body.tear2 main{transform:translateX(-5px);filter:invert(.06) hue-rotate(-30deg)}
+#band{position:fixed;left:0;right:0;height:14px;z-index:68;pointer-events:none;opacity:0;background:linear-gradient(90deg,#4ef2e022,#ff3b3b33,#f0b63c22);mix-blend-mode:screen;backdrop-filter:blur(1px) hue-rotate(90deg)}
+#band.on{opacity:1}
+.logo:hover{animation:hj .3s steps(3) 2}
+/* WATERMARK */
+#wm{position:fixed;z-index:66;pointer-events:none;font-family:var(--eas);font-size:clamp(44px,11vw,160px);letter-spacing:.08em;line-height:1;color:var(--gold2);text-shadow:0 0 24px #f0b63c88;opacity:0;mix-blend-mode:screen;white-space:nowrap;transform:rotate(var(--r,-6deg))}
+#wm::before,#wm::after{content:attr(data-t);position:absolute;inset:0}
+#wm::before{color:var(--red);transform:translate(-5px,1px);clip-path:inset(0 0 58% 0)}
+#wm::after{color:var(--cyan);transform:translate(5px,-1px);clip-path:inset(52% 0 0 0)}
+#wm.on{animation:wmIn 1.6s steps(1) forwards}
+@keyframes wmIn{0%{opacity:0}6%{opacity:.4;transform:rotate(var(--r)) translateX(-14px) skewX(14deg)}10%{opacity:0}16%{opacity:.3;transform:rotate(var(--r))}22%{opacity:.5;transform:rotate(var(--r)) translateX(8px)}28%{opacity:.36;transform:rotate(var(--r))}64%{opacity:.36;transform:rotate(var(--r))}68%{opacity:0}73%{opacity:.55;transform:rotate(var(--r)) translateX(-10px) skewX(-12deg);filter:blur(1px)}78%{opacity:0}84%{opacity:.25;transform:rotate(var(--r)) scaleY(.2)}88%,100%{opacity:0}}
+#bug{position:fixed;right:14px;bottom:10px;z-index:65;font-family:var(--eas);font-size:17px;letter-spacing:.18em;color:var(--gold);opacity:.75;text-shadow:0 0 8px #f0b63c99;transition:opacity .2s}
+#bug:hover{opacity:1}
+#bug.flick{animation:fl .5s steps(1) 1}
+@keyframes fl{0%{opacity:0}20%{opacity:.9;transform:translateX(-3px);color:var(--cyan)}40%{opacity:0}60%{opacity:.7;transform:translateX(2px);color:var(--red)}80%{opacity:.3}100%{opacity:.75}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div id="boot"><div id="bootlog"></div><div class="skip">TAP TO SKIP</div></div>
+
+<div class="ticker"><div class="tag">● ON AIR</div><div class="run" id="tick"></div></div>
+
+<nav>
+  <div class="logo" id="logo">KURIOUS<span>//</span></div>
+  <ul>
+    <li><a href="#intercept">intercept</a></li>
+    <li><a href="#dossier">dossier</a></li>
+    <li><a href="#signal">signal</a></li>
+    <li><a href="#log">log</a></li>
+    <li><a href="#arcana">arcana</a></li>
+    <li><a href="#vault">vault</a></li>
+    <li><a href="#uplink">uplink</a></li>
+  </ul>
+  <button class="mbtn" id="mbtn" aria-label="Menu">≡ MENU</button>
+  <div class="live">SIGNAL LIVE</div>
+</nav>
+
+<canvas id="field"></canvas>
+<canvas id="rain"></canvas>
+<div class="scan"></div><div id="band"></div>
+<div id="wm" data-t="3EASCORTEX.COM">3EASCORTEX.COM</div>
+<a id="bug" href="https://3eascortex.com" target="_blank" rel="noopener">◉ 3EASCORTEX.COM</a><div class="vig"></div>
+
+<main>
+<header class="hero">
+  <div class="coords tl">NODE <b>97/AMS</b><br>40.7934°N 73.9686°W<br>MANHATTAN VALLEY</div>
+  <div class="coords tr">FREQ <b id="freq">97.0</b> MHz<br>CARRIER: UPTOWN<br>ENC: BORICUA/CUBANO</div>
+  <div class="coords bl"><svg class="monk" id="monk" viewBox="0 0 100 100" fill="none" stroke="#f0b63c" stroke-width="3" stroke-linecap="round" aria-label="A Constipated Monkey"><circle cx="50" cy="44" r="22"/><circle cx="25" cy="40" r="8"/><circle cx="75" cy="40" r="8"/><circle cx="42" cy="40" r="2.5" fill="#f0b63c"/><circle cx="58" cy="40" r="2.5" fill="#f0b63c"/><path d="M40 53 Q50 60 60 53"/><path d="M26 94 Q50 66 74 94"/></svg>A CONSTIPATED MONKEY<br><b>1994</b> · EST. 1991<br>STATUS: <b>ACTIVE</b></div>
+  <div class="coords br">JAMMING: <b id="jam" style="color:var(--red)">FAILED</b><br>SCROLL ↓ TO DECODE</div>
+  <div>
+    <svg class="eye" id="eye" viewBox="0 0 240 120" fill="none" stroke="#f0b63c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <g class="ring" opacity=".35"><circle cx="120" cy="54" r="46" stroke-dasharray="2 6"/></g>
+      <path d="M20 58 C60 18 160 14 220 50 C170 86 70 92 20 58Z"/>
+      <path d="M8 40 C70 4 170 2 232 32" stroke-width="3"/>
+      <g class="pupil" id="pupil"><circle id="iris" cx="120" cy="54" r="22" fill="#f0b63c" stroke="none"/><circle cx="120" cy="54" r="8" fill="#040406" stroke="none"/><circle cx="114" cy="48" r="3" fill="#fff" stroke="none" opacity=".7"/></g>
+      <path d="M96 84 L92 112 C90 118 82 118 80 112"/>
+      <path d="M140 82 C150 96 170 100 186 92 C196 86 196 76 188 74"/>
+    </svg>
+    <div class="pre">UNAUTHORIZED TRANSMISSION</div>
+    <h1 class="glitch" data-t="KURIOUS">KURIOUS</h1>
+    <div class="tagline">The Majician<span>A.K.A. KURIOUS JORGE · BIOLLANTE · UPTOWN NYC</span></div>
+    <div class="cta">
+      <a class="btn solid" href="#signal">▶ Tune In</a>
+      <a class="btn" href="#log">Decode the Journey</a>
+    </div>
+  </div>
+</header>
+
+<section id="intercept">
+  <div class="sh"><span class="id">[00] INTERCEPT</span><h2>The <em>takeover</em></h2><span class="rule"></span></div>
+  <div class="panel hud memo">
+    <div class="hd"><span>CLASSIFIED // INTERNAL MEMO</span><span>COPY 1 OF 1 · DO NOT DISTRIBUTE</span></div>
+    <div class="meta">FROM: <span class="rx">CONSOLIDATED</span> HOLDINGS, DEPT. OF CULTURAL ACQUISITION<br>RE: HIP-HOP, PHASE IV</div>
+    <ol>
+      <li>Ownership of <span class="rx">the masters</span> is complete. The culture is now a line item.</li>
+      <li>Replace the cipher with <span class="rx">the algorithm</span>. Hooks under 15 seconds. No second verse.</li>
+      <li>Lyricism is a liability. Flag anyone still <span class="rx">writing in the studio</span>.</li>
+      <li>Shelve what can't be controlled. It worked in <span class="rx">1994</span>.</li>
+      <li class="sub">Subject KURIOUS remains uncontained. Origin: 97th &amp; Amsterdam. Associates: <span class="rx">METAL FACE</span>. Do not engage.</li>
+    </ol>
+    <div class="stamp">UNCONTAINED</div>
+  </div>
+  <div class="reply">They bought the industry. They can't buy the trick.<small>TAP THE BLACK BARS TO DECLASSIFY</small></div>
+</section>
+
+<section id="dossier">
+  <div class="sh"><span class="id">[01] DOSSIER</span><h2>Origin <em>file</em></h2><span class="rule"></span></div>
+  <div class="dossier">
+    <div class="panel hud txt">
+      <p>Subject <b>Jorge Antonio Alvarez</b> grew up in Manhattan Valley, the stretch just below Harlem on the West Side. He's Boricua and Cuban, and his mother built a life from nothing.</p>
+      <p>Rock Steady Park and the Zulu Nation were close by. At Game Night in the community room, the older kids rapped and cut breaks. That's where the signal started.</p>
+      <p>He interned at Def Jam and crossed paths with 3rd Bass. That's how he met <b>Zev Love X</b> of KMD, the man who later became DOOM, and they stayed creative partners for life. His peers gave him the name <b>the Majician</b>. Three decades later, the transmission is still running.</p>
+    </div>
+    <dl class="panel hud spec">
+      <div><dt>Designation</dt><dd class="hl">KURIOUS</dd></div>
+      <div><dt>Aliases</dt><dd>Kurious Jorge · Biollante · The Majician</dd></div>
+      <div><dt>Origin node</dt><dd>97th &amp; Amsterdam</dd></div>
+      <div><dt>Heritage</dt><dd>Puerto Rican · Cuban</dd></div>
+      <div><dt>Collectives</dt><dd>Constipated Monkeys · Monsta Island Czars</dd></div>
+      <div><dt>Days since debut LP</dt><dd class="hl" id="days">—</dd></div>
+      <div><dt>Status</dt><dd style="color:var(--cyan)">● TRANSMITTING</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section id="signal">
+  <div class="sh"><span class="id">[02] SIGNAL</span><h2>The <em>jukebox</em></h2><span class="rule"></span></div>
+  <div class="panel hud deck-player">
+    <div class="scope"><canvas id="scope"></canvas><div class="lbl"><small>NOW DECODING</small>MAJICIAN</div></div>
+    <div class="pl">
+      <div class="now" id="src">MAJICIAN · 2024 · METALFACE / RHYMESAYERS</div>
+      <div class="title" id="ttl">Unknown Species</div>
+      <div class="row"><button class="btn solid" id="play">▶ Play</button><span id="tm">00:00</span><div class="bar" id="bar"><i id="prog"></i></div></div>
+      <ul class="tracks" id="tracks"></ul>
+      <div class="note">Placeholder tracklist, no audio yet. Live demo: <label for="file">load an audio file</label> and the visuals react to it.<input type="file" id="file" accept="audio/*" hidden></div>
+      <audio id="aud" crossorigin="anonymous"></audio>
+    </div>
+  </div>
+</section>
+
+<section id="log">
+  <div class="sh"><span class="id">[03] TRANSMISSION LOG</span><h2>The <em>journey</em></h2><span class="rule"></span></div>
+  <div class="panel log" id="logs"></div>
+</section>
+
+<section id="arcana">
+  <div class="sh"><span class="id">[04] MAJOR ARCANA</span><h2>Pull <em>a card</em></h2><span class="rule"></span></div>
+  <div class="arcana" id="cards"></div>
+  <div class="hint">TAP A CARD TO REVEAL THE RECORD</div>
+</section>
+
+<section id="vault">
+  <div class="sh"><span class="id">[05] VAULT</span><h2>The <em>DOOM files</em></h2><span class="rule"></span></div>
+  <div class="vault" id="vlt"></div>
+</section>
+
+<section id="crew">
+  <div class="sh"><span class="id">[06] NETWORK</span><h2>Constipated <em>Monkeys</em></h2><span class="rule"></span></div>
+  <div class="panel hud crew">
+    <p>An uptown crew of MCs, DJs and graffiti writers, KMD members among them. This node map grows as the crew shares flyers, tags, photos and stories.</p>
+    <div class="nodes"><span class="k">Kurious</span><span>Zev Love X</span><span>Subroc</span><span>Kadi</span><span>Lord Sear</span><span class="add">+ add node</span></div>
+  </div>
+</section>
+
+<section id="uplink">
+  <div class="sh"><span class="id">[07] UPLINK</span><h2>Summon <em>the Majician</em></h2><span class="rule"></span></div>
+  <div class="up">
+    <div class="panel hud links">
+      <a href="https://kurious1.bandcamp.com" target="_blank" rel="noopener">Bandcamp <small>BUY DIRECT ↗</small></a>
+      <a href="https://instagram.com/kurious97beast" target="_blank" rel="noopener">Instagram <small>@KURIOUS97BEAST ↗</small></a>
+      <a href="https://rhymesayers.com" target="_blank" rel="noopener">Rhymesayers <small>MAJICIAN ↗</small></a>
+    </div>
+    <form class="panel hud" id="f">
+      <span class="lb">CHANNEL</span>
+      <select required><option value="">— select —</option><option>Booking / Live</option><option>Feature verse</option><option>Press / Interview</option><option>Licensing / Sync</option></select>
+      <span class="lb">CALLSIGN</span><input required placeholder="Your name">
+      <span class="lb">RETURN ADDRESS</span><input type="email" required placeholder="you@domain">
+      <span class="lb">PAYLOAD</span><textarea rows="3" placeholder="City, date, what you're building"></textarea>
+      <button class="btn solid" type="submit">Transmit ↗</button>
+      <div class="sent" id="sent">&gt; DEMO ONLY: nothing was sent. It goes live once it's wired to his inbox.</div>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <span>KURIOUS // <b>THE MAJICIAN</b> // 97/AMS // NYC</span>
+  <span class="credit">SITE DESIGNED &amp; BUILT BY <a href="https://3eascortex.com" target="_blank" rel="noopener">3EASCORTEX.COM</a></span>
+  <span class="legal">© 2026 3EASCORTEX.COM · Concept design &amp; code. Kurious name, music &amp; likeness © Kurious. MF DOOM &amp; Metalface © their respective owners. Unofficial concept, not affiliated.</span>
+</footer>
+
+<script>
+const $=s=>document.querySelector(s), RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+/* BOOT */
+const bootLines=[['> INIT CARRIER 97.0 MHz',''],['> WARNING: CARRIER JAMMED BY [REDACTED] HOLDINGS',''],['> ROUTING AROUND THE ALGORITHM ...... OK','ok'],['> LOCATING NODE ............ 97TH & AMSTERDAM','ok'],['> DECRYPT: KURIOUS_JORGE.SIG','',],['> HANDSHAKE WITH METAL FACE ...... ACCEPTED','ok'],['> SUMMONING THE MAJICIAN_','']];
+const bl=$('#bootlog');let bi=0;
+function nextBoot(){if(bi>=bootLines.length){setTimeout(endBoot,450);return}const p=document.createElement('p');p.textContent=bootLines[bi][0];if(bootLines[bi][1])p.className='ok';bl.appendChild(p);bi++;setTimeout(nextBoot,260)}
+function endBoot(){$('#boot').classList.add('off')}
+$('#boot').onclick=endBoot; RM?endBoot():nextBoot();
+
+/* TICKER */
+const debut=new Date('1994-01-18'),since=new Date('1991-01-01');
+function days(d){return Math.floor((Date.now()-d)/864e5).toLocaleString()}
+function buildTicker(){
+  const items=[`<b>NOW:</b> MAJICIAN — EXEC. PROD. DOOM`,`DAYS SINCE A CONSTIPATED MONKEY: <i>${days(debut)}</i>`,`<b>SIGNAL ORIGIN:</b> 97TH & AMSTERDAM`,
+  `VERSES ON DOOM-RELATED RECORDS: <i>8+</i>`,`<b>LATEST:</b> "WHOLE NEW CHAPTER"`,`DAYS ON AIR: <i>${days(since)}</i>`,`BIOLLANTE OF THE MONSTA ISLAND CZARS`,
+  `<b>GRENADA 2016:</b> "UNKNOWN SPECIES" PLAYED FOR THE SUPERVILLAIN`,`WALK LIKE A DUCK · UPTOWN SH*T · I'M KURIOUS`,`<b>STATUS:</b> STILL CONJURING`,`<b style="color:#ff3b3b">INTERCEPTED:</b> "THE CULTURE HAS BEEN ACQUIRED"`,`HIP-HOP CONDITION: <i>CRITICAL</i> · LIFE SUPPORT: THE UNDERGROUND`,`<b style="color:#ff3b3b">ALGORITHM QUOTA:</b> 15-SECOND HOOKS`,`WHO OWNS THE MASTERS? <i>[REDACTED]</i>`,`<b>COUNTER-SIGNAL:</b> UPTOWN · UNCONTAINED`];
+  $('#tick').innerHTML=[...items,...items].map(x=>`<span>${x}</span><span style="color:#f0b63c55">◆</span>`).join('');
+  $('#days').textContent=days(debut);
+}
+buildTicker();
+setInterval(()=>{$('#freq').textContent=(97+Math.sin(Date.now()/900)*.05).toFixed(2)},120);
+
+/* AUDIO */
+const aud=$('#aud');let actx,an,dataF,level=0,playing=false,fakeT=0;
+function initAudio(){if(actx)return;try{actx=new (window.AudioContext||window.webkitAudioContext)();const src=actx.createMediaElementSource(aud);an=actx.createAnalyser();an.fftSize=256;dataF=new Uint8Array(an.frequencyBinCount);src.connect(an);an.connect(actx.destination)}catch(e){}}
+function getLevel(){if(an&&aud.src&&!aud.paused){an.getByteFrequencyData(dataF);let s=0;for(let i=0;i<32;i++)s+=dataF[i];return s/(32*255)}
+  return playing?.35+Math.sin(Date.now()/140)*.15+Math.random()*.15:0}
+
+/* PARTICLE SCHEMATIC FIELD */
+const cv=$('#field'),cx=cv.getContext('2d');let W,H,P=[],mx=-999,my=-999;
+function size(){W=cv.width=innerWidth*devicePixelRatio;H=cv.height=innerHeight*devicePixelRatio;cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';
+  const n=Math.min(110,Math.floor(innerWidth*innerHeight/14000));P=[];for(let i=0;i<n;i++)P.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.6+.4,c:Math.random()<.12})}
+size();addEventListener('resize',size);
+addEventListener('mousemove',e=>{mx=e.clientX*devicePixelRatio;my=e.clientY*devicePixelRatio;look(e.clientX,e.clientY)});
+addEventListener('touchmove',e=>{const t=e.touches[0];mx=t.clientX*devicePixelRatio;my=t.clientY*devicePixelRatio;look(t.clientX,t.clientY)},{passive:true});
+function field(){
+  level=level*.85+getLevel()*.15;
+  cx.clearRect(0,0,W,H);
+  // grid
+  const g=60*devicePixelRatio;cx.strokeStyle='rgba(240,182,60,0.035)';cx.lineWidth=1;cx.beginPath();
+  for(let x=(Date.now()/80%g);x<W;x+=g){cx.moveTo(x,0);cx.lineTo(x,H)}for(let y=0;y<H;y+=g){cx.moveTo(0,y);cx.lineTo(W,y)}cx.stroke();
+  const boost=1+level*3, D=130*devicePixelRatio;
+  for(const p of P){p.x+=p.vx*boost;p.y+=p.vy*boost;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
+    const dx=p.x-mx,dy=p.y-my,d=Math.hypot(dx,dy);if(d<140*devicePixelRatio){p.x+=dx/d*1.5;p.y+=dy/d*1.5}}
+  for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const a=P[i],b=P[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+    if(d<D){cx.strokeStyle=`rgba(240,182,60,${(1-d/D)*(.18+level*.5)})`;cx.beginPath();cx.moveTo(a.x,a.y);
+      // schematic right-angle traces
+      if((i+j)%3===0){cx.lineTo(b.x,a.y);cx.lineTo(b.x,b.y)}else cx.lineTo(b.x,b.y);cx.stroke()}}
+  for(const p of P){cx.fillStyle=p.c?'rgba(78,242,224,.9)':`rgba(255,221,138,${.5+level*.5})`;cx.beginPath();cx.arc(p.x,p.y,p.r*devicePixelRatio*(1+level*1.5),0,7);cx.fill()}
+  scope();
+  requestAnimationFrame(field)}
+
+/* SCOPE (jukebox visual) */
+const sc=$('#scope'),sx=sc.getContext('2d');
+let SW=0,SH=0;function sizeScope(){SW=sc.width=sc.clientWidth*devicePixelRatio;SH=sc.height=sc.clientHeight*devicePixelRatio}sizeScope();addEventListener("resize",sizeScope);
+function scope(){const w=SW,h=SH,c=w/2,m=h/2;
+  sx.clearRect(0,0,w,h);const t=Date.now()/1000,R=Math.min(w,h)*.28;
+  for(let k=0;k<3;k++){sx.strokeStyle=k===1?'rgba(78,242,224,.6)':`rgba(240,182,60,${.8-k*.25})`;sx.lineWidth=(k===0?2:1)*devicePixelRatio;sx.beginPath();
+    for(let a=0;a<=Math.PI*2+.01;a+=.03){let amp;if(an&&aud.src&&!aud.paused){const idx=Math.floor((a/(Math.PI*2))*64)%64;amp=dataF[idx]/255}else amp=level*(.5+.5*Math.sin(a*6+t*4+k));
+      const r=R*(1+k*.18)+amp*R*.55*(k===0?1:.6)+Math.sin(a*3+t+k)*3;const x=c+Math.cos(a)*r,y=m+Math.sin(a)*r;a?sx.lineTo(x,y):sx.moveTo(x,y)}sx.stroke()}
+  sx.fillStyle='rgba(240,182,60,.9)';sx.beginPath();sx.arc(c,m,R*.22*(1+level),0,7);sx.fill();
+  sx.fillStyle='#040406';sx.beginPath();sx.arc(c,m,R*.08,0,7);sx.fill();
+  sx.strokeStyle='rgba(255,255,255,.08)';sx.beginPath();sx.moveTo(0,m);sx.lineTo(w,m);sx.moveTo(c,0);sx.lineTo(c,h);sx.stroke()}
+if(!RM)field();else scope();
+
+/* EYE */
+const pupil=$('#pupil');
+function look(x,y){const r=$('#eye').getBoundingClientRect();const dx=Math.max(-1,Math.min(1,(x-(r.left+r.width/2))/400)),dy=Math.max(-1,Math.min(1,(y-(r.top+r.height*.45))/300));pupil.style.transform=`translate(${dx*22}px,${dy*8}px)`}
+
+/* GLYPH RAIN (tap eye or logo) */
+const rc=$('#rain'),rx=rc.getContext('2d');let raining=0;
+function rain(){if(RM||raining)return;raining=1;rc.width=innerWidth;rc.height=innerHeight;rc.classList.add('on');const cols=Math.floor(innerWidth/16),y=Array(cols).fill(0).map(()=>Math.random()*-40);
+  const glyphs='KURIOUS97AMSTERDAMDOOM3EAS𓂀☉◆アカサタナ01'.split('');let f=0;
+  (function step(){rx.fillStyle='rgba(4,4,6,.18)';rx.fillRect(0,0,rc.width,rc.height);rx.font='14px JetBrains Mono';
+    for(let i=0;i<cols;i++){rx.fillStyle=Math.random()<.08?'#4ef2e0':'#f0b63c';rx.fillText(glyphs[Math.floor(Math.random()*glyphs.length)],i*16,y[i]*16);y[i]+=1;if(y[i]*16>rc.height&&Math.random()>.95)y[i]=0}
+    if(++f<110)requestAnimationFrame(step);else{rc.classList.remove('on');setTimeout(()=>{rx.clearRect(0,0,rc.width,rc.height);raining=0},400)}})()}
+$('#eye').onclick=rain;$('#logo').onclick=rain;
+
+/* JUKEBOX */
+const tracks=[['Unknown Species','MAJICIAN · 2024'],['Eye of Horus','MAJICIAN · 2024'],['Separation Anxiety','MAJICIAN · 2024'],['Par For the Course ft. Mr. Fantastik','MAJICIAN · 2024'],['Whole New Chapter','SINGLE · 2026'],['Easy (prod. Beatminerz)','SINGLE · 2025'],["I'm Kurious",'A CONSTIPATED MONKEY · 1994'],['Walk Like a Duck','A CONSTIPATED MONKEY · 1994']];
+const tl=$('#tracks');
+tracks.forEach((t,i)=>{const li=document.createElement('li');li.innerHTML=`<span>${t[0]}</span><span>${t[1]}</span>`;if(!i)li.className='on';
+  li.onclick=()=>{[...tl.children].forEach(c=>c.className='');li.className='on';$('#ttl').textContent=t[0];$('#src').textContent=t[1]+' · PREVIEW PENDING'};tl.appendChild(li)});
+const play=$('#play'),prog=$('#prog'),tm=$('#tm');
+play.onclick=async()=>{initAudio();if(actx&&actx.state==='suspended')try{await actx.resume()}catch(e){}
+  playing=!playing;play.textContent=playing?'❚❚ Pause':'▶ Play';if(aud.src){try{playing?await aud.play():aud.pause()}catch(e){}}};
+setInterval(()=>{if(playing&&!aud.src){fakeT=(fakeT+1)%240;prog.style.width=(fakeT/240*100)+'%';tm.textContent=`${String(Math.floor(fakeT/60)).padStart(2,'0')}:${String(fakeT%60).padStart(2,'0')}`}},1000);
+aud.ontimeupdate=()=>{if(aud.duration){prog.style.width=(aud.currentTime/aud.duration*100)+'%';const s=Math.floor(aud.currentTime);tm.textContent=`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}};
+aud.onended=()=>{playing=false;play.textContent='▶ Play'};
+$('#bar').onclick=e=>{if(aud.duration){const r=e.currentTarget.getBoundingClientRect();aud.currentTime=(e.clientX-r.left)/r.width*aud.duration}};
+$('#file').onchange=e=>{const f=e.target.files[0];if(!f)return;aud.src=URL.createObjectURL(f);$('#ttl').textContent=f.name.replace(/\.[^.]+$/,'');$('#src').textContent='LOCAL FILE · LIVE DECODE';playing=false;play.click()};
+
+/* LOG */
+const ev=[
+ ['1970','GENESIS','Born uptown','Jorge Antonio Alvarez is born and raised in Manhattan Valley, around 97th & Amsterdam.',''],
+ ['198X','GAME NIGHT','First signal','Rock Steady Park, the Zulu Nation and Game Night in the building\'s community room. The older kids rap and cut breaks, and he takes it all in.',''],
+ ['198X','DEF JAM','Contact: Zev Love X','Interning at Def Jam, he crosses paths with 3rd Bass and meets the KMD MC who later becomes DOOM.','doom'],
+ ['1991','POWERULE','First verse on wax','"Young Stars From Nowhere" with the uptown trio Powerule.',''],
+ ['1992','HOPPOH','Walk Like a Duck','His debut single, produced by the Beatnuts, on Hoppoh, Pete Nice and Bobbito Garcia\'s imprint at Columbia. DJ Red Alert plays it on the radio.','key'],
+ ['1994.01.18','DEBUT LP','A Constipated Monkey','Critics love it. It hits #68 on Billboard\'s R&B/Hip-Hop Albums and #31 on Heatseekers. Then the label contract freezes his solo career for years. Shelved, not silenced.','jam'],
+ ['1999','DOOMSDAY','"?" — Operation: Doomsday','He resurfaces on DOOM\'s solo debut with one of the album\'s standout verses.','doom'],
+ ['2001—03','MIC','Biollante rises','"All Great" drops. He appears in the Monsta Island Czars as Biollante, on King Geedorah\'s Take Me to Your Leader and on Special Herbs + Spices.','doom'],
+ ['2009','II','Return + Supervillainz','His second album, II, includes "Benetton" with DOOM and MC Serch. He also lands a verse on DOOM\'s Born Like This.','doom'],
+ ['2016','GRENADA','The reunion','He meets DOOM abroad and plays him "Unknown Species." DOOM signs on as executive producer of the next album.','doom'],
+ ['2021—23','SECOND WIND','Koncrete Jungle · Monkeyman','His most productive run yet. Monkeyman, made with Finland\'s Cut Beetlez, makes year-end top-10 lists.','key'],
+ ['2024','MAJICIAN','The Majician','Produced by Mono En Stereo, executive produced by DOOM, released on Metalface and Rhymesayers.','now'],
+ ['2025 →','STILL LIVE','Still conjuring','"Easy" with the Beatminerz, "Doom on the Beatbox," then "Whole New Chapter" in 2026. The transmission continues.','now']
+];
+const flagTxt={jam:'SIGNAL JAMMED',doom:'DOOM LINK',key:'KEY EVENT',now:'ACTIVE'};
+$('#logs').innerHTML=ev.map(e=>`<div class="entry"><div class="ts">${e[0]}<small>${e[1]}</small></div><div><h3>${e[2]}</h3><p>${e[3]}</p>${e[4]?`<span class="flag ${e[4]}">${flagTxt[e[4]]}</span>`:''}</div></div>`).join('');
+const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.2});
+document.querySelectorAll('.entry').forEach(e=>io.observe(e));
+
+/* ARCANA */
+const G={
+ monkey:'<circle cx="50" cy="42" r="20"/><circle cx="28" cy="38" r="7"/><circle cx="72" cy="38" r="7"/><path d="M42 48 Q50 54 58 48"/><path d="M28 92 Q50 64 72 92"/><path d="M10 10 H90 V90" stroke-dasharray="2 4" opacity=".4"/>',
+ two:'<path d="M36 14 V86 M64 14 V86"/><circle cx="50" cy="50" r="36"/><circle cx="50" cy="50" r="44" stroke-dasharray="1 5" opacity=".5"/>',
+ jungle:'<path d="M50 92 V30"/><path d="M50 42 Q30 20 14 32 M50 42 Q70 20 86 32 M50 58 Q28 46 16 60 M50 58 Q72 46 84 60"/><path d="M16 92 V70 H28 V92 M70 92 V62 H84 V92"/>',
+ man:'<circle cx="50" cy="28" r="13"/><path d="M50 41 V72 M28 54 H72 M50 72 L36 92 M50 72 L64 92"/><path d="M12 12 L88 88 M88 12 L12 88" stroke-dasharray="2 6" opacity=".4"/>',
+ eye:'<path d="M8 50 C30 24 70 24 92 50 C70 76 30 76 8 50Z"/><circle cx="50" cy="50" r="12" fill="#f0b63c"/><path d="M44 66 L40 90 M60 64 C68 76 80 78 86 72"/><circle cx="50" cy="50" r="40" stroke-dasharray="1 4" opacity=".4"/>',
+ sun:'<circle cx="50" cy="50" r="17"/><path d="M50 10V24M50 76V90M10 50H24M76 50H90M22 22L32 32M68 68L78 78M78 22L68 32M32 68L22 78"/><circle cx="50" cy="50" r="30" stroke-dasharray="2 5" opacity=".5"/>'
+};
+const A=[['0','The Monkey','A Constipated Monkey','1994 · HOPPOH / COLUMBIA','Beatnuts beats and wordplay that\'s razor-sharp and frequently hilarious. The uptown classic that started it all.','monkey'],
+ ['II','The Return','II','2009 · AMALGAM DIGITAL','Fifteen years later. "Benetton" with DOOM and MC Serch. A grown man\'s record.','two'],
+ ['III','The Jungle','Koncrete Jungle','2021 · CHONG WIZARD','Produced by Ro Data, with Planet Asia and Homeboy Sandman. The second wind begins.','jungle'],
+ ['IV','The Monkeyman','Monkeyman','2023 · WEAPONIZE','A transatlantic link with Finland\'s Cut Beetlez. Uptown mythology, fully owned.','man'],
+ ['V','The Majician','Majician','2024 · METALFACE / RHYMESAYERS','Executive produced by DOOM, produced by Mono En Stereo. A tribute to a lifelong creative partnership.','eye'],
+ ['VI','God\'s Time','God\'s Time','2025 · CASUAL DAD','Patience as a practice. Right on time.','sun']];
+$('#cards').innerHTML=A.map(a=>`<div class="card"><div class="ci"><div class="face"><div class="top"><b>${a[0]}</b><span>ARCANA</span></div><svg viewBox="0 0 100 100" fill="none" stroke="#f0b63c" stroke-width="2" stroke-linecap="round">${G[a[5]]}</svg><div class="nm">${a[1]}</div></div><div class="face back"><div class="meta">${a[3]}</div><h4>${a[2]}</h4><p>${a[4]}</p></div></div></div>`).join('');
+document.querySelectorAll('.card').forEach(c=>c.onclick=()=>c.classList.toggle('flip'));
+
+/* VAULT */
+const V=[['1993','Dust to Dust','Prime Minister Pete Nice & Daddy Rich · guest verse'],['1993','No Need for Alarm','Del tha Funkee Homosapien · guest verse'],['1994','Smokin\' That Sh*t','KMD — Black Bastards'],['1994','6 Feet Deep','Gravediggaz · guest verse'],['1999','?','MF DOOM — Operation: Doomsday'],['2001','Fast Lane','Monsta Island Czars — The Next 1,000 Years'],['2003','Fastlane','King Geedorah — Take Me to Your Leader'],['2003','Mugwort + Cinnamon = Shifting Lanes','MF Grimm & MF DOOM — Special Herbs + Spices'],['2006','Traveling','MF Grimm — American Hunger'],['2009','Supervillainz','MF DOOM — Born Like This'],['2014','Enough','Homeboy Sandman — Hallways']];
+$('#vlt').innerHTML=V.map(x=>`<div><div class="y">${x[0]}</div><div class="s">${x[1]}</div><div class="a">${x[2]}</div></div>`).join('');
+
+const nv=document.querySelector('nav');$('#mbtn').onclick=()=>{nv.classList.toggle('open');$('#mbtn').textContent=nv.classList.contains('open')?'✕ CLOSE':'≡ MENU'};
+nv.querySelectorAll('ul a').forEach(a=>a.addEventListener('click',()=>{nv.classList.remove('open');$('#mbtn').textContent='≡ MENU'}));
+if(!RM){
+  const heads=[...document.querySelectorAll('.sh h2')];
+  setInterval(()=>{const vis=heads.filter(h=>{const r=h.getBoundingClientRect();return r.bottom>0&&r.top<innerHeight});const h=vis[Math.floor(Math.random()*vis.length)];if(!h)return;h.classList.remove('gl');void h.offsetWidth;h.classList.add('gl')},2400);
+  const band=$('#band');
+  (function tear(){setTimeout(()=>{document.body.classList.add('tear');band.style.top=(Math.random()*90)+'vh';band.classList.add('on');
+    setTimeout(()=>{document.body.classList.replace('tear','tear2');band.style.top=(Math.random()*90)+'vh'},70);
+    setTimeout(()=>{document.body.classList.remove('tear2');band.classList.remove('on');tear()},150)},5000+Math.random()*7000)})();
+  const G2='█▓▒░<>/\\#%&@$*+=?01';
+  function scramble(el){const o=el.dataset.o||(el.dataset.o=el.textContent);let f=0;const t=setInterval(()=>{el.textContent=[...o].map((c,i)=>c===' '||i<f?c:G2[Math.floor(Math.random()*G2.length)]).join('');f+=2;if(f>o.length){clearInterval(t);el.textContent=o}},35)}
+  const pre=document.querySelector('.pre');setInterval(()=>scramble(pre),7000);
+  const ids=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){scramble(x.target);ids.unobserve(x.target)}}),{threshold:.5});
+  document.querySelectorAll('.sh .id').forEach(e=>ids.observe(e));
+}
+const eyeEl=$('#eye'),jam=$('#jam');
+function seeThrough(){eyeEl.classList.add('see');jam.classList.add('hit');setTimeout(()=>{eyeEl.classList.remove('see');jam.classList.remove('hit')},1400)}
+$('#monk').onclick=()=>document.getElementById('arcana').scrollIntoView({behavior:'smooth'});
+setTimeout(seeThrough,1800);
+if(!RM){new MutationObserver(()=>{if(document.body.classList.contains('tear'))seeThrough()}).observe(document.body,{attributes:true,attributeFilter:['class']})}
+if(!RM){
+  const wm=$('#wm'),bug=$('#bug'),WT=['3EASCORTEX.COM'];
+  function ghost(){const t=WT[Math.floor(Math.random()*WT.length)];wm.textContent=t;wm.dataset.t=t;
+    wm.style.setProperty('--r',(Math.random()*16-8).toFixed(1)+'deg');
+    wm.style.top=(12+Math.random()*62)+'vh';const sp=100-wm.offsetWidth/innerWidth*100-4;wm.style.left=(sp>2?2+Math.random()*sp:1)+'vw';
+    wm.classList.remove('on');void wm.offsetWidth;wm.classList.add('on');
+    bug.classList.remove('flick');void bug.offsetWidth;bug.classList.add('flick')}
+  (function loop(){setTimeout(()=>{ghost();loop()},7000+Math.random()*8000)})();
+  setTimeout(ghost,3500);
+}
+document.querySelectorAll('.rx').forEach(r=>r.onclick=()=>r.classList.toggle('show'));
+$('#f').onsubmit=e=>{e.preventDefault();$('#sent').style.display='block'};
+</script>
+</body>
+</html>
