@@ -212,6 +212,30 @@ section{padding:110px 4vw;position:relative}
 .back h4{font-family:var(--display);font-weight:700;font-size:28px;line-height:.92;text-transform:uppercase}
 .back p{font-size:12px;color:#c9c3b6}
 .hint{margin-top:16px;font-size:10px;letter-spacing:.3em;color:var(--dim)}
+/* DECK */
+.table{max-width:1240px;padding:18px 18px 22px;--cw:clamp(98px,12.5vw,150px)}
+.stage{position:relative;height:calc(var(--cw)*2.75);perspective:1400px;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.stage::after{content:"";position:absolute;left:50%;bottom:6%;width:calc(var(--cw)*3.4);height:calc(var(--cw)*.5);transform:translateX(-50%);background:radial-gradient(ellipse,#f0b63c14,#0000 70%);pointer-events:none}
+.dc{position:absolute;left:50%;top:55%;width:var(--cw);aspect-ratio:7/12;margin-left:calc(var(--cw)/-2);margin-top:calc(var(--cw)*-6/7);transform-origin:50% 150%;transition:transform .55s cubic-bezier(.2,.7,.2,1);cursor:pointer;transform-style:preserve-3d;will-change:transform}
+.dc .ci{transition:transform .8s cubic-bezier(.2,.7,.2,1)}
+.dc.flp .ci{transform:rotateY(180deg)}
+.dc .face{padding:10px}
+.dc .cf{transform:rotateY(180deg);border-color:var(--cyan);box-shadow:0 0 30px #4ef2e033}
+.dc .cf .nm{font-size:calc(var(--cw)*.12)}
+.dc .cf .al{font-family:var(--hud);font-size:calc(var(--cw)*.062);letter-spacing:.12em;color:var(--cyan);text-align:center;text-transform:uppercase}
+.dc .cb{align-items:center;justify-content:center;gap:6px;background:repeating-linear-gradient(45deg,#f0b63c12 0 5px,#0000 5px 10px),linear-gradient(170deg,#16121e,#07070b)}
+.dc .cb::before{content:"";position:absolute;inset:7px;border:1px solid #f0b63c55}
+.dc .cb svg{width:62%}
+.dc .cb b{font-family:var(--tag);font-weight:400;font-size:calc(var(--cw)*.15);color:var(--gold);transform:rotate(-4deg);text-shadow:2px 2px 0 #7a1010}
+.dc:hover .cb{border-color:var(--gold);box-shadow:0 0 22px #f0b63c44}
+.stage.glx .dc{filter:drop-shadow(-3px 0 0 #ff3b3b99) drop-shadow(3px 0 0 #4ef2e099)}
+.rinfo{min-height:120px;padding:18px 6px 0;text-align:center;max-width:640px;margin:0 auto}
+.rinfo .meta{font-family:var(--hud);font-size:11px;letter-spacing:.25em;color:var(--cyan)}
+.rinfo h4{font-family:var(--display);font-weight:700;font-size:clamp(26px,3.6vw,40px);text-transform:uppercase;line-height:1;margin:6px 0 8px}
+.rinfo p{color:#c9c3b6;font-size:13px}
+.rinfo .say{font-family:var(--hand);font-size:clamp(22px,3vw,32px);color:var(--gold2);transform:rotate(-2deg)}
+.deckctl{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:16px}
+.deckctl .hint{margin:0}
 
 /* VAULT */
 .vault{max-width:1240px;display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
@@ -407,9 +431,12 @@ body.tear2 main{transform:translateX(-5px);filter:invert(.06) hue-rotate(-30deg)
 </section>
 
 <section id="arcana">
-  <div class="sh"><span class="id">[04] MAJOR ARCANA</span><h2>Pull <em>a card</em></h2><span class="rule"></span></div>
-  <div class="arcana" id="cards"></div>
-  <div class="hint">TAP A CARD TO REVEAL THE RECORD</div>
+  <div class="sh"><span class="id">[04] MAJOR ARCANA</span><h2>Pick <em>a card, any card</em></h2><span class="rule"></span></div>
+  <div class="panel hud table">
+    <div class="stage" id="stage"></div>
+    <div class="rinfo" id="rinfo"><div class="say">Six records. One deck. Your pick.</div></div>
+    <div class="deckctl"><button class="btn solid" id="shuf">⟲ Shuffle</button><button class="btn" id="draw">Fan the deck</button><span class="hint" id="dhint">TAP THE DECK TO FAN IT OUT</span></div>
+  </div>
 </section>
 
 <section id="vault">
@@ -581,8 +608,40 @@ const A=[['0','The Monkey','A Constipated Monkey','1994 · HOPPOH / COLUMBIA','B
  ['IV','The Monkeyman','Monkeyman','2023 · WEAPONIZE','A transatlantic link with Finland\'s Cut Beetlez. Uptown mythology, fully owned.','man'],
  ['V','The Majician','Majician','2024 · METALFACE / RHYMESAYERS','Executive produced by DOOM, produced by Mono En Stereo. A tribute to a lifelong creative partnership.','eye'],
  ['VI','God\'s Time','God\'s Time','2025 · CASUAL DAD','Patience as a practice. Right on time.','sun']];
-$('#cards').innerHTML=A.map(a=>`<div class="card"><div class="ci"><div class="face"><div class="top"><b>${a[0]}</b><span>ARCANA</span></div><svg viewBox="0 0 100 100" fill="none" stroke="#f0b63c" stroke-width="2" stroke-linecap="round">${G[a[5]]}</svg><div class="nm">${a[1]}</div></div><div class="face back"><div class="meta">${a[3]}</div><h4>${a[2]}</h4><p>${a[4]}</p></div></div></div>`).join('');
-document.querySelectorAll('.card').forEach(c=>c.onclick=()=>c.classList.toggle('flip'));
+/* DECK: shuffle, fan, pick */
+const stage=$('#stage'),rinfo=$('#rinfo'),dhint=$('#dhint'),shufB=$('#shuf'),drawB=$('#draw');
+const BACK='<svg viewBox="0 0 240 120" fill="none" stroke="#f0b63c" stroke-width="5" stroke-linecap="round"><path d="M20 58 C60 18 160 14 220 50 C170 86 70 92 20 58Z"/><circle cx="120" cy="54" r="20" fill="#f0b63c" stroke="none"/><circle cx="120" cy="54" r="7" fill="#07070b" stroke="none"/><path d="M96 84 L92 112"/><path d="M140 82 C150 96 170 100 186 92"/></svg><b>Majician</b>';
+const DC=A.map((a,i)=>{const d=document.createElement('div');d.className='dc';d.dataset.i=i;
+  d.innerHTML=`<div class="ci"><div class="face cb">${BACK}</div><div class="face cf"><div class="top"><b>${a[0]}</b><span>ARCANA</span></div><svg viewBox="0 0 100 100" fill="none" stroke="#4ef2e0" stroke-width="2" stroke-linecap="round">${G[a[5]]}</svg><div><div class="nm">${a[1]}</div><div class="al">${a[2]}</div></div></div></div>`;
+  stage.appendChild(d);return d});
+const jit=DC.map(()=>Math.random()*6-3);
+let order=DC.map((_,i)=>i),mode='stack',picked=-1,busy=false;
+const cw=()=>DC[0].offsetWidth;
+const rnd=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function stack(dx=0){order.forEach((ix,pos)=>{const d=DC[ix];d.style.zIndex=pos;d.style.transform=`translate(${dx+pos*1.4}px,${-pos*1.4}px) rotate(${jit[ix]}deg)`})}
+function info(html){rinfo.style.opacity=0;setTimeout(()=>{rinfo.innerHTML=html;rinfo.style.opacity=1},180)}
+rinfo.style.transition='opacity .18s';
+function reset(){DC.forEach(d=>d.classList.remove('flp'));picked=-1;mode='stack';stack()}
+function fan(){if(busy)return;if(mode==='pick')reset();mode='fan';const n=order.length,spread=Math.min(64,innerWidth/9);
+  order.forEach((ix,pos)=>{const d=DC[ix],ang=-spread/2+spread*pos/(n-1);d.style.zIndex=pos;d.style.transform=`rotate(${ang}deg) translateY(-6%)`});
+  dhint.textContent='PICK A CARD, ANY CARD';drawB.textContent='Close the fan';info('<div class="say">Pick a card, any card.</div>')}
+function pick(ix){mode='pick';picked=ix;const w=cw(),dx=-Math.min(w*1.55,stage.clientWidth/2-w*.55);
+  order.filter(i=>i!==ix).forEach((i,pos)=>{const d=DC[i];d.style.zIndex=pos;d.style.transform=`translate(${dx+pos*1.4}px,${-pos*1.4+w*.1}px) rotate(${jit[i]-4}deg) scale(.82)`});
+  const d=DC[ix];d.style.zIndex=60;d.style.transform=`translate(${w*.45}px,-4%) scale(1.22) rotate(0deg)`;setTimeout(()=>d.classList.add('flp'),260);
+  const a=A[ix];info(`<div class="meta">${a[3]}</div><h4>${a[2]}</h4><p>${a[4]}</p>`);
+  dhint.textContent='TAP THE DECK TO DRAW AGAIN';drawB.textContent='Draw again'}
+function shuffle(){if(busy)return;busy=true;reset();stage.classList.add('glx');info('<div class="say">Watch the hands…</div>');dhint.textContent='SHUFFLING';
+  const w=cw();let k=0;
+  (function riffle(){order.forEach((ix,pos)=>{const d=DC[ix],L=pos%2===0;d.style.transform=`translate(${(L?-1:1)*w*.62}px,${-pos*1.4}px) rotate(${(L?-8:8)+jit[ix]}deg)`});
+    setTimeout(()=>{order=rnd(order);stack();if(++k<3)setTimeout(riffle,240);else setTimeout(()=>{busy=false;stage.classList.remove('glx');dhint.textContent='TAP THE DECK TO FAN IT OUT';drawB.textContent='Fan the deck';info('<div class="say">Shuffled. The deck is hot.</div>')},450)},300)})()}
+stage.addEventListener('click',e=>{if(busy)return;const d=e.target.closest('.dc');
+  if(mode==='stack')return fan();
+  if(mode==='fan'){if(d)pick(+d.dataset.i);else{reset();dhint.textContent='TAP THE DECK TO FAN IT OUT';drawB.textContent='Fan the deck'}return}
+  if(mode==='pick'){if(d&&+d.dataset.i===picked){d.classList.toggle('flp');return}order=rnd(order);reset();setTimeout(fan,350)}});
+shufB.onclick=shuffle;
+drawB.onclick=()=>{if(busy)return;if(mode==='fan'){reset();dhint.textContent='TAP THE DECK TO FAN IT OUT';drawB.textContent='Fan the deck'}else{if(mode==='pick'){order=rnd(order);reset();setTimeout(fan,350)}else fan()}};
+addEventListener('resize',()=>{if(mode==='stack')stack();else if(mode==='fan')fan();else pick(picked)});
+order=rnd(order);stack();
 
 /* VAULT */
 const V=[['1993','Dust to Dust','Prime Minister Pete Nice & Daddy Rich · guest verse'],['1993','No Need for Alarm','Del tha Funkee Homosapien · guest verse'],['1994','Smokin\' That Sh*t','KMD — Black Bastards'],['1994','6 Feet Deep','Gravediggaz · guest verse'],['1999','?','MF DOOM — Operation: Doomsday'],['2001','Fast Lane','Monsta Island Czars — The Next 1,000 Years'],['2003','Fastlane','King Geedorah — Take Me to Your Leader'],['2003','Mugwort + Cinnamon = Shifting Lanes','MF Grimm & MF DOOM — Special Herbs + Spices'],['2006','Traveling','MF Grimm — American Hunger'],['2009','Supervillainz','MF DOOM — Born Like This'],['2014','Enough','Homeboy Sandman — Hallways']];
