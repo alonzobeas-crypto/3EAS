@@ -119,6 +119,34 @@ section{padding:110px 4vw;position:relative}
 .reply small{display:block;font-family:var(--hud);font-size:11px;letter-spacing:.3em;color:var(--dim);margin-top:6px;transform:rotate(2deg)}
 @media(max-width:620px){.memo{padding-bottom:30px}.stamp{position:static;display:inline-block;margin-top:18px}}
 
+/* RAICES */
+.raices{max-width:1240px;display:grid;grid-template-columns:1.1fr .9fr;gap:24px}
+@media(max-width:900px){.raices{grid-template-columns:1fr}}
+.flags{padding:26px;display:grid;grid-template-columns:1fr 1fr;gap:18px;align-content:center}
+.fl{text-align:center}
+.fl small{display:block;margin-top:10px;font-family:var(--hud);font-size:10px;letter-spacing:.25em;color:var(--dim)}
+.flag{width:100%;display:block;filter:drop-shadow(0 0 10px #0008);transition:filter .2s}
+.flag rect,.flag path{transition:fill .35s steps(3)}
+.flag .edge{fill:none;stroke:#f0b63c55;stroke-width:2}
+.flag .star{fill:#f4efe2}
+#fPR .s0{fill:#c8322f}#fPR .s1{fill:#f4efe2}#fPR .tri{fill:#2f74b5}
+#fCU .s0{fill:#1f3f8f}#fCU .s1{fill:#f4efe2}#fCU .tri{fill:#c8322f}
+.flags.mir #fPR .s0{fill:#1f3f8f}.flags.mir #fPR .tri{fill:#c8322f}
+.flags.mir #fCU .s0{fill:#c8322f}.flags.mir #fCU .tri{fill:#2f74b5}
+.flags.mir .flag{filter:drop-shadow(-3px 0 0 #ff3b3b88) drop-shadow(3px 0 0 #4ef2e088)}
+.flagnote{grid-column:1/-1;font-family:var(--hud);font-size:11px;letter-spacing:.2em;color:var(--cyan);text-align:center;margin-top:6px}
+.rtxt{padding:28px;font-size:14px;line-height:1.85}
+.rtxt p+p{margin-top:14px}
+.rtxt b{color:var(--gold);font-weight:600}
+.rtxt .es{font-family:var(--hand);font-size:24px;color:var(--cyan);display:block;margin-bottom:8px;transform:rotate(-2deg)}
+.clave{display:grid;grid-template-columns:repeat(16,1fr);gap:4px;margin-top:20px}
+.clave i{height:10px;border:1px solid #ffffff1a;background:#ffffff08}
+.clave i.h{border-color:#f0b63c66}
+.clave i.on{background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.clave i.h.on{background:var(--gold);box-shadow:0 0 12px var(--gold)}
+.clvl{font-family:var(--hud);font-size:10px;letter-spacing:.25em;color:var(--dim);margin-top:8px;display:flex;justify-content:space-between}
+.live.hit::before{background:var(--gold);box-shadow:0 0 14px var(--gold)}
+
 /* DOSSIER */
 .dossier{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;max-width:1240px}
 @media(max-width:900px){.dossier{grid-template-columns:1fr}}
@@ -261,6 +289,7 @@ body.tear2 main{transform:translateX(-5px);filter:invert(.06) hue-rotate(-30deg)
   <ul>
     <li><a href="#intercept">intercept</a></li>
     <li><a href="#dossier">dossier</a></li>
+    <li><a href="#raices">raíces</a></li>
     <li><a href="#signal">signal</a></li>
     <li><a href="#log">log</a></li>
     <li><a href="#arcana">arcana</a></li>
@@ -336,6 +365,24 @@ body.tear2 main{transform:translateX(-5px);filter:invert(.06) hue-rotate(-30deg)
       <div><dt>Days since debut LP</dt><dd class="hl" id="days">—</dd></div>
       <div><dt>Status</dt><dd style="color:var(--cyan)">● TRANSMITTING</dd></div>
     </dl>
+  </div>
+</section>
+
+<section id="raices">
+  <div class="sh"><span class="id">[01B] RAÍCES</span><h2>Two <em>islands</em></h2><span class="rule"></span></div>
+  <div class="raices">
+    <div class="panel hud flags" id="flags">
+      <div class="fl"><svg class="flag" id="fPR" viewBox="0 0 300 200"><rect class="s0" x="0" y="0" width="300" height="40"/><rect class="s1" x="0" y="40" width="300" height="40"/><rect class="s0" x="0" y="80" width="300" height="40"/><rect class="s1" x="0" y="120" width="300" height="40"/><rect class="s0" x="0" y="160" width="300" height="40"/><path class="tri" d="M0 0 L173 100 L0 200Z"/><path class="star" d="M58.0,70.0 L65.1,90.3 L86.5,90.7 L69.4,103.7 L75.6,124.3 L58.0,112.0 L40.4,124.3 L46.6,103.7 L29.5,90.7 L50.9,90.3Z"/><rect class="edge" x="1" y="1" width="298" height="198"/></svg><small>PUERTO RICO · 1895</small></div>
+      <div class="fl"><svg class="flag" id="fCU" viewBox="0 0 300 200"><rect class="s0" x="0" y="0" width="300" height="40"/><rect class="s1" x="0" y="40" width="300" height="40"/><rect class="s0" x="0" y="80" width="300" height="40"/><rect class="s1" x="0" y="120" width="300" height="40"/><rect class="s0" x="0" y="160" width="300" height="40"/><path class="tri" d="M0 0 L173 100 L0 200Z"/><path class="star" d="M58.0,70.0 L65.1,90.3 L86.5,90.7 L69.4,103.7 L75.6,124.3 L58.0,112.0 L40.4,124.3 L46.6,103.7 L29.5,90.7 L50.9,90.3Z"/><rect class="edge" x="1" y="1" width="298" height="198"/></svg><small>CUBA · 1849</small></div>
+      <div class="flagnote">SAME DESIGN · COLORS INVERTED · TAP TO MIRROR</div>
+    </div>
+    <div class="panel hud rtxt">
+      <span class="es">Boricua y cubano.</span>
+      <p>In 1895, Puerto Rican exiles in <b>Manhattan</b> unveiled a new flag for their island: Cuba's design with the colors flipped. Two islands, one fight against the same empire, stitched together in New York.</p>
+      <p>Kurious carries both. His mother came from Puerto Rico at <b>13</b>, an orphan who didn't speak English, and built a life uptown. Manhattan Valley in those days was Black and Puerto Rican, all mixed together, and the culture came out of that mix.</p>
+      <div class="clave" id="clave"></div>
+      <div class="clvl"><span>CLAVE 3-2 · THE HEARTBEAT UNDER EVERYTHING</span><span id="cbpm">100 BPM</span></div>
+    </div>
   </div>
 </section>
 
@@ -421,7 +468,7 @@ function days(d){return Math.floor((Date.now()-d)/864e5).toLocaleString()}
 function buildTicker(){
   const items=[`<b>NOW:</b> MAJICIAN — EXEC. PROD. DOOM`,`DAYS SINCE A CONSTIPATED MONKEY: <i>${days(debut)}</i>`,`<b>SIGNAL ORIGIN:</b> 97TH & AMSTERDAM`,
   `VERSES ON DOOM-RELATED RECORDS: <i>8+</i>`,`<b>LATEST:</b> "WHOLE NEW CHAPTER"`,`DAYS ON AIR: <i>${days(since)}</i>`,`BIOLLANTE OF THE MONSTA ISLAND CZARS`,
-  `<b>GRENADA 2016:</b> "UNKNOWN SPECIES" PLAYED FOR THE SUPERVILLAIN`,`WALK LIKE A DUCK · UPTOWN SH*T · I'M KURIOUS`,`<b>STATUS:</b> STILL CONJURING`,`<b style="color:#ff3b3b">INTERCEPTED:</b> "THE CULTURE HAS BEEN ACQUIRED"`,`HIP-HOP CONDITION: <i>CRITICAL</i> · LIFE SUPPORT: THE UNDERGROUND`,`<b style="color:#ff3b3b">ALGORITHM QUOTA:</b> 15-SECOND HOOKS`,`WHO OWNS THE MASTERS? <i>[REDACTED]</i>`,`<b>COUNTER-SIGNAL:</b> UPTOWN · UNCONTAINED`];
+  `<b>GRENADA 2016:</b> "UNKNOWN SPECIES" PLAYED FOR THE SUPERVILLAIN`,`WALK LIKE A DUCK · UPTOWN SH*T · I'M KURIOUS`,`<b>STATUS:</b> STILL CONJURING`,`<b style="color:#ff3b3b">INTERCEPTED:</b> "THE CULTURE HAS BEEN ACQUIRED"`,`HIP-HOP CONDITION: <i>CRITICAL</i> · LIFE SUPPORT: THE UNDERGROUND`,`<b style="color:#ff3b3b">ALGORITHM QUOTA:</b> 15-SECOND HOOKS`,`WHO OWNS THE MASTERS? <i>[REDACTED]</i>`,`<b>COUNTER-SIGNAL:</b> UPTOWN · UNCONTAINED`,`<b>RAÍCES:</b> BORICUA + CUBANO`,`<b>1895:</b> PUERTO RICO'S FLAG UNVEILED IN MANHATTAN · <i>CUBA'S COLORS, INVERTED</i>`,`<b>CLAVE:</b> 3-2`];
   $('#tick').innerHTML=[...items,...items].map(x=>`<span>${x}</span><span style="color:#f0b63c55">◆</span>`).join('');
   $('#days').textContent=days(debut);
 }
@@ -570,6 +617,16 @@ if(!RM){
     bug.classList.remove('flick');void bug.offsetWidth;bug.classList.add('flick')}
   (function loop(){setTimeout(()=>{ghost();loop()},7000+Math.random()*8000)})();
   setTimeout(ghost,3500);
+}
+/* RAICES: mirror flags + clave */
+const flg=$('#flags');flg.onclick=()=>flg.classList.toggle('mir');
+const cl=$('#clave'),HITS=[0,3,6,10,12],cells=[];
+for(let i=0;i<16;i++){const c=document.createElement('i');if(HITS.includes(i))c.className='h';cl.appendChild(c);cells.push(c)}
+if(!RM){let step=0;const live=document.querySelector('.live');
+  setInterval(()=>{cells.forEach(c=>c.classList.remove('on'));cells[step].classList.add('on');
+    if(HITS.includes(step)){live.classList.add('hit');setTimeout(()=>live.classList.remove('hit'),90)}
+    step=(step+1)%16},150);
+  setInterval(()=>{if(!flg.matches(':hover')){flg.classList.add('mir');setTimeout(()=>flg.classList.remove('mir'),900)}},6000);
 }
 document.querySelectorAll('.rx').forEach(r=>r.onclick=()=>r.classList.toggle('show'));
 $('#f').onsubmit=e=>{e.preventDefault();$('#sent').style.display='block'};
