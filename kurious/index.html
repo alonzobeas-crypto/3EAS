@@ -507,29 +507,60 @@ function initAudio(){if(actx)return;try{actx=new (window.AudioContext||window.we
 function getLevel(){if(an&&aud.src&&!aud.paused){an.getByteFrequencyData(dataF);let s=0;for(let i=0;i<32;i++)s+=dataF[i];return s/(32*255)}
   return playing?.35+Math.sin(Date.now()/140)*.15+Math.random()*.15:0}
 
-/* PARTICLE SCHEMATIC FIELD */
-const cv=$('#field'),cx=cv.getContext('2d');let W,H,P=[],mx=-999,my=-999;
-function size(){W=cv.width=innerWidth*devicePixelRatio;H=cv.height=innerHeight*devicePixelRatio;cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';
-  const n=Math.min(110,Math.floor(innerWidth*innerHeight/14000));P=[];for(let i=0;i<n;i++)P.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.6+.4,c:Math.random()<.12})}
+/* UPTOWN GRID: Manhattan Valley street map on the real 29° grid tilt. Home node 97th & Amsterdam, the 1 train under Broadway, scrolling = heading uptown */
+const cv=$('#field'),cx=cv.getContext('2d');let W,H,AV,S,mx=-999,my=-999,train=null,trainAt=Date.now()+2500;
+const HOME=97,TILT=29*Math.PI/180,CT=Math.cos(TILT),ST=Math.sin(TILT),MAJOR=[96,106,110,116,125,135,145,155];
+function size(){const d=devicePixelRatio;W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cv.style.width=W+'px';cv.style.height=H+'px';AV=Math.max(120,Math.min(230,W/6.5));S=AV/3.4}
 size();addEventListener('resize',size);
-addEventListener('mousemove',e=>{mx=e.clientX*devicePixelRatio;my=e.clientY*devicePixelRatio;look(e.clientX,e.clientY)});
-addEventListener('touchmove',e=>{const t=e.touches[0];mx=t.clientX*devicePixelRatio;my=t.clientY*devicePixelRatio;look(t.clientX,t.clientY)},{passive:true});
-function field(){
-  level=level*.85+getLevel()*.15;
-  cx.clearRect(0,0,W,H);
-  // grid
-  const g=60*devicePixelRatio;cx.strokeStyle='rgba(240,182,60,0.035)';cx.lineWidth=1;cx.beginPath();
-  for(let x=(Date.now()/80%g);x<W;x+=g){cx.moveTo(x,0);cx.lineTo(x,H)}for(let y=0;y<H;y+=g){cx.moveTo(0,y);cx.lineTo(W,y)}cx.stroke();
-  const boost=1+level*3, D=130*devicePixelRatio;
-  for(const p of P){p.x+=p.vx*boost;p.y+=p.vy*boost;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
-    const dx=p.x-mx,dy=p.y-my,d=Math.hypot(dx,dy);if(d<140*devicePixelRatio){p.x+=dx/d*1.5;p.y+=dy/d*1.5}}
-  for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const a=P[i],b=P[j],d=Math.hypot(a.x-b.x,a.y-b.y);
-    if(d<D){cx.strokeStyle=`rgba(240,182,60,${(1-d/D)*(.18+level*.5)})`;cx.beginPath();cx.moveTo(a.x,a.y);
-      // schematic right-angle traces
-      if((i+j)%3===0){cx.lineTo(b.x,a.y);cx.lineTo(b.x,b.y)}else cx.lineTo(b.x,b.y);cx.stroke()}}
-  for(const p of P){cx.fillStyle=p.c?'rgba(78,242,224,.9)':`rgba(255,221,138,${.5+level*.5})`;cx.beginPath();cx.arc(p.x,p.y,p.r*devicePixelRatio*(1+level*1.5),0,7);cx.fill()}
-  scope();
-  requestAnimationFrame(field)}
+addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;look(e.clientX,e.clientY)});
+addEventListener('touchmove',e=>{const t=e.touches[0];mx=t.clientX;my=t.clientY;look(t.clientX,t.clientY)},{passive:true});
+function avName(i,n){return i===-3?'RIVERSIDE':i===-2&&n<=107?'WEST END':i===-1?'BROADWAY':i===0?'AMSTERDAM':i===1&&n<110?'COLUMBUS':i===2?(n<110?'CPW':'F. DOUGLASS'):''}
+const PK=[];function packet(){const st=Math.random()<.6;return st?{st,n:0,i:0,p:-3.2*AV,v:(.6+Math.random()*.8)}:{st,i:Math.floor(Math.random()*6)-3,p:0,v:(Math.random()<.5?1:-1)*(.5+Math.random()*.6)}}
+function frame(){
+  const d=devicePixelRatio,now=Date.now(),off=scrollY*.15,R=Math.hypot(W,H)/2+60,L=1+level*2.5;
+  const yOf=n=>-(n-HOME)*S+off,nLo=Math.max(59,Math.floor(HOME+(off-R)/S)),nHi=Math.ceil(HOME+(off+R)/S);
+  cx.setTransform(d,0,0,d,0,0);cx.clearRect(0,0,W,H);cx.translate(W/2,H/2);cx.rotate(TILT);cx.lineWidth=1;
+  const y110=yOf(110),west=-3*AV;
+  // Hudson: slow flowing hatch west of Riverside
+  cx.strokeStyle='rgba(78,242,224,.05)';cx.setLineDash([2,14]);cx.lineDashOffset=-(now/90%16);cx.beginPath();
+  for(let x=west-AV*.55;x>-R;x-=9){cx.moveTo(x,-R);cx.lineTo(x,R)}cx.stroke();cx.setLineDash([]);
+  // Central Park: dotted ground east of CPW, south of 110th
+  if(y110<R){cx.fillStyle='rgba(240,182,60,.09)';for(let x=2*AV+14;x<R;x+=14)for(let y=Math.max(y110+10,-R);y<R;y+=14)if(((x+y)|0)%28<14)cx.fillRect(x,y,1,1)}
+  // streets
+  cx.font='9px "Share Tech Mono",monospace';
+  for(let n=nLo;n<=nHi;n++){const y=yOf(n),mj=MAJOR.includes(n),xE=n<110?2*AV:R;
+    cx.strokeStyle=`rgba(240,182,60,${(mj?.11:.05)*L})`;cx.lineWidth=mj?1.4:1;cx.beginPath();cx.moveTo(west,y);cx.lineTo(xE,y);cx.stroke();
+    cx.fillStyle=`rgba(240,182,60,${mj?.32:.14})`;cx.fillText('W '+n,west+5,y-3)}
+  // avenues
+  cx.lineWidth=1;for(let i=-3;i*AV<R;i++){const x=i*AV;let y0=-R,y1=R;
+    if(i===-2)y0=Math.max(-R,yOf(107));if(i>2)y1=Math.min(R,y110);if(y0>=y1)continue;
+    cx.strokeStyle=`rgba(240,182,60,${(i===0?.13:.07)*L})`;cx.beginPath();cx.moveTo(x,y0);cx.lineTo(x,y1);cx.stroke()}
+  cx.save();cx.rotate(-Math.PI/2);cx.fillStyle='rgba(240,182,60,.22)';cx.fillText('AMSTERDAM AV',H*.3,-5);cx.fillStyle='rgba(238,53,46,.32)';cx.fillText('BROADWAY · 1 LINE',H*.3,-AV-5);cx.restore();
+  // the 1 train under Broadway: dashed tunnel + lit cars
+  cx.strokeStyle='rgba(238,53,46,.07)';cx.setLineDash([6,6]);cx.beginPath();cx.moveTo(-AV,-R);cx.lineTo(-AV,R);cx.stroke();cx.setLineDash([]);
+  if(!train&&now>trainAt){const dir=Math.random()<.5?1:-1;train={dir,y:-dir*(R+80)}}
+  if(train){train.y+=train.dir*2.4*(1+level*2);cx.shadowColor='#ee352e';cx.shadowBlur=10;cx.fillStyle='rgba(238,53,46,.6)';
+    for(let k=0;k<7;k++)cx.fillRect(-AV-1.5,train.y-train.dir*k*(S*.8),3,S*.7);cx.shadowBlur=0;
+    cx.fillStyle='#ee352e';cx.beginPath();cx.arc(-AV+11,train.y+train.dir*12,6,0,7);cx.fill();cx.fillStyle='#fff';cx.font='bold 9px "Chakra Petch",sans-serif';cx.fillText('1',-AV+8.5,train.y+train.dir*12+3.2);cx.font='9px "Share Tech Mono",monospace';
+    if(Math.abs(train.y)>R+S*7&&Math.sign(train.y)===train.dir){train=null;trainAt=now+7000+Math.random()*9000}}
+  // signal packets routing around the algorithm
+  while(PK.length<7)PK.push(packet());
+  for(let k=0;k<PK.length;k++){const p=PK[k];p.p+=p.v*(1+level*3);let x,y,tx,ty;
+    if(p.st){if(!p.n)p.n=nLo+Math.floor(Math.random()*(nHi-nLo));y=yOf(p.n);x=p.p;tx=x-26;ty=y;if(x>(p.n<110?2*AV:R))PK[k]=packet()}
+    else{x=p.i*AV;y=p.p+off;tx=x;ty=y-p.v*40;if(Math.abs(p.p)>R+off+60)PK[k]=packet()}
+    const g=cx.createLinearGradient(tx,ty,x,y);g.addColorStop(0,'rgba(78,242,224,0)');g.addColorStop(1,`rgba(78,242,224,${.45+level*.5})`);
+    cx.strokeStyle=g;cx.lineWidth=1.5;cx.beginPath();cx.moveTo(tx,ty);cx.lineTo(x,y);cx.stroke()}
+  // home node: 97th & Amsterdam
+  const hy=yOf(HOME),ph=(now%2400)/2400;
+  cx.strokeStyle=`rgba(240,182,60,${.5*(1-ph)})`;cx.lineWidth=1;cx.beginPath();cx.arc(0,hy,6+ph*40,0,7);cx.stroke();
+  cx.fillStyle=`rgba(255,221,138,${.7+level*.3})`;cx.beginPath();cx.arc(0,hy,3+level*4,0,7);cx.fill();
+  cx.fillStyle='rgba(240,182,60,.55)';cx.fillText('97/AMS',8,hy-8);
+  // cursor: nearest intersection readout
+  if(mx>-999){const dx=mx-W/2,dy=my-H/2,u=dx*CT+dy*ST,v=-dx*ST+dy*CT,n=Math.round(HOME-(v-off)/S),i=Math.round(u/AV),ix=i*AV,iy=yOf(n);
+    if(n>=59&&i>=-3&&(n>=110||i<=2)&&Math.hypot(u-ix,v-iy)<70){cx.strokeStyle='rgba(78,242,224,.6)';cx.beginPath();cx.moveTo(ix-9,iy);cx.lineTo(ix+9,iy);cx.moveTo(ix,iy-9);cx.lineTo(ix,iy+9);cx.stroke();
+      const nm=avName(i,n);cx.fillStyle='rgba(78,242,224,.75)';cx.fillText(`W ${n} ST${nm?' × '+nm:''}`,ix+8,iy+13)}}
+}
+function field(){level=level*.85+getLevel()*.15;frame();scope();requestAnimationFrame(field)}
 
 /* SCOPE (jukebox visual) */
 const sc=$('#scope'),sx=sc.getContext('2d');
@@ -542,7 +573,7 @@ function scope(){const w=SW,h=SH,c=w/2,m=h/2;
   sx.fillStyle='rgba(240,182,60,.9)';sx.beginPath();sx.arc(c,m,R*.22*(1+level),0,7);sx.fill();
   sx.fillStyle='#040406';sx.beginPath();sx.arc(c,m,R*.08,0,7);sx.fill();
   sx.strokeStyle='rgba(255,255,255,.08)';sx.beginPath();sx.moveTo(0,m);sx.lineTo(w,m);sx.moveTo(c,0);sx.lineTo(c,h);sx.stroke()}
-if(!RM)field();else scope();
+if(!RM)field();else{scope();frame();addEventListener('scroll',frame,{passive:true});addEventListener('resize',frame)}
 
 /* EYE */
 const pupil=$('#pupil');
