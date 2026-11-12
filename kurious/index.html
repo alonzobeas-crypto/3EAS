@@ -122,19 +122,19 @@ section{padding:110px 4vw;position:relative}
 /* RAICES */
 .raices{max-width:1240px;display:grid;grid-template-columns:1.1fr .9fr;gap:24px}
 @media(max-width:900px){.raices{grid-template-columns:1fr}}
-.flags{padding:26px;display:grid;grid-template-columns:1fr 1fr;gap:18px;align-content:center}
-.fl{text-align:center}
-.fl small{display:block;margin-top:10px;font-family:var(--hud);font-size:10px;letter-spacing:.25em;color:var(--dim)}
-.flag{width:100%;display:block;filter:drop-shadow(0 0 10px #0008);transition:filter .2s}
-.flag rect,.flag path{transition:fill .35s steps(3)}
-.flag .edge{fill:none;stroke:#f0b63c55;stroke-width:2}
-.flag .star{fill:#f4efe2}
-#fPR .s0{fill:#c8322f}#fPR .s1{fill:#f4efe2}#fPR .tri{fill:#2f74b5}
-#fCU .s0{fill:#1f3f8f}#fCU .s1{fill:#f4efe2}#fCU .tri{fill:#c8322f}
-.flags.mir #fPR .s0{fill:#1f3f8f}.flags.mir #fPR .tri{fill:#c8322f}
-.flags.mir #fCU .s0{fill:#c8322f}.flags.mir #fCU .tri{fill:#2f74b5}
-.flags.mir .flag{filter:drop-shadow(-3px 0 0 #ff3b3b88) drop-shadow(3px 0 0 #4ef2e088)}
-.flagnote{grid-column:1/-1;font-family:var(--hud);font-size:11px;letter-spacing:.2em;color:var(--cyan);text-align:center;margin-top:6px}
+.sig{padding:26px;display:flex;flex-direction:column;justify-content:center;gap:16px;cursor:crosshair;position:relative;overflow:hidden;min-height:260px}
+.sig svg{width:100%;max-width:520px;margin:0 auto;display:block}
+.sig .g *{fill:none;stroke:#f0b63c;stroke-width:1;vector-effect:non-scaling-stroke}
+.sig .g{opacity:.12;animation:sigb 7s ease-in-out infinite}
+@keyframes sigb{0%,100%{opacity:.07}50%{opacity:.2}}
+.sig .f{opacity:0}
+.sig.sub .f{opacity:1}
+.sig.sub svg{filter:drop-shadow(-4px 0 0 #ff3b3b99) drop-shadow(4px 0 0 #4ef2e099)}
+.sig .f .s1,.sig .f .star{fill:#f4efe2}
+.sig[data-p=pr] .f .s0{fill:#c8322f}.sig[data-p=pr] .f .tri{fill:#2f74b5}
+.sig[data-p=cu] .f .s0{fill:#1f3f8f}.sig[data-p=cu] .f .tri{fill:#c8322f}
+.signote{display:flex;justify-content:space-between;font-family:var(--hud);font-size:10px;letter-spacing:.25em;color:var(--dim)}
+.signote b{color:var(--cyan);font-weight:400;opacity:.7}
 .rtxt{padding:28px;font-size:14px;line-height:1.85}
 .rtxt p+p{margin-top:14px}
 .rtxt b{color:var(--gold);font-weight:600}
@@ -190,7 +190,7 @@ section{padding:110px 4vw;position:relative}
 .ts small{display:block;color:var(--dim);font-weight:300;font-size:9px;letter-spacing:.25em;margin-top:2px}
 .entry h3{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.03em;text-transform:uppercase;line-height:1.05;margin-bottom:4px;color:var(--txt)}
 .entry p{color:#b9b3a6;max-width:700px}
-.flag{display:inline-block;margin-top:8px;font-size:9px;letter-spacing:.25em;padding:2px 7px;border:1px solid currentColor}
+.flag{display:inline-block;width:100%;margin-top:8px;font-size:9px;letter-spacing:.25em;padding:2px 7px;border:1px solid currentColor}
 .flag.doom{color:var(--red)}.flag.jam{color:#000;background:var(--red);border-color:var(--red)}.flag.key{color:var(--cyan)}.flag.now{color:var(--gold)}
 @media(max-width:620px){.entry{grid-template-columns:1fr;gap:6px}}
 
@@ -395,10 +395,9 @@ body.tear2 main{transform:translateX(-5px);filter:invert(.06) hue-rotate(-30deg)
 <section id="raices">
   <div class="sh"><span class="id">[01B] RAÍCES</span><h2>Two <em>islands</em></h2><span class="rule"></span></div>
   <div class="raices">
-    <div class="panel hud flags" id="flags">
-      <div class="fl"><svg class="flag" id="fPR" viewBox="0 0 300 200"><rect class="s0" x="0" y="0" width="300" height="40"/><rect class="s1" x="0" y="40" width="300" height="40"/><rect class="s0" x="0" y="80" width="300" height="40"/><rect class="s1" x="0" y="120" width="300" height="40"/><rect class="s0" x="0" y="160" width="300" height="40"/><path class="tri" d="M0 0 L173 100 L0 200Z"/><path class="star" d="M58.0,70.0 L65.1,90.3 L86.5,90.7 L69.4,103.7 L75.6,124.3 L58.0,112.0 L40.4,124.3 L46.6,103.7 L29.5,90.7 L50.9,90.3Z"/><rect class="edge" x="1" y="1" width="298" height="198"/></svg><small>PUERTO RICO · 1895</small></div>
-      <div class="fl"><svg class="flag" id="fCU" viewBox="0 0 300 200"><rect class="s0" x="0" y="0" width="300" height="40"/><rect class="s1" x="0" y="40" width="300" height="40"/><rect class="s0" x="0" y="80" width="300" height="40"/><rect class="s1" x="0" y="120" width="300" height="40"/><rect class="s0" x="0" y="160" width="300" height="40"/><path class="tri" d="M0 0 L173 100 L0 200Z"/><path class="star" d="M58.0,70.0 L65.1,90.3 L86.5,90.7 L69.4,103.7 L75.6,124.3 L58.0,112.0 L40.4,124.3 L46.6,103.7 L29.5,90.7 L50.9,90.3Z"/><rect class="edge" x="1" y="1" width="298" height="198"/></svg><small>CUBA · 1849</small></div>
-      <div class="flagnote">SAME DESIGN · COLORS INVERTED · TAP TO MIRROR</div>
+    <div class="panel hud sig" id="sig" aria-hidden="true">
+      <svg viewBox="0 0 300 200"><g class="f"><rect class="s0" x="0" y="0" width="300" height="40"/><rect class="s1" x="0" y="40" width="300" height="40"/><rect class="s0" x="0" y="80" width="300" height="40"/><rect class="s1" x="0" y="120" width="300" height="40"/><rect class="s0" x="0" y="160" width="300" height="40"/><path class="tri" d="M0 0 L173 100 L0 200Z"/><path class="star" d="M58.0,70.0 L65.1,90.3 L86.5,90.7 L69.4,103.7 L75.6,124.3 L58.0,112.0 L40.4,124.3 L46.6,103.7 L29.5,90.7 L50.9,90.3Z"/></g><g class="g"><rect x="1" y="1" width="298" height="198"/><line x1="0" y1="40" x2="300" y2="40"/><line x1="0" y1="80" x2="300" y2="80"/><line x1="0" y1="120" x2="300" y2="120"/><line x1="0" y1="160" x2="300" y2="160"/><path d="M0 0 L173 100 L0 200"/><path d="M58.0,70.0 L65.1,90.3 L86.5,90.7 L69.4,103.7 L75.6,124.3 L58.0,112.0 L40.4,124.3 L46.6,103.7 L29.5,90.7 L50.9,90.3Z"/></g></svg>
+      <div class="signote"><span>1849</span><b id="signote" data-o="SOMETHING IS WOVEN INTO THIS SIGNAL">SOMETHING IS WOVEN INTO THIS SIGNAL</b><span>1895</span></div>
     </div>
     <div class="panel hud rtxt">
       <span class="es">Boricua y cubano.</span>
@@ -677,15 +676,18 @@ if(!RM){
   (function loop(){setTimeout(()=>{ghost();loop()},7000+Math.random()*8000)})();
   setTimeout(ghost,3500);
 }
-/* RAICES: mirror flags + clave */
-const flg=$('#flags');flg.onclick=()=>flg.classList.toggle('mir');
+/* RAICES: subliminal flag + clave */
+const sg=$('#sig'),sn=$('#signote');
+function sub(p,ms){sg.dataset.p=p;sg.classList.add('sub');setTimeout(()=>sg.classList.remove('sub'),ms)}
+sg.onclick=()=>{if(RM){sub('pr',1200);return}sub('pr',70);setTimeout(()=>sub('cu',70),160);
+  sn.textContent='DID YOU SEE IT?';clearTimeout(sn._t);sn._t=setTimeout(()=>sn.textContent=sn.dataset.o,1600)};
 const cl=$('#clave'),HITS=[0,3,6,10,12],cells=[];
 for(let i=0;i<16;i++){const c=document.createElement('i');if(HITS.includes(i))c.className='h';cl.appendChild(c);cells.push(c)}
 if(!RM){let step=0;const live=document.querySelector('.live');
   setInterval(()=>{cells.forEach(c=>c.classList.remove('on'));cells[step].classList.add('on');
     if(HITS.includes(step)){live.classList.add('hit');setTimeout(()=>live.classList.remove('hit'),90)}
     step=(step+1)%16},150);
-  setInterval(()=>{if(!flg.matches(':hover')){flg.classList.add('mir');setTimeout(()=>flg.classList.remove('mir'),900)}},6000);
+  (function blip(){setTimeout(()=>{const r=sg.getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight)sub(Math.random()<.5?'pr':'cu',60);blip()},7000+Math.random()*9000)})();
 }
 document.querySelectorAll('.rx').forEach(r=>r.onclick=()=>r.classList.toggle('show'));
 $('#f').onsubmit=e=>{e.preventDefault();$('#sent').style.display='block'};
