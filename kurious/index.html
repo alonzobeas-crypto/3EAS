@@ -481,6 +481,12 @@ body.tear2 main{transform:translateX(-5px);filter:invert(.06) hue-rotate(-30deg)
 <script>
 const $=s=>document.querySelector(s), RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
 
+/* Every load starts at the top: no restored scroll, no jump to a #section left in the URL */
+if('scrollRestoration' in history)history.scrollRestoration='manual';
+if(location.hash)history.replaceState(null,'',location.pathname+location.search);
+const toTop=()=>scrollTo({top:0,left:0,behavior:'instant'});toTop();
+addEventListener('load',toTop);addEventListener('pageshow',e=>{if(e.persisted)toTop()});
+
 /* BOOT */
 const bootLines=[['> INIT CARRIER 97.0 MHz',''],['> WARNING: CARRIER JAMMED BY [REDACTED] HOLDINGS',''],['> ROUTING AROUND THE ALGORITHM ...... OK','ok'],['> LOCATING NODE ............ 97TH & AMSTERDAM','ok'],['> DECRYPT: KURIOUS_JORGE.SIG','',],['> HANDSHAKE WITH METAL FACE ...... ACCEPTED','ok'],['> SUMMONING THE MAJICIAN_','']];
 const bl=$('#bootlog');let bi=0;
