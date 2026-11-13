@@ -73,10 +73,12 @@
       "title": "THE UNIFORM — 3EAS CORTEX TEE",
       "category": "apparel",
       "price": 30,
-      "description": "Distressed block wordmark. Artwork preview, photos of the printed shirt coming soon.",
+      "description": "Distressed block wordmark. Bone ink on a black tee.",
       "fulfillment": "self",
       "shipping": "apparel",
       "images": [
+        "merch-photos/3eas-cortex-tee-photo-1.jpg",
+        "merch-photos/3eas-cortex-tee-photo-2.jpg",
         "merch-photos/3eas-cortex-tee-art.png"
       ],
       "sizes": {
