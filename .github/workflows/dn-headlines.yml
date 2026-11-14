@@ -1,0 +1,37 @@
+# Daily: today's Democracy Now! Headlines video goes to the top of SIGNAL FEED (/feed/).
+# Democracy Now! airs 8am ET on weekdays; the Headlines clip is usually up by late morning.
+# Two tries per weekday in case it posts late. Also runnable by hand from the Actions tab.
+name: Democracy Now! headlines -> SIGNAL FEED
+
+on:
+  schedule:
+    - cron: '23 16 * * 1-5'   # ~11:23 ET / 8:23 PT
+    - cron: '47 19 * * 1-5'   # ~2:47 ET / 11:47 PT (backup)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dn-headlines
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Fetch today's Headlines
+        run: node scripts/dn-headlines.mjs
+      - name: Publish if changed
+        run: |
+          if git diff --quiet -- feed/videos.json; then echo "no change"; exit 0; fi
+          git config user.name  "signal-feed-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add feed/videos.json
+          git commit -m "SIGNAL FEED: Democracy Now! headlines (auto)"
+          git push

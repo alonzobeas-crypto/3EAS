@@ -32,7 +32,10 @@ Two Cloudflare Workers sit beside it, deployed separately:
   (short vt.tiktok.com links can't be resolved here; ask for the full tiktok.com/@user/video/... link)
 - Instagram Reel/post: `{"src": "ig", "id": "<code from /reel/<code>/ or /p/<code>/>", "kind": "reel"|"p", "url": "<link>", "caption": "..."}`
 - IG/TikTok Stories can't be embedded (24h, no embed API).
-Only add links the user sends. The only way in from the home page
+Only add links the user sends — except the one automation below.
+- Automation: `.github/workflows/dn-headlines.yml` runs `scripts/dn-headlines.mjs` each weekday and puts the
+  latest Democracy Now! "Headlines" video at the top (entry tagged `"tag": "dn"`; only the newest one is kept).
+  Test without network: `DN_RSS_FILE=sample.xml node scripts/dn-headlines.mjs --dry-run`. The only way in from the home page
 is the hidden `#feedDoor` above the hero logo (hover / first tap glitches it in).
 
 ## Ticker names
