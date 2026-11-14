@@ -191,13 +191,14 @@ a{color:inherit;text-decoration:none}
   fetch('videos.json',{cache:'no-cache'}).then(r=>r.json()).then(d=>{
     const ok={yt:/^[A-Za-z0-9_-]{11}$/,tt:/^\d{8,25}$/,ig:/^[A-Za-z0-9_-]{5,40}$/};
     videos=(d.videos||[]).filter(v=>v&&ok[srcOf(v)].test(String(v.id)));
-    // Order: the Democracy Now! week (tag "dn") stays on top, then the FRESH newest posts in
-    // order; every older post is shuffled into a new random order on each visit.
-    const FRESH=3;
+    // Order: whichever is newer goes first — your latest upload (by its "added" date) or the
+    // Democracy Now! week (tag "dn", by its newest "date"); the other comes next. Everything
+    // else is shuffled into a new random order on each visit.
     const dn=videos.filter(v=>v.tag==='dn'),mine=videos.filter(v=>v.tag!=='dn');
-    const old=mine.slice(FRESH);
+    const latest=mine.slice(0,1),old=mine.slice(1);
     for(let i=old.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[old[i],old[j]]=[old[j],old[i]];}
-    videos=[...dn,...mine.slice(0,FRESH),...old];
+    const dnDate=dn.reduce((m,v)=>v.date>m?v.date:m,''),myDate=(latest[0]&&latest[0].added)||'';
+    videos=myDate>dnDate?[...latest,...dn,...old]:[...dn,...latest,...old];
     NAMES=nameless(videos);
     feed.innerHTML=videos.map(slideHTML).join('');
     const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting&&en.intersectionRatio>.6)activate(+en.target.dataset.i);});},{root:feed,threshold:[.6]});

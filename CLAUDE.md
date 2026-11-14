@@ -34,6 +34,7 @@ Two Cloudflare Workers sit beside it, deployed separately:
   (short vt.tiktok.com links can't be resolved here; ask for the full tiktok.com/@user/video/... link)
 - Instagram Reel/post: `{"src": "ig", "id": "<code from /reel/<code>/ or /p/<code>/>", "kind": "reel"|"p", "url": "<link>", "caption": "..."}`
 - IG/TikTok Stories can't be embedded (24h, no embed API).
+New entries get `"added": "<today, LA date YYYY-MM-DD>"` and go right after the DN block in the file. On the page, the newest of (latest upload, DN week) shows first, then the other, then everything else shuffled per visit.
 Only add links the user sends — except the one automation below.
 - Automation: `.github/workflows/dn-headlines.yml` runs `scripts/dn-headlines.mjs` each weekday and puts the
   current week's Democracy Now! "Headlines" videos at the top, newest first (entries tagged `"tag": "dn"`).
