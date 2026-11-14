@@ -34,8 +34,9 @@ Two Cloudflare Workers sit beside it, deployed separately:
 - IG/TikTok Stories can't be embedded (24h, no embed API).
 Only add links the user sends — except the one automation below.
 - Automation: `.github/workflows/dn-headlines.yml` runs `scripts/dn-headlines.mjs` each weekday and puts the
-  latest Democracy Now! "Headlines" video at the top (entry tagged `"tag": "dn"`; only the newest one is kept).
-  Test without network: `DN_RSS_FILE=sample.xml node scripts/dn-headlines.mjs --dry-run`. The only way in from the home page
+  current week's Democracy Now! "Headlines" videos at the top, newest first (entries tagged `"tag": "dn"`).
+  The set resets each Monday (weekends show the week just ended).
+  Test without network: `DN_RSS_FILE=a.xml DN_SEARCH_FILE=b.html DN_TODAY=YYYY-MM-DD node scripts/dn-headlines.mjs --dry-run`. The only way in from the home page
 is the hidden `#feedDoor` above the hero logo (hover / first tap glitches it in).
 
 ## Ticker names
