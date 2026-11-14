@@ -16,7 +16,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
 <style>
 /* SIGNAL FEED — vertical swipe feed of YouTube transmissions.
-   Videos live in videos.json: {"videos":[{"id":"<11-char YouTube id>","caption":"..."}]}, newest first. */
+   Videos live in videos.json, newest first. Each entry:
+     YouTube:   {"id":"<11-char id>","caption":"..."}                       (src defaults to "yt")
+     TikTok:    {"src":"tt","id":"<numeric video id>","url":"<tiktok link>","caption":"..."}
+     Instagram: {"src":"ig","id":"<shortcode>","kind":"reel"|"p","url":"<ig link>","caption":"..."}
+   YouTube + TikTok autoplay muted and obey tap / SOUND; Instagram's embed allows no remote
+   control, so IG slides are tap-to-play inside the post. */
 :root{--bg:#000;--fg:#e6e2d6;--dim:#6c665c;--dim2:#aaa293;--accent:#cbbb88;--hot:#f2ead0;--rust:#a8695a;--cyan:#0ff;
   --vt:'VT323',monospace;--mono:'Share Tech Mono',monospace}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,6 +62,12 @@ a{color:inherit;text-decoration:none}
 @keyframes gin{0%{opacity:0;clip-path:inset(40% 0 45% 0);transform:translateX(-6px)}40%{opacity:1;clip-path:inset(10% 0 60% 0);transform:translateX(5px)}70%{clip-path:inset(55% 0 5% 0);transform:translateX(-3px)}100%{clip-path:inset(0);transform:none}}
 @media (min-width:700px){.slide .media{left:50%;width:min(100vw,56.25dvh);transform:translateX(-50%)}.info{left:calc(50% - min(50vw,28.1dvh) + 16px);right:auto;max-width:min(80vw,40dvh)}.side{right:calc(50% - min(50vw,28.1dvh) - 76px)}}
 @media (max-width:480px){#top{gap:6px;padding-left:10px;padding-right:10px}#title{font-size:17px;letter-spacing:1px;white-space:nowrap}#back{font-size:10px;letter-spacing:1px;white-space:nowrap}#snd{min-width:0;padding:0 8px;font-size:10px;letter-spacing:1px;white-space:nowrap}}
+.ph{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--vt);font-size:28px;letter-spacing:6px;color:var(--dim)}
+.slide.src-ig .media iframe{left:50%;top:50%;width:min(100%,420px);height:min(100%,760px);transform:translate(-50%,-50%);background:#000}
+.slide.src-ig .tap{display:none}
+.slide.src-ig .shade{display:none}
+.slide.src-ig .info{bottom:calc(12px + env(safe-area-inset-bottom))}
+.igtip{position:absolute;left:0;right:0;top:calc(64px + env(safe-area-inset-top));z-index:4;text-align:center;font-size:10px;letter-spacing:3px;color:var(--dim2);pointer-events:none}
 @media (prefers-reduced-motion:reduce){.glitch-in,#hint{animation:none}}
 </style>
 </head>
@@ -77,16 +88,35 @@ a{color:inherit;text-decoration:none}
   const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const say=t=>{toast.textContent=t;toast.classList.add('on');clearTimeout(say.t);say.t=setTimeout(()=>toast.classList.remove('on'),1800);};
   // Talk to the YouTube player without loading the full IFrame API.
-  const cmd=(slide,func,args)=>{const f=slide&&slide.querySelector('iframe');if(f&&f.contentWindow)f.contentWindow.postMessage(JSON.stringify({event:'command',func,args:args||[]}),'*');};
+  // Remote-control whichever player the slide holds (play / pause / mute / unmute).
+  const cmd=(slide,func)=>{const f=slide&&slide.querySelector('iframe');if(!f||!f.contentWindow)return;const v=videos[+slide.dataset.i];SRC[srcOf(v)].send(f.contentWindow,func);};
 
+  const SRC={
+    yt:{name:'YOU<br>TUBE ↗',label:'YouTube',link:v=>'https://youtu.be/'+v.id,
+        thumb:v=>'<img loading="lazy" alt="" src="https://i.ytimg.com/vi/'+esc(v.id)+'/hqdefault.jpg">',
+        embed:(v,auto)=>'https://www.youtube-nocookie.com/embed/'+encodeURIComponent(v.id)+'?enablejsapi=1&playsinline=1&mute=1&autoplay='+(auto?1:0)+'&controls=0&rel=0&modestbranding=1&loop=1&playlist='+encodeURIComponent(v.id),
+        send:(w,f)=>w.postMessage(JSON.stringify({event:'command',func:{play:'playVideo',pause:'pauseVideo',mute:'mute',unmute:'unMute'}[f],args:[]}),'*')},
+    tt:{name:'TIK<br>TOK ↗',label:'TikTok',link:v=>v.url||'https://www.tiktok.com/',
+        thumb:()=>'<div class="ph">TIKTOK</div>',
+        embed:(v,auto)=>'https://www.tiktok.com/player/v1/'+encodeURIComponent(v.id)+'?autoplay='+(auto?1:0)+'&muted=1&loop=1&controls=0&progress_bar=0&play_button=0&volume_control=0&fullscreen_button=0&timestamp=0&music_info=0&description=0&rel=0&native_context_menu=0&closed_caption=0',
+        send:(w,f)=>w.postMessage({type:{play:'play',pause:'pause',mute:'mute',unmute:'unMute'}[f],'x-tiktok-player':true},'*')},
+    ig:{name:'INSTA<br>GRAM ↗',label:'Instagram',link:v=>v.url||'https://www.instagram.com/'+(v.kind==='p'?'p':'reel')+'/'+v.id+'/',
+        thumb:()=>'<div class="ph">INSTAGRAM</div>',
+        embed:v=>'https://www.instagram.com/'+(v.kind==='p'?'p':'reel')+'/'+encodeURIComponent(v.id)+'/embed/',
+        send:()=>{}}  // Instagram's embed takes no remote commands
+  };
+  const srcOf=v=>SRC[v.src]?v.src:'yt';
+  const keyOf=v=>srcOf(v)==='yt'?v.id:srcOf(v)+'-'+v.id;
   function slideHTML(v,i){
-    return '<section class="slide" data-i="'+i+'" id="v-'+esc(v.id)+'">'
-      +'<div class="media"><img loading="lazy" alt="" src="https://i.ytimg.com/vi/'+esc(v.id)+'/hqdefault.jpg"></div>'
+    const S=SRC[srcOf(v)];
+    return '<section class="slide src-'+srcOf(v)+'" data-i="'+i+'" id="v-'+esc(keyOf(v))+'">'
+      +'<div class="media">'+S.thumb(v)+'</div>'
       +'<div class="tap" aria-hidden="true"></div><div class="paused">❚❚</div><div class="shade"></div>'
+      +(srcOf(v)==='ig'?'<div class="igtip">TAP ▶ ON THE POST</div>':'')
       +'<div class="info"><div class="num">TRANSMISSION '+String(i+1).padStart(2,'0')+' / '+String(videos.length).padStart(2,'0')+'</div>'
       +'<div class="cap">'+esc(v.caption||'UNTITLED SIGNAL')+'</div></div>'
       +'<div class="side"><button type="button" class="share" aria-label="Share">SHARE</button>'
-      +'<a class="yt" href="https://youtu.be/'+esc(v.id)+'" target="_blank" rel="noopener" aria-label="Open on YouTube">YOU<br>TUBE ↗</a></div>'
+      +'<a class="yt" href="'+esc(S.link(v))+'" target="_blank" rel="noopener" aria-label="Open on '+S.label+'">'+S.name+'</a></div>'
       +'</section>';
   }
   // Only the visible slide (and its neighbours) get a live player; the rest stay a thumbnail.
@@ -94,30 +124,30 @@ a{color:inherit;text-decoration:none}
     if(!slide||slide.querySelector('iframe'))return;
     const v=videos[+slide.dataset.i];
     const f=document.createElement('iframe');
-    f.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(v.id)+'?enablejsapi=1&playsinline=1&mute=1&autoplay='+(auto?1:0)+'&controls=0&rel=0&modestbranding=1&loop=1&playlist='+encodeURIComponent(v.id);
-    f.allow='autoplay; encrypted-media; picture-in-picture';f.title=v.caption||'video';f.loading='eager';
+    f.src=SRC[srcOf(v)].embed(v,auto);
+    f.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';f.title=v.caption||'video';f.loading='eager';
     f.addEventListener('load',()=>{if(+slide.dataset.i===current)play(slide);});
     slide.querySelector('.media').appendChild(f);
   }
   function unmount(slide){const f=slide&&slide.querySelector('iframe');if(f)f.remove();}
-  function play(slide){cmd(slide,'playVideo');cmd(slide,soundOn?'unMute':'mute');slide.classList.remove('is-paused');}
+  function play(slide){cmd(slide,'play');cmd(slide,soundOn?'unmute':'mute');slide.classList.remove('is-paused');}
   function activate(i){
     if(i===current)return;
     const slides=feed.children;
-    if(current>=0&&slides[current]){cmd(slides[current],'pauseVideo');}
+    if(current>=0&&slides[current]){cmd(slides[current],'pause');unmount(slides[current]);mount(slides[current],false);}
     current=i;
     for(let k=0;k<slides.length;k++){if(Math.abs(k-i)<=1)mount(slides[k],k===i);else unmount(slides[k]);}
     const s=slides[i];s.querySelector('.cap').classList.remove('glitch-in');void s.offsetWidth;s.querySelector('.cap').classList.add('glitch-in');
     play(s);
-    history.replaceState(null,'','#'+videos[i].id);
+    history.replaceState(null,'','#'+keyOf(videos[i]));
   }
-  function setSound(on){soundOn=on;snd.classList.toggle('on',on);snd.textContent=on?'SOUND ON':'SOUND OFF';snd.setAttribute('aria-pressed',on);const s=feed.children[current];if(s)cmd(s,on?'unMute':'mute');}
+  function setSound(on){soundOn=on;snd.classList.toggle('on',on);snd.textContent=on?'SOUND ON':'SOUND OFF';snd.setAttribute('aria-pressed',on);const s=feed.children[current];if(s)cmd(s,on?'unmute':'mute');}
 
   snd.addEventListener('click',()=>setSound(!soundOn));
   feed.addEventListener('click',e=>{
     const slide=e.target.closest('.slide');if(!slide)return;
     if(e.target.closest('.share')){
-      const v=videos[+slide.dataset.i],url=location.origin+'/feed/#'+v.id;
+      const v=videos[+slide.dataset.i],url=location.origin+'/feed/#'+keyOf(v);
       if(navigator.share)navigator.share({title:'3EAS // '+(v.caption||'SIGNAL FEED'),url}).catch(()=>{});
       else if(navigator.clipboard)navigator.clipboard.writeText(url).then(()=>say('LINK COPIED'),()=>say(url));
       else say(url);
@@ -126,7 +156,7 @@ a{color:inherit;text-decoration:none}
     if(e.target.closest('.tap')){
       // first tap anywhere turns the sound on; after that a tap pauses / resumes
       if(!soundOn){setSound(true);return;}
-      if(slide.classList.toggle('is-paused'))cmd(slide,'pauseVideo');else play(slide);
+      if(slide.classList.toggle('is-paused'))cmd(slide,'pause');else play(slide);
     }
   });
   document.addEventListener('keydown',e=>{
@@ -137,11 +167,12 @@ a{color:inherit;text-decoration:none}
   function go(i){const s=feed.children[Math.max(0,Math.min(i,feed.children.length-1))];if(s)s.scrollIntoView({behavior:'smooth'});}
 
   fetch('videos.json',{cache:'no-cache'}).then(r=>r.json()).then(d=>{
-    videos=(d.videos||[]).filter(v=>/^[A-Za-z0-9_-]{11}$/.test(v.id));
+    const ok={yt:/^[A-Za-z0-9_-]{11}$/,tt:/^\d{8,25}$/,ig:/^[A-Za-z0-9_-]{5,40}$/};
+    videos=(d.videos||[]).filter(v=>v&&ok[srcOf(v)].test(String(v.id)));
     feed.innerHTML=videos.map(slideHTML).join('');
     const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting&&en.intersectionRatio>.6)activate(+en.target.dataset.i);});},{root:feed,threshold:[.6]});
     [...feed.children].forEach(s=>io.observe(s));
-    const want=location.hash.slice(1),start=Math.max(0,videos.findIndex(v=>v.id===want));
+    const want=location.hash.slice(1),start=Math.max(0,videos.findIndex(v=>keyOf(v)===want));
     if(start>0)feed.children[start].scrollIntoView();
     activate(start);
   }).catch(()=>{feed.innerHTML='<section class="slide"><div class="info" style="position:static"><div class="cap">SIGNAL LOST. RELOAD.</div></div></section>';});

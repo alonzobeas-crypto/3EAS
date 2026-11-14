@@ -26,8 +26,13 @@ Two Cloudflare Workers sit beside it, deployed separately:
 3EAS-only copy. Say "Chicano", never "Latin". Pirate-signal / noir tone; no generic marketing language.
 
 ## Signal feed
-`/feed/` is a vertical swipe feed of YouTube videos. Videos live in `feed/videos.json` as
-`{"id": "<11-char YouTube id>", "caption": "..."}`, newest first. The only way in from the home page
+`/feed/` is a vertical swipe feed (YouTube, TikTok, Instagram). Videos live in `feed/videos.json`, newest first:
+- YouTube: `{"id": "<11-char id>", "caption": "..."}`
+- TikTok: `{"src": "tt", "id": "<numeric id from /video/<id>>", "url": "<link>", "caption": "..."}`
+  (short vt.tiktok.com links can't be resolved here; ask for the full tiktok.com/@user/video/... link)
+- Instagram Reel/post: `{"src": "ig", "id": "<code from /reel/<code>/ or /p/<code>/>", "kind": "reel"|"p", "url": "<link>", "caption": "..."}`
+- IG/TikTok Stories can't be embedded (24h, no embed API).
+Only add links the user sends. The only way in from the home page
 is the hidden `#feedDoor` above the hero logo (hover / first tap glitches it in).
 
 ## Ticker names
