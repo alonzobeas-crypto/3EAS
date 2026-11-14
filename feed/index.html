@@ -50,6 +50,9 @@ a{color:inherit;text-decoration:none}
 #back{font-size:11px;letter-spacing:3px;color:var(--dim2);padding:8px 0}
 #title{font-family:var(--vt);font-size:24px;letter-spacing:3px;color:var(--hot)}
 #title b{color:var(--rust);font-weight:400}
+#title{position:relative;flex:1;min-width:0;height:34px;max-width:340px}
+#title canvas{position:absolute;inset:0;width:100%;height:100%}
+#title .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 #snd{min-width:84px;height:36px;background:rgba(0,0,0,.55);border:1px solid var(--dim);color:var(--accent);font-family:var(--mono);font-size:11px;letter-spacing:2px;cursor:pointer}
 #snd.on{border-color:var(--accent);color:var(--hot)}
 /* tv grit */
@@ -74,7 +77,7 @@ a{color:inherit;text-decoration:none}
 <body>
 <div id="top">
   <a id="back" href="/">◂ CORTEX</a>
-  <div id="title">3EAS <b>//</b> SIGNAL FEED</div>
+  <h1 id="title"><canvas aria-hidden="true"></canvas><span class="sr">3EAS // SIGNAL FEED</span></h1>
   <button id="snd" type="button" aria-pressed="false">SOUND OFF</button>
 </div>
 <main id="feed" aria-label="Signal feed"></main>
@@ -176,6 +179,54 @@ a{color:inherit;text-decoration:none}
     if(start>0)feed.children[start].scrollIntoView();
     activate(start);
   }).catch(()=>{feed.innerHTML='<section class="slide"><div class="info" style="position:static"><div class="cap">SIGNAL LOST. RELOAD.</div></div></section>';});
+})();
+</script>
+<script>
+// Title in particles, same palette as the home-page door: every dot drifts on its own slow
+// orbit around its spot in the letters, and every few seconds a ripple scatters a band of
+// dots that then swim back into place. "//" is drawn in rust.
+(function(){
+  const box=document.getElementById('title'),cv=box.querySelector('canvas'),cx=cv.getContext('2d');
+  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const COLS=['203,187,136','203,187,136','242,234,208','242,234,208','63,208,200'],RUST='168,105,90';
+  let W=0,H=0,P=[],raf=0,ripple=null,nextRipple=0;
+  function build(){
+    const r=box.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);
+    W=Math.max(1,Math.round(r.width));H=Math.max(1,Math.round(r.height));
+    cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);
+    const o=document.createElement('canvas');o.width=W;o.height=H;const ox=o.getContext('2d');
+    const parts=['3EAS ','//',' SIGNAL FEED'];let fs=H*.8;
+    const setF=()=>{ox.font='400 '+fs+'px VT323, "Share Tech Mono", monospace';};
+    setF();const width=()=>parts.reduce((w,t)=>w+ox.measureText(t).width,0);
+    while(width()>W*.98&&fs>8){fs-=1;setF();}
+    // draw each part in its own channel colour so "//" can be told apart when sampling
+    let x=Math.max(0,(W-width())/2);ox.textBaseline='middle';
+    parts.forEach((t,i)=>{ox.fillStyle=i===1?'#f00':'#fff';ox.fillText(t,x,H/2);x+=ox.measureText(t).width;});
+    const d=ox.getImageData(0,0,W,H).data;P=[];const step=W<260?1:1.5;
+    for(let y=0;y<H;y+=step)for(let x2=0;x2<W;x2+=step){
+      const i=((y|0)*W+(x2|0))*4;if(d[i+3]<120)continue;
+      const slash=d[i]>150&&d[i+1]<90;
+      P.push({tx:x2,ty:y,x:x2,y,ph:Math.random()*6.28,f:.6+Math.random()*1.2,amp:.35+Math.random()*.55,
+        c:slash?RUST:COLS[Math.random()*COLS.length|0],k:.7+Math.random()*.3,ox:0,oy:0});
+    }
+  }
+  function frame(now){
+    raf=0;const t=now/1000;cx.clearRect(0,0,W,H);
+    if(!ripple&&now>nextRipple){ripple={x:-20,v:W/0.9};nextRipple=now+3500+Math.random()*3500;}
+    if(ripple){ripple.x+=ripple.v/60;if(ripple.x>W+40)ripple=null;}
+    for(const p of P){
+      if(ripple&&Math.abs(p.tx-ripple.x)<10){p.ox+=(Math.random()-.5)*5;p.oy+=(Math.random()-.5)*5;}
+      p.ox*=.9;p.oy*=.9;   // swim back home
+      const x=p.tx+Math.sin(t*p.f+p.ph)*p.amp+p.ox, y=p.ty+Math.cos(t*p.f*.8+p.ph)*p.amp+p.oy;
+      cx.fillStyle='rgba('+p.c+','+p.k+')';cx.fillRect(x,y,1.2,1.2);
+    }
+    if(!document.hidden)raf=requestAnimationFrame(frame);
+  }
+  function still(){cx.clearRect(0,0,W,H);for(const p of P){cx.fillStyle='rgba('+p.c+','+p.k+')';cx.fillRect(p.tx,p.ty,1.2,1.2);}}
+  function go(){build();if(reduce)still();else if(!raf)raf=requestAnimationFrame(frame);}
+  (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(go);
+  addEventListener('resize',()=>{build();if(reduce)still();});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!reduce&&!raf)raf=requestAnimationFrame(frame);});
 })();
 </script>
 </body>
