@@ -25,5 +25,10 @@ Two Cloudflare Workers sit beside it, deployed separately:
 ## Voice
 3EAS-only copy. Say "Chicano", never "Latin". Pirate-signal / noir tone; no generic marketing language.
 
+## Signal feed
+`/feed/` is a vertical swipe feed of YouTube videos. Videos live in `feed/videos.json` as
+`{"id": "<11-char YouTube id>", "caption": "..."}`, newest first. The only way in from the home page
+is the hidden `#feedDoor` above the hero logo (hover / first tap glitches it in).
+
 ## Ticker names
 Adding a person to the ticker uses the `linaje` skill (`.claude/skills/linaje/`).

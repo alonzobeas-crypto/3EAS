@@ -423,6 +423,16 @@ body{
 @keyframes dreamScanTick{0%{opacity:1}50%{opacity:.4;filter:contrast(1.8) brightness(1.4)}100%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.dreamscan-canvas,.dreamscan-canvas::after{animation:none}}
 
+/* SIGNAL FEED door: an invisible hot spot above the 3EAS logo. Hover (or the first tap on a
+   phone) glitches it in; clicking it (second tap on a phone) opens /feed/. */
+#feedDoor{position:absolute;top:13%;left:50%;transform:translateX(-50%);z-index:30;width:min(72%,440px);height:120px;display:flex;align-items:center;justify-content:center;font-family:var(--vt);font-size:34px;letter-spacing:6px;color:var(--hot);text-decoration:none;opacity:0;transition:opacity .15s;-webkit-tap-highlight-color:transparent}
+#feedDoor span{display:inline-block;padding:6px 14px;border:1px solid var(--accent);background:rgba(0,0,0,.55);text-shadow:2px 0 rgba(0,255,255,.45),-2px 0 rgba(255,0,80,.4)}
+#feedDoor:hover,#feedDoor:focus-visible,#feedDoor.lit{opacity:1;outline:none}
+#feedDoor:hover span,#feedDoor:focus-visible span,#feedDoor.lit span{animation:doorIn .45s steps(5,end),doorJit 2.2s steps(1,end) .45s infinite}
+@keyframes doorIn{0%{clip-path:inset(45% 0 40% 0);transform:translateX(-8px)}35%{clip-path:inset(5% 0 65% 0);transform:translateX(6px)}70%{clip-path:inset(60% 0 0 0);transform:translateX(-3px)}100%{clip-path:inset(0);transform:none}}
+@keyframes doorJit{0%,88%,100%{transform:none}90%{transform:translateX(-3px)}93%{transform:translateX(2px)}}
+@media (prefers-reduced-motion:reduce){#feedDoor span{animation:none!important}}
+@media (max-width:520px){#feedDoor{font-size:26px;letter-spacing:4px;height:96px}}
 .s1-coords{
   position:absolute;top:52px;left:60px;z-index:10;
   font-family:var(--mono);font-size:12px;letter-spacing:5px;color:var(--dim2);
@@ -1457,6 +1467,7 @@ body{
     <div class="tech-hazard"></div>
     <div class="s1-eye" id="s1eye"><video id="eye-src" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><video class="v-r" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><video class="v-b" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><div class="s1-eye2"><video src="uploads/eye-glitch.mp4" muted loop playsinline preload="none"></video></div><div class="s1-ring2"></div><div class="s1-ring3"></div><canvas class="dreamscan-canvas" id="dreamscan-eye"></canvas></div>
     <div class="s1-video2" id="s1video2"><video id="video2-src" src="uploads/hero-overlay.mp4" muted playsinline preload="auto"></video><canvas class="dreamscan-canvas" id="dreamscan-video2"></canvas></div>
+    <a id="feedDoor" href="/feed/" aria-label="Signal feed"><span>▶ SIGNAL FEED</span></a>
     <div class="s1-coords">SYS// 3EAS-001 // LINCOLN HEIGHTS, NELA // 34.0590°N 118.2321°W // ▮</div>
     <div class="s1-main" style="padding:0 60px;position:relative;z-index:10">
       <div class="s1-title" id="hw1" data-txt="3EAS">3EAS</div>
@@ -6330,6 +6341,16 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
   };
 })();
 
+// SIGNAL FEED door (hidden link above the hero logo). Touch screens can't hover, so the first
+// tap reveals it and a second tap within 5s goes through.
+(function(){
+  const d=document.getElementById('feedDoor');if(!d)return;
+  let t=0;
+  d.addEventListener('click',e=>{
+    if(matchMedia('(hover:hover)').matches||d.classList.contains('lit'))return;
+    e.preventDefault();d.classList.add('lit');clearTimeout(t);t=setTimeout(()=>d.classList.remove('lit'),5000);
+  });
+})();
 // US National Debt live estimate — seeded from U.S. Treasury Fiscal Data
 // (Debt to the Penny: $40,593,637,262,883 as of Oct 29, 2026), extrapolated
 // at ~$9B/day, roughly the recent average. Short-run swings (tax dates,
