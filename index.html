@@ -425,14 +425,10 @@ body{
 
 /* SIGNAL FEED door: an invisible hot spot above the 3EAS logo. Hover (or the first tap on a
    phone) glitches it in; clicking it (second tap on a phone) opens /feed/. */
-#feedDoor{position:absolute;top:13%;left:50%;transform:translateX(-50%);z-index:30;width:min(72%,440px);height:120px;display:flex;align-items:center;justify-content:center;font-family:var(--vt);font-size:34px;letter-spacing:6px;color:var(--hot);text-decoration:none;opacity:0;transition:opacity .15s;-webkit-tap-highlight-color:transparent}
-#feedDoor span{display:inline-block;padding:6px 14px;border:1px solid var(--accent);background:rgba(0,0,0,.55);text-shadow:2px 0 rgba(0,255,255,.45),-2px 0 rgba(255,0,80,.4)}
-#feedDoor:hover,#feedDoor:focus-visible,#feedDoor.lit{opacity:1;outline:none}
-#feedDoor:hover span,#feedDoor:focus-visible span,#feedDoor.lit span{animation:doorIn .45s steps(5,end),doorJit 2.2s steps(1,end) .45s infinite}
-@keyframes doorIn{0%{clip-path:inset(45% 0 40% 0);transform:translateX(-8px)}35%{clip-path:inset(5% 0 65% 0);transform:translateX(6px)}70%{clip-path:inset(60% 0 0 0);transform:translateX(-3px)}100%{clip-path:inset(0);transform:none}}
-@keyframes doorJit{0%,88%,100%{transform:none}90%{transform:translateX(-3px)}93%{transform:translateX(2px)}}
-@media (prefers-reduced-motion:reduce){#feedDoor span{animation:none!important}}
-@media (max-width:520px){#feedDoor{font-size:26px;letter-spacing:4px;height:96px}}
+#feedDoor{position:absolute;top:13%;left:50%;transform:translateX(-50%);z-index:30;width:min(78%,480px);height:120px;display:block;text-decoration:none;-webkit-tap-highlight-color:transparent;outline:none}
+#feedDoor canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#feedDoor .fd-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:520px){#feedDoor{height:96px}}
 .s1-coords{
   position:absolute;top:52px;left:60px;z-index:10;
   font-family:var(--mono);font-size:12px;letter-spacing:5px;color:var(--dim2);
@@ -1467,7 +1463,7 @@ body{
     <div class="tech-hazard"></div>
     <div class="s1-eye" id="s1eye"><video id="eye-src" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><video class="v-r" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><video class="v-b" src="uploads/eye-glitch.mp4" autoplay muted loop playsinline preload="auto"></video><div class="s1-eye2"><video src="uploads/eye-glitch.mp4" muted loop playsinline preload="none"></video></div><div class="s1-ring2"></div><div class="s1-ring3"></div><canvas class="dreamscan-canvas" id="dreamscan-eye"></canvas></div>
     <div class="s1-video2" id="s1video2"><video id="video2-src" src="uploads/hero-overlay.mp4" muted playsinline preload="auto"></video><canvas class="dreamscan-canvas" id="dreamscan-video2"></canvas></div>
-    <a id="feedDoor" href="/feed/" aria-label="Signal feed"><span>▶ SIGNAL FEED</span></a>
+    <a id="feedDoor" href="/feed/" aria-label="Signal feed"><canvas aria-hidden="true"></canvas><span class="fd-label">SIGNAL FEED</span></a>
     <div class="s1-coords">SYS// 3EAS-001 // LINCOLN HEIGHTS, NELA // 34.0590°N 118.2321°W // ▮</div>
     <div class="s1-main" style="padding:0 60px;position:relative;z-index:10">
       <div class="s1-title" id="hw1" data-txt="3EAS">3EAS</div>
@@ -6343,15 +6339,74 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
   };
 })();
 
-// SIGNAL FEED door (hidden link above the hero logo). Touch screens can't hover, so the first
-// tap reveals it and a second tap within 5s goes through.
+// SIGNAL FEED door (hidden link above the hero logo). The words are built from
+// particles in the hero network's colours: on hover (first tap on touch screens)
+// dots stream in from the field and lock into "SIGNAL FEED" with glitch tears;
+// on leave they scatter back into the background. Touch: first tap reveals,
+// a second tap within 5s goes through.
 (function(){
   const d=document.getElementById('feedDoor');if(!d)return;
-  let t=0;
+  const cv=d.querySelector('canvas'),cx=cv.getContext('2d');
+  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const COLS=['203,187,136','203,187,136','203,187,136','242,234,208','63,208,200','168,105,90'];
+  let W=0,H=0,dpr=1,P=[],on=false,raf=0,t=0,tear=0,lit=0,built=false;
+  function build(){
+    const r=d.getBoundingClientRect();dpr=Math.min(2,devicePixelRatio||1);
+    W=Math.max(1,Math.round(r.width));H=Math.max(1,Math.round(r.height));
+    cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);
+    // rasterise the words off-screen, then sample them into target points
+    const o=document.createElement('canvas');o.width=W;o.height=H;const ox=o.getContext('2d');
+    let fs=Math.min(H*.62,W/6.2);
+    ox.font='400 '+fs+'px VT323, "Share Tech Mono", monospace';
+    const txt='SIGNAL FEED';
+    while(ox.measureText(txt).width>W*.94&&fs>10){fs-=2;ox.font='400 '+fs+'px VT323, "Share Tech Mono", monospace';}
+    ox.fillStyle='#fff';ox.textAlign='center';ox.textBaseline='middle';
+    try{ox.letterSpacing=Math.round(fs*.08)+'px';}catch(e){}
+    ox.fillText(txt,W/2,H/2);
+    const data=ox.getImageData(0,0,W,H).data,step=2,pts=[];
+    for(let y=0;y<H;y+=step)for(let x=0;x<W;x+=step)if(data[(y*W+x)*4+3]>128)pts.push([x,y]);
+    P=pts.map(([x,y])=>({tx:x,ty:y,x:Math.random()*W,y:Math.random()<.5?-Math.random()*H:H+Math.random()*H,
+      vx:0,vy:0,c:COLS[Math.random()*COLS.length|0],s:Math.random()<.18?2.2:1.7,a:0}));
+    built=true;
+  }
+  function frame(){
+    t++;cx.clearRect(0,0,W,H);
+    if(on&&Math.random()<.035)tear=6+(Math.random()*8|0);   // occasional glitch tear
+    const band=tear>0?{y:Math.random()*H,h:4+Math.random()*16,dx:(Math.random()-.5)*28}:null;if(tear>0)tear--;
+    let alive=0;
+    for(const p of P){
+      if(on){ // spring toward the letter, with a little jitter so it never sits dead still
+        p.vx+=(p.tx-p.x)*.09;p.vy+=(p.ty-p.y)*.09;p.vx*=.72;p.vy*=.72;
+        p.a=Math.min(1,p.a+.06);
+      }else{  // scatter back into the field and fade
+        if(p.a>0&&p.vx===0&&p.vy===0){p.vx=(Math.random()-.5)*6;p.vy=(Math.random()-.5)*6;}
+        p.vx*=.97;p.vy=p.vy*.97+.02;p.a=Math.max(0,p.a-.025);
+      }
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.a<=0)continue;alive++;
+      let x=p.x+(on?(Math.random()-.5)*.6:0);
+      if(band&&p.y>band.y&&p.y<band.y+band.h)x+=band.dx;
+      cx.fillStyle='rgba('+p.c+','+(p.a*(.75+Math.random()*.25)).toFixed(2)+')';
+      cx.fillRect(x,p.y,p.s,p.s);
+    }
+    if(on||alive){raf=requestAnimationFrame(frame);}else{raf=0;cx.clearRect(0,0,W,H);}
+  }
+  function show(){
+    if(!built)build();
+    if(!on&&P.length&&P[0].a<=0)P.forEach(p=>{p.x=Math.random()*W;p.y=Math.random()<.5?-Math.random()*H*.8:H+Math.random()*H*.8;p.vx=p.vy=0;});
+    on=true;
+    if(reduce){cx.clearRect(0,0,W,H);P.forEach(p=>{p.a=1;cx.fillStyle='rgba('+p.c+',.9)';cx.fillRect(p.tx,p.ty,p.s,p.s);});return;}
+    if(!raf)raf=requestAnimationFrame(frame);
+  }
+  function hide(){on=false;P.forEach(p=>{p.vx=p.vy=0;});if(reduce){cx.clearRect(0,0,W,H);P.forEach(p=>p.a=0);return;}if(!raf)raf=requestAnimationFrame(frame);}
+  d.addEventListener('mouseenter',show);d.addEventListener('mouseleave',()=>{if(!d.classList.contains('lit'))hide();});
+  d.addEventListener('focus',show);d.addEventListener('blur',hide);
   d.addEventListener('click',e=>{
     if(matchMedia('(hover:hover)').matches||d.classList.contains('lit'))return;
-    e.preventDefault();d.classList.add('lit');clearTimeout(t);t=setTimeout(()=>d.classList.remove('lit'),5000);
+    e.preventDefault();d.classList.add('lit');show();clearTimeout(lit);
+    lit=setTimeout(()=>{d.classList.remove('lit');hide();},5000);
   });
+  addEventListener('resize',()=>{built=false;if(on)build();});
 })();
 // US National Debt live estimate — seeded from U.S. Treasury Fiscal Data
 // (Debt to the Penny: $40,593,637,262,883 as of Oct 29, 2026), extrapolated
