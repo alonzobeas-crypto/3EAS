@@ -21,6 +21,7 @@ Two Cloudflare Workers sit beside it, deployed separately:
 - Never deploy a Worker, flip `MOCK_MODE`, set `SHOP_PROD_URL`, or push to `main` without asking first.
   - Exception: the words "ticker" and "feed" are the OK. "Ticker" = add/edit/remove ticker lines; "feed" = add/edit/remove videos in `feed/videos.json`. Commit and push to `main` without asking again. Everything else still needs a yes first.
   - A bare YouTube / TikTok / Instagram link sent on its own (no other instruction) counts as "feed": add it to the top of SIGNAL FEED (after the Democracy Now! block) and push.
+  - Likewise a standalone ticker-style line (a statement, quote or name, optionally with a non-video link) counts as "ticker": add it under today's LA date marker and push. If a message could be either a ticker line or a question/instruction to Claude, ask instead of posting.
 - After a `--local` pipeline run, restore `index.html` and `media/catalog.json` before committing.
 
 ## Voice
