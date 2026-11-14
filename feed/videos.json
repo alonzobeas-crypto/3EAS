@@ -1,6 +1,36 @@
 {
   "videos": [
     {
+      "id": "ugE_DpZH3ec",
+      "caption": "DEMOCRACY NOW! // HEADLINES FRI, NOVEMBER 13, 2026",
+      "tag": "dn",
+      "date": "2026-11-13"
+    },
+    {
+      "id": "FxNUxvEC7Vg",
+      "caption": "DEMOCRACY NOW! // HEADLINES THU, NOVEMBER 12, 2026",
+      "tag": "dn",
+      "date": "2026-11-12"
+    },
+    {
+      "id": "dOUTUzLXLlQ",
+      "caption": "DEMOCRACY NOW! // HEADLINES WED, NOVEMBER 11, 2026",
+      "tag": "dn",
+      "date": "2026-11-11"
+    },
+    {
+      "id": "vCiHYdMz7GY",
+      "caption": "DEMOCRACY NOW! // HEADLINES TUE, NOVEMBER 10, 2026",
+      "tag": "dn",
+      "date": "2026-11-10"
+    },
+    {
+      "id": "zdzhrOl2P5U",
+      "caption": "DEMOCRACY NOW! // HEADLINES MON, NOVEMBER 9, 2026",
+      "tag": "dn",
+      "date": "2026-11-09"
+    },
+    {
       "id": "hfZebq4cbHs",
       "caption": ""
     },
