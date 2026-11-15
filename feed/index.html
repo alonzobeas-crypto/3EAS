@@ -31,7 +31,7 @@ a{color:inherit;text-decoration:none}
 #feed::-webkit-scrollbar{display:none}
 .slide{position:relative;height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden}
 .media{position:absolute;inset:0}
-.media img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:grayscale(.35) brightness(.7)}
+.media img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:100%;max-width:640px;height:auto;aspect-ratio:16/9;object-fit:cover;filter:grayscale(.35) brightness(.7)}
 .media iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 /* the tap layer sits over the video so swipes scroll the feed instead of being eaten by the YouTube frame */
 .tap{position:absolute;inset:0;z-index:3;cursor:pointer}
@@ -105,7 +105,7 @@ a{color:inherit;text-decoration:none}
 
   const SRC={
     yt:{name:'YOU<br>TUBE ↗',label:'YouTube',link:v=>'https://youtu.be/'+v.id,
-        thumb:v=>'<img loading="lazy" alt="" src="https://i.ytimg.com/vi/'+esc(v.id)+'/hqdefault.jpg">',
+        thumb:v=>'<img loading="lazy" alt="" src="https://i.ytimg.com/vi/'+esc(v.id)+'/mqdefault.jpg">',
         embed:(v,auto)=>'https://www.youtube-nocookie.com/embed/'+encodeURIComponent(v.id)+'?enablejsapi=1&playsinline=1&mute='+(startMuted()?1:0)+'&autoplay='+(auto?1:0)+'&controls='+(IOS?1:0)+'&rel=0&modestbranding=1&loop=1&playlist='+encodeURIComponent(v.id),
         send:(w,f)=>w.postMessage(JSON.stringify({event:'command',func:{play:'playVideo',pause:'pauseVideo',mute:'mute',unmute:'unMute'}[f],args:[]}),'*')},
     tt:{name:'TIK<br>TOK ↗',label:'TikTok',link:v=>v.url||'https://www.tiktok.com/',
