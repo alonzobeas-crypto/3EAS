@@ -71,6 +71,8 @@ a{color:inherit;text-decoration:none}
 .slide.src-ig .shade{display:none}
 .slide.src-ig .info{bottom:calc(12px + env(safe-area-inset-bottom))}
 .igtip{position:absolute;left:0;right:0;top:calc(64px + env(safe-area-inset-top));z-index:4;text-align:center;font-size:10px;letter-spacing:3px;color:var(--dim2);pointer-events:none}
+.ios .tap{pointer-events:none}
+.ios #snd{display:none}
 @media (prefers-reduced-motion:reduce){.glitch-in,#hint{animation:none}}
 </style>
 </head>
@@ -88,6 +90,13 @@ a{color:inherit;text-decoration:none}
 (function(){
   const feed=document.getElementById('feed'), snd=document.getElementById('snd'), toast=document.getElementById('toast');
   let videos=[], soundOn=false, current=-1, justUnmuted=0;
+  // iPhones/iPads never let a page start or unmute an embedded video with sound, and they
+  // refuse to autoplay one that starts unmuted. So on iOS every video autoplays muted with
+  // the player's own controls showing (its speaker / "tap to unmute" turns sound on), and
+  // taps go straight to the player instead of the feed's tap layer.
+  const IOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  if(IOS)document.documentElement.classList.add('ios');
+  const startMuted=()=>IOS||!soundOn;
   const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const say=t=>{toast.textContent=t;toast.classList.add('on');clearTimeout(say.t);say.t=setTimeout(()=>toast.classList.remove('on'),1800);};
   // Talk to the YouTube player without loading the full IFrame API.
@@ -97,11 +106,11 @@ a{color:inherit;text-decoration:none}
   const SRC={
     yt:{name:'YOU<br>TUBE ↗',label:'YouTube',link:v=>'https://youtu.be/'+v.id,
         thumb:v=>'<img loading="lazy" alt="" src="https://i.ytimg.com/vi/'+esc(v.id)+'/hqdefault.jpg">',
-        embed:(v,auto)=>'https://www.youtube-nocookie.com/embed/'+encodeURIComponent(v.id)+'?enablejsapi=1&playsinline=1&mute='+(soundOn?0:1)+'&autoplay='+(auto?1:0)+'&controls=0&rel=0&modestbranding=1&loop=1&playlist='+encodeURIComponent(v.id),
+        embed:(v,auto)=>'https://www.youtube-nocookie.com/embed/'+encodeURIComponent(v.id)+'?enablejsapi=1&playsinline=1&mute='+(startMuted()?1:0)+'&autoplay='+(auto?1:0)+'&controls='+(IOS?1:0)+'&rel=0&modestbranding=1&loop=1&playlist='+encodeURIComponent(v.id),
         send:(w,f)=>w.postMessage(JSON.stringify({event:'command',func:{play:'playVideo',pause:'pauseVideo',mute:'mute',unmute:'unMute'}[f],args:[]}),'*')},
     tt:{name:'TIK<br>TOK ↗',label:'TikTok',link:v=>v.url||'https://www.tiktok.com/',
         thumb:()=>'<div class="ph">TIKTOK</div>',
-        embed:(v,auto)=>'https://www.tiktok.com/player/v1/'+encodeURIComponent(v.id)+'?autoplay='+(auto?1:0)+'&muted='+(soundOn?0:1)+'&loop=1&controls=0&progress_bar=0&play_button=0&volume_control=0&fullscreen_button=0&timestamp=0&music_info=0&description=0&rel=0&native_context_menu=0&closed_caption=0',
+        embed:(v,auto)=>'https://www.tiktok.com/player/v1/'+encodeURIComponent(v.id)+'?autoplay='+(auto?1:0)+'&muted='+(startMuted()?1:0)+'&loop=1&controls='+(IOS?1:0)+'&progress_bar=0&play_button='+(IOS?1:0)+'&volume_control='+(IOS?1:0)+'&fullscreen_button=0&timestamp=0&music_info=0&description=0&rel=0&native_context_menu=0&closed_caption=0',
         send:(w,f)=>w.postMessage({type:{play:'play',pause:'pause',mute:'mute',unmute:'unMute'}[f],'x-tiktok-player':true},'*')},
     ig:{name:'INSTA<br>GRAM ↗',label:'Instagram',link:v=>v.url||'https://www.instagram.com/'+(v.kind==='p'?'p':'reel')+'/'+v.id+'/',
         thumb:()=>'<div class="ph">INSTAGRAM</div>',
@@ -152,18 +161,21 @@ a{color:inherit;text-decoration:none}
     slide.querySelector('.media').appendChild(f);
   }
   function unmount(slide){const f=slide&&slide.querySelector('iframe');if(f)f.remove();}
-  function play(slide){cmd(slide,'play');cmd(slide,soundOn?'unmute':'mute');slide.classList.remove('is-paused');}
+  function play(slide){cmd(slide,'play');if(!IOS)cmd(slide,soundOn?'unmute':'mute');slide.classList.remove('is-paused');}
   function activate(i){
     if(i===current)return;
     const slides=feed.children;
-    if(current>=0&&slides[current]){cmd(slides[current],'pause');unmount(slides[current]);mount(slides[current],false);}
+    if(current>=0&&slides[current])cmd(slides[current],'pause');
     current=i;
-    for(let k=0;k<slides.length;k++){if(Math.abs(k-i)<=1)mount(slides[k],k===i);else unmount(slides[k]);}
+    // only the visible slide holds a player, mounted fresh with autoplay every time it comes
+    // into view: the player's own autoplay is far more reliable than remote "play" commands.
+    for(let k=0;k<slides.length;k++)unmount(slides[k]);
+    mount(slides[i],true);
     const s=slides[i];s.querySelector('.cap').classList.remove('glitch-in');void s.offsetWidth;s.querySelector('.cap').classList.add('glitch-in');
     [0,400,1200].forEach(ms=>setTimeout(()=>{if(current===i&&!s.classList.contains('is-paused'))play(s);},ms));
     history.replaceState(null,'','#'+keyOf(videos[i]));
   }
-  function setSound(on){soundOn=on;snd.classList.toggle('on',on);snd.textContent=on?'SOUND ON':'SOUND OFF';snd.setAttribute('aria-pressed',on);const s=feed.children[current];if(s)[0,300,1000].forEach(ms=>setTimeout(()=>cmd(s,soundOn?'unmute':'mute'),ms));}
+  function setSound(on){soundOn=on;snd.classList.toggle('on',on);snd.textContent=on?'SOUND ON':'SOUND OFF';snd.setAttribute('aria-pressed',on);const s=feed.children[current];if(s&&!IOS)[0,300,1000].forEach(ms=>setTimeout(()=>cmd(s,soundOn?'unmute':'mute'),ms));}
 
   snd.addEventListener('click',()=>setSound(!soundOn));
   // Browsers only allow sound after the visitor touches the page, so the first touch,
@@ -171,7 +183,7 @@ a{color:inherit;text-decoration:none}
   const firstTouch=e=>{
     if(e.target&&e.target.closest&&e.target.closest('#snd'))return;   // the button handles itself
     ['pointerdown','touchend','keydown'].forEach(t=>removeEventListener(t,firstTouch,true));
-    if(!soundOn){setSound(true);justUnmuted=Date.now();}
+    if(!soundOn&&!IOS){setSound(true);justUnmuted=Date.now();}
   };
   ['pointerdown','touchend','keydown'].forEach(t=>addEventListener(t,firstTouch,true));
   feed.addEventListener('click',e=>{
