@@ -425,7 +425,7 @@ body{
 
 /* SIGNAL FEED door: an invisible hot spot above the 3EAS logo. Hover (or the first tap on a
    phone) glitches it in; clicking it (second tap on a phone) opens /feed/. */
-#feedDoor{position:absolute;top:13%;left:50%;transform:translateX(-50%);z-index:30;width:min(78%,480px);height:120px;display:block;text-decoration:none;-webkit-tap-highlight-color:transparent;outline:none}
+#feedDoor{position:absolute;top:13%;left:50%;transform:translate(-50%,-50%);will-change:left,top;z-index:30;width:min(78%,480px);height:120px;display:block;text-decoration:none;-webkit-tap-highlight-color:transparent;outline:none}
 #feedDoor canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 #feedDoor .fd-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (max-width:520px){#feedDoor{height:96px}}
@@ -6416,6 +6416,31 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     lit=setTimeout(()=>{d.classList.remove('lit');set(false);},5000);
   });
   addEventListener('resize',()=>{build();kick();});
+  // Wander: the dot drifts around the hero on a slow, never-quite-repeating path (two
+  // sine waves per axis). It freezes while revealed so it's easy to catch, and picks up
+  // where it left off afterwards. The whole box moves, so the words reveal wherever it is.
+  const hero=d.offsetParent||d.parentElement;
+  const ph=[Math.random()*6.28,Math.random()*6.28,Math.random()*6.28,Math.random()*6.28];
+  let wt=Math.random()*100,wPrev=0,wRaf=0,wx=null,wy=null;
+  function wander(now){
+    wRaf=0;
+    const dt=Math.min(.05,(now-(wPrev||now))/1000);wPrev=now;
+    if(!on&&!reduce)wt+=dt;
+    const SW=hero.clientWidth,SH=hero.clientHeight,bw=d.offsetWidth,bh=d.offsetHeight;
+    const fx=.5+.4*Math.sin(wt*.22+ph[0])+.08*Math.sin(wt*.57+ph[1]);
+    const fy=.5+.36*Math.sin(wt*.17+ph[2])+.08*Math.sin(wt*.47+ph[3]);
+    // idle: only the dot has to stay on screen, so it can roam edge to edge;
+    // revealed: ease the box inward so the whole of SIGNAL FEED fits.
+    const mx=on?bw/2:34,my=on?bh/2:34;
+    const tx=Math.min(SW-mx,Math.max(mx,fx*SW)),ty=Math.min(SH-my-40,Math.max(my+70,fy*SH));
+    wx=wx==null?tx:wx+(tx-wx)*(on?.18:1);wy=wy==null?ty:wy+(ty-wy)*(on?.18:1);
+    d.style.left=wx+'px';d.style.top=wy+'px';
+    if(visible&&!document.hidden)wRaf=requestAnimationFrame(wander);
+  }
+  const wKick=()=>{if(!wRaf&&visible&&!document.hidden){wPrev=0;wRaf=requestAnimationFrame(wander);}};
+  wKick();
+  if('IntersectionObserver' in window)new IntersectionObserver(es=>{if(es[0].isIntersecting)wKick();}).observe(hero);
+  document.addEventListener('visibilitychange',wKick);
 })();
 // US National Debt live estimate — seeded from U.S. Treasury Fiscal Data
 // (Debt to the Penny: $40,593,637,262,883 as of Oct 29, 2026), extrapolated
