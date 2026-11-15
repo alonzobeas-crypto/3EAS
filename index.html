@@ -427,6 +427,7 @@ body{
    phone) glitches it in; clicking it (second tap on a phone) opens /feed/. */
 #feedDoor{position:absolute;top:13%;left:50%;transform:translate(-50%,-50%);will-change:left,top;z-index:30;width:min(78%,480px);height:120px;display:block;text-decoration:none;-webkit-tap-highlight-color:transparent;outline:none}
 #feedDoor canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#feedDoor canvas.fd-sonar{inset:auto;left:50%;top:50%;width:120px;height:120px;transform:translate(-50%,-50%)}
 #feedDoor .fd-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (max-width:520px){#feedDoor{height:96px}}
 .s1-coords{
@@ -6347,13 +6348,18 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
 (function(){
   const d=document.getElementById('feedDoor');if(!d)return;
   const cv=d.querySelector('canvas'),cx=cv.getContext('2d');
+  // The sonar dot lives on its own fixed 120×120 canvas so page resizes (iOS address bar)
+  // can never stretch or clip it; the letters stay on the full-size canvas.
+  const sv=document.createElement('canvas');sv.className='fd-sonar';sv.setAttribute('aria-hidden','true');d.appendChild(sv);
+  const sx=sv.getContext('2d'),SD=Math.min(2,devicePixelRatio||1);sv.width=120*SD;sv.height=120*SD;sx.setTransform(SD,0,0,SD,0,0);
   const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
   const COLS=['203,187,136','203,187,136','242,234,208','242,234,208','63,208,200'];
   const PING=2400;                                   // ms between sonar pings
   let W=0,H=0,CX=0,CY=0,P=[],on=false,raf=0,visible=true,lit=0,rings=[],lastPing=-1e9,settled=false,mix=0;
   function build(){
     const r=d.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);
-    W=Math.max(1,Math.round(r.width));H=Math.max(1,Math.round(r.height));CX=W/2;CY=H/2;
+    if(r.width<40||r.height<40){requestAnimationFrame(build);return;}   // not laid out yet: try next frame
+    W=Math.round(r.width);H=Math.round(r.height);CX=W/2;CY=H/2;
     cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);
     const o=document.createElement('canvas');o.width=W;o.height=H;const ox=o.getContext('2d');
     const txt='SIGNAL FEED';let fs=Math.min(H*.62,W/6.2);
@@ -6366,26 +6372,26 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
   }
   function dot(alpha,now){
     // the lone signal: gold core with a soft cyan halo; it flares as each ping leaves
-    const flare=Math.max(0,1-(now-lastPing)/500);
-    const g=cx.createRadialGradient(CX,CY,0,CX,CY,14+flare*8);
-    g.addColorStop(0,'rgba(242,234,208,'+(alpha*(.9+.1*flare))+')');
-    g.addColorStop(.25,'rgba(203,187,136,'+(alpha*.7)+')');
-    g.addColorStop(1,'rgba(63,208,200,0)');
-    cx.fillStyle=g;cx.beginPath();cx.arc(CX,CY,14+flare*8,0,6.2832);cx.fill();
-    cx.fillStyle='rgba(255,250,235,'+alpha+')';cx.beginPath();cx.arc(CX,CY,2.4+flare*1.2,0,6.2832);cx.fill();
+    const flare=Math.max(0,1-(now-lastPing)/500),a=Math.max(0,Math.min(1,alpha)).toFixed(3);
+    const g=sx.createRadialGradient(60,60,0,60,60,9+flare*4);
+    g.addColorStop(0,'rgba(242,234,208,'+a+')');
+    g.addColorStop(.35,'rgba(203,187,136,'+(a*.45).toFixed(3)+')');
+    g.addColorStop(1,'rgba(203,187,136,0)');
+    sx.fillStyle=g;sx.beginPath();sx.arc(60,60,9+flare*4,0,6.2832);sx.fill();
+    sx.fillStyle='rgba(255,250,235,'+a+')';sx.beginPath();sx.arc(60,60,2.2+flare,0,6.2832);sx.fill();
   }
   function frame(now){
-    raf=0;cx.clearRect(0,0,W,H);
+    raf=0;cx.clearRect(0,0,W,H);sx.clearRect(0,0,120,120);
     mix+=((on?1:0)-mix)*.12;                       // 0 = sonar, 1 = words
     // sonar rings: emitted only while idle, then expand and fade
     if(!on&&now-lastPing>PING){rings.push(now);lastPing=now;}
-    const maxR=Math.min(H*.48,60);
+    const maxR=56;
     rings=rings.filter(t=>now-t<1800);
     for(const t of rings){
       const k=(now-t)/1800,r=4+k*maxR,a=(1-k)*(1-mix)*.75;
       if(a<=.01)continue;
-      cx.strokeStyle='rgba(63,208,200,'+a.toFixed(3)+')';cx.lineWidth=1.3;
-      cx.beginPath();cx.arc(CX,CY,r,0,6.2832);cx.stroke();
+      sx.strokeStyle='rgba(63,208,200,'+a.toFixed(3)+')';sx.lineWidth=1.3;
+      sx.beginPath();sx.arc(60,60,r,0,6.2832);sx.stroke();
     }
     if(1-mix>.02)dot(1-mix,now);
     // particles: burst out to the letters on hover, collapse back into the dot on leave
@@ -6402,7 +6408,7 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     settled=on&&!moving&&mix>.995;
     if(visible&&!document.hidden&&!settled)raf=requestAnimationFrame(frame);   // fully revealed: hold still
   }
-  function staticDraw(){cx.clearRect(0,0,W,H);if(on){P.forEach(p=>{cx.fillStyle='rgba('+p.c+','+p.k+')';cx.fillRect(p.tx,p.ty,p.s,p.s);});}else{lastPing=-1e9;dot(1,0);}}
+  function staticDraw(){cx.clearRect(0,0,W,H);sx.clearRect(0,0,120,120);if(on){P.forEach(p=>{cx.fillStyle='rgba('+p.c+','+p.k+')';cx.fillRect(p.tx,p.ty,p.s,p.s);});}else{lastPing=-1e9;dot(1,0);}}
   function kick(){if(reduce){staticDraw();return;}settled=false;if(!raf&&visible)raf=requestAnimationFrame(frame);}
   const set=v=>{on=v;kick();};
   (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{build();kick();});
@@ -6415,7 +6421,7 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     e.preventDefault();d.classList.add('lit');set(true);clearTimeout(lit);
     lit=setTimeout(()=>{d.classList.remove('lit');set(false);},5000);
   });
-  addEventListener('resize',()=>{build();kick();});
+  addEventListener('resize',()=>{const r=d.getBoundingClientRect();if(Math.round(r.width)!==W||Math.round(r.height)!==H){build();kick();}});
   // Wander: the dot drifts around the hero on a slow, never-quite-repeating path (two
   // sine waves per axis). It freezes while revealed so it's easy to catch, and picks up
   // where it left off afterwards. The whole box moves, so the words reveal wherever it is.
