@@ -13,7 +13,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: dn-headlines
+  group: signal-feed-bots     # never write videos.json at the same time as another feed bot
   cancel-in-progress: false
 
 jobs:
@@ -34,4 +34,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add feed/videos.json
           git commit -m "SIGNAL FEED: Democracy Now! headlines (auto)"
+          git pull --rebase origin main
           git push

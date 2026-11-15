@@ -215,11 +215,13 @@ a{color:inherit;text-decoration:none}
     // Order: whichever is newer goes first — your latest upload (by its "added" date) or the
     // Democracy Now! week (tag "dn", by its newest "date"); the other comes next. Everything
     // else is shuffled into a new random order on each visit.
-    const dn=videos.filter(v=>v.tag==='dn'),mine=videos.filter(v=>v.tag!=='dn');
+    // Channel bots (tag other than "dn", e.g. "bobby": newest upload from a followed channel)
+    // sit right after that pair, before the shuffle.
+    const dn=videos.filter(v=>v.tag==='dn'),bots=videos.filter(v=>v.tag&&v.tag!=='dn'),mine=videos.filter(v=>!v.tag);
     const latest=mine.slice(0,1),old=mine.slice(1);
     for(let i=old.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[old[i],old[j]]=[old[j],old[i]];}
     const dnDate=dn.reduce((m,v)=>v.date>m?v.date:m,''),myDate=(latest[0]&&latest[0].added)||'';
-    videos=myDate>dnDate?[...latest,...dn,...old]:[...dn,...latest,...old];
+    videos=[...(myDate>dnDate?[...latest,...dn]:[...dn,...latest]),...bots,...old];
     NAMES=nameless(videos);
     feed.innerHTML=videos.map(slideHTML).join('');
     const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting&&en.intersectionRatio>.6)activate(+en.target.dataset.i);});},{root:feed,threshold:[.6]});

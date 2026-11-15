@@ -39,6 +39,10 @@ Only add links the user sends — except the one automation below.
 - Automation: `.github/workflows/dn-headlines.yml` runs `scripts/dn-headlines.mjs` each weekday and puts the
   single most recent Democracy Now! "Headlines" video in the feed (entry tagged `"tag": "dn"`).
   Only one is ever up; the next one replaces it.
+- Automation: `.github/workflows/channel-latest.yml` runs `scripts/channel-latest.mjs <handle> <tag> "<PREFIX>"` daily
+  for each followed channel (now: @bobbyowsinskimedia, tag `bobby`) and keeps only that channel's newest non-Short upload.
+  On the page, channel-bot entries (any tag except `dn`) sit after the latest-upload/DN pair, before the shuffle.
+  Add a channel = add one line to that workflow's Update step.
   Test without network: `DN_RSS_FILE=a.xml DN_SEARCH_FILE=b.html DN_TODAY=YYYY-MM-DD node scripts/dn-headlines.mjs --dry-run`. The only way in from the home page
 is the hidden `#feedDoor` above the hero logo (hover / first tap glitches it in).
 
