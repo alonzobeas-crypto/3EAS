@@ -1,4 +1,5 @@
-// Democracy Now! "Headlines" in SIGNAL FEED, one per weekday, a fresh set each week.
+// Democracy Now! "Headlines" in SIGNAL FEED: only the single most recent one is ever up;
+// when the next one is posted it replaces it.
 // Run by .github/workflows/dn-headlines.yml (GitHub's servers can reach YouTube).
 // No API key: reads the channel's public RSS feed plus its in-channel search for
 // "headlines" (the RSS only holds the last ~15 uploads, which DN fills in a day or two).
@@ -8,10 +9,8 @@
 //   node scripts/dn-headlines.mjs --dry-run  print what it would do, change nothing
 //   DN_RSS_FILE=a.xml DN_SEARCH_FILE=b.html DN_TODAY=2026-11-14 node ...   offline test
 //
-// The week: keeps every Headlines from Monday of the current week (New York time) on,
-// newest first, at the top of the feed. On a Saturday/Sunday "the current week" is the
-// one that just ended, so the weekend shows Mon–Fri; the next Monday's run drops last
-// week's and starts over. Entries it adds carry "tag":"dn"; nothing else is touched.
+// Keeps exactly one entry tagged "tag":"dn" (the newest Headlines found in the last 14
+// days); any older DN entries are removed. Nothing else in videos.json is touched.
 
 import fs from 'node:fs';
 
@@ -63,28 +62,17 @@ async function fromSearch() {
   });
 }
 
-// Monday (New York) of the week that contains `today`; Sat/Sun count as the week just ended.
-function weekStart(today) {
-  const d = new Date(today + 'T12:00:00Z');
-  const back = (d.getUTCDay() + 6) % 7;            // Mon=0 … Sun=6
-  d.setUTCDate(d.getUTCDate() - back);
-  return d.toISOString().slice(0, 10);
-}
-
 const today = process.env.DN_TODAY || nyDate(Date.now());
-const monday = weekStart(today);
 let found = [];
 for (const src of [fromRss, fromSearch]) {
   try { found.push(...await src()); } catch (e) { console.log(`${src.name}: ${e.message}`); }
 }
-// one Headlines per day: the "Headlines for <date>" clip, dated this week, newest first
-const byDay = new Map();
-for (const v of found) {
-  if (!v.id || !v.date || !/\bheadlines\b/i.test(v.title)) continue;
-  if (v.date < monday || v.date > today) continue;
-  if (!byDay.has(v.date)) byDay.set(v.date, v);
-}
-const week = [...byDay.values()].sort((a, b) => b.date.localeCompare(a.date));
+// the newest "Headlines for <date>" clip from the last two weeks
+const since = new Date(new Date(today + 'T12:00:00Z') - 14 * 864e5).toISOString().slice(0, 10);
+const week = found
+  .filter((v) => v.id && v.date && /\bheadlines\b/i.test(v.title) && v.date >= since && v.date <= today)
+  .sort((a, b) => b.date.localeCompare(a.date))
+  .slice(0, 1);
 
 const data = JSON.parse(fs.readFileSync(FEED, 'utf8'));
 const rest = (data.videos || []).filter((v) => v.tag !== 'dn');
@@ -92,7 +80,7 @@ const before = (data.videos || []).filter((v) => v.tag === 'dn').map((v) => v.id
 const label = (iso) => new Date(iso + 'T12:00:00Z').toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase();
 const dn = week.map((v) => ({ id: v.id, caption: `DEMOCRACY NOW! // HEADLINES ${label(v.date)}`, tag: 'dn', date: v.date }));
 
-console.log(`week of ${monday} (today ${today}): ${dn.length} Headlines found` + dn.map((v) => `\n  ${v.date} ${v.id}`).join(''));
+console.log(`latest Headlines (today ${today}): ${dn.length ? 'found' : 'none found'}` + dn.map((v) => `\n  ${v.date} ${v.id}`).join(''));
 if (!dn.length && before) { console.log('nothing found this run; leaving the current ones in place'); process.exit(0); }
 if (dn.map((v) => v.id).join(',') === before) { console.log('no change'); process.exit(0); }
 data.videos = [...dn, ...rest];

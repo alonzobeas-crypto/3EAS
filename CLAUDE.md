@@ -37,8 +37,8 @@ Two Cloudflare Workers sit beside it, deployed separately:
 New entries get `"added": "<today, LA date YYYY-MM-DD>"` and go right after the DN block in the file. On the page, the newest of (latest upload, DN week) shows first, then the other, then everything else shuffled per visit.
 Only add links the user sends — except the one automation below.
 - Automation: `.github/workflows/dn-headlines.yml` runs `scripts/dn-headlines.mjs` each weekday and puts the
-  current week's Democracy Now! "Headlines" videos at the top, newest first (entries tagged `"tag": "dn"`).
-  The set resets each Monday (weekends show the week just ended).
+  single most recent Democracy Now! "Headlines" video in the feed (entry tagged `"tag": "dn"`).
+  Only one is ever up; the next one replaces it.
   Test without network: `DN_RSS_FILE=a.xml DN_SEARCH_FILE=b.html DN_TODAY=YYYY-MM-DD node scripts/dn-headlines.mjs --dry-run`. The only way in from the home page
 is the hidden `#feedDoor` above the hero logo (hover / first tap glitches it in).
 
