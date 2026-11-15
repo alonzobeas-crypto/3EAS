@@ -6339,53 +6339,75 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
   };
 })();
 
-// SIGNAL FEED door (link above the hero logo), drawn as particles in the hero
-// network's colours. Idle: the words sit in place and slowly pulse, fading in and
-// out of the background. Hover / focus (first tap on touch screens): they hold
-// still and come up bright. Touch: first tap brightens, a second tap within 5s
-// goes through.
+// SIGNAL FEED door (link above the hero logo). Idle: one lone signal dot (gold core,
+// cyan rings, unlike the hero's legacy particle) sends out a sonar ping every couple of
+// seconds to draw people in. Hover / focus (first tap on touch screens): the pinging stops
+// and particles burst out of the dot into the words SIGNAL FEED, then hold still. Leave:
+// they pull back into the dot and the sonar resumes. Touch: a second tap within 5s enters.
 (function(){
   const d=document.getElementById('feedDoor');if(!d)return;
   const cv=d.querySelector('canvas'),cx=cv.getContext('2d');
   const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
-  const COLS=['203,187,136','203,187,136','203,187,136','242,234,208','63,208,200','168,105,90'];
-  const PULSE=5200, LO=.06, HI=.38;            // idle pulse: period (ms), dimmest / brightest
-  let W=0,H=0,P=[],on=false,a=LO,raf=0,last=0,visible=true,lit=0;
+  const COLS=['203,187,136','203,187,136','242,234,208','242,234,208','63,208,200'];
+  const PING=2400;                                   // ms between sonar pings
+  let W=0,H=0,CX=0,CY=0,P=[],on=false,raf=0,visible=true,lit=0,rings=[],lastPing=-1e9,settled=false,mix=0;
   function build(){
     const r=d.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);
-    W=Math.max(1,Math.round(r.width));H=Math.max(1,Math.round(r.height));
+    W=Math.max(1,Math.round(r.width));H=Math.max(1,Math.round(r.height));CX=W/2;CY=H/2;
     cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);
     const o=document.createElement('canvas');o.width=W;o.height=H;const ox=o.getContext('2d');
     const txt='SIGNAL FEED';let fs=Math.min(H*.62,W/6.2);
     const setF=()=>{ox.font='400 '+fs+'px VT323, "Share Tech Mono", monospace';try{ox.letterSpacing=Math.round(fs*.08)+'px';}catch(e){}};
     setF();while(ox.measureText(txt).width>W*.94&&fs>10){fs-=2;setF();}
-    ox.fillStyle='#fff';ox.textAlign='center';ox.textBaseline='middle';ox.fillText(txt,W/2,H/2);
+    ox.fillStyle='#fff';ox.textAlign='center';ox.textBaseline='middle';ox.fillText(txt,CX,CY);
     const data=ox.getImageData(0,0,W,H).data;P=[];
     for(let y=0;y<H;y+=2)for(let x=0;x<W;x+=2)if(data[(y*W+x)*4+3]>128)
-      P.push({x,y,c:COLS[Math.random()*COLS.length|0],s:Math.random()<.18?2.2:1.7,k:.75+Math.random()*.25});
+      P.push({tx:x,ty:y,x:CX,y:CY,vx:0,vy:0,c:COLS[Math.random()*COLS.length|0],s:Math.random()<.18?2.2:1.7,k:.75+Math.random()*.25});
   }
-  function draw(){
-    cx.clearRect(0,0,W,H);
-    for(const p of P){cx.fillStyle='rgba('+p.c+','+(a*p.k).toFixed(3)+')';cx.fillRect(p.x,p.y,p.s,p.s);}
+  function dot(alpha,now){
+    // the lone signal: gold core with a soft cyan halo; it flares as each ping leaves
+    const flare=Math.max(0,1-(now-lastPing)/500);
+    const g=cx.createRadialGradient(CX,CY,0,CX,CY,14+flare*8);
+    g.addColorStop(0,'rgba(242,234,208,'+(alpha*(.9+.1*flare))+')');
+    g.addColorStop(.25,'rgba(203,187,136,'+(alpha*.7)+')');
+    g.addColorStop(1,'rgba(63,208,200,0)');
+    cx.fillStyle=g;cx.beginPath();cx.arc(CX,CY,14+flare*8,0,6.2832);cx.fill();
+    cx.fillStyle='rgba(255,250,235,'+alpha+')';cx.beginPath();cx.arc(CX,CY,2.4+flare*1.2,0,6.2832);cx.fill();
   }
-  function loop(now){
-    raf=0;
-    const target=on?1:(reduce?(LO+HI)/2:LO+(HI-LO)*(.5-.5*Math.cos(now/PULSE*2*Math.PI)));
-    if(on&&Math.abs(target-a)<.004){          // fully lit: hold perfectly still, no redraws
-      if(a!==1){a=1;draw();}
-    }else{
-      a+=(target-a)*(on?.18:.08);             // ease, so hover brightens smoothly
-      if(now-last>33){last=now;draw();}        // ~30fps is plenty for a slow pulse
+  function frame(now){
+    raf=0;cx.clearRect(0,0,W,H);
+    mix+=((on?1:0)-mix)*.12;                       // 0 = sonar, 1 = words
+    // sonar rings: emitted only while idle, then expand and fade
+    if(!on&&now-lastPing>PING){rings.push(now);lastPing=now;}
+    const maxR=Math.min(H*.48,60);
+    rings=rings.filter(t=>now-t<1800);
+    for(const t of rings){
+      const k=(now-t)/1800,r=4+k*maxR,a=(1-k)*(1-mix)*.75;
+      if(a<=.01)continue;
+      cx.strokeStyle='rgba(63,208,200,'+a.toFixed(3)+')';cx.lineWidth=1.3;
+      cx.beginPath();cx.arc(CX,CY,r,0,6.2832);cx.stroke();
     }
-    if(visible&&!document.hidden)raf=requestAnimationFrame(loop);
+    if(1-mix>.02)dot(1-mix,now);
+    // particles: burst out to the letters on hover, collapse back into the dot on leave
+    let moving=false;
+    for(const p of P){
+      const gx=on?p.tx:CX,gy=on?p.ty:CY;
+      p.vx=(p.vx+(gx-p.x)*.11)*.74;p.vy=(p.vy+(gy-p.y)*.11)*.74;
+      p.x+=p.vx;p.y+=p.vy;
+      if(Math.abs(p.vx)+Math.abs(p.vy)>.05)moving=true;
+      const a=on?Math.min(1,mix*1.2):mix*.9;
+      if(a<.02)continue;
+      cx.fillStyle='rgba('+p.c+','+(a*p.k).toFixed(3)+')';cx.fillRect(p.x,p.y,p.s,p.s);
+    }
+    settled=on&&!moving&&mix>.995;
+    if(visible&&!document.hidden&&!settled)raf=requestAnimationFrame(frame);   // fully revealed: hold still
   }
-  function start(){if(!raf&&visible)raf=requestAnimationFrame(loop);}
-  const set=v=>{on=v;start();};
-  // build once the pixel font is ready so the dots trace VT323, not a fallback
-  (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{build();start();});
-  // only animate while the hero is on screen
-  if('IntersectionObserver' in window)new IntersectionObserver(es=>{visible=es[0].isIntersecting;start();}).observe(d);
-  document.addEventListener('visibilitychange',start);
+  function staticDraw(){cx.clearRect(0,0,W,H);if(on){P.forEach(p=>{cx.fillStyle='rgba('+p.c+','+p.k+')';cx.fillRect(p.tx,p.ty,p.s,p.s);});}else{lastPing=-1e9;dot(1,0);}}
+  function kick(){if(reduce){staticDraw();return;}settled=false;if(!raf&&visible)raf=requestAnimationFrame(frame);}
+  const set=v=>{on=v;kick();};
+  (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{build();kick();});
+  if('IntersectionObserver' in window)new IntersectionObserver(es=>{visible=es[0].isIntersecting;kick();}).observe(d);
+  document.addEventListener('visibilitychange',kick);
   d.addEventListener('mouseenter',()=>set(true));d.addEventListener('mouseleave',()=>{if(!d.classList.contains('lit'))set(false);});
   d.addEventListener('focus',()=>set(true));d.addEventListener('blur',()=>set(false));
   d.addEventListener('click',e=>{
@@ -6393,7 +6415,7 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     e.preventDefault();d.classList.add('lit');set(true);clearTimeout(lit);
     lit=setTimeout(()=>{d.classList.remove('lit');set(false);},5000);
   });
-  addEventListener('resize',()=>{build();draw();});
+  addEventListener('resize',()=>{build();kick();});
 })();
 // US National Debt live estimate — seeded from U.S. Treasury Fiscal Data
 // (Debt to the Penny: $40,593,637,262,883 as of Oct 29, 2026), extrapolated
