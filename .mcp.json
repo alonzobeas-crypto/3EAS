@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "leonardo": {
+      "type": "http",
+      "url": "https://mcp.leonardo.ai/v1/mcp",
+      "headers": {
+        "API-Key": "${LEONARDO_API_KEY:-injected-by-network-secret}"
+      }
+    }
+  }
+}
