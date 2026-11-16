@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="author" content="3EAS CORTEX · 3eascortex.com">
+<meta name="theme-color" content="#0a0a0a">
+<title>SUCIOPATH — Los Angeles</title>
+<meta name="description" content="SUCIOPATH. Los Angeles. Tees and archive resale by DJ Antiq.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="3EAS CORTEX">
+<meta property="og:title" content="SUCIOPATH — Los Angeles">
+<meta property="og:description" content="Cubicle. Crates. Booth. Los Angeles.">
+<meta property="og:image" content="https://3eascortex.com/assets/og-card.jpg">
+<meta property="og:url" content="https://3eascortex.com/suciopath/">
+<link rel="icon" href="/assets/app-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Herr+Von+Muellerhoff&family=Oswald:wght@300;500;700&family=Barlow:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+/* SUCIOPATH — LA streetwear by DJ Antiq (Anthony Saldana). Sub-signal of 3EAS CORTEX.
+   Look: black-and-grey Chicano tattoo. Old English + fine-line script, smoke, soft grey gradients.
+   The site stays black & grey; colour lives on the garments. */
+:root{
+  --bg:#0a0a0a;--ink:#ecebe8;--g1:#b9b7b2;--g2:#8a8884;--g3:#55534f;--g4:#2a2928;--g5:#161615;
+  --line:rgba(185,183,178,.22);
+  --old:'UnifrakturMaguntia',serif;--script:'Herr Von Muellerhoff',cursive;
+  --cond:'Oswald',sans-serif;--body:'Barlow',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--ink);color:var(--bg)}
+#grain{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50;opacity:.06;mix-blend-mode:screen}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:40;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px;
+  background:linear-gradient(#0a0a0a 60%,rgba(10,10,10,0));}
+.nav .logo{font-family:var(--old);font-size:26px;line-height:1}
+.nav nav{display:flex;gap:22px;font-family:var(--cond);font-weight:500;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--g1)}
+.nav nav a:hover{color:var(--ink)}
+.nav .home{font-family:var(--cond);font-size:11px;letter-spacing:.2em;color:var(--g3);text-transform:uppercase}
+.nav .home:hover{color:var(--g1)}
+@media(max-width:640px){.nav nav a:not(.keep){display:none}.nav .home{display:none}}
+
+/* hero */
+.hero{position:relative;min-height:94vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 16px 70px;overflow:hidden}
+.rays{position:absolute;left:50%;top:46%;width:1500px;height:1500px;transform:translate(-50%,-50%);pointer-events:none;opacity:.55}
+.smoke{position:absolute;left:-10%;top:-10%;width:120%;height:120%;pointer-events:none;opacity:.18}
+.hero > *:not(.rays):not(.smoke){position:relative}
+.hero .pre{font-family:var(--cond);font-weight:300;font-size:13px;letter-spacing:.5em;color:var(--g2);text-transform:uppercase;margin-bottom:10px}
+.mark{font-family:var(--old);font-weight:normal;font-size:clamp(72px,16vw,220px);line-height:.95;
+  background:linear-gradient(180deg,#fff 0%,#d9d7d2 38%,#8f8d88 62%,#e6e4df 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 6px 24px rgba(0,0,0,.9))}
+.hero .sig{font-family:var(--script);font-size:clamp(48px,8vw,92px);color:var(--g1);line-height:.6;margin-top:-.08em;transform:rotate(-4deg)}
+.hero .tag{margin-top:34px;font-size:clamp(16px,2.2vw,19px);color:var(--g1);max-width:540px;line-height:1.55}
+.cta{margin-top:34px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.btn{display:inline-block;padding:14px 26px;border:1px solid var(--g3);font-family:var(--cond);font-weight:500;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink);transition:.18s}
+.btn:hover{border-color:var(--ink)}
+.btn.solid{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.btn.solid:hover{background:transparent;color:var(--ink)}
+
+/* marquee */
+.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;white-space:nowrap;padding:14px 0}
+.marquee span{display:inline-block;animation:mq 40s linear infinite;font-family:var(--cond);font-weight:700;font-size:20px;letter-spacing:.24em;color:var(--g3);text-transform:uppercase}
+.marquee i{font-style:normal;color:var(--g1);margin:0 18px}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* shared */
+section{padding:96px 20px;max-width:1180px;margin:0 auto}
+.kick{font-family:var(--cond);font-weight:500;font-size:12px;letter-spacing:.32em;color:var(--g2);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.kick::before{content:"";width:32px;height:1px;background:var(--g3)}
+h2{font-family:var(--old);font-weight:normal;font-size:clamp(46px,7vw,84px);line-height:1;margin-bottom:26px;color:var(--ink)}
+p.copy{font-size:18px;line-height:1.65;color:var(--g1);max-width:600px}
+p.copy+p.copy{margin-top:16px}
+p.copy b{color:var(--ink);font-weight:500}
+.orn{display:block;width:220px;height:20px;margin:0 auto;opacity:.6}
+
+/* triptych: cubicle -> crates -> booth, told in drawings */
+.trip{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:10px;padding-bottom:30px}
+.panel{background:radial-gradient(ellipse at 50% 40%,#232322 0%,#0f0f0e 75%);aspect-ratio:3/4;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;position:relative;overflow:hidden}
+.panel svg{width:100%;height:auto}
+.panel figcaption{font-family:var(--old);font-size:clamp(30px,3.6vw,44px);color:var(--ink);margin-top:6px}
+.panel:hover .spin{animation:spin 1.8s linear infinite}
+.spin{transform-box:fill-box;transform-origin:center;animation:spin 6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.arrow{font-family:var(--cond);font-size:28px;color:var(--g3)}
+.signoff{text-align:center;font-family:var(--script);font-size:clamp(64px,10vw,120px);color:var(--g1);line-height:1;padding-bottom:60px}
+.signoff span{display:inline-block;transform:rotate(-4deg)}
+@media(max-width:860px){.trip{grid-template-columns:1fr;max-width:380px}.arrow{transform:rotate(90deg);text-align:center}}
+/* grey -> colour band: the site is grey, the clothes are not */
+.band{display:flex;height:120px}
+.band span{flex:1;transition:flex .35s}
+.band span:hover{flex:2.4}
+
+
+.head{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:34px}
+.head h2{margin-bottom:0}
+.head p{color:var(--g2);max-width:340px;font-size:15px;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
+.item{background:var(--g5);transition:transform .25s}
+.item:hover{transform:translateY(-4px)}
+.item .stage{position:relative;aspect-ratio:1/1.12;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 38%,#2b2a29 0%,#121211 72%);overflow:hidden}
+.item svg.tee{width:84%;height:auto;filter:drop-shadow(0 22px 26px rgba(0,0,0,.75))}
+.item .badge{position:absolute;top:14px;left:14px;font-family:var(--cond);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--g1);border:1px solid var(--g3);padding:4px 10px}
+.item .meta{padding:16px 16px 6px;display:flex;justify-content:space-between;gap:10px}
+.item .nm{font-family:var(--cond);font-weight:700;font-size:19px;letter-spacing:.06em;text-transform:uppercase}
+.item .px{font-family:var(--cond);font-weight:500;font-size:19px;color:var(--g1)}
+.item .cw{padding:0 16px 16px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--g2)}
+.item .sw{width:14px;height:14px;border-radius:50%;border:1px solid var(--g3)}
+.item .go{display:block;text-align:center;padding:13px;border-top:1px solid var(--line);font-family:var(--cond);font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--g1)}
+.item .go:hover{background:var(--ink);color:var(--bg)}
+
+/* archivo */
+.archivo{display:grid;grid-template-columns:1fr 1.15fr;gap:56px;align-items:center}
+.racks{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rk{aspect-ratio:3/4;background:linear-gradient(160deg,#2a2928,#121211);display:flex;flex-direction:column;justify-content:flex-end;padding:12px;position:relative;overflow:hidden}
+.rk::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.07),transparent 60%)}
+.rk svg{position:absolute;left:12%;top:10%;width:76%;height:auto}
+.rk .y{font-family:var(--old);font-size:34px;color:var(--g1);line-height:1;position:relative}
+.rk .d{font-family:var(--cond);font-size:11px;letter-spacing:.18em;color:var(--g3);text-transform:uppercase;margin-top:6px;position:relative}
+@media(max-width:860px){.archivo{grid-template-columns:1fr}}
+
+/* notify */
+.notify{text-align:center}
+.notify h2{margin-bottom:16px}
+.notify p.copy{margin:0 auto}
+
+footer{padding:50px 20px 70px;text-align:center;border-top:1px solid var(--line)}
+footer .f1{font-family:var(--old);font-size:34px}
+footer .f2{margin-top:10px;font-family:var(--cond);font-size:11px;letter-spacing:.3em;color:var(--g3);text-transform:uppercase;line-height:2.2}
+footer a{color:var(--g2)} footer a:hover{color:var(--ink)}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="grain" aria-hidden="true"></canvas>
+
+<!-- shared SVG defs: smoke filter -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="smokeF" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency=".006 .012" numOctaves="4" seed="7"/>
+    <feColorMatrix values="0 0 0 0 .75  0 0 0 0 .74  0 0 0 0 .72  0 0 0 1.4 -.55"/>
+  </filter>
+</svg>
+
+<header class="nav">
+  <a class="logo" href="#top">Suciopath</a>
+  <nav>
+    <a href="#historia">Historia</a>
+    <a href="#drop">Drop 001</a>
+    <a href="#archivo">Archivo</a>
+    <a class="keep" href="#lista">The List</a>
+  </nav>
+  <a class="home" href="/">3EAS Cortex ↗</a>
+</header>
+
+<main id="top">
+<div class="hero">
+  <svg class="smoke" aria-hidden="true"><rect width="100%" height="100%" filter="url(#smokeF)"/></svg>
+  <svg class="rays" viewBox="-750 -750 1500 1500" aria-hidden="true" id="rays"></svg>
+  <div class="pre">DJ Antiq presents</div>
+  <h1 class="mark">Suciopath</h1>
+  <div class="sig">Los Angeles</div>
+  <div class="cta">
+    <a class="btn solid" href="#drop">Shop Drop 001</a>
+    <a class="btn" href="#historia">Cubicle → Booth</a>
+  </div>
+</div>
+
+<div class="marquee" aria-hidden="true"><span id="mq"></span></div>
+
+<section id="historia" class="trip">
+  <figure class="panel"><svg viewBox="0 0 300 300" id="ilCubicle" aria-label="Cubicle"></svg><figcaption>Cubicle</figcaption></figure>
+  <span class="arrow" aria-hidden="true">→</span>
+  <figure class="panel"><svg viewBox="0 0 300 300" id="ilCrates" aria-label="Crates"></svg><figcaption>Crates</figcaption></figure>
+  <span class="arrow" aria-hidden="true">→</span>
+  <figure class="panel"><svg viewBox="0 0 300 300" id="ilBooth" aria-label="Booth"></svg><figcaption>Booth</figcaption></figure>
+</section>
+<div class="signoff"><span>DJ Antiq</span></div>
+
+<div class="band" aria-hidden="true" id="band"></div>
+
+<section id="drop">
+  <div class="head">
+    <div><div class="kick">Drop 001</div><h2>Tees.</h2></div>
+  </div>
+  <div class="grid" id="dropGrid"></div>
+</section>
+
+<section id="archivo" class="archivo">
+  <div>
+    <div class="kick">Resale</div>
+    <h2>Archivo.</h2>
+    <div class="cta" style="justify-content:flex-start"><a class="btn" href="#lista">First Look</a></div>
+  </div>
+  <div class="racks">
+    <div class="rk"><svg viewBox="0 0 100 90" class="fold"></svg><div class="y">’89</div></div>
+    <div class="rk"><svg viewBox="0 0 100 90" class="fold"></svg><div class="y">’93</div></div>
+    <div class="rk"><svg viewBox="0 0 100 90" class="fold"></svg><div class="y">’96</div></div>
+    <div class="rk"><svg viewBox="0 0 100 90" class="fold"></svg><div class="y">’98</div></div>
+    <div class="rk"><svg viewBox="0 0 100 90" class="fold"></svg><div class="y">’01</div></div>
+    <div class="rk"><svg viewBox="0 0 100 90" class="fold"></svg><div class="y">??</div></div>
+  </div>
+</section>
+
+<section id="lista" class="notify">
+  <div class="kick" style="justify-content:center">The List</div>
+  <h2>Get on the list.</h2>
+  <div class="cta">
+    <a class="btn solid" href="https://ig.me/m/dj_antiq" target="_blank" rel="noopener">DM “SUCIO”</a>
+    <a class="btn" href="https://www.instagram.com/dj_antiq/" target="_blank" rel="noopener">Follow</a>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="f1">Suciopath</div>
+  <div class="f2">Los Angeles / © <span id="yr">2026</span><br>Broadcast through <a href="/">3EAS Cortex</a></div>
+</footer>
+
+<script>
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs,parent){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+
+  // fine-line halo rays behind the wordmark
+  var rays=document.getElementById('rays');
+  for(var i=0;i<120;i++){
+    var a=i/120*Math.PI*2, long=i%2===0, r1=long?120:180, r2=long?740:520;
+    el('line',{x1:Math.cos(a)*r1,y1:Math.sin(a)*r1,x2:Math.cos(a)*r2,y2:Math.sin(a)*r2,stroke:'#8a8884','stroke-width':long?1:.5,opacity:long?.5:.3},rays);
+  }
+
+
+  // ---- triptych drawings: black-and-grey fine line ----
+  var L='fill="none" stroke="#b9b7b2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"';
+  var Ld='fill="none" stroke="#6f6d69" stroke-width="1"';
+  var hatch='<defs><pattern id="hx" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="#55534f" stroke-width="1"/></pattern>'+
+    '<pattern id="dots" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r=".8" fill="#3d3c3a"/></pattern>'+
+    '<radialGradient id="crt"><stop offset="0" stop-color="#d9d7d2" stop-opacity=".55"/><stop offset="1" stop-color="#1a1a19"/></radialGradient></defs>';
+
+  document.getElementById('ilCubicle').innerHTML=hatch+
+    // partition walls
+    '<rect x="20" y="30" width="260" height="170" fill="url(#dots)"/><path d="M20 200V30h260v170" '+L+'/><path d="M150 30v170" '+Ld+'/>'+
+    // pinned memo + calendar
+    '<rect x="36" y="48" width="34" height="40" fill="#1c1c1b" '+Ld+'/><path d="M42 58h22M42 66h18M42 74h20" '+Ld+'/>'+
+    '<rect x="228" y="46" width="38" height="30" '+Ld+'/><path d="M228 54h38M237 46v30M247 46v30M257 46v30M228 62h38M228 70h38" stroke="#3d3c3a" stroke-width=".8"/>'+
+    // CRT monitor
+    '<rect x="92" y="78" width="116" height="96" rx="10" fill="#121211" '+L+'/><rect x="104" y="89" width="92" height="70" rx="6" fill="url(#crt)" stroke="#6f6d69"/>'+
+    '<path d="M110 128q8-14 16 0t16 0 16 0 16 0 16 0" fill="none" stroke="#ecebe8" stroke-width="1.2" opacity=".85"/>'+
+    '<path d="M135 174l-8 24h46l-8-24" fill="#121211" '+L+'/>'+
+    // desk
+    '<path d="M10 200h280l-14 22H24z" fill="url(#hx)" '+L+'/><path d="M24 222v54M276 222v54" '+L+'/>'+
+    // keyboard
+    '<path d="M108 203h84l6 13h-96z" fill="#161615" '+L+'/><path d="M112 208h76M110 212h80" '+Ld+'/>'+
+    // desk phone with curly cord
+    '<rect x="214" y="180" width="44" height="20" rx="3" fill="#161615" '+L+'/><path d="M212 178q24-14 48 0" '+L+' stroke-width="5"/>'+
+    '<path d="M214 192c-6 4-2 8-8 10s-2 8-8 10" '+Ld+'/>'+
+    // mug
+    '<path d="M44 176h20v24H44z" fill="#161615" '+L+'/><path d="M64 182q9 0 0 12" '+L+'/><path d="M50 170q3-6 0-12M57 170q3-6 0-12" '+Ld+'/>';
+
+  var recs='', xs=[70,80,89,99,108,118,126,137,146,156,165,175,186,195,206,216,226];
+  xs.forEach(function(x,i){ var h=58+((i*37)%28), g=['#2a2928','#3d3c3a','#55534f','#8a8884','#1c1c1b'][i%5];
+    recs+='<rect x="'+x+'" y="'+(160-h)+'" width="9" height="'+(h+6)+'" fill="'+g+'" stroke="#0a0a0a" stroke-width=".8"/>'; });
+  var holes=''; for(var r=0;r<3;r++)for(var c=0;c<6;c++) holes+='<rect x="'+(72+c*27)+'" y="'+(176+r*28)+'" width="18" height="18" rx="5" fill="#0a0a0a" '+Ld+'/>';
+  document.getElementById('ilCrates').innerHTML=hatch+
+    // a record being pulled: sleeve + disc
+    '<g transform="rotate(-14 150 70)"><circle cx="178" cy="60" r="40" fill="#121211" '+L+'/><circle cx="178" cy="60" r="30" '+Ld+'/><circle cx="178" cy="60" r="22" '+Ld+'/><circle cx="178" cy="60" r="12" fill="#d9d7d2"/><circle cx="178" cy="60" r="2" fill="#0a0a0a"/>'+
+    '<rect x="96" y="20" width="80" height="80" fill="#2a2928" '+L+'/><text x="136" y="70" text-anchor="middle" font-family="UnifrakturMaguntia" font-size="30" fill="#b9b7b2">S</text></g>'+
+    recs+
+    // milk crate
+    '<rect x="58" y="160" width="184" height="104" rx="6" fill="url(#hx)" '+L+'/>'+holes+'<path d="M58 172h184" '+L+'/>'+
+    '<rect x="120" y="164" width="60" height="6" rx="3" fill="#0a0a0a" '+Ld+'/>'+
+    '<path d="M40 270h220" '+Ld+'/>';
+
+  var grooves=''; for(var g2=30;g2<84;g2+=3.4) grooves+='<circle cx="130" cy="160" r="'+g2+'" fill="none" stroke="#2f2e2d" stroke-width=".7"/>';
+  document.getElementById('ilBooth').innerHTML=hatch+
+    // plinth
+    '<rect x="18" y="58" width="264" height="206" rx="8" fill="#121211" '+L+'/><rect x="24" y="64" width="252" height="194" rx="5" fill="url(#hx)" opacity=".35"/>'+
+    // platter + spinning record
+    '<circle cx="130" cy="160" r="92" fill="#1c1c1b" '+L+'/>'+
+    '<g class="spin"><circle cx="130" cy="160" r="86" fill="#0d0d0d" stroke="#3d3c3a"/>'+grooves+
+    '<circle cx="130" cy="160" r="26" fill="#d9d7d2"/><text x="130" y="171" text-anchor="middle" font-family="UnifrakturMaguntia" font-size="28" fill="#111">S</text>'+
+    '<path d="M70 110a80 80 0 0 1 40-28" stroke="#ecebe8" stroke-width="2" opacity=".25" fill="none"/></g>'+
+    '<circle cx="130" cy="160" r="3" fill="#b9b7b2"/>'+
+    // tonearm
+    '<circle cx="246" cy="92" r="16" fill="#1c1c1b" '+L+'/><circle cx="246" cy="92" r="6" fill="#b9b7b2"/>'+
+    '<path d="M246 92L240 196L206 214" '+L+' stroke-width="3"/><rect x="196" y="206" width="18" height="12" rx="2" transform="rotate(28 205 212)" fill="#b9b7b2"/>'+
+    '<rect x="258" y="70" width="14" height="10" rx="2" '+Ld+'/>'+
+    // pitch fader + start/stop + light
+    '<rect x="252" y="150" width="10" height="84" rx="2" '+Ld+'/><rect x="249" y="186" width="16" height="9" fill="#b9b7b2"/>'+
+    '<rect x="32" y="232" width="26" height="16" rx="2" fill="#1c1c1b" '+L+'/><circle cx="38" cy="78" r="5" fill="#ecebe8" opacity=".8"/>';
+
+  // archivo: folded vintage tees, each a different grey with a faded print
+  var FOLD=[['#2e2d2c','#8a8884','c'],['#4a4947','#d9d7d2','b'],['#1c1c1b','#6f6d69','r'],['#7a7874','#1c1c1b','s'],['#3a3938','#b9b7b2','l'],['#242423','#3d3c3a','q']];
+  Array.prototype.forEach.call(document.querySelectorAll('.rk svg.fold'),function(sv,i){
+    var f=FOLD[i%FOLD.length], c=f[1], pr='';
+    if(f[2]==='c') pr='<circle cx="50" cy="52" r="13" fill="none" stroke="'+c+'" stroke-width="2"/><circle cx="50" cy="52" r="4" fill="'+c+'"/>';
+    if(f[2]==='b') pr='<rect x="34" y="42" width="32" height="20" fill="none" stroke="'+c+'" stroke-width="2"/><path d="M38 48h24M38 54h18" stroke="'+c+'" stroke-width="2"/>';
+    if(f[2]==='r') pr='<path d="M32 60l8-16 8 10 6-8 12 14z" fill="'+c+'"/>';
+    if(f[2]==='s') pr='<text x="50" y="62" text-anchor="middle" font-family="UnifrakturMaguntia" font-size="24" fill="'+c+'">S</text>';
+    if(f[2]==='l') pr='<path d="M34 56q8-14 16 0t16 0" fill="none" stroke="'+c+'" stroke-width="2"/>';
+    if(f[2]==='q') pr='<text x="50" y="62" text-anchor="middle" font-family="Oswald" font-size="20" fill="'+c+'">?</text>';
+    sv.innerHTML='<path d="M14 26l18-12h36l18 12-6 14H20z" fill="'+f[0]+'" stroke="#0a0a0a"/><rect x="20" y="30" width="60" height="50" rx="3" fill="'+f[0]+'" stroke="#0a0a0a"/>'+
+      '<path d="M38 14q12 10 24 0" fill="none" stroke="#0a0a0a" stroke-width="3"/><path d="M20 70h60" stroke="#000" stroke-opacity=".3"/>'+
+      '<g opacity=".75">'+pr+'</g>';
+  });
+
+  // grey -> colour band
+  var BAND=['#0f0f0f','#1f1f1e','#333231','#4c4b49','#6c6a67','#8f8d89','#b5b3ae','#dad8d3','#8e1b22','#c4471c','#d9a21b','#2f6b3a','#1f3f8f','#5b2a74'];
+  document.getElementById('band').innerHTML=BAND.map(function(c){return '<span style="background:'+c+'"></span>';}).join('');
+
+  // marquee: text written twice so the loop is seamless
+  var mqTxt=['Suciopath','Los Angeles','Drop 001','Cubicle','Crates','Booth','Archivo'].join('<i>✦</i>')+'<i>✦</i>';
+  document.getElementById('mq').innerHTML=mqTxt+mqTxt;
+
+  // ---- DROP 001: edit here. status: "soon" | "live" | "gone"; add url when live ----
+  var DROP=[
+    {name:'Suciopath Classic', price:40, cw:'Black / grey ink',   tee:'#151515', ink:'#bdbbb6', gfx:'old',     status:'soon'},
+    {name:'Cubicle to Crates', price:40, cw:'Heather grey / black',tee:'#9a9893', ink:'#141414', gfx:'stack',   status:'soon'},
+    {name:'Los Angeles Script',price:45, cw:'Cherry / bone',      tee:'#8e1b22', ink:'#efe9dc', gfx:'script',  status:'soon'},
+    {name:'Side A',            price:45, cw:'Cobalt / white',     tee:'#1f3f8f', ink:'#f4f4f2', gfx:'record',  status:'soon'}
+  ];
+  function gfx(d){
+    var c=d.ink;
+    switch(d.gfx){
+      case 'old': return '<text x="150" y="132" text-anchor="middle" font-family="UnifrakturMaguntia" font-size="34" fill="'+c+'">Suciopath</text>'+
+        '<text x="150" y="152" text-anchor="middle" font-family="Oswald" font-size="7" letter-spacing="4" fill="'+c+'">LOS ANGELES · CALIFORNIA</text>';
+      case 'stack': return '<text x="150" y="112" text-anchor="middle" font-family="Oswald" font-weight="700" font-size="17" letter-spacing="1" fill="'+c+'">FROM THE CUBICLE</text>'+
+        '<text x="150" y="140" text-anchor="middle" font-family="Herr Von Muellerhoff" font-size="34" fill="'+c+'">to the crates</text>'+
+        '<text x="150" y="160" text-anchor="middle" font-family="UnifrakturMaguntia" font-size="13" fill="'+c+'">Suciopath</text>';
+      case 'script': return '<text x="150" y="132" text-anchor="middle" font-family="Herr Von Muellerhoff" font-size="50" fill="'+c+'" transform="rotate(-6 150 130)">Los Angeles</text>'+
+        '<text x="150" y="160" text-anchor="middle" font-family="UnifrakturMaguntia" font-size="14" fill="'+c+'">Suciopath</text>';
+      case 'record': var s='<circle cx="150" cy="128" r="34" fill="none" stroke="'+c+'" stroke-width="2"/>';
+        for(var r=14;r<32;r+=4) s+='<circle cx="150" cy="128" r="'+r+'" fill="none" stroke="'+c+'" stroke-width=".6" opacity=".7"/>';
+        return s+'<text x="150" y="134" text-anchor="middle" font-family="UnifrakturMaguntia" font-size="18" fill="'+c+'">S</text>'+
+          '<text x="150" y="180" text-anchor="middle" font-family="Oswald" font-size="9" letter-spacing="4" fill="'+c+'">SIDE A · VINYL ONLY</text>';
+    }
+    return '';
+  }
+  function tee(d,i){
+    var id='t'+i;
+    return '<svg class="tee" viewBox="0 0 300 300" aria-label="'+d.name+' tee">'+
+      '<defs><linearGradient id="'+id+'" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset=".25" stop-color="#fff" stop-opacity=".06"/><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".4"/></linearGradient></defs>'+
+      '<path id="p'+id+'" d="M95 40 L60 55 L18 95 L45 130 L72 112 L72 272 L228 272 L228 112 L255 130 L282 95 L240 55 L205 40 C195 62 175 72 150 72 C125 72 105 62 95 40Z" fill="'+d.tee+'"/>'+
+      '<path d="M95 40 L60 55 L18 95 L45 130 L72 112 L72 272 L228 272 L228 112 L255 130 L282 95 L240 55 L205 40 C195 62 175 72 150 72 C125 72 105 62 95 40Z" fill="url(#'+id+')"/>'+
+      '<path d="M95 40 C105 62 125 72 150 72 C175 72 195 62 205 40" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="5"/>'+
+      '<path d="M72 112 L72 200 M228 112 L228 200" stroke="#000" stroke-opacity=".18" stroke-width="1"/>'+
+      gfx(d)+'</svg>';
+  }
+  var BADGE={soon:'Coming soon',live:'Available',gone:'Sold out'};
+  document.getElementById('dropGrid').innerHTML=DROP.map(function(d,i){
+    var go=d.status==='live'&&d.url?'<a class="go" href="'+d.url+'">Buy now</a>':d.status==='gone'?'<span class="go">Sold out</span>':'<a class="go" href="#lista">Notify me</a>';
+    return '<article class="item"><div class="stage"><span class="badge">'+BADGE[d.status]+'</span>'+tee(d,i)+'</div>'+
+      '<div class="meta"><div class="nm">'+d.name+'</div><div class="px">$'+d.price+'</div></div>'+
+      '<div class="cw"><span class="sw" style="background:'+d.tee+'"></span>'+d.cw+'</div>'+go+'</article>';
+  }).join('');
+
+  document.getElementById('yr').textContent=new Date().getFullYear();
+
+  // film grain (photo texture, slow)
+  var g=document.getElementById('grain'),gx=g.getContext('2d');
+  function size(){g.width=Math.ceil(innerWidth/3);g.height=Math.ceil(innerHeight/3);}
+  function grain(){var img=gx.createImageData(g.width,g.height),d=img.data;for(var i=0;i<d.length;i+=4){var v=Math.random()*255|0;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255;}gx.putImageData(img,0,0);}
+  size();grain();addEventListener('resize',function(){size();grain();});
+  if(!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)) setInterval(grain,120);
+})();
+</script>
+</body>
+</html>
