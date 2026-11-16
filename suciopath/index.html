@@ -4,332 +4,325 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="author" content="3EAS CORTEX · 3eascortex.com">
-<meta name="theme-color" content="#000000">
-<title>SUCIOPATH // 3EAS CORTEX</title>
-<meta name="description" content="SUCIOPATH. Los Angeles. Tees, archive resale. Founded by DJ Antiq. Broadcast through 3EAS CORTEX.">
+<meta name="theme-color" content="#0a0a0a">
+<title>SUCIOPATH — Los Angeles</title>
+<meta name="description" content="SUCIOPATH. Los Angeles streetwear by DJ Antiq (Anthony Saldana). Tees and archive resale.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="3EAS CORTEX">
-<meta property="og:title" content="SUCIOPATH // 3EAS CORTEX">
-<meta property="og:description" content="Dirty by design. Los Angeles. Drop 001 incoming.">
+<meta property="og:title" content="SUCIOPATH — Los Angeles">
+<meta property="og:description" content="From the cubicle to the crates. Streetwear by DJ Antiq.">
 <meta property="og:image" content="https://3eascortex.com/assets/og-card.jpg">
 <meta property="og:url" content="https://3eascortex.com/suciopath/">
 <link rel="icon" href="/assets/app-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Courier+Prime:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Herr+Von+Muellerhoff&family=Oswald:wght@300;500;700&family=Barlow:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
-/* SUCIOPATH — LA streetwear, founded by DJ Antiq. Sub-signal of 3EAS CORTEX.
-   Palette = 3EAS bone/black + one stain: SUCIO red. Keep it that way. */
+/* SUCIOPATH — LA streetwear by DJ Antiq (Anthony Saldana). Sub-signal of 3EAS CORTEX.
+   Look: black-and-grey Chicano tattoo. Old English + fine-line script, smoke, soft grey gradients.
+   The site stays black & grey; colour lives on the garments. */
 :root{
-  --bg:#000;--fg:#e6e2d6;--dim:#6c665c;--dim2:#aaa293;--dimmer:#1a1816;
-  --accent:#cbbb88;--hot:#f2ead0;--stain:#c23a22;--stain-dk:#5a1a10;
-  --border:rgba(108,102,92,.55);
-  --vt:'VT323',monospace;--mono:'Share Tech Mono',monospace;--body:'Courier Prime',monospace;
+  --bg:#0a0a0a;--ink:#ecebe8;--g1:#b9b7b2;--g2:#8a8884;--g3:#55534f;--g4:#2a2928;--g5:#161615;
+  --line:rgba(185,183,178,.22);
+  --old:'UnifrakturMaguntia',serif;--script:'Herr Von Muellerhoff',cursive;
+  --cond:'Oswald',sans-serif;--body:'Barlow',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--fg);font-family:var(--mono);-webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100vh}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
-::selection{background:var(--stain);color:var(--hot)}
+::selection{background:var(--ink);color:var(--bg)}
+#grain{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50;opacity:.06;mix-blend-mode:screen}
 
-/* grain + scanlines over everything */
-#grain{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50;opacity:.09;mix-blend-mode:screen}
-body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:51;
-  background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0 2px,rgba(0,0,0,.28) 2px 3px)}
-
-/* top bar */
-.bar{position:sticky;top:0;z-index:40;display:flex;justify-content:space-between;align-items:center;gap:12px;
-  padding:10px 16px;font-size:11px;letter-spacing:3px;color:var(--dim2);background:rgba(0,0,0,.82);
-  border-bottom:1px solid var(--border);backdrop-filter:blur(6px)}
-.bar a:hover{color:var(--hot)}
-.bar .rec{color:var(--stain)}
-.bar .rec::before{content:"●";margin-right:6px;animation:blink 1.2s steps(2) infinite}
-@keyframes blink{50%{opacity:0}}
-.bar nav{display:flex;gap:18px}
-@media(max-width:560px){.bar nav a:not(.keep){display:none}}
+/* nav */
+.nav{position:sticky;top:0;z-index:40;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px;
+  background:linear-gradient(#0a0a0a 60%,rgba(10,10,10,0));}
+.nav .logo{font-family:var(--old);font-size:26px;line-height:1}
+.nav nav{display:flex;gap:22px;font-family:var(--cond);font-weight:500;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--g1)}
+.nav nav a:hover{color:var(--ink)}
+.nav .home{font-family:var(--cond);font-size:11px;letter-spacing:.2em;color:var(--g3);text-transform:uppercase}
+.nav .home:hover{color:var(--g1)}
+@media(max-width:640px){.nav nav a:not(.keep){display:none}.nav .home{display:none}}
 
 /* hero */
-.hero{position:relative;min-height:92vh;display:flex;flex-direction:column;justify-content:center;align-items:center;
-  padding:60px 16px 40px;text-align:center;overflow:hidden}
-.hero .freq{font-size:11px;letter-spacing:5px;color:var(--dim2);margin-bottom:22px}
-.hero .freq b{color:var(--stain);font-weight:normal}
-.mark{position:relative;font-family:var(--vt);font-size:clamp(64px,17vw,230px);line-height:.82;letter-spacing:-.01em;color:var(--hot);
-  text-shadow:0 0 28px rgba(194,58,34,.25)}
-.mark::before,.mark::after{content:attr(data-t);position:absolute;inset:0;pointer-events:none}
-.mark::before{color:var(--stain);transform:translate(3px,0);mix-blend-mode:screen;clip-path:inset(0 0 60% 0);animation:g1 3.8s infinite steps(1)}
-.mark::after{color:#0ff;opacity:.55;transform:translate(-3px,0);mix-blend-mode:screen;clip-path:inset(55% 0 0 0);animation:g2 4.6s infinite steps(1)}
-@keyframes g1{0%,88%,100%{transform:translate(0);clip-path:inset(0 0 100% 0)}89%{transform:translate(6px,-2px);clip-path:inset(10% 0 55% 0)}92%{transform:translate(-4px,1px);clip-path:inset(40% 0 30% 0)}}
-@keyframes g2{0%,80%,100%{transform:translate(0);clip-path:inset(100% 0 0 0)}81%{transform:translate(-7px,2px);clip-path:inset(60% 0 10% 0)}84%{transform:translate(5px,0);clip-path:inset(20% 0 70% 0)}}
-.drip{display:block;width:min(90%,820px);height:46px;margin:-4px auto 0}
-.hero .tag{margin-top:26px;font-family:var(--body);font-style:italic;font-size:clamp(15px,2.4vw,19px);color:var(--dim2);max-width:560px;line-height:1.5}
-.hero .cta{margin-top:34px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
-.btn{display:inline-block;padding:13px 22px;border:1px solid var(--border);font-size:12px;letter-spacing:4px;color:var(--fg);transition:.15s}
-.btn:hover{border-color:var(--hot);color:var(--hot)}
-.btn.stain{background:var(--stain);border-color:var(--stain);color:#0a0505}
-.btn.stain:hover{background:var(--hot);border-color:var(--hot)}
-.hero .coords{position:absolute;bottom:18px;left:16px;right:16px;display:flex;justify-content:space-between;font-size:10px;letter-spacing:3px;color:var(--dim)}
+.hero{position:relative;min-height:94vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 16px 70px;overflow:hidden}
+.rays{position:absolute;left:50%;top:46%;width:1500px;height:1500px;transform:translate(-50%,-50%);pointer-events:none;opacity:.55}
+.smoke{position:absolute;left:-10%;top:-10%;width:120%;height:120%;pointer-events:none;opacity:.5}
+.hero > *:not(.rays):not(.smoke){position:relative}
+.hero .pre{font-family:var(--cond);font-weight:300;font-size:13px;letter-spacing:.5em;color:var(--g2);text-transform:uppercase;margin-bottom:10px}
+.mark{font-family:var(--old);font-weight:normal;font-size:clamp(72px,16vw,220px);line-height:.95;
+  background:linear-gradient(180deg,#fff 0%,#d9d7d2 38%,#8f8d88 62%,#e6e4df 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 6px 24px rgba(0,0,0,.9))}
+.hero .sig{font-family:var(--script);font-size:clamp(48px,8vw,92px);color:var(--g1);line-height:.6;margin-top:-.08em;transform:rotate(-4deg)}
+.hero .tag{margin-top:34px;font-size:clamp(16px,2.2vw,19px);color:var(--g1);max-width:540px;line-height:1.55}
+.cta{margin-top:34px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.btn{display:inline-block;padding:14px 26px;border:1px solid var(--g3);font-family:var(--cond);font-weight:500;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink);transition:.18s}
+.btn:hover{border-color:var(--ink)}
+.btn.solid{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.btn.solid:hover{background:transparent;color:var(--ink)}
 
-/* crawl */
-.crawl{border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;white-space:nowrap;padding:10px 0;background:#050404}
-.crawl span{display:inline-block;padding-left:100%;animation:crawl 38s linear infinite;font-family:var(--vt);font-size:22px;letter-spacing:4px;color:var(--accent)}
-.crawl i{font-style:normal;color:var(--stain);margin:0 14px}
-@keyframes crawl{to{transform:translateX(-100%)}}
+/* marquee */
+.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;white-space:nowrap;padding:14px 0}
+.marquee span{display:inline-block;animation:mq 40s linear infinite;font-family:var(--cond);font-weight:700;font-size:20px;letter-spacing:.24em;color:var(--g3);text-transform:uppercase}
+.marquee i{font-style:normal;color:var(--g1);margin:0 18px}
+@keyframes mq{to{transform:translateX(-50%)}}
 
-/* sections */
-section{padding:84px 16px;max-width:1180px;margin:0 auto}
-.lbl{font-size:11px;letter-spacing:5px;color:var(--dim2);margin-bottom:10px}
-.lbl b{color:var(--stain);font-weight:normal}
-h2{font-family:var(--vt);font-weight:normal;font-size:clamp(40px,7vw,76px);line-height:.9;color:var(--hot);margin-bottom:28px}
-p.copy{font-family:var(--body);font-size:17px;line-height:1.65;color:var(--fg);max-width:640px}
+/* shared */
+section{padding:96px 20px;max-width:1180px;margin:0 auto}
+.kick{font-family:var(--cond);font-weight:500;font-size:12px;letter-spacing:.32em;color:var(--g2);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.kick::before{content:"";width:32px;height:1px;background:var(--g3)}
+h2{font-family:var(--old);font-weight:normal;font-size:clamp(46px,7vw,84px);line-height:1;margin-bottom:26px;color:var(--ink)}
+p.copy{font-size:18px;line-height:1.65;color:var(--g1);max-width:600px}
 p.copy+p.copy{margin-top:16px}
-.redact{background:var(--fg);color:var(--fg);padding:0 4px;user-select:none}
+p.copy b{color:var(--ink);font-weight:500}
+.orn{display:block;width:220px;height:20px;margin:0 auto;opacity:.6}
 
-/* manifesto */
-.manifesto{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
-.manifesto ol{list-style:none;counter-reset:r;border-left:1px solid var(--border)}
-.manifesto li{counter-increment:r;padding:14px 0 14px 22px;border-bottom:1px dashed var(--dimmer);font-size:14px;letter-spacing:1px;color:var(--dim2)}
-.manifesto li::before{content:"0" counter(r) " //";color:var(--stain);margin-right:10px}
-.manifesto li b{color:var(--hot);font-weight:normal}
-@media(max-width:820px){.manifesto{grid-template-columns:1fr}}
+/* story */
+.story{overflow:hidden;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.vinyl{width:100%;max-width:460px;aspect-ratio:1;justify-self:center;animation:spin 10s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chapters{margin-top:34px;display:grid;gap:0;border-left:1px solid var(--line)}
+.ch{padding:16px 0 16px 24px;position:relative}
+.ch::before{content:"";position:absolute;left:-4px;top:24px;width:7px;height:7px;background:var(--g1);transform:rotate(45deg)}
+.ch .n{font-family:var(--cond);font-size:12px;letter-spacing:.3em;color:var(--g3);text-transform:uppercase}
+.ch .t{font-family:var(--cond);font-weight:700;font-size:24px;letter-spacing:.06em;text-transform:uppercase;margin:4px 0 4px}
+.ch p{color:var(--g2);font-size:16px;line-height:1.5}
+.signed{margin-top:30px;font-family:var(--script);font-size:64px;color:var(--ink);line-height:1;transform:rotate(-3deg);transform-origin:left}
+.signed small{display:block;font-family:var(--cond);font-size:12px;letter-spacing:.3em;color:var(--g3);transform:rotate(3deg);margin-top:6px;text-transform:uppercase}
+@media(max-width:860px){.story{grid-template-columns:1fr}.vinyl{max-width:300px;order:-1}}
 
-/* drop grid */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
-.item{position:relative;border:1px solid var(--border);background:#070606;transition:border-color .15s}
-.item:hover{border-color:var(--stain)}
-.item .stage{aspect-ratio:1/1.1;display:flex;align-items:center;justify-content:center;background:
-  radial-gradient(ellipse at 50% 40%,#1a1512 0%,#000 70%);overflow:hidden}
-.item svg.tee{width:82%;height:auto;filter:drop-shadow(0 18px 30px rgba(0,0,0,.8));transition:transform .3s}
-.item:hover svg.tee{transform:translateY(-4px) rotate(-1deg)}
-.item .meta{padding:14px 14px 16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:baseline;gap:10px}
-.item .nm{font-family:var(--vt);font-size:24px;color:var(--hot);line-height:1}
-.item .sub{font-size:10px;letter-spacing:3px;color:var(--dim);margin-top:6px}
-.item .px{font-family:var(--vt);font-size:24px;color:var(--accent)}
-.item .stamp{position:absolute;top:12px;left:12px;font-size:10px;letter-spacing:3px;padding:4px 8px;border:1px solid var(--stain);color:var(--stain);background:rgba(0,0,0,.7)}
-.item .claim{display:block;text-align:center;padding:12px;border-top:1px solid var(--border);font-size:11px;letter-spacing:4px;color:var(--dim2)}
-.item .claim:hover{background:var(--stain);color:#0a0505}
+/* familia */
+.familia{max-width:none;background:radial-gradient(ellipse at 50% 0%,#1d1d1c 0%,var(--bg) 70%);border-top:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center}
+.familia .in{max-width:760px;margin:0 auto}
+.familia h2{margin-top:18px}
+.familia p.copy{margin:0 auto}
+.familia .quote{font-family:var(--script);font-size:clamp(44px,6vw,70px);color:var(--ink);line-height:1;margin:30px 0 4px}
 
-/* archivo / resale */
-.archivo{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center}
-.ledger{font-size:13px;border:1px solid var(--border)}
-.ledger .row{display:grid;grid-template-columns:70px 1fr 80px;gap:10px;padding:12px 14px;border-bottom:1px dashed var(--dimmer);color:var(--dim2)}
-.ledger .row:last-child{border-bottom:0}
-.ledger .row.h{color:var(--dim);font-size:10px;letter-spacing:3px}
-.ledger .st{color:var(--stain);text-align:right}
-.ledger .st.ok{color:var(--accent)}
-@media(max-width:820px){.archivo{grid-template-columns:1fr}}
+/* drop */
+.head{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:34px}
+.head h2{margin-bottom:0}
+.head p{color:var(--g2);max-width:340px;font-size:15px;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
+.item{background:var(--g5);transition:transform .25s}
+.item:hover{transform:translateY(-4px)}
+.item .stage{position:relative;aspect-ratio:1/1.12;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 38%,#2b2a29 0%,#121211 72%);overflow:hidden}
+.item svg.tee{width:84%;height:auto;filter:drop-shadow(0 22px 26px rgba(0,0,0,.75))}
+.item .badge{position:absolute;top:14px;left:14px;font-family:var(--cond);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--g1);border:1px solid var(--g3);padding:4px 10px}
+.item .meta{padding:16px 16px 6px;display:flex;justify-content:space-between;gap:10px}
+.item .nm{font-family:var(--cond);font-weight:700;font-size:19px;letter-spacing:.06em;text-transform:uppercase}
+.item .px{font-family:var(--cond);font-weight:500;font-size:19px;color:var(--g1)}
+.item .cw{padding:0 16px 16px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--g2)}
+.item .sw{width:14px;height:14px;border-radius:50%;border:1px solid var(--g3)}
+.item .go{display:block;text-align:center;padding:13px;border-top:1px solid var(--line);font-family:var(--cond);font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--g1)}
+.item .go:hover{background:var(--ink);color:var(--bg)}
 
-/* operador */
-.op{display:grid;grid-template-columns:320px 1fr;gap:44px;align-items:center}
-.dossier{position:relative;aspect-ratio:3/4;border:1px solid var(--border);background:
-  repeating-linear-gradient(45deg,#0a0908 0 6px,#0d0b0a 6px 12px);display:flex;align-items:flex-end;padding:14px;overflow:hidden}
-.dossier .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--vt);font-size:88px;color:var(--dimmer)}
-.dossier .file{position:relative;font-size:10px;letter-spacing:3px;color:var(--dim2);line-height:1.8}
-.dossier .file b{color:var(--stain);font-weight:normal}
-.dossier::after{content:"CLASSIFIED";position:absolute;top:22px;right:-38px;transform:rotate(35deg);background:var(--stain);color:#0a0505;font-size:10px;letter-spacing:4px;padding:4px 44px}
-.op .ig{margin-top:26px}
-@media(max-width:820px){.op{grid-template-columns:1fr}.dossier{max-width:320px}}
+/* archivo */
+.archivo{display:grid;grid-template-columns:1fr 1.15fr;gap:56px;align-items:center}
+.racks{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rk{aspect-ratio:3/4;background:linear-gradient(160deg,#2a2928,#121211);display:flex;flex-direction:column;justify-content:flex-end;padding:12px;position:relative;overflow:hidden}
+.rk::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.07),transparent 60%)}
+.rk .y{font-family:var(--old);font-size:34px;color:var(--g1);line-height:1;position:relative}
+.rk .d{font-family:var(--cond);font-size:11px;letter-spacing:.18em;color:var(--g3);text-transform:uppercase;margin-top:6px;position:relative}
+@media(max-width:860px){.archivo{grid-template-columns:1fr}}
 
-/* frequency / notify */
-.notify{text-align:center;border-top:1px solid var(--border);border-bottom:1px solid var(--border);max-width:none;background:
-  radial-gradient(ellipse at center,rgba(194,58,34,.08),transparent 70%)}
-.notify h2{margin-bottom:14px}
-.notify p.copy{margin:0 auto 30px}
-.wave{display:block;width:min(100%,640px);height:60px;margin:0 auto 30px}
+/* notify */
+.notify{text-align:center}
+.notify h2{margin-bottom:16px}
+.notify p.copy{margin:0 auto}
 
-footer{padding:40px 16px 60px;text-align:center;font-size:10px;letter-spacing:4px;color:var(--dim);line-height:2.2}
-footer a{color:var(--dim2)}
-footer a:hover{color:var(--hot)}
+footer{padding:50px 20px 70px;text-align:center;border-top:1px solid var(--line)}
+footer .f1{font-family:var(--old);font-size:34px}
+footer .f2{margin-top:10px;font-family:var(--cond);font-size:11px;letter-spacing:.3em;color:var(--g3);text-transform:uppercase;line-height:2.2}
+footer a{color:var(--g2)} footer a:hover{color:var(--ink)}
 
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <canvas id="grain" aria-hidden="true"></canvas>
 
-<header class="bar">
-  <a href="/" title="Back to 3EAS CORTEX">◂ 3EAS CORTEX</a>
-  <span class="rec">SUB-SIGNAL // SUCIOPATH</span>
+<!-- shared SVG defs: smoke filter -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="smokeF" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency=".006 .012" numOctaves="4" seed="7"/>
+    <feColorMatrix values="0 0 0 0 .75  0 0 0 0 .74  0 0 0 0 .72  0 0 0 1.4 -.55"/>
+  </filter>
+</svg>
+
+<header class="nav">
+  <a class="logo" href="#top">Suciopath</a>
   <nav>
-    <a href="#drop">DROP 001</a>
-    <a href="#archivo">ARCHIVO</a>
-    <a href="#operador">OPERADOR</a>
-    <a class="keep" href="#frecuencia">NOTIFY</a>
+    <a href="#historia">Historia</a>
+    <a href="#drop">Drop 001</a>
+    <a href="#archivo">Archivo</a>
+    <a class="keep" href="#lista">The List</a>
   </nav>
+  <a class="home" href="/">3EAS Cortex ↗</a>
 </header>
 
-<main>
+<main id="top">
 <div class="hero">
-  <div class="freq">3EAS CORTEX PRESENTS // <b>INTERCEPT 0X5C</b> // LOS ANGELES</div>
-  <h1 class="mark" data-t="SUCIOPATH">SUCIOPATH</h1>
-  <!-- ink drip under the wordmark -->
-  <svg class="drip" viewBox="0 0 820 46" preserveAspectRatio="none" aria-hidden="true">
-    <path fill="#c23a22" d="M0 0h820v4c-10 0-12 6-14 14s-4 10-6 0-4-14-30-14-22 26-26 34-6 8-8-2-2-30-40-30-60 4-80 4-12 18-14 22-6 2-6-6 0-18-50-18-90 6-120 6-10 30-14 38-6 8-7-4-2-38-40-38-80 2-110 2-16 12-18 16-4 0-5-4-6-14-60-14-50 8-70 8-8 22-12 28-6 6-6-6S80 4 0 4z"/>
-  </svg>
-  <p class="tag">Dirty by design. Cut in the basement, printed under the 10. For the ones who stayed out past the last song.</p>
+  <svg class="smoke" aria-hidden="true"><rect width="100%" height="100%" filter="url(#smokeF)"/></svg>
+  <svg class="rays" viewBox="-750 -750 1500 1500" aria-hidden="true" id="rays"></svg>
+  <div class="pre">DJ Antiq presents</div>
+  <h1 class="mark">Suciopath</h1>
+  <div class="sig">Los Angeles</div>
+  <p class="tag">Black and grey, made in LA. Tees and archive resale from a selector who spent his life in the music.</p>
   <div class="cta">
-    <a class="btn stain" href="#drop">VIEW DROP 001</a>
-    <a class="btn" href="#frecuencia">GET ON THE FREQUENCY</a>
+    <a class="btn solid" href="#drop">Shop Drop 001</a>
+    <a class="btn" href="#historia">The Story</a>
   </div>
-  <div class="coords"><span>34.0522° N / 118.2437° W</span><span id="clock">LA --:--:--</span></div>
 </div>
 
-<div class="crawl" aria-hidden="true"><span>
-  SUCIOPATH<i>✕</i>DROP 001 INCOMING<i>✕</i>NO RESTOCKS<i>✕</i>ARCHIVO RESALE OPEN SOON<i>✕</i>FOUNDED BY DJ ANTIQ<i>✕</i>50 YEARS OF TASTE<i>✕</i>AGED, NOT FADED<i>✕</i>LOS ANGELES<i>✕</i>BROADCAST VIA 3EAS CORTEX<i>✕</i>DIRTY BY DESIGN<i>✕</i>
-</span></div>
+<div class="marquee" aria-hidden="true"><span id="mq"></span></div>
 
-<section class="manifesto">
+<section id="historia" class="story">
   <div>
-    <div class="lbl">FILE 01 // <b>MANIFIESTO</b></div>
-    <h2>SUCIO<br>IS A<br>METHOD.</h2>
+    <div class="kick">La Historia</div>
+    <h2>From the cubicle to the crates.</h2>
+    <p class="copy"><b>Anthony Saldana</b> worked inside the music business for years, from a desk. He saw how records got made, sold and pushed, then went after the part he loved.</p>
+    <div class="chapters">
+      <div class="ch"><div class="n">I.</div><div class="t">The Cubicle</div><p>An industry job behind a desk, close to the music without touching it.</p></div>
+      <div class="ch"><div class="n">II.</div><div class="t">The Crates</div><p>He started DJing on vinyl: wax only, digging and learning every record by hand.</p></div>
+      <div class="ch"><div class="n">III.</div><div class="t">The Booth</div><p>Now he's DJ Antiq, one of the names LA knows. Fifty years old, still digging.</p></div>
+    </div>
+    <div class="signed">Anthony Saldana<small>DJ Antiq / Founder</small></div>
   </div>
-  <div>
-    <p class="copy">SUCIOPATH comes from the booth, not the boardroom. Every graphic starts as a flyer, a crate, a burned CD-R with the label half rubbed off. It gets printed on heavy cotton and sent out into the street.</p>
-    <ol style="margin-top:28px">
-      <li><b>Small runs.</b> Each drop is numbered. When it's gone, it's gone.</li>
-      <li><b>Heavyweight blanks.</b> Boxy fit, made to take a beating.</li>
-      <li><b>Archive resale.</b> Vintage band, rave and LA tees, found and checked.</li>
-      <li><b>Sound first.</b> Each drop comes with a mix. Wear the tee, play the tape.</li>
-    </ol>
+  <svg class="vinyl" viewBox="-200 -200 400 400" aria-hidden="true" id="vinyl"></svg>
+</section>
+
+<section class="familia">
+  <div class="in">
+    <svg class="orn" viewBox="0 0 220 20" aria-hidden="true"><path d="M0 10h90M130 10h90" stroke="#b9b7b2" stroke-width="1"/><path d="M110 2l8 8-8 8-8-8z" fill="none" stroke="#b9b7b2"/><circle cx="96" cy="10" r="2" fill="#b9b7b2"/><circle cx="124" cy="10" r="2" fill="#b9b7b2"/></svg>
+    <h2>Fashion runs in the familia.</h2>
+    <p class="copy">His cousin owned T&amp;A Showroom, so Anthony grew up around racks, samples and people who took clothes seriously. He loves color, he loves fashion, and he dresses with intent. SUCIOPATH is where that finally gets its own label.</p>
+    <div class="quote">Dress like the record&rsquo;s still playing.</div>
   </div>
 </section>
 
 <section id="drop">
-  <div class="lbl">FILE 02 // <b>DROP 001</b> // TEES</div>
-  <h2>FIRST PRESSING.</h2>
+  <div class="head">
+    <div><div class="kick">Drop 001 / Tees</div><h2>First pressing.</h2></div>
+    <p>The site is black and grey. The color is on the clothes. Small runs, heavyweight cotton, boxy fit.</p>
+  </div>
   <div class="grid" id="dropGrid"></div>
 </section>
 
 <section id="archivo" class="archivo">
   <div>
-    <div class="lbl">FILE 03 // <b>ARCHIVO</b> // RESALE</div>
-    <h2>DEAD STOCK.<br>LIVE WIRE.</h2>
-    <p class="copy">Picked from swap meets, estate sales and old promo boxes. Bootleg rap tees, rave flyers you can wear, faded band shirts. Each piece is checked, measured and logged before it's listed.</p>
-    <p class="copy">Curated by a 50-year-old who wore the originals the first time around. One of each. No holds.</p>
-    <div style="margin-top:28px"><a class="btn" href="#frecuencia">FIRST LOOK AT THE ARCHIVE</a></div>
+    <div class="kick">Archivo / Resale</div>
+    <h2>Worn the first time around.</h2>
+    <p class="copy">Vintage tees, rare rap and rave promo pieces, and LA one-offs, picked by someone who was in the room when they were new. Every piece is checked and measured before it's listed.</p>
+    <p class="copy">One of each. No holds.</p>
+    <div class="cta" style="justify-content:flex-start"><a class="btn" href="#lista">First Look</a></div>
   </div>
-  <div class="ledger" aria-label="Archive ledger preview">
-    <div class="row h"><span>LOT</span><span>DESCRIPTION</span><span style="text-align:right">STATUS</span></div>
-    <div class="row"><span>A-001</span><span>Single-stitch tour tee / faded black</span><span class="st">LOGGING</span></div>
-    <div class="row"><span>A-002</span><span>90s rave promo longsleeve</span><span class="st">LOGGING</span></div>
-    <div class="row"><span>A-003</span><span>Bootleg rap tee / cracked print</span><span class="st">LOGGING</span></div>
-    <div class="row"><span>A-004</span><span>LA swap meet airbrush tee</span><span class="st">LOGGING</span></div>
-    <div class="row"><span>A-005</span><span><span class="redact">██████████</span></span><span class="st ok">SEALED</span></div>
-  </div>
-</section>
-
-<section id="operador" class="op">
-  <div class="dossier">
-    <div class="ph">?</div>
-    <div class="file">SUBJECT: <b>DJ ANTIQ</b><br>ROLE: FOUNDER / SELECTOR<br>AGE: 50 // VINTAGE GRADE<br>BASE: LOS ANGELES<br>STATUS: TRANSMITTING</div>
-  </div>
-  <div>
-    <div class="lbl">FILE 04 // <b>OPERADOR</b></div>
-    <h2>DJ ANTIQ.</h2>
-    <p class="copy">SUCIOPATH is run by DJ Antiq: 50 years old, from Los Angeles, and older than the trend. The name is the point. He doesn't chase what's new; he digs up what lasted.</p>
-    <p class="copy">The brand runs like his sets: the right record, the right print, the right room. Half a century of taste, printed on cotton.</p>
-    <p class="copy" style="color:var(--dim2)"><!-- EDIT: drop Antiq's real story here: crews, residencies, sound, how the brand started. -->Full file declassified with Drop 001.</p>
-    <div class="ig"><a class="btn" href="https://www.instagram.com/dj_antiq/" target="_blank" rel="noopener">@DJ_ANTIQ ↗</a></div>
+  <div class="racks">
+    <div class="rk"><div class="y">’89</div><div class="d">Tour tee</div></div>
+    <div class="rk"><div class="y">’93</div><div class="d">Rap promo</div></div>
+    <div class="rk"><div class="y">’96</div><div class="d">Rave flyer tee</div></div>
+    <div class="rk"><div class="y">’98</div><div class="d">Swap meet airbrush</div></div>
+    <div class="rk"><div class="y">’01</div><div class="d">Record store staff</div></div>
+    <div class="rk"><div class="y">??</div><div class="d">Coming soon</div></div>
   </div>
 </section>
 
-<section id="frecuencia" class="notify">
-  <div class="lbl">FILE 05 // <b>FRECUENCIA</b></div>
-  <h2>GET ON THE FREQUENCY.</h2>
-  <canvas class="wave" id="wave" width="1280" height="120" aria-hidden="true"></canvas>
-  <p class="copy">Drop dates go out on the wire first. DM the operator to get on the list. Those who wait for the public post miss out.</p>
-  <div class="cta" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-    <a class="btn stain" href="https://ig.me/m/dj_antiq" target="_blank" rel="noopener">DM "SUCIO" TO @DJ_ANTIQ</a>
-    <a class="btn" href="/">RETURN TO CORTEX</a>
+<section id="lista" class="notify">
+  <div class="kick" style="justify-content:center">The List</div>
+  <h2>Get on the list.</h2>
+  <p class="copy">Drop dates go out to the list first. DM "SUCIO" to Antiq and you're on it.</p>
+  <div class="cta">
+    <a class="btn solid" href="https://ig.me/m/dj_antiq" target="_blank" rel="noopener">DM @dj_antiq</a>
+    <a class="btn" href="https://www.instagram.com/dj_antiq/" target="_blank" rel="noopener">Follow</a>
   </div>
 </section>
 </main>
 
 <footer>
-  SUCIOPATH © <span id="yr">2026</span> // LOS ANGELES<br>
-  A SUB-SIGNAL OF <a href="/">3EAS CORTEX</a> // ALL TRANSMISSIONS MONITORED
+  <div class="f1">Suciopath</div>
+  <div class="f2">Los Angeles / © <span id="yr">2026</span><br>Broadcast through <a href="/">3EAS Cortex</a></div>
 </footer>
 
 <script>
 (function(){
-  // ---- DROP 001: edit this list. status: "incoming" | "live" | "gone" ----
-  var DROP = [
-    {name:"SUCIO CLASSIC", sub:"BONE ON BLACK / 6.5OZ", price:40, tee:"#0b0b0b", ink:"#e6e2d6", gfx:"wordmark", status:"incoming"},
-    {name:"LAST SONG",     sub:"STAIN ON BONE / 6.5OZ", price:40, tee:"#e6e2d6", ink:"#c23a22", gfx:"drip",     status:"incoming"},
-    {name:"BOOTH LIGHT",   sub:"RED ON BLACK / 6.5OZ",  price:45, tee:"#0b0b0b", ink:"#c23a22", gfx:"signal",   status:"incoming"},
-    {name:"CDR // 001",    sub:"BONE ON OXBLOOD",       price:45, tee:"#3a0f0a", ink:"#f2ead0", gfx:"disc",     status:"incoming"}
-  ];
-  var STAMP = {incoming:"INCOMING", live:"LIVE", gone:"GONE"};
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs,parent){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
 
-  function gfx(kind, ink, tee){
-    switch(kind){
-      case "wordmark": return '<text x="150" y="128" text-anchor="middle" font-family="VT323" font-size="30" fill="'+ink+'">SUCIOPATH</text>'+
-        '<text x="150" y="146" text-anchor="middle" font-family="Share Tech Mono" font-size="7" letter-spacing="3" fill="'+ink+'" opacity=".7">LOS ANGELES // 001</text>';
-      case "drip": return '<text x="150" y="122" text-anchor="middle" font-family="VT323" font-size="26" fill="'+ink+'">LAST SONG</text>'+
-        '<path fill="'+ink+'" d="M108 128h84v3c-4 0-5 3-6 8s-2 5-3 0-2-8-12-8-9 14-11 18-3 4-3-1-1-17-15-17-18 6-20 10-2 1-2-2-1-8-12-8z"/>';
-      case "signal": var s=''; for(var i=0;i<5;i++){ s+='<path d="M'+(150-12-i*9)+' 130 a'+(12+i*9)+' '+(12+i*9)+' 0 0 1 '+(24+i*18)+' 0" fill="none" stroke="'+ink+'" stroke-width="2" opacity="'+(1-i*.17)+'"/>'; }
-        return s+'<circle cx="150" cy="130" r="3" fill="'+ink+'"/><text x="150" y="152" text-anchor="middle" font-family="Share Tech Mono" font-size="8" letter-spacing="3" fill="'+ink+'">BOOTH LIGHT</text>';
-      case "disc": return '<circle cx="150" cy="120" r="30" fill="none" stroke="'+ink+'" stroke-width="2"/><circle cx="150" cy="120" r="7" fill="none" stroke="'+ink+'" stroke-width="2"/>'+
-        '<path d="M126 108 l48 4" stroke="'+ink+'" stroke-width="3" opacity=".8"/><text x="150" y="166" text-anchor="middle" font-family="VT323" font-size="16" fill="'+ink+'">CDR//001 MIX ENCLOSED</text>';
+  // fine-line halo rays behind the wordmark
+  var rays=document.getElementById('rays');
+  for(var i=0;i<120;i++){
+    var a=i/120*Math.PI*2, long=i%2===0, r1=long?120:180, r2=long?740:520;
+    el('line',{x1:Math.cos(a)*r1,y1:Math.sin(a)*r1,x2:Math.cos(a)*r2,y2:Math.sin(a)*r2,stroke:'#8a8884','stroke-width':long?1:.5,opacity:long?.5:.3},rays);
+  }
+
+  // spinning record, grey grooves
+  var v=document.getElementById('vinyl');
+  var defs=el('defs',{},v), rg=el('radialGradient',{id:'vg'},defs);
+  el('stop',{offset:'0','stop-color':'#2a2928'},rg); el('stop',{offset:'1','stop-color':'#0d0d0d'},rg);
+  var sh=el('linearGradient',{id:'vs',x1:0,y1:0,x2:1,y2:1},defs);
+  el('stop',{offset:'0','stop-color':'#fff','stop-opacity':0},sh);el('stop',{offset:'.48','stop-color':'#fff','stop-opacity':.12},sh);el('stop',{offset:'.52','stop-color':'#fff','stop-opacity':0},sh);
+  el('circle',{r:195,fill:'url(#vg)'},v);
+  for(var r=70;r<192;r+=3.2) el('circle',{r:r,fill:'none',stroke:'#3a3938','stroke-width':.6,opacity:.8},v);
+  el('circle',{r:195,fill:'url(#vs)'},v);
+  el('circle',{r:62,fill:'#d9d7d2'},v);
+  var t=el('text',{y:12,'text-anchor':'middle','font-family':'UnifrakturMaguntia','font-size':44,fill:'#111'},v); t.textContent='S';
+  var t2=el('text',{y:36,'text-anchor':'middle','font-family':'Oswald','font-size':8,'letter-spacing':3,fill:'#333'},v); t2.textContent='SIDE A · 33⅓';
+  el('circle',{r:4,fill:'#0a0a0a'},v);
+
+  // marquee: text written twice so the loop is seamless
+  var mqTxt=['Suciopath','Los Angeles','Drop 001','DJ Antiq','Cubicle to crates','Vinyl only','Black & grey','Archivo resale'].join('<i>✦</i>')+'<i>✦</i>';
+  document.getElementById('mq').innerHTML=mqTxt+mqTxt;
+
+  // ---- DROP 001: edit here. status: "soon" | "live" | "gone"; add url when live ----
+  var DROP=[
+    {name:'Suciopath Classic', price:40, cw:'Black / grey ink',   tee:'#151515', ink:'#bdbbb6', gfx:'old',     status:'soon'},
+    {name:'Cubicle to Crates', price:40, cw:'Heather grey / black',tee:'#9a9893', ink:'#141414', gfx:'stack',   status:'soon'},
+    {name:'Los Angeles Script',price:45, cw:'Cherry / bone',      tee:'#8e1b22', ink:'#efe9dc', gfx:'script',  status:'soon'},
+    {name:'Side A',            price:45, cw:'Cobalt / white',     tee:'#1f3f8f', ink:'#f4f4f2', gfx:'record',  status:'soon'}
+  ];
+  function gfx(d){
+    var c=d.ink;
+    switch(d.gfx){
+      case 'old': return '<text x="150" y="132" text-anchor="middle" font-family="UnifrakturMaguntia" font-size="34" fill="'+c+'">Suciopath</text>'+
+        '<text x="150" y="152" text-anchor="middle" font-family="Oswald" font-size="7" letter-spacing="4" fill="'+c+'">LOS ANGELES · CALIFORNIA</text>';
+      case 'stack': return '<text x="150" y="112" text-anchor="middle" font-family="Oswald" font-weight="700" font-size="17" letter-spacing="1" fill="'+c+'">FROM THE CUBICLE</text>'+
+        '<text x="150" y="140" text-anchor="middle" font-family="Herr Von Muellerhoff" font-size="34" fill="'+c+'">to the crates</text>'+
+        '<text x="150" y="160" text-anchor="middle" font-family="UnifrakturMaguntia" font-size="13" fill="'+c+'">Suciopath</text>';
+      case 'script': return '<text x="150" y="132" text-anchor="middle" font-family="Herr Von Muellerhoff" font-size="50" fill="'+c+'" transform="rotate(-6 150 130)">Los Angeles</text>'+
+        '<text x="150" y="160" text-anchor="middle" font-family="UnifrakturMaguntia" font-size="14" fill="'+c+'">Suciopath</text>';
+      case 'record': var s='<circle cx="150" cy="128" r="34" fill="none" stroke="'+c+'" stroke-width="2"/>';
+        for(var r=14;r<32;r+=4) s+='<circle cx="150" cy="128" r="'+r+'" fill="none" stroke="'+c+'" stroke-width=".6" opacity=".7"/>';
+        return s+'<text x="150" y="134" text-anchor="middle" font-family="UnifrakturMaguntia" font-size="18" fill="'+c+'">S</text>'+
+          '<text x="150" y="180" text-anchor="middle" font-family="Oswald" font-size="9" letter-spacing="4" fill="'+c+'">SIDE A · VINYL ONLY</text>';
     }
     return '';
   }
-  function teeSvg(d){
-    var stroke = d.tee==="#e6e2d6" ? "#8a8478" : "#2a2724";
-    return '<svg class="tee" viewBox="0 0 300 300" aria-label="'+d.name+' tee mockup">'+
-      '<path d="M95 40 L60 55 L18 95 L45 130 L72 112 L72 270 L228 270 L228 112 L255 130 L282 95 L240 55 L205 40 C195 62 175 72 150 72 C125 72 105 62 95 40Z" fill="'+d.tee+'" stroke="'+stroke+'" stroke-width="2"/>'+
-      '<path d="M95 40 C105 62 125 72 150 72 C175 72 195 62 205 40" fill="none" stroke="'+stroke+'" stroke-width="5"/>'+
-      gfx(d.gfx, d.ink, d.tee)+'</svg>';
+  function tee(d,i){
+    var id='t'+i;
+    return '<svg class="tee" viewBox="0 0 300 300" aria-label="'+d.name+' tee">'+
+      '<defs><linearGradient id="'+id+'" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset=".25" stop-color="#fff" stop-opacity=".06"/><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".4"/></linearGradient></defs>'+
+      '<path id="p'+id+'" d="M95 40 L60 55 L18 95 L45 130 L72 112 L72 272 L228 272 L228 112 L255 130 L282 95 L240 55 L205 40 C195 62 175 72 150 72 C125 72 105 62 95 40Z" fill="'+d.tee+'"/>'+
+      '<path d="M95 40 L60 55 L18 95 L45 130 L72 112 L72 272 L228 272 L228 112 L255 130 L282 95 L240 55 L205 40 C195 62 175 72 150 72 C125 72 105 62 95 40Z" fill="url(#'+id+')"/>'+
+      '<path d="M95 40 C105 62 125 72 150 72 C175 72 195 62 205 40" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="5"/>'+
+      '<path d="M72 112 L72 200 M228 112 L228 200" stroke="#000" stroke-opacity=".18" stroke-width="1"/>'+
+      gfx(d)+'</svg>';
   }
-  var grid = document.getElementById('dropGrid');
-  grid.innerHTML = DROP.map(function(d,i){
-    var n = ('00'+(i+1)).slice(-3);
-    var claimTxt = d.status==="live" ? "CLAIM ↗" : d.status==="gone" ? "SOLD THROUGH" : "NOTIFY ME";
-    return '<article class="item"><span class="stamp">'+STAMP[d.status]+' // '+n+'</span>'+
-      '<div class="stage">'+teeSvg(d)+'</div>'+
-      '<div class="meta"><div><div class="nm">'+d.name+'</div><div class="sub">'+d.sub+'</div></div><div class="px">$'+d.price+'</div></div>'+
-      '<a class="claim" href="'+(d.status==="live" && d.url ? d.url : '#frecuencia')+'">'+claimTxt+'</a></article>';
+  var BADGE={soon:'Coming soon',live:'Available',gone:'Sold out'};
+  document.getElementById('dropGrid').innerHTML=DROP.map(function(d,i){
+    var go=d.status==='live'&&d.url?'<a class="go" href="'+d.url+'">Buy now</a>':d.status==='gone'?'<span class="go">Sold out</span>':'<a class="go" href="#lista">Notify me</a>';
+    return '<article class="item"><div class="stage"><span class="badge">'+BADGE[d.status]+'</span>'+tee(d,i)+'</div>'+
+      '<div class="meta"><div class="nm">'+d.name+'</div><div class="px">$'+d.price+'</div></div>'+
+      '<div class="cw"><span class="sw" style="background:'+d.tee+'"></span>'+d.cw+'</div>'+go+'</article>';
   }).join('');
 
-  // LA clock
-  var clk = document.getElementById('clock');
-  function tick(){ try{ clk.textContent = 'LA ' + new Date().toLocaleTimeString('en-US',{timeZone:'America/Los_Angeles',hour12:false}); }catch(e){} }
-  tick(); setInterval(tick,1000);
-  document.getElementById('yr').textContent = new Date().getFullYear();
+  document.getElementById('yr').textContent=new Date().getFullYear();
 
-  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  // grain
-  var g = document.getElementById('grain'), gx = g.getContext('2d');
-  function sizeG(){ g.width = Math.ceil(innerWidth/3); g.height = Math.ceil(innerHeight/3); }
-  sizeG(); addEventListener('resize', sizeG);
-  function grain(){
-    var w=g.width,h=g.height,img=gx.createImageData(w,h),d=img.data;
-    for(var i=0;i<d.length;i+=4){ var v=Math.random()*255|0; d[i]=d[i+1]=d[i+2]=v; d[i+3]=255; }
-    gx.putImageData(img,0,0);
-  }
-  grain();
-
-  // waveform
-  var wv = document.getElementById('wave'), wx = wv.getContext('2d'), t = 0;
-  function wave(){
-    var W=wv.width,H=wv.height; wx.clearRect(0,0,W,H);
-    for(var x=0;x<W;x+=6){
-      var a = Math.sin(x*.012+t)*.5 + Math.sin(x*.031-t*1.7)*.3 + (Math.random()-.5)*.25;
-      var env = Math.sin(Math.PI*x/W);
-      var hgt = Math.abs(a)*env*H*.9 + 2;
-      wx.fillStyle = (x/W>.42 && x/W<.58) ? '#c23a22' : '#6c665c';
-      wx.fillRect(x,(H-hgt)/2,3,hgt);
-    }
-  }
-  wave();
-
-  if(!reduce){
-    var last=0;
-    (function loop(ts){
-      if(ts-last>70){ grain(); t+=.09; wave(); last=ts; }
-      requestAnimationFrame(loop);
-    })(0);
-  }
+  // film grain (photo texture, slow)
+  var g=document.getElementById('grain'),gx=g.getContext('2d');
+  function size(){g.width=Math.ceil(innerWidth/3);g.height=Math.ceil(innerHeight/3);}
+  function grain(){var img=gx.createImageData(g.width,g.height),d=img.data;for(var i=0;i<d.length;i+=4){var v=Math.random()*255|0;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255;}gx.putImageData(img,0,0);}
+  size();grain();addEventListener('resize',function(){size();grain();});
+  if(!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)) setInterval(grain,120);
 })();
 </script>
 </body>
