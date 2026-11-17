@@ -6362,7 +6362,7 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     W=Math.round(r.width);H=Math.round(r.height);CX=W/2;CY=H/2;
     cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0);
     const o=document.createElement('canvas');o.width=W;o.height=H;const ox=o.getContext('2d');
-    const txt='SIGNAL FEED';let fs=Math.min(H*.62,W/6.2);
+    const txt='SIGNAL FEED';let fs=Math.min(H*.36,W/10);   // revealed words: compact, about half the old size
     const setF=()=>{ox.font='400 '+fs+'px VT323, "Share Tech Mono", monospace';try{ox.letterSpacing=Math.round(fs*.08)+'px';}catch(e){}};
     setF();while(ox.measureText(txt).width>W*.94&&fs>10){fs-=2;setF();}
     ox.fillStyle='#fff';ox.textAlign='center';ox.textBaseline='middle';ox.fillText(txt,CX,CY);
