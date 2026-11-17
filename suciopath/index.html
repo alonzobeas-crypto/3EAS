@@ -475,7 +475,7 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
   function play(key,auto){
     var c=MIXES.filter(function(m){return norm(m.key)===norm(key);})[0]; if(!c) return;
     current=c.key;
-    document.getElementById('mixFrame').src='https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1'+(auto?'&autoplay=1':'')+
+    document.getElementById('mixFrame').src='https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&hide_artwork=1'+(auto?'&autoplay=1':'')+
       '&feed='+encodeURIComponent(decodeURIComponent(c.key)); // key may arrive with the ñ already %-encoded
     document.getElementById('npName').textContent=c.name||'';
     markSet(c.key);
