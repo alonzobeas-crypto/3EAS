@@ -161,6 +161,51 @@ footer .links{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px
 footer .links a:hover{color:var(--ink)}
 footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.32em;text-align:center;color:var(--g5);-webkit-text-stroke:1px var(--g4);margin-bottom:-4vw;user-select:none}
 
+/* ---------- phone ---------- */
+.only-sm{display:none}
+.dots{justify-content:center;gap:8px;margin-top:16px}
+.dots i{width:22px;height:2px;background:var(--g4);transition:background .2s}
+.dots i.on{background:var(--ink)}
+@media(max-width:720px){
+  .only-lg{display:none}.only-sm{display:block}.dots.only-sm{display:flex}
+  .signal{padding:7px 16px}
+  .nav{padding:12px 16px}
+  .nav .logo{font-size:28px}
+  .nav .lbl{font-size:10px;padding:10px 0}
+  /* hero: let the wordmark own the screen */
+  .hero{height:calc(100svh - 96px);min-height:520px;padding-bottom:70px}
+  .mark{font-size:21.5vw}
+  .credit{gap:10px;margin-bottom:4px}.credit .rule{width:22px}.credit .who{font-size:36px}
+  .drip{width:88vw;height:26px}
+  .under{margin-top:14px;gap:12px}.under .rule{width:40px}.under .la{font-size:44px}
+  .scroll{bottom:26px}
+  /* section heads */
+  .sec{padding:76px 16px 24px}
+  .sh{flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:22px}
+  .sh h2{font-size:58px}
+  /* lookbook: swipe carousel */
+  .look{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:0 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .look::-webkit-scrollbar{display:none}
+  .lk,.lk:nth-child(n){flex:0 0 84vw;scroll-snap-align:center;grid-column:auto;grid-row:auto}
+  .lk .stage,.lk:nth-child(n) .stage{min-height:0;aspect-ratio:1/1.08}
+  .lk svg.tee{width:96%}
+  .lk .num{display:none}
+  .lk .meta{flex-direction:column;align-items:stretch;gap:12px;padding:14px}
+  .lk .nm{font-size:12px}
+  .lk .meta>div:last-child{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:10px}
+  .lk .meta>div:last-child>div{margin:0!important;text-align:left!important}
+  .lk .px{font-size:14px;text-align:left}
+  .lk .sz{margin:0}
+  .ribbon{margin-top:16px}
+  /* statement + archive + list */
+  .statement{padding:50px 0 24px;margin-top:60px}
+  .statement .row{font-size:34vw}
+  .freq{padding:90px 16px}
+  .freq h2{font-size:56px}
+  .btn{padding:16px 22px}
+  .sig{padding:50px 16px 50px}
+  footer .links{flex-direction:column;gap:8px}
+}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -199,8 +244,9 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
 </div>
 
 <section class="sec" id="lookbook">
-  <div class="sh"><h2>Drop 001</h2><span class="lbl">Hover or tap to see the back</span></div>
+  <div class="sh"><h2>Drop 001</h2><span class="lbl only-lg">Hover or tap to see the back</span><span class="lbl only-sm">Swipe → / Tap to flip</span></div>
   <div class="look" id="look"></div>
+  <div class="dots only-sm" id="dots" aria-hidden="true"></div>
   <div class="ribbon" id="ribbon" aria-hidden="true"></div>
 </section>
 
@@ -304,6 +350,14 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
     el.addEventListener('click',t);
     el.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();el.classList.toggle('flip');} });
   });
+
+  // phone carousel dots
+  var dots=document.getElementById('dots');
+  dots.innerHTML=DROP.map(function(_,i){return '<i'+(i?'':' class="on"')+'></i>';}).join('');
+  look.addEventListener('scroll',function(){
+    var w=look.firstElementChild.getBoundingClientRect().width+12, k=Math.round(look.scrollLeft/w);
+    Array.prototype.forEach.call(dots.children,function(d,i){d.classList.toggle('on',i===k);});
+  },{passive:true});
 
   // colourway ribbon: grey to the garment colours
   document.getElementById('ribbon').innerHTML=['#141414','#2b2a29','#4b4a48','#6f6d69','#9b9994','#c9c7c2','#8e1b22','#c4471c','#d9a21b','#2f6b3a','#1f3f8f','#5b2a74']
