@@ -1,0 +1,10 @@
+Suciopath Fraktur (SuciopathFraktur.woff2)
+
+Modified version of UnifrakturMaguntia.
+Copyright (c) 2010 j. 'mach' wust, with Reserved Font Name UnifrakturMaguntia.
+Copyright (c) 2009 Peter Wiegel.
+Modification: the capital S glyph is replaced by the font's own round lowercase s, scaled to cap height.
+Renamed per the Reserved Font Name clause.
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+Full license text: https://openfontlicense.org/open-font-license-official-text/
