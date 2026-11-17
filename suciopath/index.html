@@ -145,10 +145,21 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:61;
 .set .side{display:flex;flex-direction:column;align-items:flex-end;gap:8px;text-align:right}
 .set .go{font-family:var(--wide);font-stretch:125%;font-weight:600;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--g2);transition:color .2s}
 .set .pin{color:var(--stain)}
-.set:hover .tt{transform:translateX(14px)}
-.set:hover .go{color:var(--ink)}
 .set::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--stain);transform:scaleY(0);transition:transform .3s}
-.set:hover::before{transform:scaleY(1)}
+@media(hover:hover){.set:hover .tt{transform:translateX(14px)}.set:hover .go{color:var(--ink)}.set:hover::before{transform:scaleY(1)}}
+.set.on::before{transform:scaleY(1)}
+.set.on .tt{transform:translateX(14px)}
+.set.on .go{color:var(--stain)}
+/* embedded Mixcloud player: sticks under the nav while the list scrolls */
+.player{position:sticky;top:64px;z-index:5;border:1px solid var(--line);background:rgba(10,10,9,.94);backdrop-filter:blur(6px);padding:14px 14px 10px;margin-bottom:18px}
+.player .ph{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:10px}
+.player .np{font-family:var(--old);font-size:clamp(24px,2.6vw,34px);line-height:1;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player iframe{display:block;border:0;background:#111}
+.eq{display:inline-flex;gap:2px;align-items:flex-end;height:10px;margin-right:10px;vertical-align:middle}
+.eq b{width:2px;background:var(--stain);animation:eq .9s ease-in-out infinite}
+.eq b:nth-child(2){animation-delay:.2s}.eq b:nth-child(3){animation-delay:.4s}
+@keyframes eq{0%,100%{height:3px}50%{height:10px}}
+@media(max-width:720px){.player{top:58px;padding:10px 10px 8px}.player .np{font-size:22px}}
 .mix-fallback{display:flex;flex-direction:column;align-items:center;gap:10px;padding:56px 16px;border:1px solid var(--line);text-align:center;transition:border-color .2s}
 .mix-fallback:hover{border-color:var(--ink)}
 .mix-fallback .ft{font-family:var(--old);font-size:clamp(40px,6vw,72px);line-height:1}
@@ -280,6 +291,10 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
 <section class="sec" id="mixes">
   <div class="sh"><h2>Sets</h2><a class="lbl" href="https://www.mixcloud.com/anthony-antiq-salda%C3%B1a/" target="_blank" rel="noopener">All on Mixcloud ↗</a></div>
   <!-- set links: pinned ones always show; more are added from Mixcloud in the visitor's browser -->
+  <div class="player" id="player">
+    <div class="ph"><span class="lbl"><i class="eq" aria-hidden="true"><b></b><b></b><b></b></i>Now Playing</span><span class="np" id="npName"></span></div>
+    <iframe id="mixFrame" title="DJ Antiq on Mixcloud" width="100%" height="120" frameborder="0" allow="autoplay; encrypted-media"></iframe>
+  </div>
   <ol class="sets" id="mixGrid"></ol>
   <div class="more only-sm" id="mixMore" hidden><button class="btn" type="button">More sets</button></div>
   <a class="mix-fallback" id="mixFallback" href="https://www.mixcloud.com/anthony-antiq-salda%C3%B1a/" target="_blank" rel="noopener">
@@ -430,7 +445,7 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
   size();grain();addEventListener('resize',function(){size();grain();});
 
   // ---- MIXES: DJ Antiq's Mixcloud sets ----
-  // Shown as big chrome blackletter links to Mixcloud (no artwork, no embedded player). PINNED sets always show first and work without the API. His other uploads are added from the public API (JSONP, no key).
+  // Shown as big chrome blackletter links to Mixcloud (no artwork); tapping one plays it in the embedded player. PINNED sets always show first and work without the API. His other uploads are added from the public API (JSONP, no key).
   // To pin another set: add {key:'/anthony-antiq-salda%C3%B1a/<slug>/', name:'<Title>'} (slug = the part after his name in the share link).
   var PINNED=[
     {key:'/anthony-antiq-salda%C3%B1a/good-night-good-morning/', name:'Good Night Good Morning', pinned:true},
@@ -446,15 +461,34 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
     grid.innerHTML=MIXES.map(function(c,i){
       var url=c.url||('https://www.mixcloud.com'+c.key);
       var meta=c.created_time?when(c.created_time)+(c.audio_length?' / '+dur(c.audio_length):''):'';
-      return '<li><a class="set" href="'+esc(url)+'" target="_blank" rel="noopener">'+
+      return '<li><a class="set" data-k="'+esc(c.key)+'" href="'+esc(url)+'" target="_blank" rel="noopener">'+
         '<span class="n">'+('0'+(i+1)).slice(-2)+'</span><span class="tt">'+esc(c.name)+'</span>'+
-        '<span class="side">'+(c.pinned?'<span class="lbl pin">Featured</span>':'')+(meta?'<span class="mono">'+meta+'</span>':'')+'<span class="go">Listen ↗</span></span></a></li>';
+        '<span class="side">'+(c.pinned?'<span class="lbl pin">Featured</span>':'')+(meta?'<span class="mono">'+meta+'</span>':'')+'<span class="go">▶ Play</span></span></a></li>';
     }).join('');
     document.getElementById('mixFallback').hidden=MIXES.length>0;
     more.hidden=!(MIXES.length>6&&!grid.classList.contains('all'));
+    if(typeof current!=='undefined'&&current) markSet(current); // re-highlight only; never reload the player
   }
   more.querySelector('button').addEventListener('click',function(){grid.classList.add('all');more.hidden=true;});
-  MIXES=PINNED.slice(); render();
+  // embedded player: tap a title to play it here; Cmd/Ctrl/middle-click still opens Mixcloud
+  var current=null, touched=false;
+  function play(key,auto){
+    var c=MIXES.filter(function(m){return norm(m.key)===norm(key);})[0]; if(!c) return;
+    current=c.key;
+    document.getElementById('mixFrame').src='https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1'+(auto?'&autoplay=1':'')+
+      '&feed='+encodeURIComponent(decodeURIComponent(c.key)); // key may arrive with the ñ already %-encoded
+    document.getElementById('npName').textContent=c.name||'';
+    markSet(c.key);
+  }
+  function markSet(key){
+    Array.prototype.forEach.call(grid.querySelectorAll('.set'),function(a){var on=norm(a.dataset.k)===norm(key);a.classList.toggle('on',on);a.querySelector('.go').textContent=on?'❚❚ Playing':'▶ Play';});
+  }
+  grid.addEventListener('click',function(e){
+    var a=e.target.closest('.set'); if(!a||e.metaKey||e.ctrlKey||e.shiftKey||e.button) return;
+    e.preventDefault(); touched=true; play(a.dataset.k,true);
+    var pl=document.getElementById('player'); if(pl.getBoundingClientRect().top<0||pl.getBoundingClientRect().top>innerHeight*.6) pl.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  MIXES=PINNED.slice(); render(); play(PINNED[0].key,false);
 
   window.sucioMixes=function(d){
     try{
