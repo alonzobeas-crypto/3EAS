@@ -4,358 +4,341 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="author" content="3EAS CORTEX · 3eascortex.com">
-<meta name="theme-color" content="#0a0a0a">
+<meta name="theme-color" content="#070707">
 <title>SUCIOPATH — Los Angeles</title>
-<meta name="description" content="SUCIOPATH. Los Angeles. Tees and archive resale by DJ Antiq.">
+<meta name="description" content="SUCIOPATH. Los Angeles. Drop 001 and archive resale by DJ Antiq.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="3EAS CORTEX">
 <meta property="og:title" content="SUCIOPATH — Los Angeles">
-<meta property="og:description" content="Black-and-grey art you can wear. Los Angeles.">
+<meta property="og:description" content="Drop 001. Black and grey. Los Angeles.">
 <meta property="og:image" content="https://3eascortex.com/assets/og-card.jpg">
 <meta property="og:url" content="https://3eascortex.com/suciopath/">
 <link rel="icon" href="/assets/app-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Herr+Von+Muellerhoff&family=Oswald:wght@300;500;700&family=Barlow:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-<!-- capital S only: Unifraktur's S reads like a G, so the S comes from Grenze Gotisch (text=S loads just that glyph) -->
-<link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@500&text=S&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Herr+Von+Muellerhoff&family=Archivo:wdth,wght@100..125,300..700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<!-- capital S only: Unifraktur's S reads like a G, so every capital S comes from Fruktur (text=S loads just that glyph) -->
+<link href="https://fonts.googleapis.com/css2?family=Fruktur&text=S&display=swap" rel="stylesheet">
 <style>
-/* SUCIOPATH — LA streetwear by DJ Antiq (Anthony Saldana). Sub-signal of 3EAS CORTEX.
-   Look: black-and-grey Chicano tattoo. Old English + fine-line script, smoke, soft grey gradients.
-   The site stays black & grey; colour lives on the garments. */
+/* SUCIOPATH — LA streetwear by DJ Antiq. Sub-signal of 3EAS CORTEX.
+   Blackletter (Unifraktur + Fruktur S) in black-and-grey tattoo dimension, wide grotesk for fashion labels,
+   Share Tech Mono for the 3EAS signal layer. One red stain, used sparingly. Colour lives on the garments. */
 :root{
-  --bg:#0a0a0a;--ink:#ecebe8;--g1:#b9b7b2;--g2:#8a8884;--g3:#55534f;--g4:#2a2928;--g5:#161615;
-  --line:rgba(185,183,178,.22);
-  --old:'Grenze Gotisch','UnifrakturMaguntia',serif;--script:'Herr Von Muellerhoff',cursive;
-  --cond:'Oswald',sans-serif;--body:'Barlow',sans-serif;
+  --bg:#070707;--ink:#eeece8;--g1:#bdbbb6;--g2:#8b8985;--g3:#55534f;--g4:#262524;--g5:#121211;
+  --stain:#c23a22;--line:rgba(189,187,182,.16);
+  --old:'Fruktur','UnifrakturMaguntia',serif;--script:'Herr Von Muellerhoff',cursive;
+  --wide:'Archivo',sans-serif;--mono:'Share Tech Mono',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--wide);font-stretch:112%;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
-::selection{background:var(--ink);color:var(--bg)}
-#grain{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50;opacity:.06;mix-blend-mode:screen}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+::selection{background:var(--stain);color:var(--ink)}
+#grain{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60;opacity:.07;mix-blend-mode:screen}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:61;
+  background:repeating-linear-gradient(to bottom,transparent 0 2px,rgba(0,0,0,.14) 2px 3px)}
+.lbl{font-family:var(--wide);font-stretch:125%;font-weight:500;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--g2)}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--g2)}
 
-/* nav */
-.nav{position:sticky;top:0;z-index:40;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px;
-  background:linear-gradient(#0a0a0a 60%,rgba(10,10,10,0));}
-.nav .logo{font-family:var(--old);font-size:26px;line-height:1}
-.nav nav{display:flex;gap:22px;font-family:var(--cond);font-weight:500;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--g1)}
-.nav nav a:hover{color:var(--ink)}
-.nav .home{font-family:var(--cond);font-size:11px;letter-spacing:.2em;color:var(--g3);text-transform:uppercase}
-.nav .home:hover{color:var(--g1)}
-@media(max-width:640px){.nav nav a:not(.keep){display:none}.nav .home{display:none}}
+/* signal strip (3EAS layer) + nav */
+.signal{display:flex;justify-content:space-between;gap:12px;padding:7px 20px;border-bottom:1px solid var(--line);background:#000}
+.signal .rec{color:var(--stain)}
+.signal .rec::before{content:"●";margin-right:8px;animation:blink 1.2s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.signal a:hover{color:var(--ink)}
+.nav{position:sticky;top:0;z-index:50;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px 20px;
+  background:rgba(7,7,7,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav .l,.nav .r{display:flex;gap:26px}
+.nav .r{justify-content:flex-end}
+.nav a.lbl:hover{color:var(--ink)}
+.nav .logo{font-family:var(--old);font-size:30px;line-height:1}
+@media(max-width:720px){.nav .l a:not(:first-child),.nav .r a:not(:last-child){display:none}.signal .hide-sm{display:none}}
 
-/* hero */
-.hero{position:relative;min-height:94vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 16px 70px;overflow:hidden}
-.rays{position:absolute;left:50%;top:46%;width:1500px;height:1500px;transform:translate(-50%,-50%);pointer-events:none;opacity:.55}
-.smoke{position:absolute;left:-10%;top:-10%;width:120%;height:120%;pointer-events:none;opacity:.18}
-.hero > *:not(.rays):not(.smoke){position:relative}
-.hero .pre{font-family:var(--cond);font-weight:300;font-size:13px;letter-spacing:.5em;color:var(--g2);text-transform:uppercase;margin-bottom:10px}
-.mark{font-family:var(--old);font-weight:normal;font-size:clamp(72px,16vw,220px);line-height:.95;
-  background:linear-gradient(180deg,#fff 0%,#d9d7d2 38%,#8f8d88 62%,#e6e4df 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
-  filter:drop-shadow(0 6px 24px rgba(0,0,0,.9))}
-.hero .sig{font-family:var(--script);font-size:clamp(48px,8vw,92px);color:var(--g1);line-height:.6;margin-top:-.08em;transform:rotate(-4deg)}
-.hero .tag{margin-top:34px;font-size:clamp(16px,2.2vw,19px);color:var(--g1);max-width:540px;line-height:1.55}
-.cta{margin-top:34px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
-.btn{display:inline-block;padding:14px 26px;border:1px solid var(--g3);font-family:var(--cond);font-weight:500;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink);transition:.18s}
+/* hero: dimensional blackletter */
+.hero{position:relative;height:calc(100svh - 92px);min-height:560px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+.rays{position:absolute;left:50%;top:48%;width:1700px;height:1700px;transform:translate(-50%,-50%);opacity:.5;pointer-events:none}
+.smoke{position:absolute;left:-10%;top:-10%;width:120%;height:120%;opacity:.16;pointer-events:none}
+.mark{position:relative;isolation:isolate;font-family:var(--old);font-weight:normal;font-size:clamp(76px,17.5vw,270px);line-height:1;white-space:nowrap}
+.mark span{display:block}
+/* chrome face */
+.mark .fg{background:linear-gradient(180deg,#fff 0%,#e9e7e2 34%,#9c9a95 49%,#4a4846 51%,#cfcdc8 60%,#8d8b86 82%,#f4f2ee 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:.6px rgba(255,255,255,.35)}
+/* extrude: stacked shadows behind the chrome, like hand-shaded tattoo lettering */
+.mark .sh,.mark .gl{position:absolute;left:0;top:0}
+.mark .sh{z-index:-1;color:#3a3937;text-shadow:1px 1px 0 #2f2e2c,2px 2px 0 #272625,3px 3px 0 #201f1e,4px 4px 0 #1a1918,5px 5px 0 #141413,6px 6px 0 #0e0e0d,8px 10px 26px rgba(0,0,0,.95)}
+/* glitch flash (3EAS layer) */
+.mark .gl{color:var(--stain);mix-blend-mode:screen;opacity:0;pointer-events:none}
+.mark.glitch .gl{animation:gl .38s steps(2) 1}
+@keyframes gl{0%{opacity:.9;transform:translate(6px,-2px);clip-path:inset(12% 0 58% 0)}50%{opacity:.8;transform:translate(-5px,2px);clip-path:inset(55% 0 18% 0)}100%{opacity:0}}
+.drip{width:min(74vw,1000px);height:38px;margin-top:-.4vw;opacity:.9}
+.under{margin-top:18px;display:flex;align-items:center;gap:22px}
+.under .rule{width:min(12vw,140px);height:1px;background:var(--g3)}
+.under .la{font-family:var(--script);font-size:clamp(42px,6vw,76px);color:var(--g1);line-height:.6}
+.corner{position:absolute;bottom:20px;display:flex;flex-direction:column;gap:6px}
+.corner.l{left:20px}.corner.r{right:20px;text-align:right}
+.scroll{position:absolute;bottom:22px;left:50%;transform:translateX(-50%)}
+.scroll a{display:inline-block;white-space:nowrap;padding:13px 26px;border:1px solid var(--ink);font-stretch:125%;font-size:10px;letter-spacing:.3em;font-weight:600;text-transform:uppercase;transition:.2s}
+.scroll a:hover{background:var(--ink);color:var(--bg)}
+@media(max-width:720px){.corner{display:none}}
+
+/* section heads */
+.sec{padding:110px 20px 40px;max-width:1400px;margin:0 auto}
+.sh{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:34px;border-bottom:1px solid var(--line);padding-bottom:16px}
+.sh h2{font-family:var(--old);font-weight:normal;font-size:clamp(54px,8vw,120px);line-height:.9}
+
+/* lookbook */
+.look{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.lk{position:relative;background:radial-gradient(ellipse at 50% 42%,#262524 0%,#0e0e0d 70%);cursor:pointer;overflow:hidden;display:flex;flex-direction:column}
+.lk:nth-child(1){grid-column:span 7;grid-row:span 2}
+.lk:nth-child(2),.lk:nth-child(3){grid-column:span 5}
+.lk:nth-child(4){grid-column:span 12}
+.lk .stage{flex:1;display:flex;align-items:center;justify-content:center;min-height:400px;position:relative}
+.lk:nth-child(1) .stage{min-height:720px}
+.lk:nth-child(4) .stage{min-height:520px}
+.lk svg.tee{width:min(78%,560px);height:auto;filter:drop-shadow(0 30px 36px rgba(0,0,0,.8));transition:opacity .45s,transform .6s cubic-bezier(.2,.7,.2,1)}
+.lk .back{position:absolute;opacity:0;transform:scale(.96)}
+.lk.flip .front{opacity:0;transform:scale(.96)}
+.lk.flip .back{opacity:1;transform:scale(1)}
+@media(hover:hover){.lk:hover .front{opacity:0;transform:scale(.96)}.lk:hover .back{opacity:1;transform:scale(1)}}
+.lk .tag{position:absolute;top:16px;left:18px;right:18px;display:flex;justify-content:space-between;z-index:2}
+.lk .side::after{content:"Front";}
+.lk.flip .side::after{content:"Back"}
+@media(hover:hover){.lk:hover .side::after{content:"Back"}}
+.lk .num{font-family:var(--old);font-size:64px;line-height:1;position:absolute;left:18px;bottom:78px;color:var(--g4);-webkit-text-stroke:1px var(--g3)}
+.lk .meta{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:16px 18px;border-top:1px solid var(--line);background:rgba(7,7,7,.4)}
+.lk .nm{font-stretch:125%;font-weight:600;font-size:13px;letter-spacing:.16em;text-transform:uppercase}
+.lk .cw{margin-top:6px;display:flex;gap:8px;align-items:center}
+.lk .sw{width:10px;height:10px;border-radius:50%;border:1px solid var(--g3)}
+.lk .px{font-stretch:125%;font-weight:500;font-size:13px;letter-spacing:.1em;text-align:right}
+.lk .sz{margin-top:6px;display:flex;gap:10px;justify-content:flex-end}
+@media(max-width:860px){.lk:nth-child(n){grid-column:span 12;grid-row:auto}.lk .stage,.lk:nth-child(n) .stage{min-height:440px}}
+
+/* colourway ribbon */
+.ribbon{display:flex;height:14px;margin-top:14px}
+.ribbon span{flex:1}
+
+/* statement */
+.statement{overflow:hidden;padding:80px 0 40px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:90px}
+.statement .row{white-space:nowrap;font-family:var(--old);font-size:clamp(110px,20vw,320px);line-height:1;color:transparent;-webkit-text-stroke:1px var(--g3);animation:drift 50s linear infinite}
+.statement .row b{font-weight:normal;font-family:var(--wide);font-size:.22em;vertical-align:middle;color:var(--stain);-webkit-text-stroke:0;margin:0 .3em}
+.statement .row.two{animation-direction:reverse;-webkit-text-stroke:1px var(--g4)}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* archivo ledger */
+.ledger{border-top:1px solid var(--line)}
+.lr{display:grid;grid-template-columns:72px 90px 1fr 110px 70px 110px;align-items:center;gap:14px;padding:12px 4px;border-bottom:1px solid var(--line);transition:background .2s}
+.lr:hover{background:#111110}
+.lr svg{width:64px;height:58px}
+.lr .pc{font-stretch:118%;font-size:14px;letter-spacing:.06em}
+.lr .st{text-align:right}
+.lr .st.hot{color:var(--stain)}
+.lr.h{color:var(--g3)}
+.lr.h:hover{background:none}
+@media(max-width:720px){.lr{grid-template-columns:48px 50px 1fr 58px;gap:10px}.lr .hide-sm{display:none}.lr svg{width:46px}.lr .pc{font-size:13px}}
+
+/* frequency */
+.freq{text-align:center;padding:120px 20px}
+.freq h2{font-family:var(--old);font-weight:normal;font-size:clamp(60px,9vw,130px);line-height:.95;margin:14px 0 26px}
+.wave{display:block;width:min(100%,720px);height:64px;margin:0 auto 34px}
+.btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-block;padding:15px 28px;border:1px solid var(--g3);font-stretch:125%;font-weight:600;font-size:10px;letter-spacing:.3em;text-transform:uppercase;transition:.2s}
 .btn:hover{border-color:var(--ink)}
-.btn.solid{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.btn.solid{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .btn.solid:hover{background:transparent;color:var(--ink)}
 
-/* marquee */
-.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;white-space:nowrap;padding:14px 0}
-.marquee span{display:inline-block;animation:mq 40s linear infinite;font-family:var(--cond);font-weight:700;font-size:20px;letter-spacing:.24em;color:var(--g3);text-transform:uppercase}
-.marquee i{font-style:normal;color:var(--g1);margin:0 18px}
-@keyframes mq{to{transform:translateX(-50%)}}
+/* footer: oversized cut-off wordmark */
+footer{border-top:1px solid var(--line);overflow:hidden}
+footer .links{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:22px 20px}
+footer .links a:hover{color:var(--ink)}
+footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.32em;text-align:center;color:var(--g5);-webkit-text-stroke:1px var(--g4);margin-bottom:-4vw;user-select:none}
 
-/* shared */
-section{padding:96px 20px;max-width:1180px;margin:0 auto}
-.kick{font-family:var(--cond);font-weight:500;font-size:12px;letter-spacing:.32em;color:var(--g2);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:12px}
-.kick::before{content:"";width:32px;height:1px;background:var(--g3)}
-h2{font-family:var(--old);font-weight:normal;font-size:clamp(46px,7vw,84px);line-height:1;margin-bottom:26px;color:var(--ink)}
-p.copy{font-size:18px;line-height:1.65;color:var(--g1);max-width:600px}
-p.copy+p.copy{margin-top:16px}
-p.copy b{color:var(--ink);font-weight:500}
-.orn{display:block;width:220px;height:20px;margin:0 auto;opacity:.6}
-
-/* flash sheet: the art, hung like a tattoo shop wall */
-.sheet{position:relative;background:
-  radial-gradient(ellipse at 50% 30%,#1f1f1e 0%,#121211 70%),#121211;border:1px solid var(--line);padding:56px 34px 130px;
-  box-shadow:inset 0 0 120px rgba(0,0,0,.8)}
-.sheet::before{content:"";position:absolute;inset:12px;border:1px solid rgba(185,183,178,.12);pointer-events:none}
-.sheet .no{position:absolute;top:24px;left:30px;font-family:var(--cond);font-size:11px;letter-spacing:.3em;color:var(--g3);text-transform:uppercase}
-.sheet .sig{position:absolute;right:34px;bottom:14px;font-family:var(--script);font-size:clamp(46px,6vw,72px);color:var(--g1);transform:rotate(-5deg)}
-.flash{display:grid;grid-template-columns:repeat(4,1fr);gap:26px 18px}
-.flash figure{text-align:center;cursor:default}
-.flash svg{width:100%;max-width:200px;height:auto;transition:transform .35s,filter .35s;filter:drop-shadow(0 8px 14px rgba(0,0,0,.7))}
-.flash figure:hover svg{transform:scale(1.07) rotate(-2deg);filter:drop-shadow(0 0 18px rgba(236,235,232,.18))}
-.flash figcaption{font-family:var(--cond);font-size:11px;letter-spacing:.28em;color:var(--g3);text-transform:uppercase;margin-top:6px}
-@media(max-width:760px){.flash{grid-template-columns:repeat(2,1fr)}.sheet{padding:50px 16px 120px}}
-/* grey -> colour band: the site is grey, the clothes are not */
-.band{display:flex;height:120px}
-.band span{flex:1;transition:flex .35s}
-.band span:hover{flex:2.4}
-
-
-.head{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:34px}
-.head h2{margin-bottom:0}
-.head p{color:var(--g2);max-width:340px;font-size:15px;line-height:1.5}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
-.item{background:var(--g5);transition:transform .25s}
-.item:hover{transform:translateY(-4px)}
-.item .stage{position:relative;aspect-ratio:1/1.12;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(ellipse at 50% 38%,#2b2a29 0%,#121211 72%);overflow:hidden}
-.item svg.tee{width:84%;height:auto;filter:drop-shadow(0 22px 26px rgba(0,0,0,.75))}
-.item .badge{position:absolute;top:14px;left:14px;font-family:var(--cond);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--g1);border:1px solid var(--g3);padding:4px 10px}
-.item .meta{padding:16px 16px 6px;display:flex;justify-content:space-between;gap:10px}
-.item .nm{font-family:var(--cond);font-weight:700;font-size:19px;letter-spacing:.06em;text-transform:uppercase}
-.item .px{font-family:var(--cond);font-weight:500;font-size:19px;color:var(--g1)}
-.item .cw{padding:0 16px 16px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--g2)}
-.item .sw{width:14px;height:14px;border-radius:50%;border:1px solid var(--g3)}
-.item .go{display:block;text-align:center;padding:13px;border-top:1px solid var(--line);font-family:var(--cond);font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--g1)}
-.item .go:hover{background:var(--ink);color:var(--bg)}
-
-/* archivo */
-.archivo{display:grid;grid-template-columns:1fr 1.15fr;gap:56px;align-items:center}
-.racks{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.rk{aspect-ratio:3/4;background:linear-gradient(160deg,#2a2928,#121211);display:flex;flex-direction:column;justify-content:flex-end;padding:12px;position:relative;overflow:hidden}
-.rk::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.07),transparent 60%)}
-.rk svg{position:absolute;left:12%;top:10%;width:76%;height:auto}
-.rk .y{font-family:var(--old);font-size:34px;color:var(--g1);line-height:1;position:relative}
-.rk .d{font-family:var(--cond);font-size:11px;letter-spacing:.18em;color:var(--g3);text-transform:uppercase;margin-top:6px;position:relative}
-@media(max-width:860px){.archivo{grid-template-columns:1fr}}
-
-/* notify */
-.notify{text-align:center}
-.notify h2{margin-bottom:16px}
-.notify p.copy{margin:0 auto}
-
-footer{padding:50px 20px 70px;text-align:center;border-top:1px solid var(--line)}
-footer .f1{font-family:var(--old);font-size:34px}
-footer .f2{margin-top:10px;font-family:var(--cond);font-size:11px;letter-spacing:.3em;color:var(--g3);text-transform:uppercase;line-height:2.2}
-footer a{color:var(--g2)} footer a:hover{color:var(--ink)}
-
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <canvas id="grain" aria-hidden="true"></canvas>
-
-<!-- shared SVG defs: smoke filter -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <filter id="smokeF" x="0" y="0" width="100%" height="100%">
-    <feTurbulence type="fractalNoise" baseFrequency=".006 .012" numOctaves="4" seed="7"/>
-    <feColorMatrix values="0 0 0 0 .75  0 0 0 0 .74  0 0 0 0 .72  0 0 0 1.4 -.55"/>
-  </filter>
+  <filter id="smokeF"><feTurbulence type="fractalNoise" baseFrequency=".006 .012" numOctaves="4" seed="7"/>
+    <feColorMatrix values="0 0 0 0 .75  0 0 0 0 .74  0 0 0 0 .72  0 0 0 1.4 -.55"/></filter>
 </svg>
 
+<div class="signal mono">
+  <span class="rec">Sub-signal // Suciopath</span>
+  <span class="hide-sm">34.0522° N / 118.2437° W</span>
+  <a href="/">3EAS Cortex ↗</a>
+</div>
 <header class="nav">
-  <a class="logo" href="#top">Suciopath</a>
-  <nav>
-    <a href="#arte">Arte</a>
-    <a href="#drop">Drop 001</a>
-    <a href="#archivo">Archivo</a>
-    <a class="keep" href="#lista">The List</a>
-  </nav>
-  <a class="home" href="/">3EAS Cortex ↗</a>
+  <div class="l"><a class="lbl" href="#lookbook">Drop 001</a><a class="lbl" href="#archivo">Archivo</a></div>
+  <a class="logo" href="#top" aria-label="Suciopath">Suciopath</a>
+  <div class="r"><a class="lbl" href="https://www.instagram.com/dj_antiq/" target="_blank" rel="noopener">Instagram</a><a class="lbl" href="#frecuencia">The List</a></div>
 </header>
 
 <main id="top">
 <div class="hero">
   <svg class="smoke" aria-hidden="true"><rect width="100%" height="100%" filter="url(#smokeF)"/></svg>
-  <svg class="rays" viewBox="-750 -750 1500 1500" aria-hidden="true" id="rays"></svg>
-  <div class="pre">DJ Antiq presents</div>
-  <h1 class="mark">Suciopath</h1>
-  <div class="sig">Los Angeles</div>
-  <div class="cta">
-    <a class="btn solid" href="#drop">Shop Drop 001</a>
-    <a class="btn" href="#arte">The Art</a>
-  </div>
+  <svg class="rays" viewBox="-850 -850 1700 1700" id="rays" aria-hidden="true"></svg>
+  <h1 class="mark" id="mark"><span class="sh" aria-hidden="true">Suciopath</span><span class="fg">Suciopath</span><span class="gl" aria-hidden="true">Suciopath</span></h1>
+  <svg class="drip" viewBox="0 0 1000 38" preserveAspectRatio="none" aria-hidden="true">
+    <path fill="#1a1918" stroke="#4a4846" stroke-width=".8" d="M0 0h1000v3c-14 0-16 5-18 12s-5 8-7 0-5-12-38-12-28 20-32 27-8 7-9-1-3-26-50-26-74 3-98 3-15 15-17 19-7 2-7-5 0-15-62-15-110 5-148 5-12 24-17 31-7 7-8-3-3-31-50-31-98 2-134 2-20 10-22 13-5 0-6-3-8-12-74-12-62 7-86 7-10 18-15 23-7 5-7-5S95 3 0 3z"/>
+    <circle cx="566" cy="33" r="3.2" fill="#c23a22"/>
+  </svg>
+  <div class="under"><span class="rule"></span><span class="la">Los Angeles</span><span class="rule"></span></div>
+  <div class="corner l"><span class="lbl">Drop 001</span><span class="mono">FW26 / Tees + Archivo</span></div>
+  <div class="corner r"><span class="lbl">DJ Antiq</span><span class="mono" id="clock">LA --:--:--</span></div>
+  <div class="scroll"><a href="#lookbook">View Lookbook</a></div>
 </div>
 
-<div class="marquee" aria-hidden="true"><span id="mq"></span></div>
-
-<section id="arte">
-  <div class="kick">Arte</div>
-  <h2>Flash.</h2>
-  <div class="sheet">
-    <span class="no">Sheet 001 / Black &amp; Grey</span>
-    <div class="flash" id="flash"></div>
-    <span class="sig">DJ Antiq</span>
-  </div>
+<section class="sec" id="lookbook">
+  <div class="sh"><h2>Drop 001</h2><span class="lbl">Hover or tap to see the back</span></div>
+  <div class="look" id="look"></div>
+  <div class="ribbon" id="ribbon" aria-hidden="true"></div>
 </section>
 
-<div class="band" aria-hidden="true" id="band"></div>
+<div class="statement" aria-hidden="true">
+  <div class="row">Los Angeles <b>✦</b> Sucio <b>✦</b> Los Angeles <b>✦</b> Sucio <b>✦</b>&nbsp;</div>
+  <div class="row two">Black &amp; Grey <b>✦</b> Suciopath <b>✦</b> Black &amp; Grey <b>✦</b> Suciopath <b>✦</b>&nbsp;</div>
+</div>
 
-<section id="drop">
-  <div class="head">
-    <div><div class="kick">Drop 001</div><h2>Tees.</h2></div>
-  </div>
-  <div class="grid" id="dropGrid"></div>
+<section class="sec" id="archivo">
+  <div class="sh"><h2>Archivo</h2><span class="lbl">Resale / One of each</span></div>
+  <div class="ledger" id="ledger"></div>
 </section>
 
-<section id="archivo" class="archivo">
-  <div>
-    <div class="kick">Resale</div>
-    <h2>Archivo.</h2>
-    <div class="cta" style="justify-content:flex-start"><a class="btn" href="#lista">First Look</a></div>
-  </div>
-  <div class="racks">
-    <div class="rk"><svg viewBox="0 0 100 90" class="fold"></svg><div class="y">’89</div></div>
-    <div class="rk"><svg viewBox="0 0 100 90" class="fold"></svg><div class="y">’93</div></div>
-    <div class="rk"><svg viewBox="0 0 100 90" class="fold"></svg><div class="y">’96</div></div>
-    <div class="rk"><svg viewBox="0 0 100 90" class="fold"></svg><div class="y">’98</div></div>
-    <div class="rk"><svg viewBox="0 0 100 90" class="fold"></svg><div class="y">’01</div></div>
-    <div class="rk"><svg viewBox="0 0 100 90" class="fold"></svg><div class="y">??</div></div>
-  </div>
-</section>
-
-<section id="lista" class="notify">
-  <div class="kick" style="justify-content:center">The List</div>
-  <h2>Get on the list.</h2>
-  <div class="cta">
-    <a class="btn solid" href="https://ig.me/m/dj_antiq" target="_blank" rel="noopener">DM “SUCIO”</a>
-    <a class="btn" href="https://www.instagram.com/dj_antiq/" target="_blank" rel="noopener">Follow</a>
+<section class="freq" id="frecuencia">
+  <span class="lbl">The List</span>
+  <h2>Get on the Frequency</h2>
+  <canvas class="wave" id="wave" width="1440" height="128" aria-hidden="true"></canvas>
+  <div class="btns">
+    <a class="btn solid" href="https://ig.me/m/dj_antiq" target="_blank" rel="noopener">DM “Sucio”</a>
+    <a class="btn" href="https://www.instagram.com/dj_antiq/" target="_blank" rel="noopener">@dj_antiq</a>
   </div>
 </section>
 </main>
 
 <footer>
-  <div class="f1">Suciopath</div>
-  <div class="f2">Los Angeles / © <span id="yr">2026</span><br>Broadcast through <a href="/">3EAS Cortex</a></div>
+  <div class="links mono"><span>Suciopath © <span id="yr">2026</span> / Los Angeles</span><a href="/">Broadcast through 3EAS Cortex</a></div>
+  <div class="big" aria-hidden="true">Suciopath</div>
 </footer>
 
 <script>
 (function(){
-  var NS='http://www.w3.org/2000/svg';
-  function el(tag,attrs,parent){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+  var OLD = 'Fruktur, UnifrakturMaguntia';
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // fine-line halo rays behind the wordmark
-  var rays=document.getElementById('rays');
-  for(var i=0;i<120;i++){
-    var a=i/120*Math.PI*2, long=i%2===0, r1=long?120:180, r2=long?740:520;
-    el('line',{x1:Math.cos(a)*r1,y1:Math.sin(a)*r1,x2:Math.cos(a)*r2,y2:Math.sin(a)*r2,stroke:'#8a8884','stroke-width':long?1:.5,opacity:long?.5:.3},rays);
-  }
-
-
-  // ---- flash sheet: fine-line black-and-grey designs (viewBox 0 0 120 120) ----
-  var K='stroke="#d9d7d2" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"';
-  var k='stroke="#8a8884" stroke-width=".8" fill="none"';
-  function grad(id,a,b){return '<defs><radialGradient id="'+id+'" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="'+a+'"/><stop offset="1" stop-color="'+b+'"/></radialGradient></defs>';}
-  function raysAt(cx,cy,r1,r2,n,from,to){var o='';for(var i=0;i<n;i++){var a=(from+(to-from)*i/(n-1))*Math.PI/180;o+='<line x1="'+(cx+Math.cos(a)*r1).toFixed(1)+'" y1="'+(cy+Math.sin(a)*r1).toFixed(1)+'" x2="'+(cx+Math.cos(a)*r2).toFixed(1)+'" y2="'+(cy+Math.sin(a)*r2).toFixed(1)+'" '+k+'/>';}return o;}
-  var FLASH=[
-    ['Sagrado', grad('fh','#9a9893','#1c1c1b')+raysAt(60,62,40,56,13,-160,-20)+
-      '<path d="M60 102C24 76 20 46 38 38c11-5 19 2 22 10 3-8 11-15 22-10 18 8 14 38-22 64z" fill="url(#fh)" '+K+'/>'+
-      '<path d="M54 36c-4-8 2-12 2-20 4 4 4 8 4 12 2-6 6-8 6-14 4 6 4 14 0 22" fill="#0d0d0d" '+K+'/>'+
-      '<path d="M30 58c10 6 20-4 30 2s20-4 30 2" '+k+'/><path d="M34 54l-3-3M46 62l-2 4M66 56l2-4M80 62l2 3" '+k+'/>'],
-    ['Daga', grad('fd','#d9d7d2','#3a3938')+
-      '<path d="M54 42h12l-6 66z" fill="url(#fd)" '+K+'/><path d="M60 44v54" '+k+'/>'+
-      '<path d="M36 36q24 10 48 0v6q-24 6-48 0z" fill="#2a2928" '+K+'/>'+
-      '<rect x="55" y="16" width="10" height="20" rx="2" fill="#1c1c1b" '+K+'/><path d="M55 21h10M55 26h10M55 31h10" '+k+'/>'+
-      '<circle cx="60" cy="11" r="5" fill="#55534f" '+K+'/>'],
-    ['Rosa', grad('fr','#b9b7b2','#1c1c1b')+
-      '<path d="M60 84v30" '+K+'/><path d="M60 98c-10-8-20-4-22 2 8 4 16 4 22-2zM60 106c8-8 18-6 20 0-8 4-14 4-20 0z" fill="#2a2928" '+K+'/>'+
-      '<path d="M34 56c-4 18 10 30 26 30s30-12 26-30c-6 4-14 2-18-2" fill="url(#fr)" '+K+'/>'+
-      '<path d="M34 56c-6-12 2-24 14-24M86 56c6-12-2-24-14-24" fill="none" '+K+'/><path d="M42 54c0-14 10-22 18-22s18 8 18 22" fill="#2a2928" '+K+'/>'+
-      '<path d="M60 50c5-4 11 0 7 6-4 6-15 2-13-7 2-9 17-11 21 0 4 11-9 20-21 15" fill="none" '+K+'/>'],
-    ['Corona', grad('fc','#8a8884','#161615')+
-      '<path d="M26 82l4-40 16 20 14-28 14 28 16-20 4 40z" fill="url(#fc)" '+K+'/>'+
-      '<rect x="24" y="82" width="72" height="12" rx="2" fill="#1c1c1b" '+K+'/>'+
-      '<circle cx="30" cy="40" r="3.5" fill="#d9d7d2"/><circle cx="60" cy="31" r="4" fill="#d9d7d2"/><circle cx="90" cy="40" r="3.5" fill="#d9d7d2"/>'+
-      '<path d="M44 88h0M60 88h0M76 88h0" stroke="#d9d7d2" stroke-width="5" stroke-linecap="round"/>'],
-    ['Ojo', grad('fo','#ecebe8','#2a2928')+raysAt(60,60,34,52,24,0,345)+
-      '<path d="M22 60q38-36 76 0-38 36-76 0z" fill="#0d0d0d" '+K+'/>'+
-      '<circle cx="60" cy="60" r="15" fill="url(#fo)" '+K+'/><circle cx="60" cy="60" r="6" fill="#0a0a0a"/><circle cx="56" cy="56" r="2" fill="#fff"/>'],
-    ['Suerte', grad('fx','#b9b7b2','#3a3938')+
-      '<path d="M60 26l30 14-30 14-30-14z" fill="url(#fx)" '+K+'/><path d="M30 40v36l30 16V54z" fill="#2a2928" '+K+'/><path d="M90 40v36L60 92V54z" fill="#161615" '+K+'/>'+
-      '<ellipse cx="60" cy="40" rx="4" ry="2" fill="#0a0a0a"/>'+
-      '<ellipse cx="38" cy="54" rx="2" ry="3" fill="#d9d7d2"/><ellipse cx="52" cy="76" rx="2" ry="3" fill="#d9d7d2"/>'+
-      '<ellipse cx="70" cy="62" rx="2" ry="3" fill="#d9d7d2"/><ellipse cx="80" cy="70" rx="2" ry="3" fill="#d9d7d2"/><ellipse cx="74" cy="80" rx="2" ry="3" fill="#d9d7d2"/><ellipse cx="82" cy="58" rx="2" ry="3" fill="#d9d7d2"/>'],
-    ['Telaraña', (function(){var o='',R=[12,22,33,44,54],n=10;for(var i=0;i<n;i++){var a=i/n*Math.PI*2;o+='<line x1="60" y1="60" x2="'+(60+Math.cos(a)*56).toFixed(1)+'" y2="'+(60+Math.sin(a)*56).toFixed(1)+'" '+K+' stroke-width=".9"/>';}
-      R.forEach(function(r){var d='';for(var i=0;i<=n;i++){var a=i/n*Math.PI*2,a0=(i-.5)/n*Math.PI*2,m=r*.86;d+=(i?' Q'+(60+Math.cos(a0)*m).toFixed(1)+' '+(60+Math.sin(a0)*m).toFixed(1)+' ':'M')+(60+Math.cos(a)*r).toFixed(1)+' '+(60+Math.sin(a)*r).toFixed(1);}o+='<path d="'+d+'" fill="none" stroke="#b9b7b2" stroke-width=".8"/>';});
-      return o+'<path d="M60 4v20" '+k+'/><circle cx="60" cy="27" r="4" fill="#d9d7d2"/>';})()],
-    ['Sucio', '<path d="M8 70l14-6v24l-14 6 6-12z" fill="#2a2928" '+K+'/><path d="M112 70l-14-6v24l14 6-6-12z" fill="#2a2928" '+K+'/>'+
-      '<path d="M22 64q38-14 76 0v24q-38-14-76 0z" fill="#d9d7d2" '+K+'/>'+
-      '<text x="60" y="84" text-anchor="middle" font-family="Herr Von Muellerhoff" font-size="30" fill="#111" transform="rotate(-3 60 80)">Sucio</text>'+
-      '<path d="M60 52l4-10 10-2-8-7 2-11-8 6-8-6 2 11-8 7 10 2z" fill="none" '+K+'/>']
-  ];
-  document.getElementById('flash').innerHTML=FLASH.map(function(f){return '<figure><svg viewBox="0 0 120 120" aria-label="'+f[0]+'">'+f[1]+'</svg><figcaption>'+f[0]+'</figcaption></figure>';}).join('');
-
-  // archivo: folded vintage tees, each a different grey with a faded print
-  var FOLD=[['#2e2d2c','#8a8884','c'],['#4a4947','#d9d7d2','b'],['#1c1c1b','#6f6d69','r'],['#7a7874','#1c1c1b','s'],['#3a3938','#b9b7b2','l'],['#242423','#3d3c3a','q']];
-  Array.prototype.forEach.call(document.querySelectorAll('.rk svg.fold'),function(sv,i){
-    var f=FOLD[i%FOLD.length], c=f[1], pr='';
-    if(f[2]==='c') pr='<circle cx="50" cy="52" r="13" fill="none" stroke="'+c+'" stroke-width="2"/><circle cx="50" cy="52" r="4" fill="'+c+'"/>';
-    if(f[2]==='b') pr='<rect x="34" y="42" width="32" height="20" fill="none" stroke="'+c+'" stroke-width="2"/><path d="M38 48h24M38 54h18" stroke="'+c+'" stroke-width="2"/>';
-    if(f[2]==='r') pr='<path d="M32 60l8-16 8 10 6-8 12 14z" fill="'+c+'"/>';
-    if(f[2]==='s') pr='<text x="50" y="62" text-anchor="middle" font-family="Grenze Gotisch, UnifrakturMaguntia" font-size="24" fill="'+c+'">S</text>';
-    if(f[2]==='l') pr='<path d="M34 56q8-14 16 0t16 0" fill="none" stroke="'+c+'" stroke-width="2"/>';
-    if(f[2]==='q') pr='<text x="50" y="62" text-anchor="middle" font-family="Oswald" font-size="20" fill="'+c+'">?</text>';
-    sv.innerHTML='<path d="M14 26l18-12h36l18 12-6 14H20z" fill="'+f[0]+'" stroke="#0a0a0a"/><rect x="20" y="30" width="60" height="50" rx="3" fill="'+f[0]+'" stroke="#0a0a0a"/>'+
-      '<path d="M38 14q12 10 24 0" fill="none" stroke="#0a0a0a" stroke-width="3"/><path d="M20 70h60" stroke="#000" stroke-opacity=".3"/>'+
-      '<g opacity=".75">'+pr+'</g>';
-  });
-
-  // grey -> colour band
-  var BAND=['#0f0f0f','#1f1f1e','#333231','#4c4b49','#6c6a67','#8f8d89','#b5b3ae','#dad8d3','#8e1b22','#c4471c','#d9a21b','#2f6b3a','#1f3f8f','#5b2a74'];
-  document.getElementById('band').innerHTML=BAND.map(function(c){return '<span style="background:'+c+'"></span>';}).join('');
-
-  // marquee: text written twice so the loop is seamless
-  var mqTxt=['Suciopath','Los Angeles','Drop 001','Flash','Arte','Black & Grey','Archivo'].join('<i>✦</i>')+'<i>✦</i>';
-  document.getElementById('mq').innerHTML=mqTxt+mqTxt;
+  // halo rays
+  var rays=document.getElementById('rays'), r='';
+  for(var i=0;i<140;i++){var a=i/140*Math.PI*2,lg=i%2===0,r1=lg?140:220,r2=lg?840:560;
+    r+='<line x1="'+(Math.cos(a)*r1).toFixed(1)+'" y1="'+(Math.sin(a)*r1).toFixed(1)+'" x2="'+(Math.cos(a)*r2).toFixed(1)+'" y2="'+(Math.sin(a)*r2).toFixed(1)+'" stroke="#8b8985" stroke-width="'+(lg?1:.5)+'" opacity="'+(lg?.45:.25)+'"/>';}
+  rays.innerHTML=r;
 
   // ---- DROP 001: edit here. status: "soon" | "live" | "gone"; add url when live ----
   var DROP=[
-    {name:'Suciopath Classic', price:40, cw:'Black / grey ink',   tee:'#151515', ink:'#bdbbb6', gfx:'old',     status:'soon'},
-    {name:'Sagrado',           price:40, cw:'Heather grey / black',tee:'#9a9893', ink:'#141414', gfx:'stack',   status:'soon'},
-    {name:'Los Angeles Script',price:45, cw:'Cherry / bone',      tee:'#8e1b22', ink:'#efe9dc', gfx:'script',  status:'soon'},
-    {name:'Side A',            price:45, cw:'Cobalt / white',     tee:'#1f3f8f', ink:'#f4f4f2', gfx:'record',  status:'soon'}
+    {name:'Suciopath Classic', price:40, cw:'Black / grey ink',    tee:'#141414', ink:'#c9c7c2', front:'chestS',   back:'arch',   status:'soon'},
+    {name:'Sagrado',           price:40, cw:'Heather grey / black',tee:'#9b9994', ink:'#151515', front:'chestHeart',back:'heart', status:'soon'},
+    {name:'Los Angeles',       price:45, cw:'Cherry / bone',       tee:'#8e1b22', ink:'#efe9dc', front:'chestWord', back:'script', status:'soon'},
+    {name:'Side A',            price:45, cw:'Cobalt / white',      tee:'#1f3f8f', ink:'#f4f4f2', front:'chestS',   back:'record', status:'soon'}
   ];
-  function gfx(d){
-    var c=d.ink;
-    switch(d.gfx){
-      case 'old': return '<text x="150" y="132" text-anchor="middle" font-family="Grenze Gotisch, UnifrakturMaguntia" font-size="34" fill="'+c+'">Suciopath</text>'+
-        '<text x="150" y="152" text-anchor="middle" font-family="Oswald" font-size="7" letter-spacing="4" fill="'+c+'">LOS ANGELES · CALIFORNIA</text>';
-      case 'stack': return '<path d="M150 158C122 138 119 115 133 108c9-4 14 2 17 8 3-6 8-12 17-8 14 7 11 30-17 50z" fill="'+c+'"/>'+
-        '<path d="M146 106c-3-7 2-10 2-17 3 3 3 7 3 10 2-5 5-7 5-12 3 5 3 12 0 19" fill="'+c+'"/>'+
-        (function(){var o='';for(var i=0;i<11;i++){var a=(-160+14*i)*Math.PI/180;o+='<line x1="'+(150+Math.cos(a)*34).toFixed(1)+'" y1="'+(128+Math.sin(a)*34).toFixed(1)+'" x2="'+(150+Math.cos(a)*46).toFixed(1)+'" y2="'+(128+Math.sin(a)*46).toFixed(1)+'" stroke="'+c+'" stroke-width="1"/>';}return o;})()+
-        '<text x="150" y="182" text-anchor="middle" font-family="Grenze Gotisch, UnifrakturMaguntia" font-size="14" fill="'+c+'">Suciopath</text>';
-      case 'script': return '<text x="150" y="132" text-anchor="middle" font-family="Herr Von Muellerhoff" font-size="50" fill="'+c+'" transform="rotate(-6 150 130)">Los Angeles</text>'+
-        '<text x="150" y="160" text-anchor="middle" font-family="Grenze Gotisch, UnifrakturMaguntia" font-size="14" fill="'+c+'">Suciopath</text>';
-      case 'record': var s='<circle cx="150" cy="128" r="34" fill="none" stroke="'+c+'" stroke-width="2"/>';
-        for(var r=14;r<32;r+=4) s+='<circle cx="150" cy="128" r="'+r+'" fill="none" stroke="'+c+'" stroke-width=".6" opacity=".7"/>';
-        return s+'<text x="150" y="134" text-anchor="middle" font-family="Grenze Gotisch, UnifrakturMaguntia" font-size="18" fill="'+c+'">S</text>'+
-          '<text x="150" y="180" text-anchor="middle" font-family="Oswald" font-size="9" letter-spacing="4" fill="'+c+'">SIDE A · VINYL ONLY</text>';
+  var BODY='M95 40 L60 55 L18 95 L45 130 L72 112 L72 272 L228 272 L228 112 L255 130 L282 95 L240 55 L205 40 C195 62 175 72 150 72 C125 72 105 62 95 40Z';
+  var BACKNECK='M95 40 C112 50 130 54 150 54 C170 54 188 50 205 40';
+  function heartPath(cx,cy,s){return 'M'+cx+' '+(cy+30*s)+'C'+(cx-28*s)+' '+(cy+10*s)+' '+(cx-31*s)+' '+(cy-13*s)+' '+(cx-17*s)+' '+(cy-20*s)+'c'+(9*s)+' '+(-4*s)+' '+(14*s)+' '+(2*s)+' '+(17*s)+' '+(8*s)+' '+(3*s)+' '+(-6*s)+' '+(8*s)+' '+(-12*s)+' '+(17*s)+' '+(-8*s)+'C'+(cx+31*s)+' '+(cy-13*s)+' '+(cx+28*s)+' '+(cy+10*s)+' '+cx+' '+(cy+30*s)+'z';}
+  function print(kind,c,uid){
+    switch(kind){
+      case 'chestS': return '<text x="188" y="112" text-anchor="middle" font-family="'+OLD+'" font-size="22" fill="'+c+'">S</text>';
+      case 'chestHeart': return '<path d="'+heartPath(188,104,.3)+'" fill="'+c+'"/>';
+      case 'chestWord': return '<text x="186" y="110" text-anchor="middle" font-family="'+OLD+'" font-size="11" fill="'+c+'">Suciopath</text>';
+      case 'arch': return '<path id="a'+uid+'" d="M86 132 Q150 84 214 132" fill="none"/>'+
+        '<text font-family="'+OLD+'" font-size="34" fill="'+c+'" text-anchor="middle"><textPath href="#a'+uid+'" startOffset="50%">Suciopath</textPath></text>'+
+        '<text x="150" y="158" text-anchor="middle" font-family="Herr Von Muellerhoff" font-size="34" fill="'+c+'">Los Angeles</text>'+
+        '<text x="150" y="232" text-anchor="middle" font-family="Archivo" font-size="6" letter-spacing="4" fill="'+c+'" opacity=".7">DROP 001 · FW26</text>';
+      case 'heart': var o='';for(var i=0;i<17;i++){var a=(-170+i*10)*Math.PI/180;o+='<line x1="'+(150+Math.cos(a)*44).toFixed(1)+'" y1="'+(150+Math.sin(a)*44).toFixed(1)+'" x2="'+(150+Math.cos(a)*(i%2?56:64)).toFixed(1)+'" y2="'+(150+Math.sin(a)*(i%2?56:64)).toFixed(1)+'" stroke="'+c+'" stroke-width="1.1"/>';}
+        return '<path id="a'+uid+'" d="M90 112 Q150 66 210 112" fill="none"/>'+
+          '<text font-family="'+OLD+'" font-size="22" fill="'+c+'" text-anchor="middle"><textPath href="#a'+uid+'" startOffset="50%">Suciopath</textPath></text>'+o+
+          '<path d="'+heartPath(150,150,1.1)+'" fill="'+c+'"/><path d="M144 124c-3-8 2-12 3-19 3 4 3 8 3 11 2-6 6-8 6-14 4 6 3 14 0 22" fill="'+c+'"/>'+
+          '<text x="150" y="222" text-anchor="middle" font-family="Herr Von Muellerhoff" font-size="26" fill="'+c+'">Sagrado</text>';
+      case 'script': return '<path id="a'+uid+'" d="M92 110 Q150 74 208 110" fill="none"/>'+
+          '<text font-family="'+OLD+'" font-size="24" fill="'+c+'" text-anchor="middle"><textPath href="#a'+uid+'" startOffset="50%">Suciopath</textPath></text>'+
+          '<text x="150" y="160" text-anchor="middle" font-family="Herr Von Muellerhoff" font-size="64" fill="'+c+'" transform="rotate(-7 150 150)">Los Angeles</text>'+
+          '<path d="M100 184 h100" stroke="'+c+'" stroke-width=".8"/><text x="150" y="198" text-anchor="middle" font-family="Archivo" font-size="6" letter-spacing="4" fill="'+c+'">CALIFORNIA</text>';
+      case 'record': var g='<circle cx="150" cy="150" r="54" fill="none" stroke="'+c+'" stroke-width="2"/>';
+        for(var rr=22;rr<52;rr+=4) g+='<circle cx="150" cy="150" r="'+rr+'" fill="none" stroke="'+c+'" stroke-width=".6" opacity=".7"/>';
+        return '<path id="a'+uid+'" d="M88 98 Q150 60 212 98" fill="none"/>'+
+          '<text font-family="'+OLD+'" font-size="22" fill="'+c+'" text-anchor="middle"><textPath href="#a'+uid+'" startOffset="50%">Suciopath</textPath></text>'+
+          g+'<text x="150" y="160" text-anchor="middle" font-family="'+OLD+'" font-size="30" fill="'+c+'">S</text>'+
+          '<text x="150" y="228" text-anchor="middle" font-family="Archivo" font-size="7" letter-spacing="5" fill="'+c+'">SIDE A · VINYL ONLY</text>';
     }
     return '';
   }
-  function tee(d,i){
-    var id='t'+i;
-    return '<svg class="tee" viewBox="0 0 300 300" aria-label="'+d.name+' tee">'+
-      '<defs><linearGradient id="'+id+'" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset=".25" stop-color="#fff" stop-opacity=".06"/><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".4"/></linearGradient></defs>'+
-      '<path id="p'+id+'" d="M95 40 L60 55 L18 95 L45 130 L72 112 L72 272 L228 272 L228 112 L255 130 L282 95 L240 55 L205 40 C195 62 175 72 150 72 C125 72 105 62 95 40Z" fill="'+d.tee+'"/>'+
-      '<path d="M95 40 L60 55 L18 95 L45 130 L72 112 L72 272 L228 272 L228 112 L255 130 L282 95 L240 55 L205 40 C195 62 175 72 150 72 C125 72 105 62 95 40Z" fill="url(#'+id+')"/>'+
-      '<path d="M95 40 C105 62 125 72 150 72 C175 72 195 62 205 40" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="5"/>'+
-      '<path d="M72 112 L72 200 M228 112 L228 200" stroke="#000" stroke-opacity=".18" stroke-width="1"/>'+
-      gfx(d)+'</svg>';
+  function tee(d,i,side){
+    var uid=side+i, gid='sh'+uid;
+    return '<svg class="tee '+side+'" viewBox="0 0 300 300" aria-label="'+d.name+' '+side+'">'+
+      '<defs><linearGradient id="'+gid+'" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".38"/><stop offset=".22" stop-color="#fff" stop-opacity=".07"/><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient></defs>'+
+      '<path d="'+BODY+'" fill="'+d.tee+'"/><path d="'+BODY+'" fill="url(#'+gid+')"/>'+
+      (side==='front'?'<path d="M95 40 C105 62 125 72 150 72 C175 72 195 62 205 40" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="5"/>'
+                     :'<path d="'+BACKNECK+'" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="4"/>')+
+      '<path d="M72 112v95M228 112v95M110 272c10-30 4-60 8-90M196 272c-8-26-2-52-6-80" stroke="#000" stroke-opacity=".14" fill="none"/>'+
+      print(side==='front'?d.front:d.back,d.ink,uid)+'</svg>';
   }
   var BADGE={soon:'Coming soon',live:'Available',gone:'Sold out'};
-  document.getElementById('dropGrid').innerHTML=DROP.map(function(d,i){
-    var go=d.status==='live'&&d.url?'<a class="go" href="'+d.url+'">Buy now</a>':d.status==='gone'?'<span class="go">Sold out</span>':'<a class="go" href="#lista">Notify me</a>';
-    return '<article class="item"><div class="stage"><span class="badge">'+BADGE[d.status]+'</span>'+tee(d,i)+'</div>'+
-      '<div class="meta"><div class="nm">'+d.name+'</div><div class="px">$'+d.price+'</div></div>'+
-      '<div class="cw"><span class="sw" style="background:'+d.tee+'"></span>'+d.cw+'</div>'+go+'</article>';
+  var look=document.getElementById('look');
+  look.innerHTML=DROP.map(function(d,i){
+    var n=('0'+(i+1)).slice(-2);
+    var cta=d.status==='live'&&d.url?'<a class="lbl" href="'+d.url+'" style="color:var(--ink)">Buy ↗</a>':'<span class="lbl"'+(d.status==='gone'?' style="color:var(--stain)"':'')+'>'+BADGE[d.status]+'</span>';
+    return '<article class="lk" tabindex="0"><div class="tag"><span class="lbl">Look '+n+'</span><span class="lbl side"></span></div>'+
+      '<div class="stage">'+tee(d,i,'front')+tee(d,i,'back')+'</div><span class="num" aria-hidden="true">'+n+'</span>'+
+      '<div class="meta"><div><div class="nm">'+d.name+'</div><div class="cw"><span class="sw" style="background:'+d.tee+'"></span><span class="mono">'+d.cw+'</span></div></div>'+
+      '<div><div class="px">$'+d.price+'</div><div class="sz mono">S M L XL XXL</div><div style="text-align:right;margin-top:6px">'+cta+'</div></div></div></article>';
   }).join('');
+  Array.prototype.forEach.call(look.querySelectorAll('.lk'),function(el){
+    function t(e){ if(e.target.closest('a'))return; el.classList.toggle('flip'); }
+    el.addEventListener('click',t);
+    el.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();el.classList.toggle('flip');} });
+  });
 
+  // colourway ribbon: grey to the garment colours
+  document.getElementById('ribbon').innerHTML=['#141414','#2b2a29','#4b4a48','#6f6d69','#9b9994','#c9c7c2','#8e1b22','#c4471c','#d9a21b','#2f6b3a','#1f3f8f','#5b2a74']
+    .map(function(c){return '<span style="background:'+c+'"></span>';}).join('');
+
+  // ---- ARCHIVO ledger: example lots, replace with real pieces ----
+  var LOTS=[
+    ['A-001','Single-stitch tour tee','’89','XL','Logging','#2e2d2c','#8b8985'],
+    ['A-002','Rap promo tee, cracked print','’93','L','Logging','#4a4947','#d9d7d2'],
+    ['A-003','Rave flyer longsleeve','’96','L','Logging','#1c1c1b','#6f6d69'],
+    ['A-004','Swap meet airbrush tee','’98','XL','Logging','#7a7874','#1c1c1b'],
+    ['A-005','Record store staff tee','’01','M','Logging','#3a3938','#bdbbb6'],
+    ['A-006','Sealed','??','—','Hold','#242423','#3c3b39']
+  ];
+  function fold(b,c,k){
+    var p=k===5?'<text x="50" y="62" text-anchor="middle" font-family="Archivo" font-size="18" fill="'+c+'">?</text>'
+         :'<text x="50" y="61" text-anchor="middle" font-family="'+OLD+'" font-size="20" fill="'+c+'" opacity=".8">'+'SSSSS'[k]+'</text>';
+    return '<svg viewBox="0 0 100 90"><path d="M14 26l18-12h36l18 12-6 14H20z" fill="'+b+'" stroke="#000"/><rect x="20" y="30" width="60" height="50" rx="3" fill="'+b+'" stroke="#000"/><path d="M38 14q12 10 24 0" fill="none" stroke="#000" stroke-width="3"/>'+p+'</svg>';
+  }
+  document.getElementById('ledger').innerHTML='<div class="lr h mono"><span></span><span>Lot</span><span>Piece</span><span class="hide-sm">Era</span><span class="hide-sm">Size</span><span class="st">Status</span></div>'+
+    LOTS.map(function(l,k){return '<div class="lr">'+fold(l[5],l[6],k)+'<span class="mono">'+l[0]+'</span><span class="pc">'+l[1]+'</span><span class="mono hide-sm">'+l[2]+'</span><span class="mono hide-sm">'+l[3]+'</span><span class="mono st'+(l[4]==='Hold'?' hot':'')+'">'+l[4]+'</span></div>';}).join('');
+
+  // clock + year
+  var clk=document.getElementById('clock');
+  function tick(){try{clk.textContent='LA '+new Date().toLocaleTimeString('en-US',{timeZone:'America/Los_Angeles',hour12:false});}catch(e){}}
+  tick();setInterval(tick,1000);
   document.getElementById('yr').textContent=new Date().getFullYear();
 
-  // film grain (photo texture, slow)
+  // rare glitch on the wordmark (3EAS layer)
+  var mark=document.getElementById('mark');
+  if(!reduce) setInterval(function(){mark.classList.remove('glitch');void mark.offsetWidth;mark.classList.add('glitch');},6500);
+
+  // film grain
   var g=document.getElementById('grain'),gx=g.getContext('2d');
   function size(){g.width=Math.ceil(innerWidth/3);g.height=Math.ceil(innerHeight/3);}
   function grain(){var img=gx.createImageData(g.width,g.height),d=img.data;for(var i=0;i<d.length;i+=4){var v=Math.random()*255|0;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255;}gx.putImageData(img,0,0);}
   size();grain();addEventListener('resize',function(){size();grain();});
-  if(!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)) setInterval(grain,120);
+
+  // waveform (grey, red centre)
+  var wv=document.getElementById('wave'),wx=wv.getContext('2d'),t=0;
+  function wave(){var W=wv.width,H=wv.height;wx.clearRect(0,0,W,H);
+    for(var x=0;x<W;x+=6){var a=Math.sin(x*.011+t)*.5+Math.sin(x*.029-t*1.6)*.3+(Math.random()-.5)*.22,env=Math.sin(Math.PI*x/W),h=Math.abs(a)*env*H*.9+2;
+      wx.fillStyle=(x/W>.46&&x/W<.54)?'#c23a22':'#55534f';wx.fillRect(x,(H-h)/2,3,h);}}
+  wave();
+  if(!reduce){var last=0;(function loop(ts){if(ts-last>110){grain();t+=.08;wave();last=ts;}requestAnimationFrame(loop);})(0);}
 })();
 </script>
 </body>
