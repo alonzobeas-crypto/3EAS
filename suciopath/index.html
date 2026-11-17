@@ -74,6 +74,13 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:61;
 .drip{width:min(74vw,1000px);height:38px;margin-top:-.4vw;opacity:.9}
 .under{margin-top:18px;display:flex;align-items:center;gap:22px}
 .under .rule{width:min(12vw,140px);height:1px;background:var(--g3)}
+/* "Created by DJ Antiq" credit */
+.credit{position:relative;display:flex;align-items:center;gap:16px;margin-bottom:8px}
+.credit .rule{width:min(8vw,90px);height:1px;background:var(--g3)}
+.credit .who{font-family:var(--script);font-size:clamp(40px,5vw,64px);color:var(--ink);line-height:.6;margin-left:-4px}
+.sig{text-align:center;padding:70px 20px 60px}
+.sig .lbl{display:block;margin-bottom:6px}
+.sig .who{font-family:var(--script);font-size:clamp(70px,10vw,140px);color:var(--g1);line-height:1;display:inline-block;transform:rotate(-4deg)}
 .under .la{font-family:var(--script);font-size:clamp(42px,6vw,76px);color:var(--g1);line-height:.6}
 .corner{position:absolute;bottom:20px;display:flex;flex-direction:column;gap:6px}
 .corner.l{left:20px}.corner.r{right:20px;text-align:right}
@@ -178,6 +185,7 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
 <div class="hero">
   <svg class="smoke" aria-hidden="true"><rect width="100%" height="100%" filter="url(#smokeF)"/></svg>
   <svg class="rays" viewBox="-850 -850 1700 1700" id="rays" aria-hidden="true"></svg>
+  <div class="credit"><span class="rule"></span><span class="lbl">Created by</span><span class="who">DJ Antiq</span><span class="rule"></span></div>
   <h1 class="mark" id="mark"><span class="sh" aria-hidden="true">Suciopath</span><span class="fg">Suciopath</span><span class="gl" aria-hidden="true">Suciopath</span></h1>
   <svg class="drip" viewBox="0 0 1000 38" preserveAspectRatio="none" aria-hidden="true">
     <path fill="#1a1918" stroke="#4a4846" stroke-width=".8" d="M0 0h1000v3c-14 0-16 5-18 12s-5 8-7 0-5-12-38-12-28 20-32 27-8 7-9-1-3-26-50-26-74 3-98 3-15 15-17 19-7 2-7-5 0-15-62-15-110 5-148 5-12 24-17 31-7 7-8-3-3-31-50-31-98 2-134 2-20 10-22 13-5 0-6-3-8-12-74-12-62 7-86 7-10 18-15 23-7 5-7-5S95 3 0 3z"/>
@@ -216,6 +224,7 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
 </section>
 </main>
 
+<div class="sig"><span class="lbl">Created by</span><span class="who">DJ Antiq</span></div>
 <footer>
   <div class="links mono"><span>Suciopath © <span id="yr">2026</span> / Los Angeles</span><a href="/">Broadcast through 3EAS Cortex</a></div>
   <div class="big" aria-hidden="true">Suciopath</div>
