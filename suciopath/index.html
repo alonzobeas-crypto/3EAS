@@ -146,6 +146,10 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:61;
 @media(max-width:720px){.lr{grid-template-columns:48px 50px 1fr 58px;gap:10px}.lr .hide-sm{display:none}.lr svg{width:46px}.lr .pc{font-size:13px}}
 
 /* frequency */
+.mix{width:min(100%,720px);margin:0 auto 34px;text-align:left;border:1px solid var(--line);background:#0d0d0c;padding:12px 12px 8px}
+.mix-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:10px}
+.mix-head .mono{color:var(--g1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mix iframe{display:block;border:0}
 .freq{text-align:center;padding:120px 20px}
 .freq h2{font-family:var(--old);font-weight:normal;font-size:clamp(60px,9vw,130px);line-height:.95;margin:14px 0 26px}
 .wave{display:block;width:min(100%,720px);height:64px;margin:0 auto 34px}
@@ -224,7 +228,7 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
 <header class="nav">
   <div class="l"><a class="lbl" href="#lookbook">Drop 001</a><a class="lbl" href="#archivo">Archivo</a></div>
   <a class="logo" href="#top" aria-label="Suciopath">Suciopath</a>
-  <div class="r"><a class="lbl" href="https://www.instagram.com/dj_antiq/" target="_blank" rel="noopener">Instagram</a><a class="lbl" href="#frecuencia">The List</a></div>
+  <div class="r"><a class="lbl" href="https://www.mixcloud.com/anthony-antiq-salda%C3%B1a/" target="_blank" rel="noopener">Mixcloud</a><a class="lbl" href="https://www.instagram.com/dj_antiq/" target="_blank" rel="noopener">Instagram</a><a class="lbl" href="#frecuencia">The List</a></div>
 </header>
 
 <main id="top">
@@ -264,8 +268,14 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
   <span class="lbl">The List</span>
   <h2>Get on the Frequency</h2>
   <canvas class="wave" id="wave" width="1440" height="128" aria-hidden="true"></canvas>
+  <!-- newest Mixcloud upload, looked up in the visitor's browser; stays hidden if the lookup fails -->
+  <div class="mix" id="mix" hidden>
+    <div class="mix-head"><span class="lbl">Latest Mix</span><span class="mono" id="mixName"></span></div>
+    <iframe id="mixFrame" title="DJ Antiq on Mixcloud" width="100%" height="60" frameborder="0" allow="autoplay; encrypted-media"></iframe>
+  </div>
   <div class="btns">
     <a class="btn solid" href="https://ig.me/m/dj_antiq" target="_blank" rel="noopener">DM “Sucio”</a>
+    <a class="btn" href="https://www.mixcloud.com/anthony-antiq-salda%C3%B1a/" target="_blank" rel="noopener">Mixcloud ↗</a>
     <a class="btn" href="https://www.instagram.com/dj_antiq/" target="_blank" rel="noopener">@dj_antiq</a>
   </div>
 </section>
@@ -273,7 +283,7 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
 
 <div class="sig"><span class="lbl">Created by</span><span class="who">DJ Antiq</span></div>
 <footer>
-  <div class="links mono"><span>Suciopath © <span id="yr">2026</span> / Los Angeles</span><a href="/">Broadcast through 3EAS Cortex</a></div>
+  <div class="links mono"><span>Suciopath © <span id="yr">2026</span> / Los Angeles</span><a href="https://www.mixcloud.com/anthony-antiq-salda%C3%B1a/" target="_blank" rel="noopener">Mixcloud</a><a href="/">Broadcast through 3EAS Cortex</a></div>
   <div class="big" aria-hidden="true">Suciopath</div>
 </footer>
 
@@ -395,6 +405,19 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
   function size(){g.width=Math.ceil(innerWidth/3);g.height=Math.ceil(innerHeight/3);}
   function grain(){var img=gx.createImageData(g.width,g.height),d=img.data;for(var i=0;i<d.length;i+=4){var v=Math.random()*255|0;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255;}gx.putImageData(img,0,0);}
   size();grain();addEventListener('resize',function(){size();grain();});
+
+  // Mixcloud: newest upload via the public API (JSONP, no key). Any failure leaves the player hidden; the links still work.
+  window.sucioMix=function(d){
+    try{
+      var c=d&&d.data&&d.data[0]; if(!c) return;
+      document.getElementById('mixFrame').src='https://player-widget.mixcloud.com/widget/iframe/?mini=1&hide_cover=1&hide_artwork=1&feed='+encodeURIComponent(decodeURIComponent(c.key)); // key may arrive with the ñ already %-encoded
+      document.getElementById('mixName').textContent=c.name||'';
+      document.getElementById('mix').hidden=false;
+    }catch(e){}
+  };
+  var mjs=document.createElement('script');
+  mjs.src='https://api.mixcloud.com/anthony-antiq-salda%C3%B1a/cloudcasts/?limit=1&callback=sucioMix';
+  mjs.async=true; document.body.appendChild(mjs);
 
   // waveform (grey, red centre)
   var wv=document.getElementById('wave'),wx=wv.getContext('2d'),t=0;
