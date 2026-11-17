@@ -16,7 +16,9 @@
 <link rel="icon" href="/assets/app-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@600&family=Herr+Von+Muellerhoff&family=Oswald:wght@300;500;700&family=Barlow:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Herr+Von+Muellerhoff&family=Oswald:wght@300;500;700&family=Barlow:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<!-- capital S only: Unifraktur's S reads like a G, so the S comes from Grenze Gotisch (text=S loads just that glyph) -->
+<link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@500&text=S&display=swap" rel="stylesheet">
 <style>
 /* SUCIOPATH — LA streetwear by DJ Antiq (Anthony Saldana). Sub-signal of 3EAS CORTEX.
    Look: black-and-grey Chicano tattoo. Old English + fine-line script, smoke, soft grey gradients.
@@ -24,7 +26,7 @@
 :root{
   --bg:#0a0a0a;--ink:#ecebe8;--g1:#b9b7b2;--g2:#8a8884;--g3:#55534f;--g4:#2a2928;--g5:#161615;
   --line:rgba(185,183,178,.22);
-  --old:'Grenze Gotisch',serif;--script:'Herr Von Muellerhoff',cursive;
+  --old:'Grenze Gotisch','UnifrakturMaguntia',serif;--script:'Herr Von Muellerhoff',cursive;
   --cond:'Oswald',sans-serif;--body:'Barlow',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -287,7 +289,7 @@ footer a{color:var(--g2)} footer a:hover{color:var(--ink)}
     if(f[2]==='c') pr='<circle cx="50" cy="52" r="13" fill="none" stroke="'+c+'" stroke-width="2"/><circle cx="50" cy="52" r="4" fill="'+c+'"/>';
     if(f[2]==='b') pr='<rect x="34" y="42" width="32" height="20" fill="none" stroke="'+c+'" stroke-width="2"/><path d="M38 48h24M38 54h18" stroke="'+c+'" stroke-width="2"/>';
     if(f[2]==='r') pr='<path d="M32 60l8-16 8 10 6-8 12 14z" fill="'+c+'"/>';
-    if(f[2]==='s') pr='<text x="50" y="62" text-anchor="middle" font-family="Grenze Gotisch" font-size="24" fill="'+c+'">S</text>';
+    if(f[2]==='s') pr='<text x="50" y="62" text-anchor="middle" font-family="Grenze Gotisch, UnifrakturMaguntia" font-size="24" fill="'+c+'">S</text>';
     if(f[2]==='l') pr='<path d="M34 56q8-14 16 0t16 0" fill="none" stroke="'+c+'" stroke-width="2"/>';
     if(f[2]==='q') pr='<text x="50" y="62" text-anchor="middle" font-family="Oswald" font-size="20" fill="'+c+'">?</text>';
     sv.innerHTML='<path d="M14 26l18-12h36l18 12-6 14H20z" fill="'+f[0]+'" stroke="#0a0a0a"/><rect x="20" y="30" width="60" height="50" rx="3" fill="'+f[0]+'" stroke="#0a0a0a"/>'+
@@ -313,17 +315,17 @@ footer a{color:var(--g2)} footer a:hover{color:var(--ink)}
   function gfx(d){
     var c=d.ink;
     switch(d.gfx){
-      case 'old': return '<text x="150" y="132" text-anchor="middle" font-family="Grenze Gotisch" font-size="34" fill="'+c+'">Suciopath</text>'+
+      case 'old': return '<text x="150" y="132" text-anchor="middle" font-family="Grenze Gotisch, UnifrakturMaguntia" font-size="34" fill="'+c+'">Suciopath</text>'+
         '<text x="150" y="152" text-anchor="middle" font-family="Oswald" font-size="7" letter-spacing="4" fill="'+c+'">LOS ANGELES · CALIFORNIA</text>';
       case 'stack': return '<path d="M150 158C122 138 119 115 133 108c9-4 14 2 17 8 3-6 8-12 17-8 14 7 11 30-17 50z" fill="'+c+'"/>'+
         '<path d="M146 106c-3-7 2-10 2-17 3 3 3 7 3 10 2-5 5-7 5-12 3 5 3 12 0 19" fill="'+c+'"/>'+
         (function(){var o='';for(var i=0;i<11;i++){var a=(-160+14*i)*Math.PI/180;o+='<line x1="'+(150+Math.cos(a)*34).toFixed(1)+'" y1="'+(128+Math.sin(a)*34).toFixed(1)+'" x2="'+(150+Math.cos(a)*46).toFixed(1)+'" y2="'+(128+Math.sin(a)*46).toFixed(1)+'" stroke="'+c+'" stroke-width="1"/>';}return o;})()+
-        '<text x="150" y="182" text-anchor="middle" font-family="Grenze Gotisch" font-size="14" fill="'+c+'">Suciopath</text>';
+        '<text x="150" y="182" text-anchor="middle" font-family="Grenze Gotisch, UnifrakturMaguntia" font-size="14" fill="'+c+'">Suciopath</text>';
       case 'script': return '<text x="150" y="132" text-anchor="middle" font-family="Herr Von Muellerhoff" font-size="50" fill="'+c+'" transform="rotate(-6 150 130)">Los Angeles</text>'+
-        '<text x="150" y="160" text-anchor="middle" font-family="Grenze Gotisch" font-size="14" fill="'+c+'">Suciopath</text>';
+        '<text x="150" y="160" text-anchor="middle" font-family="Grenze Gotisch, UnifrakturMaguntia" font-size="14" fill="'+c+'">Suciopath</text>';
       case 'record': var s='<circle cx="150" cy="128" r="34" fill="none" stroke="'+c+'" stroke-width="2"/>';
         for(var r=14;r<32;r+=4) s+='<circle cx="150" cy="128" r="'+r+'" fill="none" stroke="'+c+'" stroke-width=".6" opacity=".7"/>';
-        return s+'<text x="150" y="134" text-anchor="middle" font-family="Grenze Gotisch" font-size="18" fill="'+c+'">S</text>'+
+        return s+'<text x="150" y="134" text-anchor="middle" font-family="Grenze Gotisch, UnifrakturMaguntia" font-size="18" fill="'+c+'">S</text>'+
           '<text x="150" y="180" text-anchor="middle" font-family="Oswald" font-size="9" letter-spacing="4" fill="'+c+'">SIDE A · VINYL ONLY</text>';
     }
     return '';
