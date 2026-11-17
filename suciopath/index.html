@@ -140,7 +140,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:61;
 .player .ph .mono{color:var(--g1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .player iframe{display:block;border:0}
 .mixes{display:grid;grid-template-columns:repeat(4,1fr);gap:18px 14px}
-.mx{text-align:left;display:block;width:100%}
+.mx{text-align:left;display:block;width:100%;align-self:start}
 .mx .art{position:relative;aspect-ratio:1;background:var(--g5);overflow:hidden}
 .mx img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.1) brightness(.85);transition:filter .35s,transform .5s}
 .mx:hover img,.mx.on img{filter:none;transform:scale(1.03)}
@@ -149,6 +149,11 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:61;
 .mx .no{position:absolute;top:10px;right:12px;font-family:var(--old);font-size:30px;color:var(--ink);text-shadow:0 2px 10px #000}
 .mx .t{display:block;margin-top:10px;font-stretch:118%;font-weight:600;font-size:13px;letter-spacing:.04em;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .mx .d{display:block;margin-top:4px}
+.mx .cover{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:14%;text-align:center;
+  background:radial-gradient(circle at 50% 45%,#3a3937 0%,#141413 62%),#141413}
+.mx .cover::before{content:"";position:absolute;inset:8%;border:1px solid var(--g3);border-radius:50%;box-shadow:inset 0 0 0 10px #121211,inset 0 0 0 11px var(--g4),inset 0 0 0 22px #121211,inset 0 0 0 23px var(--g4)}
+.mx .cover span{position:relative;font-family:var(--old);font-size:clamp(22px,2.6vw,36px);line-height:1.05;color:var(--ink);text-shadow:0 3px 14px #000}
+.mx .feat{position:absolute;top:12px;left:12px;color:var(--ink);background:var(--stain);padding:4px 8px;font-size:9px}
 .mix-fallback{display:flex;flex-direction:column;align-items:center;gap:10px;padding:56px 16px;border:1px solid var(--line);text-align:center;transition:border-color .2s}
 .mix-fallback:hover{border-color:var(--ink)}
 .mix-fallback .ft{font-family:var(--old);font-size:clamp(40px,6vw,72px);line-height:1}
@@ -434,36 +439,58 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
   function grain(){var img=gx.createImageData(g.width,g.height),d=img.data;for(var i=0;i<d.length;i+=4){var v=Math.random()*255|0;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255;}gx.putImageData(img,0,0);}
   size();grain();addEventListener('resize',function(){size();grain();});
 
-  // ---- MIXES: DJ Antiq's Mixcloud uploads via the public API (JSONP, no key) ----
-  // Fills the grid with his newest sets; tapping one plays it in the sticky player. If the lookup fails, the fallback link card stays.
+  // ---- MIXES: DJ Antiq's Mixcloud sets ----
+  // PINNED sets always show first and work without the API. His other uploads are added from the public API (JSONP, no key).
+  // To pin another set: add {key:'/anthony-antiq-salda%C3%B1a/<slug>/', name:'<Title>'} (slug = the part after his name in the share link).
+  var PINNED=[
+    {key:'/anthony-antiq-salda%C3%B1a/good-night-good-morning/', name:'Good Night Good Morning', pinned:true},
+    {key:'/anthony-antiq-salda%C3%B1a/crack-sweat/', name:'Crack Sweat', pinned:true}
+  ];
   var MC_USER='anthony-antiq-salda%C3%B1a';
   function esc(t){return String(t||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function dur(sec){sec=sec|0;var h=sec/3600|0,m=(sec%3600)/60|0,s2=sec%60;return (h?h+':'+('0'+m).slice(-2):m)+':'+('0'+s2).slice(-2);}
   function when(iso){try{return new Date(iso).toLocaleDateString('en-US',{month:'short',year:'numeric'});}catch(e){return '';}}
-  var MIXES=[];
-  function play(i,auto){
-    var c=MIXES[i]; if(!c) return;
+  function norm(k){try{return decodeURIComponent(k).replace(/\/+$/,'').toLowerCase();}catch(e){return String(k).toLowerCase();}}
+  var MIXES=[], current=null, touched=false;
+  var grid=document.getElementById('mixGrid'), more=document.getElementById('mixMore');
+  function play(key,auto){
+    var c=MIXES.filter(function(m){return norm(m.key)===norm(key);})[0]; if(!c) return;
+    current=c.key;
     document.getElementById('mixFrame').src='https://player-widget.mixcloud.com/widget/iframe/?mini=1&hide_cover=1&hide_artwork=1'+(auto?'&autoplay=1':'')+
       '&feed='+encodeURIComponent(decodeURIComponent(c.key)); // key may arrive with the ñ already %-encoded
     document.getElementById('npName').textContent=c.name||'';
     document.getElementById('player').hidden=false;
-    Array.prototype.forEach.call(document.querySelectorAll('.mx'),function(el,k){el.classList.toggle('on',k===i);el.querySelector('.play').textContent=k===i?'❚❚':'▶';});
+    Array.prototype.forEach.call(grid.querySelectorAll('.mx'),function(el){var on=norm(el.dataset.k)===norm(c.key);el.classList.toggle('on',on);el.querySelector('.play').textContent=on?'❚❚':'▶';});
   }
+  function render(){
+    grid.innerHTML=MIXES.map(function(c,i){
+      var pic=c.pictures||{}, img=pic['640wx640h']||pic.extra_large||pic.large||pic.medium||'';
+      var art=img?'<img loading="lazy" alt="" src="'+esc(img)+'">'
+                 :'<span class="cover"><span>'+esc(c.name)+'</span></span>'; // no artwork yet: blackletter title card
+      var meta=c.pinned&&!c.created_time?'Featured set':when(c.created_time)+(c.audio_length?' / '+dur(c.audio_length):'');
+      return '<button class="mx'+(c.pinned?' pin':'')+'" type="button" data-k="'+esc(c.key)+'"><div class="art">'+art+
+        '<span class="no">'+('0'+(i+1)).slice(-2)+'</span><span class="play">▶</span>'+(c.pinned?'<span class="feat lbl">Featured</span>':'')+'</div>'+
+        '<span class="t">'+esc(c.name)+'</span><span class="d mono">'+meta+'</span></button>';
+    }).join('');
+    document.getElementById('mixFallback').hidden=MIXES.length>0;
+    more.hidden=!(MIXES.length>6&&!grid.classList.contains('all'));
+    if(current) play(current,false);
+  }
+  grid.addEventListener('click',function(e){var b=e.target.closest('.mx');if(b){touched=true;play(b.dataset.k,true);document.getElementById('player').scrollIntoView({behavior:'smooth',block:'nearest'});}});
+  more.querySelector('button').addEventListener('click',function(){grid.classList.add('all');more.hidden=true;});
+  MIXES=PINNED.slice(); render(); play(PINNED[0].key,false);
+
   window.sucioMixes=function(d){
     try{
-      MIXES=(d&&d.data)||[]; if(!MIXES.length) return;
-      var grid=document.getElementById('mixGrid');
-      grid.innerHTML=MIXES.map(function(c,i){
-        var pic=c.pictures||{}, img=pic['640wx640h']||pic.extra_large||pic.large||pic.medium||'';
-        return '<button class="mx" type="button" data-i="'+i+'"><div class="art">'+(img?'<img loading="lazy" alt="" src="'+esc(img)+'">':'')+
-          '<span class="no">'+('0'+(i+1)).slice(-2)+'</span><span class="play">▶</span></div>'+
-          '<span class="t">'+esc(c.name)+'</span><span class="d mono">'+when(c.created_time)+(c.audio_length?' / '+dur(c.audio_length):'')+'</span></button>';
-      }).join('');
-      grid.addEventListener('click',function(e){var b=e.target.closest('.mx');if(b){play(+b.dataset.i,true);document.getElementById('player').scrollIntoView({behavior:'smooth',block:'nearest'});}});
-      document.getElementById('mixFallback').hidden=true;
-      if(MIXES.length>6){var mm=document.getElementById('mixMore');mm.hidden=false;
-        mm.querySelector('button').addEventListener('click',function(){grid.classList.add('all');mm.hidden=true;});}
-      play(0,false);
+      var api=(d&&d.data)||[]; if(!api.length) return;
+      var pinned=PINNED.map(function(p){ // borrow artwork/date/length for pinned sets from the API when it has them
+        var hit=api.filter(function(a){return norm(a.key)===norm(p.key);})[0];
+        return hit?Object.assign({},hit,{pinned:true,name:hit.name||p.name}):p;
+      });
+      var rest=api.filter(function(a){return !PINNED.some(function(p){return norm(p.key)===norm(a.key);});});
+      MIXES=pinned.concat(rest);
+      if(!touched) current=MIXES[0].key;
+      render();
     }catch(e){}
   };
   var mjs=document.createElement('script');
