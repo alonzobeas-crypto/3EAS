@@ -16,17 +16,18 @@
 <link rel="icon" href="/assets/app-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Herr+Von+Muellerhoff&family=Archivo:wdth,wght@100..125,300..700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<!-- capital S only: Unifraktur's S reads like a G, so every capital S comes from Fruktur (text=S loads just that glyph) -->
-<link href="https://fonts.googleapis.com/css2?family=Fruktur&text=S&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Herr+Von+Muellerhoff&family=Archivo:wdth,wght@100..125,300..700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<!-- Suciopath Fraktur = UnifrakturMaguntia (OFL) with the capital S redrawn from its own round s, so it reads S, not G. See fonts/OFL.txt -->
+<link rel="preload" href="fonts/SuciopathFraktur.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 /* SUCIOPATH — LA streetwear by DJ Antiq. Sub-signal of 3EAS CORTEX.
-   Blackletter (Unifraktur + Fruktur S) in black-and-grey tattoo dimension, wide grotesk for fashion labels,
+   Blackletter (Suciopath Fraktur: Unifraktur with its own s as the capital S) in black-and-grey tattoo dimension, wide grotesk for fashion labels,
    Share Tech Mono for the 3EAS signal layer. One red stain, used sparingly. Colour lives on the garments. */
+@font-face{font-family:'Suciopath Fraktur';src:url('fonts/SuciopathFraktur.woff2') format('woff2');font-display:swap}
 :root{
   --bg:#070707;--ink:#eeece8;--g1:#bdbbb6;--g2:#8b8985;--g3:#55534f;--g4:#262524;--g5:#121211;
   --stain:#c23a22;--line:rgba(189,187,182,.16);
-  --old:'Fruktur','UnifrakturMaguntia',serif;--script:'Herr Von Muellerhoff',cursive;
+  --old:'Suciopath Fraktur',serif;--script:'Herr Von Muellerhoff',cursive;
   --wide:'Archivo',sans-serif;--mono:'Share Tech Mono',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -60,7 +61,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:61;
 .rays{position:absolute;left:50%;top:48%;width:1700px;height:1700px;transform:translate(-50%,-50%);opacity:.5;pointer-events:none}
 .smoke{position:absolute;left:-10%;top:-10%;width:120%;height:120%;opacity:.16;pointer-events:none}
 .mark{position:relative;isolation:isolate;font-family:var(--old);font-weight:normal;font-size:clamp(76px,17.5vw,270px);line-height:1;white-space:nowrap}
-.mark span{display:block}
+.mark span{display:block;padding-top:.18em;margin-top:-.18em}
 /* chrome face */
 .mark .fg{background:linear-gradient(180deg,#fff 0%,#e9e7e2 34%,#9c9a95 49%,#4a4846 51%,#cfcdc8 60%,#8d8b86 82%,#f4f2ee 100%);
   -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:.6px rgba(255,255,255,.35)}
@@ -232,7 +233,7 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
 
 <script>
 (function(){
-  var OLD = 'Fruktur, UnifrakturMaguntia';
+  var OLD = 'Suciopath Fraktur';
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // halo rays
