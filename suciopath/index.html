@@ -77,13 +77,15 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:61;
 .under{margin-top:18px;display:flex;align-items:center;gap:22px}
 .under .rule{width:min(12vw,140px);height:1px;background:var(--g3)}
 /* "Created by DJ Antiq" credit */
-.credit{position:relative;display:flex;align-items:center;gap:16px;margin-bottom:8px}
-.credit .rule{width:min(8vw,90px);height:1px;background:var(--g3)}
-.credit .who{font-family:var(--script);font-size:clamp(40px,5vw,64px);color:var(--ink);line-height:.6;margin-left:-4px}
 .sig{text-align:center;padding:70px 20px 60px}
 .sig .lbl{display:block;margin-bottom:6px}
 .sig .who{font-family:var(--script);font-size:clamp(70px,10vw,140px);color:var(--g1);line-height:1;display:inline-block;transform:rotate(-4deg)}
-.under .la{font-family:var(--script);font-size:clamp(42px,6vw,76px);color:var(--g1);line-height:.6}
+/* by DJ Antiq / Hecho en Los Angeles · Est. 1975 */
+.byline{position:relative;margin-top:22px;font-family:var(--script);font-size:clamp(50px,6.6vw,88px);line-height:.8;color:var(--ink);transform:rotate(-3deg)}
+.byline .by{color:var(--g2);font-size:.62em;margin-right:.08em}
+.byline+.under{margin-top:34px}
+.under .hecho{font-size:11px;letter-spacing:.36em;color:var(--g1)}
+.under .dot{color:var(--stain);font-size:10px}
 .corner{position:absolute;bottom:20px;display:flex;flex-direction:column;gap:6px}
 .corner.l{left:20px}.corner.r{right:20px;text-align:right}
 .scroll{position:absolute;bottom:22px;left:50%;transform:translateX(-50%)}
@@ -208,9 +210,10 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
   /* hero: let the wordmark own the screen */
   .hero{height:calc(100svh - 96px);min-height:520px;padding-bottom:70px}
   .mark{font-size:21.5vw}
-  .credit{gap:10px;margin-bottom:4px}.credit .rule{width:22px}.credit .who{font-size:36px}
+  .byline{font-size:52px;margin-top:16px}
+  .byline+.under{margin-top:26px}
   .drip{width:88vw;height:26px}
-  .under{margin-top:14px;gap:12px}.under .rule{width:40px}.under .la{font-size:44px}
+  .under{margin-top:16px;gap:9px}.under .rule{width:18px}.under .hecho{font-size:9px;letter-spacing:.26em}
   .scroll{bottom:26px}
   /* section heads */
   .sec{padding:76px 16px 24px}
@@ -264,13 +267,13 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
 <div class="hero">
   <svg class="smoke" aria-hidden="true"><rect width="100%" height="100%" filter="url(#smokeF)"/></svg>
   <svg class="rays" viewBox="-850 -850 1700 1700" id="rays" aria-hidden="true"></svg>
-  <div class="credit"><span class="rule"></span><span class="lbl">Created by</span><span class="who">DJ Antiq</span><span class="rule"></span></div>
   <h1 class="mark" id="mark"><span class="sh" aria-hidden="true">Suciopath</span><span class="fg">Suciopath</span><span class="gl" aria-hidden="true">Suciopath</span></h1>
   <svg class="drip" viewBox="0 0 1000 38" preserveAspectRatio="none" aria-hidden="true">
     <path fill="#1a1918" stroke="#4a4846" stroke-width=".8" d="M0 0h1000v3c-14 0-16 5-18 12s-5 8-7 0-5-12-38-12-28 20-32 27-8 7-9-1-3-26-50-26-74 3-98 3-15 15-17 19-7 2-7-5 0-15-62-15-110 5-148 5-12 24-17 31-7 7-8-3-3-31-50-31-98 2-134 2-20 10-22 13-5 0-6-3-8-12-74-12-62 7-86 7-10 18-15 23-7 5-7-5S95 3 0 3z"/>
     <circle cx="566" cy="33" r="3.2" fill="#c23a22"/>
   </svg>
-  <div class="under"><span class="rule"></span><span class="la">Los Angeles</span><span class="rule"></span></div>
+  <div class="byline"><span class="by">by</span> DJ Antiq</div>
+  <div class="under"><span class="rule"></span><span class="lbl hecho">Hecho en Los Angeles</span><span class="dot">✦</span><span class="lbl hecho">Est. 1975</span><span class="rule"></span></div>
   <div class="corner l"><span class="lbl">Drop 001</span><span class="mono">FW26 / Tees + Archivo</span></div>
   <div class="corner r"><span class="lbl">DJ Antiq</span><span class="mono" id="clock">LA --:--:--</span></div>
   <div class="scroll"><a href="#lookbook">View Lookbook</a></div>
@@ -321,7 +324,7 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
 
 <div class="sig"><span class="lbl">Created by</span><span class="who">DJ Antiq</span></div>
 <footer>
-  <div class="links mono"><span>Suciopath © <span id="yr">2026</span> / Los Angeles</span><a href="https://www.mixcloud.com/anthony-antiq-salda%C3%B1a/" target="_blank" rel="noopener">Mixcloud</a><a href="/">Broadcast through 3EAS Cortex</a></div>
+  <div class="links mono"><span>Suciopath © <span id="yr">2026</span> / Hecho en Los Angeles / Est. 1975</span><a href="https://www.mixcloud.com/anthony-antiq-salda%C3%B1a/" target="_blank" rel="noopener">Mixcloud</a><a href="/">Broadcast through 3EAS Cortex</a></div>
   <div class="big" aria-hidden="true">Suciopath</div>
 </footer>
 
