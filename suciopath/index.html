@@ -111,19 +111,21 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:61;
 .lk .back{position:absolute;opacity:0;transform:scale(.96)}
 .lk.flip .front{opacity:0;transform:scale(.96)}
 .lk.flip .back{opacity:1;transform:scale(1)}
-@media(hover:hover){.lk:hover .front{opacity:0;transform:scale(.96)}.lk:hover .back{opacity:1;transform:scale(1)}}
+@media(hover:hover){.lk:not(.pairlk):hover .front{opacity:0;transform:scale(.96)}.lk:not(.pairlk):hover .back{opacity:1;transform:scale(1)}}
 .lk .tag{position:absolute;top:16px;left:18px;right:18px;display:flex;justify-content:space-between;z-index:2}
 .lk .side::after{content:"Front";}
 .lk.flip .side::after{content:"Back"}
-@media(hover:hover){.lk:hover .side::after{content:"Back"}}
+@media(hover:hover){.lk:not(.pairlk):hover .side::after{content:"Back"}}
 .lk .num{font-family:var(--old);font-size:64px;line-height:1;position:absolute;left:18px;top:46px;color:var(--g4);-webkit-text-stroke:1px var(--g3)}
 .lk .meta{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:16px 18px;border-top:1px solid var(--line);background:rgba(7,7,7,.4)}
 .lk .nm{font-stretch:125%;font-weight:600;font-size:13px;letter-spacing:.16em;text-transform:uppercase}
 .lk .cw{margin-top:6px;display:flex;gap:8px;align-items:center}
-.lk .vr{display:flex;gap:6px;margin-top:10px}
-.lk .vr button{font-family:var(--old);font-size:19px;line-height:1;padding:6px 12px 5px;border:1px solid var(--g3);color:var(--g1);transition:.2s}
-.lk .vr button:hover{border-color:var(--ink);color:var(--ink)}
-.lk .vr button.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+/* Look 01: two tees in one box */
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:1%;width:100%;padding:0 1%;align-items:center}
+.pair .one{position:relative;display:flex;flex-direction:column;align-items:center}
+.lk .pair svg.tee{width:100%}
+.lk .pair .back{top:0;left:0}
+.pair .cap{margin-top:6px;font-family:var(--old);font-size:clamp(18px,2vw,28px);color:var(--g1)}
 .lk .sw{width:10px;height:10px;border-radius:50%;border:1px solid var(--g3)}
 .lk .px{font-stretch:125%;font-weight:500;font-size:13px;letter-spacing:.1em;text-align:right}
 .lk .sz{margin-top:6px;display:flex;gap:10px;justify-content:flex-end}
@@ -345,8 +347,8 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
 
   // ---- DROP 001: edit here. status: "soon" | "live" | "gone"; add url when live ----
   var DROP=[
-    // Look 01 comes in two names: Suciopath / Suciapath (the switch on the card swaps the back print)
-    {name:'Suciopath', variants:['Suciopath','Suciapath'], price:40, cw:'Black / grey ink', tee:'#141414', ink:'#c9c7c2', front:'chestS', back:'arch', status:'soon'},
+    // Look 01 = two tees in one box: Suciopath + Suciapath, side by side (opens on the backs, where the names differ)
+    {name:'Suciopath / Suciapath', variants:['Suciopath','Suciapath'], price:40, cw:'Black / grey ink', tee:'#141414', ink:'#c9c7c2', front:'chestS', back:'arch', status:'soon'},
     {name:'Sagrado',           price:40, cw:'Heather grey / black',tee:'#9b9994', ink:'#151515', front:'chestHeart',back:'heart', status:'soon'},
     {name:'Los Angeles',       price:45, cw:'Cherry / bone',       tee:'#8e1b22', ink:'#efe9dc', front:'chestWord', back:'script', status:'soon'},
     {name:'Side A',            price:45, cw:'Cobalt / white',      tee:'#1f3f8f', ink:'#f4f4f2', front:'chestS',   back:'record', status:'soon'}
@@ -397,26 +399,16 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
   look.innerHTML=DROP.map(function(d,i){
     var n=('0'+(i+1)).slice(-2);
     var cta=d.status==='live'&&d.url?'<a class="lbl" href="'+d.url+'" style="color:var(--ink)">Buy ↗</a>':'<span class="lbl"'+(d.status==='gone'?' style="color:var(--stain)"':'')+'>'+BADGE[d.status]+'</span>';
-    return '<article class="lk" tabindex="0"><div class="tag"><span class="lbl">Look '+n+'</span><span class="lbl side"></span></div>'+
-      '<div class="stage">'+tee(d,i,'front')+tee(d,i,'back')+'</div><span class="num" aria-hidden="true">'+n+'</span>'+
+    return '<article class="lk'+(d.variants?' pairlk flip':'')+'" tabindex="0"><div class="tag"><span class="lbl">Look '+n+'</span><span class="lbl side"></span></div>'+
+      '<div class="stage">'+(d.variants
+        ? '<div class="pair">'+d.variants.map(function(w,k){return '<div class="one">'+tee(d,i+'v'+k,'front',w)+tee(d,i+'v'+k,'back',w)+'<span class="cap">'+w+'</span></div>';}).join('')+'</div>'
+        : tee(d,i,'front')+tee(d,i,'back'))+'</div><span class="num" aria-hidden="true">'+n+'</span>'+
       '<div class="meta"><div><div class="nm">'+d.name+'</div>'+
-      (d.variants?'<div class="vr" role="group" aria-label="Version">'+d.variants.map(function(v,k){return '<button type="button" data-i="'+i+'" data-v="'+k+'"'+(k?'':' class="on"')+'>'+v+'</button>';}).join('')+'</div>':'')+
       '<div class="cw"><span class="sw" style="background:'+d.tee+'"></span><span class="mono">'+d.cw+'</span></div></div>'+
       '<div><div class="px">$'+d.price+'</div><div class="sz mono">S M L XL XXL</div><div style="text-align:right;margin-top:6px">'+cta+'</div></div></div></article>';
   }).join('');
   Array.prototype.forEach.call(look.querySelectorAll('.lk'),function(el){
-    function t(e){
-      if(e.target.closest('a'))return;
-      var vb=e.target.closest('.vr button');
-      if(vb){ // version switch: re-draw the tee with the chosen name and show the back, where the name is printed
-        var d=DROP[+vb.dataset.i], w=d.variants[+vb.dataset.v];
-        el.querySelector('.stage').innerHTML=tee(d,+vb.dataset.i,'front',w)+tee(d,+vb.dataset.i,'back',w);
-        el.querySelector('.nm').textContent=w;
-        Array.prototype.forEach.call(el.querySelectorAll('.vr button'),function(b){b.classList.toggle('on',b===vb);});
-        el.classList.add('flip'); return;
-      }
-      el.classList.toggle('flip');
-    }
+    function t(e){ if(e.target.closest('a'))return; el.classList.toggle('flip'); }
     el.addEventListener('click',t);
     el.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();el.classList.toggle('flip');} });
   });
