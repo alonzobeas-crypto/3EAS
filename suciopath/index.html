@@ -116,10 +116,14 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:61;
 .lk .side::after{content:"Front";}
 .lk.flip .side::after{content:"Back"}
 @media(hover:hover){.lk:hover .side::after{content:"Back"}}
-.lk .num{font-family:var(--old);font-size:64px;line-height:1;position:absolute;left:18px;bottom:78px;color:var(--g4);-webkit-text-stroke:1px var(--g3)}
+.lk .num{font-family:var(--old);font-size:64px;line-height:1;position:absolute;left:18px;top:46px;color:var(--g4);-webkit-text-stroke:1px var(--g3)}
 .lk .meta{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:16px 18px;border-top:1px solid var(--line);background:rgba(7,7,7,.4)}
 .lk .nm{font-stretch:125%;font-weight:600;font-size:13px;letter-spacing:.16em;text-transform:uppercase}
 .lk .cw{margin-top:6px;display:flex;gap:8px;align-items:center}
+.lk .vr{display:flex;gap:6px;margin-top:10px}
+.lk .vr button{font-family:var(--old);font-size:19px;line-height:1;padding:6px 12px 5px;border:1px solid var(--g3);color:var(--g1);transition:.2s}
+.lk .vr button:hover{border-color:var(--ink);color:var(--ink)}
+.lk .vr button.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .lk .sw{width:10px;height:10px;border-radius:50%;border:1px solid var(--g3)}
 .lk .px{font-stretch:125%;font-weight:500;font-size:13px;letter-spacing:.1em;text-align:right}
 .lk .sz{margin-top:6px;display:flex;gap:10px;justify-content:flex-end}
@@ -341,7 +345,8 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
 
   // ---- DROP 001: edit here. status: "soon" | "live" | "gone"; add url when live ----
   var DROP=[
-    {name:'Suciopath Classic', price:40, cw:'Black / grey ink',    tee:'#141414', ink:'#c9c7c2', front:'chestS',   back:'arch',   status:'soon'},
+    // Look 01 comes in two names: Suciopath / Suciapath (the switch on the card swaps the back print)
+    {name:'Suciopath', variants:['Suciopath','Suciapath'], price:40, cw:'Black / grey ink', tee:'#141414', ink:'#c9c7c2', front:'chestS', back:'arch', status:'soon'},
     {name:'Sagrado',           price:40, cw:'Heather grey / black',tee:'#9b9994', ink:'#151515', front:'chestHeart',back:'heart', status:'soon'},
     {name:'Los Angeles',       price:45, cw:'Cherry / bone',       tee:'#8e1b22', ink:'#efe9dc', front:'chestWord', back:'script', status:'soon'},
     {name:'Side A',            price:45, cw:'Cobalt / white',      tee:'#1f3f8f', ink:'#f4f4f2', front:'chestS',   back:'record', status:'soon'}
@@ -349,13 +354,14 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
   var BODY='M95 40 L60 55 L18 95 L45 130 L72 112 L72 272 L228 272 L228 112 L255 130 L282 95 L240 55 L205 40 C195 62 175 72 150 72 C125 72 105 62 95 40Z';
   var BACKNECK='M95 40 C112 50 130 54 150 54 C170 54 188 50 205 40';
   function heartPath(cx,cy,s){return 'M'+cx+' '+(cy+30*s)+'C'+(cx-28*s)+' '+(cy+10*s)+' '+(cx-31*s)+' '+(cy-13*s)+' '+(cx-17*s)+' '+(cy-20*s)+'c'+(9*s)+' '+(-4*s)+' '+(14*s)+' '+(2*s)+' '+(17*s)+' '+(8*s)+' '+(3*s)+' '+(-6*s)+' '+(8*s)+' '+(-12*s)+' '+(17*s)+' '+(-8*s)+'C'+(cx+31*s)+' '+(cy-13*s)+' '+(cx+28*s)+' '+(cy+10*s)+' '+cx+' '+(cy+30*s)+'z';}
-  function print(kind,c,uid){
+  function print(kind,c,uid,word){
+    word=word||'Suciopath';
     switch(kind){
       case 'chestS': return '<text x="188" y="112" text-anchor="middle" font-family="'+OLD+'" font-size="22" fill="'+c+'">S</text>';
       case 'chestHeart': return '<path d="'+heartPath(188,104,.3)+'" fill="'+c+'"/>';
       case 'chestWord': return '<text x="186" y="110" text-anchor="middle" font-family="'+OLD+'" font-size="11" fill="'+c+'">Suciopath</text>';
       case 'arch': return '<path id="a'+uid+'" d="M86 132 Q150 84 214 132" fill="none"/>'+
-        '<text font-family="'+OLD+'" font-size="34" fill="'+c+'" text-anchor="middle"><textPath href="#a'+uid+'" startOffset="50%">Suciopath</textPath></text>'+
+        '<text font-family="'+OLD+'" font-size="34" fill="'+c+'" text-anchor="middle"><textPath href="#a'+uid+'" startOffset="50%">'+word+'</textPath></text>'+
         '<text x="150" y="158" text-anchor="middle" font-family="Herr Von Muellerhoff" font-size="34" fill="'+c+'">Los Angeles</text>'+
         '<text x="150" y="232" text-anchor="middle" font-family="Archivo" font-size="6" letter-spacing="4" fill="'+c+'" opacity=".7">DROP 001 · FW26</text>';
       case 'heart': var o='';for(var i=0;i<17;i++){var a=(-170+i*10)*Math.PI/180;o+='<line x1="'+(150+Math.cos(a)*44).toFixed(1)+'" y1="'+(150+Math.sin(a)*44).toFixed(1)+'" x2="'+(150+Math.cos(a)*(i%2?56:64)).toFixed(1)+'" y2="'+(150+Math.sin(a)*(i%2?56:64)).toFixed(1)+'" stroke="'+c+'" stroke-width="1.1"/>';}
@@ -376,7 +382,7 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
     }
     return '';
   }
-  function tee(d,i,side){
+  function tee(d,i,side,word){
     var uid=side+i, gid='sh'+uid;
     return '<svg class="tee '+side+'" viewBox="0 0 300 300" aria-label="'+d.name+' '+side+'">'+
       '<defs><linearGradient id="'+gid+'" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".38"/><stop offset=".22" stop-color="#fff" stop-opacity=".07"/><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient></defs>'+
@@ -384,7 +390,7 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
       (side==='front'?'<path d="M95 40 C105 62 125 72 150 72 C175 72 195 62 205 40" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="5"/>'
                      :'<path d="'+BACKNECK+'" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="4"/>')+
       '<path d="M72 112v95M228 112v95M110 272c10-30 4-60 8-90M196 272c-8-26-2-52-6-80" stroke="#000" stroke-opacity=".14" fill="none"/>'+
-      print(side==='front'?d.front:d.back,d.ink,uid)+'</svg>';
+      print(side==='front'?d.front:d.back,d.ink,uid,word)+'</svg>';
   }
   var BADGE={soon:'Coming soon',live:'Available',gone:'Sold out'};
   var look=document.getElementById('look');
@@ -393,11 +399,24 @@ footer .big{font-family:var(--old);font-size:24vw;line-height:.72;padding-top:.3
     var cta=d.status==='live'&&d.url?'<a class="lbl" href="'+d.url+'" style="color:var(--ink)">Buy ↗</a>':'<span class="lbl"'+(d.status==='gone'?' style="color:var(--stain)"':'')+'>'+BADGE[d.status]+'</span>';
     return '<article class="lk" tabindex="0"><div class="tag"><span class="lbl">Look '+n+'</span><span class="lbl side"></span></div>'+
       '<div class="stage">'+tee(d,i,'front')+tee(d,i,'back')+'</div><span class="num" aria-hidden="true">'+n+'</span>'+
-      '<div class="meta"><div><div class="nm">'+d.name+'</div><div class="cw"><span class="sw" style="background:'+d.tee+'"></span><span class="mono">'+d.cw+'</span></div></div>'+
+      '<div class="meta"><div><div class="nm">'+d.name+'</div>'+
+      (d.variants?'<div class="vr" role="group" aria-label="Version">'+d.variants.map(function(v,k){return '<button type="button" data-i="'+i+'" data-v="'+k+'"'+(k?'':' class="on"')+'>'+v+'</button>';}).join('')+'</div>':'')+
+      '<div class="cw"><span class="sw" style="background:'+d.tee+'"></span><span class="mono">'+d.cw+'</span></div></div>'+
       '<div><div class="px">$'+d.price+'</div><div class="sz mono">S M L XL XXL</div><div style="text-align:right;margin-top:6px">'+cta+'</div></div></div></article>';
   }).join('');
   Array.prototype.forEach.call(look.querySelectorAll('.lk'),function(el){
-    function t(e){ if(e.target.closest('a'))return; el.classList.toggle('flip'); }
+    function t(e){
+      if(e.target.closest('a'))return;
+      var vb=e.target.closest('.vr button');
+      if(vb){ // version switch: re-draw the tee with the chosen name and show the back, where the name is printed
+        var d=DROP[+vb.dataset.i], w=d.variants[+vb.dataset.v];
+        el.querySelector('.stage').innerHTML=tee(d,+vb.dataset.i,'front',w)+tee(d,+vb.dataset.i,'back',w);
+        el.querySelector('.nm').textContent=w;
+        Array.prototype.forEach.call(el.querySelectorAll('.vr button'),function(b){b.classList.toggle('on',b===vb);});
+        el.classList.add('flip'); return;
+      }
+      el.classList.toggle('flip');
+    }
     el.addEventListener('click',t);
     el.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();el.classList.toggle('flip');} });
   });
