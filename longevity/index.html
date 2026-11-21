@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="author" content="3EAS CORTEX · 3eascortex.com">
+<!-- Designed & built by 3EAS CORTEX · https://3eascortex.com · © 2026 -->
+<title>LONGEVITY // DARKLEAF — 3EAS CORTEX</title>
+<meta name="description" content="Longevity: MC and producer, Darkleaf, Lodge Infinite. Los Angeles underground.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080a; --ink:#e9e6df; --dim:#8a877f; --line:#22252b;
+  --leaf:#7fae5a; --ember:#c8452c; --panel:#0e1013;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font:15px/1.65 "IBM Plex Mono",ui-monospace,monospace;overflow-x:hidden}
+a{color:var(--leaf);text-decoration:none;border-bottom:1px solid transparent}
+a:hover{border-color:var(--leaf)}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px);mix-blend-mode:overlay}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+nav{position:sticky;top:0;z-index:40;background:rgba(7,8,10,.85);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;justify-content:space-between;align-items:center;height:52px}
+nav b{font-family:Anton,sans-serif;letter-spacing:.18em;font-weight:400}
+nav ul{display:flex;gap:18px;list-style:none;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+nav ul a{color:var(--dim)} nav ul a:hover{color:var(--ink)}
+
+.hero{min-height:88vh;display:grid;place-items:center;text-align:center;position:relative;border-bottom:1px solid var(--line);
+  background:radial-gradient(ellipse at 50% 40%,rgba(127,174,90,.10),transparent 60%),radial-gradient(circle at 50% 120%,rgba(200,69,44,.18),transparent 55%)}
+.eclipse{width:min(62vw,340px);aspect-ratio:1;border-radius:50%;margin:0 auto 28px;position:relative;
+  background:var(--bg);box-shadow:0 0 0 1px rgba(233,230,223,.15),0 0 60px 8px rgba(200,69,44,.35),0 0 140px 30px rgba(127,174,90,.12)}
+.eclipse::after{content:"";position:absolute;inset:-3px;border-radius:50%;
+  background:conic-gradient(from 200deg,transparent 0 70%,rgba(233,230,223,.7) 82%,transparent 92%);
+  -webkit-mask:radial-gradient(circle,transparent 64%,#000 66%);mask:radial-gradient(circle,transparent 64%,#000 66%);
+  animation:spin 18s linear infinite}
+@keyframes spin{to{transform:rotate(1turn)}}
+h1{font-family:Anton,sans-serif;font-weight:400;font-size:clamp(56px,14vw,150px);letter-spacing:.06em;line-height:.9}
+.aka{margin-top:14px;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
+.aka span{color:var(--ember)}
+.tag{margin-top:22px;max-width:520px;margin-inline:auto;color:var(--dim)}
+
+section{padding:88px 0;border-bottom:1px solid var(--line)}
+.kicker{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--ember);margin-bottom:10px}
+h2{font-family:Anton,sans-serif;font-weight:400;font-size:clamp(34px,6vw,58px);letter-spacing:.04em;line-height:1;margin-bottom:28px}
+.cols{display:grid;grid-template-columns:1.2fr 1fr;gap:48px}
+.cols p+p{margin-top:16px}
+.facts{border:1px solid var(--line);background:var(--panel);padding:22px}
+.facts dt{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-top:14px}
+.facts dt:first-child{margin-top:0}
+.facts dd{font-size:14px}
+
+.timeline{list-style:none;border-left:1px solid var(--line);margin-left:6px}
+.timeline li{position:relative;padding:0 0 30px 26px}
+.timeline li::before{content:"";position:absolute;left:-5px;top:7px;width:9px;height:9px;border-radius:50%;background:var(--bg);border:1px solid var(--leaf)}
+.timeline .yr{font-family:Anton,sans-serif;font-size:22px;letter-spacing:.06em}
+.timeline p{color:var(--dim);max-width:640px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.card{border:1px solid var(--line);background:var(--panel);padding:20px;display:flex;flex-direction:column;gap:6px;transition:border-color .2s}
+.card:hover{border-color:var(--leaf)}
+.card .t{font-family:Anton,sans-serif;font-size:22px;letter-spacing:.04em;line-height:1.1}
+.card .m{font-size:12px;color:var(--dim)}
+.card a{margin-top:auto;padding-top:10px;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+.flag{display:inline-block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ember);border:1px solid var(--ember);padding:1px 6px;width:max-content}
+
+.embed{margin-top:28px;border:1px solid var(--line)}
+.embed iframe{display:block;width:100%;height:166px;border:0}
+
+.book{text-align:center}
+.book p{color:var(--dim);max-width:560px;margin:0 auto 26px}
+.btn{display:inline-block;font-family:Anton,sans-serif;letter-spacing:.18em;font-size:18px;padding:14px 34px;border:1px solid var(--ink);color:var(--ink)}
+.btn:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+footer{padding:36px 0;font-size:11px;color:var(--dim);letter-spacing:.1em}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+@media (max-width:760px){
+  .cols{grid-template-columns:1fr;gap:28px}
+  nav ul{gap:12px;font-size:10px}
+  section{padding:64px 0}
+}
+@media (prefers-reduced-motion:reduce){.eclipse::after{animation:none}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap"><b>LONGEVITY</b>
+<ul><li><a href="#bio">Bio</a></li><li><a href="#lineage">Lineage</a></li><li><a href="#music">Music</a></li><li><a href="#book">Book</a></li></ul></div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eclipse" aria-hidden="true"></div>
+  <h1>LONGEVITY</h1>
+  <div class="aka">fka <span>ECLIPSE</span> &nbsp;//&nbsp; DARKLEAF &nbsp;//&nbsp; LODGE INFINITE</div>
+  <p class="tag">MC. Producer. Built in the Los Angeles underground, from the same split that made Jurassic 5. Still transmitting.</p>
+</div></header>
+
+<section id="bio"><div class="wrap">
+  <div class="kicker">01 / Bio</div>
+  <h2>FROM THE OTHER HALF OF UNITY COMMITTEE</h2>
+  <div class="cols">
+    <div>
+      <p>In the early '90s, the LA crew Unity Committee split in two. One half became Jurassic 5. The other went darker and became <b>Darkleaf</b>. Longevity was one of its two producer-lyricists, building the beats and writing the bars alongside Jahli, with Kemit and Metalogik on the mic and Mixmaster Wolf (also of Breakestra) on the decks.</p>
+      <p>After self-released records and a spot on the <i>Beneath The Surface</i> compilation, Darkleaf dropped <i>F… The People</i> on Ubiquity in 2002. It was dense and disorienting, with swirling rhythms and rhymes that made people uneasy, and it carried the crew's sound past the LA underground.</p>
+      <p>Longevity kept going: as one half of the production duo <b>Lodge Infinite</b> with Jahli, and solo, working with LA heads like 2Mex.</p>
+    </div>
+    <dl class="facts">
+      <dt>Role</dt><dd>MC / Producer</dd>
+      <dt>City</dt><dd>Los Angeles</dd>
+      <dt>Groups</dt><dd>Darkleaf · Lodge Infinite (w/ Jahli)</dd>
+      <dt>Roots</dt><dd>Unity Committee</dd>
+      <dt>Labels</dt><dd>Ubiquity · Vulgar</dd>
+      <dt>Collaborators</dt><dd>Jahli, Kemit, Metalogik, Mixmaster Wolf, 2Mex</dd>
+    </dl>
+  </div>
+</div></section>
+
+<section id="lineage"><div class="wrap">
+  <div class="kicker">02 / Lineage</div>
+  <h2>SIGNAL PATH</h2>
+  <ol class="timeline">
+    <li><div class="yr">EARLY '90s</div><p>Unity Committee splits. Jurassic 5 on one side, Darkleaf on the other.</p></li>
+    <li><div class="yr">'90s</div><p>Darkleaf puts out its own records and lands on the <i>Beneath The Surface</i> comp.</p></li>
+    <li><div class="yr">2002</div><p><i>F… The People</i> comes out on Ubiquity (URLP099). Longevity has vocal credits on "Commercial" and "Triple Stages".</p></li>
+    <li><div class="yr">2008</div><p>Credited on <i>The Game Manual 9.0</i>.</p></li>
+    <li><div class="yr">LATER</div><p><i>Kimetic Principles</i> LP on Vulgar, with Lodge Infinite (Jahli &amp; Longevity) producing and Kemit Qutob on the mic.</p></li>
+    <li><div class="yr">SOLO</div><p>Solo work, including "No Surrender" featuring 2Mex. Debut solo album: <i>Warrior Music</i>.</p></li>
+  </ol>
+</div></section>
+
+<section id="music"><div class="wrap">
+  <div class="kicker">03 / Music</div>
+  <h2>TRANSMISSIONS</h2>
+  <div class="grid">
+    <div class="card"><span class="t">WARRIOR MUSIC</span><span class="m">Longevity · solo debut</span><span class="flag">title unconfirmed</span><a href="https://soundcloud.com/longevity-1" target="_blank" rel="noopener">SoundCloud →</a></div>
+    <div class="card"><span class="t">NO SURRENDER</span><span class="m">Longevity ft. 2Mex</span><a href="https://soundcloud.com/longevity-1/no-surrender-featuring-2mex" target="_blank" rel="noopener">Listen →</a></div>
+    <div class="card"><span class="t">F… THE PEOPLE</span><span class="m">Darkleaf · Ubiquity · 2002</span><a href="https://www.discogs.com/release/51193-Darkleaf-F-The-People" target="_blank" rel="noopener">Discogs →</a></div>
+    <div class="card"><span class="t">KIMETIC PRINCIPLES</span><span class="m">Darkleaf · Vulgar · prod. Lodge Infinite</span><a href="https://vulgar.bandcamp.com/album/darkleaf-kimetic-principles-lp" target="_blank" rel="noopener">Bandcamp →</a></div>
+  </div>
+  <div class="embed">
+    <iframe title="No Surrender ft. 2Mex" loading="lazy" allow="autoplay"
+      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/longevity-1/no-surrender-featuring-2mex&color=%237fae5a&inverse=true&auto_play=false&show_user=true"></iframe>
+  </div>
+</div></section>
+
+<section id="book" class="book"><div class="wrap">
+  <div class="kicker">04 / Book</div>
+  <h2>SHOWS · FEATURES · BEATS</h2>
+  <p>Live sets, features, production and licensing.</p>
+  <a class="btn" href="mailto:BOOKING@EXAMPLE.COM">GET IN TOUCH</a>
+</div></section>
+
+<footer><div class="wrap"><span>LONGEVITY · LOS ANGELES · DARKLEAF // LODGE INFINITE</span><span>SITE DESIGNED &amp; BUILT BY <a href="https://3eascortex.com" target="_blank" rel="noopener">3EASCORTEX.COM</a></span><span>© 2026 3EASCORTEX.COM · Concept design &amp; code. Longevity name, music &amp; likeness © Longevity. Unofficial concept, not affiliated.</span></div></footer>
+</body>
+</html>
