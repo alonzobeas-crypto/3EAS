@@ -10,12 +10,12 @@
 <meta name="description" content="LA TRAFFIC. 110 North. After dark.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Permanent+Marker&family=Sedgwick+Ave+Display&family=DotGothic16&family=Bungee&family=Overpass:wght@700;900&family=Special+Elite&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Egyptian+Hieroglyphs&family=Permanent+Marker&family=Sedgwick+Ave+Display&family=DotGothic16&family=Bungee&family=Overpass:wght@700;900&family=Special+Elite&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --night:#07070a; --ink:#ece7dc; --dim:#8b857a; --spray:#f26a21; --lime:#f7b51c; --rtdred:#c8202f; --rtdwhite:#f3efe6; --chrome:#d9dde2;
   --sodium:#f3a640; --sign:#0f6b3c; --tape:#f2d23c; --paper:#e7dfcc;
-  --hand:'Sedgwick Ave Display',cursive; --og:'UnifrakturMaguntia',serif; --marker:'Permanent Marker',cursive; --scrawl:'Sedgwick Ave Display',cursive; --dot:'DotGothic16',monospace; --block:'Bungee',Impact,sans-serif; --hwy:'Overpass',Arial,sans-serif;
+  --hand:'Sedgwick Ave Display',cursive; --glyph:'Noto Sans Egyptian Hieroglyphs',serif; --marker:'Permanent Marker',cursive; --scrawl:'Sedgwick Ave Display',cursive; --dot:'DotGothic16',monospace; --block:'Bungee',Impact,sans-serif; --hwy:'Overpass',Arial,sans-serif;
   --type:'Special Elite',ui-monospace,monospace; --mono:'IBM Plex Mono',ui-monospace,monospace;
   --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .6 0 0 0 0 .58 0 0 0 0 .55 0 0 0 .14 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
@@ -67,7 +67,11 @@ a{color:inherit}
   -webkit-mask:radial-gradient(circle,transparent 64%,#000 66%);mask:radial-gradient(circle,transparent 64%,#000 66%);animation:spin 20s linear infinite}
 @keyframes spin{to{transform:rotate(1turn)}}
 .title{position:relative;display:inline-block}
-.title h1{font-family:var(--og);font-weight:400;font-size:clamp(64px,17vw,200px);line-height:1;padding:0 .06em;
+/* cartouche: the name ring, sprayed */
+.title::before{content:"";position:absolute;inset:-.02em -.32em .06em -.32em;border:3px solid rgba(217,221,226,.55);border-radius:999px;transform:rotate(-2deg);box-shadow:0 0 18px rgba(242,106,33,.25)}
+.title::after{content:"";position:absolute;right:-.48em;top:12%;bottom:18%;width:3px;background:rgba(217,221,226,.55);transform:rotate(-2deg)}
+.gl{font-family:var(--glyph);color:var(--lime);letter-spacing:.3em;font-size:1.5em;vertical-align:middle;text-shadow:0 0 8px rgba(247,181,28,.4)}
+.title h1{font-family:var(--hand);font-weight:400;font-size:clamp(58px,15vw,180px);line-height:1.05;padding:0 .06em;
   background:linear-gradient(180deg,#fff 0%,#cfd4da 42%,#6c7179 50%,#e9ecef 58%,#8e939a 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
   filter:drop-shadow(4px 4px 0 #000) drop-shadow(0 0 1px var(--spray))}
 .drips{position:absolute;left:0;right:0;top:86%}
@@ -188,7 +192,7 @@ a{color:inherit}
 .hand{position:absolute;left:-62px;top:26px;width:26px;height:120px;background:#1b1b1b;border-radius:13px}
 .stk{position:absolute;right:-30px;top:90px;background:var(--spray);color:#000;font:18px var(--marker);padding:6px 12px;transform:rotate(12deg);box-shadow:0 4px 10px rgba(0,0,0,.5);text-decoration:none}
 .stk:hover{background:var(--lime)}
-.dm{margin-top:44px;font:clamp(52px,12vw,130px)/1 var(--og);color:var(--spray);text-decoration:none;transform:rotate(-4deg);display:inline-block;text-shadow:4px 4px 0 #000}
+.dm{margin-top:44px;font:clamp(52px,12vw,130px)/1 var(--hand);color:var(--spray);text-decoration:none;transform:rotate(-4deg);display:inline-block;text-shadow:4px 4px 0 #000}
 .dm:hover{color:var(--lime)}
 .dont{font:12px var(--mono);letter-spacing:.3em;color:var(--dim);margin-top:16px;text-transform:uppercase}
 
@@ -217,7 +221,7 @@ footer a{color:var(--dim)}
   <div class="in">
     <div class="orb" aria-hidden="true"></div>
     <div class="title"><h1>Longevity</h1><div class="drips" id="drips" aria-hidden="true"></div><span class="handtag" aria-hidden="true">LA Traffic</span></div>
-    <div class="whisper"><span class="rd" tabindex="0">ECLIPSE</span> was here · ask around</div>
+    <div class="whisper"><span class="gl" aria-hidden="true">𓋹𓂀𓇳</span><br><span class="rd" tabindex="0">ECLIPSE</span> was here · ask around</div>
   </div>
 </section>
 
@@ -331,6 +335,7 @@ footer a{color:var(--dim)}
       <a class="stk" href="https://www.instagram.com/gevity/" target="_blank" rel="noopener">@gevity</a>
     </div>
     <a class="dm" href="https://www.instagram.com/gevity/" target="_blank" rel="noopener">@gevity</a>
+    <div class="gl" aria-hidden="true" style="margin-top:18px;font-size:22px">𓋹</div>
     <div class="dont">Don't call. DM.</div>
   </div>
 </section>
