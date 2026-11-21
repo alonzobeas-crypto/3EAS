@@ -78,7 +78,7 @@ a{color:inherit}
 .drips i{position:absolute;top:0;width:5px;border-radius:0 0 4px 4px;background:linear-gradient(#cfd4da,#8e939a);transform-origin:top;animation:drip 3.2s ease-in both}
 .drips i::after{content:"";position:absolute;bottom:-4px;left:-1px;width:7px;height:7px;border-radius:50%;background:inherit}
 @keyframes drip{0%,40%{transform:scaleY(0)}100%{transform:scaleY(1)}}
-.handtag{position:absolute;right:-4%;bottom:-38%;font:clamp(34px,7vw,86px) var(--hand);color:var(--spray);transform:rotate(-9deg);text-shadow:2px 2px 0 #000}
+.handtag{position:absolute;right:-2%;bottom:-30%;font:clamp(24px,4.4vw,54px) var(--hand);color:var(--spray);transform:rotate(-5deg);opacity:.9;text-shadow:2px 2px 0 #000}
 .whisper{position:relative;z-index:3;margin-top:clamp(84px,12vw,130px);font:12px var(--mono);letter-spacing:.32em;text-transform:uppercase;color:var(--dim);pointer-events:auto}
 
 /* RTD stripes */
@@ -145,7 +145,7 @@ a{color:inherit}
 .tags > *{position:absolute;text-decoration:none;line-height:.9;white-space:nowrap;transform:rotate(var(--r,0deg));transition:filter .3s}
 .tags a:hover{filter:drop-shadow(0 0 12px currentColor)}
 .t-hand{font-family:var(--hand)}
-.fat,.t-hand,.handtag,.dm,.stk,.plate .tg{text-shadow:0 0 1px currentColor,0 0 3px currentColor,3px 3px 0 #000!important;-webkit-text-stroke:.6px currentColor} .t-block{font-family:var(--block)} .t-type{font-family:var(--type)}
+.fat,.t-hand,.handtag,.dm{text-shadow:0 0 1px currentColor,2px 2px 0 #000!important} .t-block{font-family:var(--block)} .t-type{font-family:var(--type)}
 .throw{font-family:var(--block);color:#111;-webkit-text-stroke:2px var(--ink);paint-order:stroke;text-shadow:5px 5px 0 var(--spray)}
 
 /* EXIT 4 — drive-in */
@@ -168,9 +168,9 @@ a{color:inherit}
 /* EXIT 5 — do not cross */
 #case{background:radial-gradient(ellipse at 50% 50%,rgba(30,60,160,.18),transparent 60%)}
 .siren{position:absolute;inset:0;pointer-events:none;animation:siren 2.2s infinite}
-@keyframes siren{0%,100%{background:radial-gradient(ellipse at 10% 0%,rgba(232,40,40,.2),transparent 50%)}50%{background:radial-gradient(ellipse at 90% 0%,rgba(40,80,232,.22),transparent 50%)}}
-.ctape{position:absolute;left:-10%;right:-10%;height:42px;background:var(--tape);color:#111;font:16px var(--block);letter-spacing:.08em;display:flex;align-items:center;overflow:hidden;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.6);z-index:1}
-.ctape span{animation:crawl 26s linear infinite;padding-left:20px}
+@keyframes siren{0%,100%{background:radial-gradient(ellipse at 10% 0%,rgba(232,40,40,.09),transparent 50%)}50%{background:radial-gradient(ellipse at 90% 0%,rgba(40,80,232,.1),transparent 50%)}}
+.ctape{position:absolute;left:-10%;right:-10%;height:42px;background:var(--tape);color:#111;font:16px var(--block);letter-spacing:.08em;display:flex;align-items:center;overflow:hidden;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.6);z-index:1;opacity:.8}
+.ctape span{animation:crawl 70s linear infinite;padding-left:20px}
 .ctape.a{top:24%;transform:rotate(-7deg)} .ctape.b{bottom:20%;transform:rotate(5deg)} .ctape.b span{animation-direction:reverse}
 @keyframes crawl{to{transform:translateX(-50%)}}
 .file{position:relative;z-index:2;max-width:520px;margin:0 auto;background:var(--paper);color:#141414;padding:24px 24px 30px;font-family:var(--type);border-radius:2px;box-shadow:0 30px 60px rgba(0,0,0,.7);transform:rotate(-1.4deg)}
@@ -221,7 +221,7 @@ footer a{color:var(--dim)}
   <div class="in">
     <div class="orb" aria-hidden="true"></div>
     <div class="title"><h1>Longevity</h1><div class="drips" id="drips" aria-hidden="true"></div><span class="handtag" aria-hidden="true">LA Traffic</span></div>
-    <div class="whisper"><span class="gl" aria-hidden="true">𓋹𓂀𓇳</span><br><span class="rd" tabindex="0">ECLIPSE</span> was here · ask around</div>
+    <div class="whisper"><span class="gl" aria-hidden="true">𓋹𓂀𓇳</span><br><span class="rd" tabindex="0">ECLIPSE</span> · Los Angeles · since the early nineties</div>
   </div>
 </section>
 
@@ -237,7 +237,7 @@ footer a{color:var(--dim)}
 </section>
 
 <section class="scene" id="room" data-st="EXIT 2 · THE ROOM">
-  <div class="exit"><div class="plate"><small>EXIT 2</small><b>THE ROOM</b><span class="ar">↗</span><span class="tg">gev</span></div></div>
+  <div class="exit"><div class="plate"><small>EXIT 2</small><b>THE ROOM</b><span class="ar">↗</span></div></div>
   <div class="in">
     <div>
       <div class="onair">● RECORDING</div>
@@ -249,48 +249,8 @@ footer a{color:var(--dim)}
   </div>
 </section>
 
-<section class="scene" id="alley" data-st="EXIT 3 · THE ALLEY">
-  <div class="exit"><div class="plate"><small>EXIT 3</small><b>LEIMERT · CRENSHAW</b><span class="ar">↗</span></div></div>
-  <div class="in tags">
-    <span class="t-block throw" style="--r:-4deg;left:2%;top:4%;font-size:clamp(40px,8vw,96px)">BLOWED</span>
-    <a class="t-hand" href="https://vulgar.bandcamp.com/album/darkleaf-kimetic-principles-lp" target="_blank" rel="noopener" style="--r:6deg;right:3%;top:18%;font-size:clamp(44px,9vw,110px);color:var(--lime)">Darkleaf</a>
-    <span class="t-type" style="--r:-2deg;left:6%;top:36%;font-size:clamp(15px,2.4vw,24px);color:var(--paper)">GOOD LIFE · THURSDAYS</span>
-    <a class="t-block" href="https://www.discogs.com/release/51193-Darkleaf-F-The-People" target="_blank" rel="noopener" style="--r:-8deg;right:5%;top:44%;font-size:clamp(20px,3.6vw,40px);color:var(--spray)">F… THE PEOPLE</a>
-    <span class="t-hand" style="--r:-12deg;left:18%;top:46%;font-size:clamp(60px,13vw,170px);color:rgba(236,231,220,.13)">Unity</span>
-    <span class="t-block" style="--r:3deg;left:4%;top:68%;font-size:clamp(28px,5vw,58px);color:#5b8cff">LODGE∞</span>
-    <span class="t-hand" style="--r:-5deg;right:10%;top:64%;font-size:clamp(34px,6vw,70px);color:var(--sodium)">'97</span>
-    <a class="t-hand" href="https://soundcloud.com/longevity-1/no-surrender-featuring-2mex" target="_blank" rel="noopener" style="--r:4deg;left:30%;top:86%;font-size:clamp(26px,4.4vw,50px);color:var(--ink)">no surrender</a>
-    <span class="t-hand" style="--r:-3deg;left:46%;top:26%;font-size:clamp(28px,5vw,60px);color:var(--spray)">gev</span>
-    <span class="t-type" style="--r:0deg;right:2%;top:92%;font-size:11px;color:var(--dim)">KAOS NETWORK</span>
-  </div>
-</section>
-
-<section class="scene" id="stop" data-st="EXIT 4 · BUS STOP">
-  <div class="exit"><div class="plate"><small>EXIT 4</small><b>CRENSHAW / 43RD</b><span class="ar">↗</span></div></div>
-  <div class="in">
-    <div class="bus" id="bus">
-      <div class="flip" id="flip">NOT IN SERVICE</div>
-      <div class="wins">
-        <div class="win"><span style="--r:-6deg">seen him at blowed. once.</span></div>
-        <div class="win"><span style="--r:4deg">your favorite producer knows</span></div>
-        <div class="win door"></div>
-        <div class="win"><span style="--r:-3deg">is he still around??</span></div>
-        <div class="win"><span style="--r:5deg">he never left</span></div>
-        <div class="win"><span style="--r:-5deg">ask somebody from leimert</span></div>
-        <div class="win"><span style="--r:3deg">credits don't say</span></div>
-        <div class="win"><span style="--r:-4deg">IYKYK</span></div>
-      </div>
-      <div class="rtd" aria-hidden="true"></div>
-      <span class="num">110</span><span class="rtdlogo">LA TRAFFIC</span>
-      <div class="wheels" aria-hidden="true"><i></i><i></i></div>
-    </div>
-    <div class="bench"><p>Everybody has a story about him. Nobody has the whole one.</p><small>BUS BENCH · CRENSHAW</small></div>
-  </div>
-  <div class="rtd thin" aria-hidden="true"></div>
-</section>
-
-<section class="scene" id="drivein" data-st="EXIT 5 · DRIVE-IN">
-  <div class="exit"><div class="plate"><small>EXIT 5</small><b>DRIVE-IN</b><span class="ar">↗</span></div></div>
+<section class="scene" id="drivein" data-st="EXIT 3 · DRIVE-IN">
+  <div class="exit"><div class="plate"><small>EXIT 3</small><b>DRIVE-IN</b><span class="ar">↗</span></div></div>
   <div class="in">
     <div class="marquee"><i>tonight only</i><b>AUDIO CINEMA</b><i>+ "THE MASK" · <a href="https://3eascortex.com" target="_blank" rel="noopener">3EAS</a> cut</i><small>ALPHA PUP PICTURES</small></div>
     <div class="screen-wrap">
@@ -308,9 +268,9 @@ footer a{color:var(--dim)}
   </div>
 </section>
 
-<section class="scene" id="case" data-st="EXIT 6 · ROAD CLOSED">
+<section class="scene" id="case" data-st="EXIT 4 · ROAD CLOSED">
   <div class="siren" aria-hidden="true"></div>
-  <div class="exit"><div class="plate"><small>EXIT 6</small><b>ROAD CLOSED</b><span class="ar">✕</span></div></div>
+  <div class="exit"><div class="plate"><small>EXIT 4</small><b>ROAD CLOSED</b><span class="ar">✕</span></div></div>
   <div class="ctape a" aria-hidden="true"><span>LA TRAFFIC · DO NOT CROSS · BLACK ON BLACK CRIME · DO NOT CROSS · LA TRAFFIC · DO NOT CROSS · BLACK ON BLACK CRIME · DO NOT CROSS · LA TRAFFIC · DO NOT CROSS · BLACK ON BLACK CRIME · DO NOT CROSS ·&nbsp;</span></div>
   <div class="ctape b" aria-hidden="true"><span>UNDER INVESTIGATION · KING · UNDER INVESTIGATION · LONGEVITY · UNDER INVESTIGATION · KING · UNDER INVESTIGATION · LONGEVITY · UNDER INVESTIGATION · KING · UNDER INVESTIGATION · LONGEVITY ·&nbsp;</span></div>
   <div class="in">
@@ -324,6 +284,46 @@ footer a{color:var(--dim)}
   </div>
 </section>
 
+<section class="scene" id="stop" data-st="EXIT 5 · BUS STOP">
+  <div class="exit"><div class="plate"><small>EXIT 5</small><b>CRENSHAW / 43RD</b><span class="ar">↗</span></div></div>
+  <div class="in">
+    <div class="bus" id="bus">
+      <div class="flip" id="flip">NOT IN SERVICE</div>
+      <div class="wins">
+        <div class="win"><span style="--r:-6deg">seen him at blowed. once.</span></div>
+        <div class="win"><span style="--r:4deg">your favorite producer knows</span></div>
+        <div class="win door"></div>
+        <div class="win"><span style="--r:-3deg">still writing</span></div>
+        <div class="win"><span style="--r:5deg">he never left</span></div>
+        <div class="win"><span style="--r:-5deg">ask somebody from leimert</span></div>
+        <div class="win"><span style="--r:3deg">credits don't say</span></div>
+        <div class="win"><span style="--r:-4deg">the source</span></div>
+      </div>
+      <div class="rtd" aria-hidden="true"></div>
+      <span class="num">110</span><span class="rtdlogo">LA TRAFFIC</span>
+      <div class="wheels" aria-hidden="true"><i></i><i></i></div>
+    </div>
+    <div class="bench"><p>Everybody has a story about him. Nobody has the whole one.</p><small>BUS BENCH · CRENSHAW</small></div>
+  </div>
+  <div class="rtd thin" aria-hidden="true"></div>
+</section>
+
+<section class="scene" id="alley" data-st="EXIT 6 · THE ALLEY">
+  <div class="exit"><div class="plate"><small>EXIT 6</small><b>LEIMERT · CRENSHAW</b><span class="ar">↗</span></div></div>
+  <div class="in tags">
+    <span class="t-block throw" style="--r:-4deg;left:2%;top:4%;font-size:clamp(40px,8vw,96px)">BLOWED</span>
+    <a class="t-hand" href="https://vulgar.bandcamp.com/album/darkleaf-kimetic-principles-lp" target="_blank" rel="noopener" style="--r:6deg;right:3%;top:18%;font-size:clamp(44px,9vw,110px);color:var(--lime)">Darkleaf</a>
+    <span class="t-type" style="--r:-2deg;left:6%;top:36%;font-size:clamp(15px,2.4vw,24px);color:var(--paper)">GOOD LIFE · THURSDAYS</span>
+    <a class="t-block" href="https://www.discogs.com/release/51193-Darkleaf-F-The-People" target="_blank" rel="noopener" style="--r:-8deg;right:5%;top:44%;font-size:clamp(20px,3.6vw,40px);color:var(--spray)">F… THE PEOPLE</a>
+    <span class="t-hand" style="--r:-12deg;left:18%;top:46%;font-size:clamp(60px,13vw,170px);color:rgba(236,231,220,.13)">Unity</span>
+    <span class="t-block" style="--r:3deg;left:4%;top:68%;font-size:clamp(28px,5vw,58px);color:#5b8cff">LODGE∞</span>
+    <span class="t-hand" style="--r:-5deg;right:10%;top:64%;font-size:clamp(34px,6vw,70px);color:var(--sodium)">'97</span>
+    <a class="t-hand" href="https://soundcloud.com/longevity-1/no-surrender-featuring-2mex" target="_blank" rel="noopener" style="--r:4deg;left:30%;top:86%;font-size:clamp(26px,4.4vw,50px);color:var(--ink)">no surrender</a>
+    <span class="t-type" style="--r:0deg;right:2%;top:92%;font-size:11px;color:var(--dim)">KAOS NETWORK</span>
+  </div>
+</section>
+
+
 <section class="scene" id="phone" data-st="LAST EXIT · PAYPHONE">
   <div class="exit"><div class="plate"><small>LAST EXIT</small><b>PAYPHONE</b><span class="ar">↗</span></div></div>
   <div class="in">
@@ -332,7 +332,6 @@ footer a{color:var(--dim)}
       <div class="top">PUBLIC</div>
       <div class="lcd" id="lcd">NO SERVICE</div>
       <div class="keys" aria-hidden="true"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i><i>*</i><i>0</i><i>#</i></div>
-      <a class="stk" href="https://www.instagram.com/gevity/" target="_blank" rel="noopener">@gevity</a>
     </div>
     <a class="dm" href="https://www.instagram.com/gevity/" target="_blank" rel="noopener">@gevity</a>
     <div class="gl" aria-hidden="true" style="margin-top:18px;font-size:22px">𓋹</div>
@@ -365,7 +364,7 @@ const RM=matchMedia('(prefers-reduced-motion: reduce)').matches,$=s=>document.qu
 })();
 
 // drips
-const d=$('#drips');for(let i=0;i<14;i++){const e=document.createElement('i');e.style.left=(4+Math.random()*92)+'%';e.style.height=(10+Math.random()*60)+'px';e.style.animationDelay=(1.5+Math.random()*2)+'s';d.appendChild(e)}
+const d=$('#drips');for(let i=0;i<6;i++){const e=document.createElement('i');e.style.left=(8+Math.random()*84)+'%';e.style.height=(8+Math.random()*26)+'px';e.style.animationDelay=(1.5+Math.random()*2)+'s';d.appendChild(e)}
 
 // redactions
 $$('.rd').forEach(r=>{r.addEventListener('click',()=>r.classList.toggle('on'));r.addEventListener('keydown',e=>{if(e.key==='Enter')r.classList.toggle('on')})});
@@ -392,7 +391,7 @@ const fl=['NOT IN SERVICE','LONGEVITY','110 N · AFTER DARK','NOT IN SERVICE','A
 if(!RM)setInterval(()=>{fi=(fi+1)%fl.length;flip.textContent=fl[fi]},2400);
 
 // payphone screen
-const lcd=$('#lcd'),msgs=['NO SERVICE','INSERT COIN','LINE BUSY',"DON'T CALL",'DM @GEVITY'];let li=0;
+const lcd=$('#lcd'),msgs=['NO SERVICE',"DON'T CALL",'DM ONLY'];let li=0;
 if(!RM)setInterval(()=>{li=(li+1)%msgs.length;lcd.textContent=msgs[li]},1800);
 
 // spray wall
@@ -406,7 +405,6 @@ c.addEventListener('pointerdown',e=>{down=true;last=pt(e);spray(last.x,last.y,16
 c.addEventListener('pointermove',e=>{if(!down)return;const p=pt(e);if(last)line(last,p);last=p});
 addEventListener('pointerup',()=>{down=false;last=null;col=(col+1)%cols.length});
 addEventListener('pointercancel',()=>{down=false;last=null});
-if(!RM){let t=0;const auto=()=>{if(t++>90)return;spray(W*(.08+.84*((t*37)%100)/100),H*(.15+.7*Math.random()),8+Math.random()*10);requestAnimationFrame(auto)};setTimeout(auto,2600)}
 })();
 </script>
 </body>
