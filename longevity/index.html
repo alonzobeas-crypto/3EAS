@@ -7,7 +7,7 @@
 <meta name="author" content="3EAS CORTEX · 3eascortex.com">
 <!-- Designed & built by 3EAS CORTEX · https://3eascortex.com · © 2026 -->
 <title>LONGEVITY — 3EAS CORTEX</title>
-<meta name="description" content="Longevity. MC, producer, beatmaker. Kemet to Los Angeles to everywhere.">
+<meta name="description" content="Longevity. Renaissance man. Kemet to Los Angeles to everywhere.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@100&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Share+Tech+Mono&family=Noto+Sans+Egyptian+Hieroglyphs&display=swap" rel="stylesheet">
@@ -74,6 +74,7 @@ p.body{margin-top:26px;color:var(--dim);font-size:clamp(19px,1.6vw,22px)}
 .hero h1{font:100 clamp(64px,13vw,168px)/1 var(--name);color:var(--y);letter-spacing:0}
 /* the mark: a hand-built glyph script, stems like blades, hairline joins */
 .wm{display:block;width:clamp(240px,48vw,620px);height:auto;margin:0 auto;overflow:visible}
+.wm{filter:url(#spray)}
 .wm .b{fill:var(--y)}
 .wm .h{fill:none;stroke:var(--y);stroke-width:1.5;stroke-linecap:round}
 .wm .k{fill:var(--y)}
@@ -140,6 +141,14 @@ footer a{color:var(--ink)}
 
 <div id="pre" aria-hidden="true"><div class="n"><svg class="wm" aria-hidden="true"></svg></div><div class="bar"><i id="bar"></i></div><div class="row mono dim"><span>Kemet — Los Angeles — Everywhere</span><span id="pct">000</span></div></div>
 <canvas id="gl" aria-hidden="true"></canvas>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="spray" x="-10%" y="-20%" width="120%" height="140%">
+  <feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="2" seed="7" result="n"/>
+  <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G" result="cut"/>
+  <feGaussianBlur in="cut" stdDeviation="2.6" result="haze"/>
+  <feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="1" seed="3" result="dots"/>
+  <feComposite in="haze" in2="dots" operator="arithmetic" k1="1.4" k2="0" k3="0" k4="0" result="over"/>
+  <feMerge><feMergeNode in="over"/><feMergeNode in="cut"/></feMerge>
+</filter></svg>
 <div class="cur" id="cur" aria-hidden="true"></div>
 
 <header class="mono"><span>Longevity</span><a href="https://www.instagram.com/gevity/" target="_blank" rel="noopener">@gevity</a></header>
@@ -149,7 +158,7 @@ footer a{color:var(--ink)}
 <section class="scene c hero" data-i="0" data-yr="2026">
   <div>
     <h1 class="rv mark" aria-label="Longevity"><svg class="wm" data-draw aria-hidden="true"></svg></h1>
-    <div class="sub mono rv d1">MC<i>—</i>Producer<i>—</i>Beatmaker</div>
+    <div class="sub rv d1" style="font:italic 400 clamp(22px,2.4vw,30px) var(--serif);letter-spacing:.04em;margin-top:34px">Renaissance man</div>
     <div class="sub mono dim rv d2"><span class="rd" tabindex="0">Eclipse</span> &nbsp;·&nbsp; Los Angeles &nbsp;·&nbsp; MMXXVI</div>
   </div>
 </section>
@@ -181,7 +190,7 @@ footer a{color:var(--ink)}
     <h2 class="rv d1">Writes the bars. <em>Builds the room</em> they live in.</h2>
     <p class="body rv d2">Three decades deep. Big rooms, no names. Some of it you've heard without knowing whose hands were on it.</p>
     <div class="rows rv d3">
-      <div><span class="mono">Craft</span><span>MC · producer · beatmaker</span></div>
+      <div><span class="mono">Craft</span><span>Renaissance man</span></div>
       <div><span class="mono">Company</span><span>LA Traffic</span></div>
       <div><span class="mono">Sessions</span><span><span class="rd" tabindex="0">Classified</span></span></div>
     </div>
@@ -259,6 +268,9 @@ void main(){
   vec3 Cr=vec3(.925,.894,.816);col+=Cr*exp(-abs(d-r)*420.)*.7*G;
   col+=O*RP*.07*smoothstep(0.,.03,o)*(.5+.5*sin(d*55.-T*1.6))*exp(-o*2.5);
   col+=(h(gl_FragCoord.xy+fract(T)*100.)-.5)*.045;
+  float wall=fbm(gl_FragCoord.xy/R.y*vec2(3.,9.))*.5+fbm(gl_FragCoord.xy/R.y*40.)*.5;
+  col+=vec3(.925,.894,.816)*(wall-.5)*.022;
+  col+=O*.05*smoothstep(.15,-.6,uv.y)*(.7+.3*n(vec2(uv.x*3.+T*.02,1.)));
   col*=1.-.45*dot(uv,uv);
   gl_FragColor=vec4(max(col,0.),1.);
 }
