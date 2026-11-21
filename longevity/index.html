@@ -34,7 +34,8 @@ main,header,footer,.hud{position:relative;z-index:2}
 /* preloader */
 #pre{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;justify-content:flex-end;padding:28px;transition:transform 1.3s var(--ease) .1s}
 #pre.out{transform:translateY(-100%)}
-#pre .n{font:100 clamp(60px,12vw,150px)/.9 var(--name);color:var(--y)}
+#pre .n{width:clamp(220px,40vw,520px)}
+#pre .n .wm{width:100%;margin:0}
 #pre .bar{height:1px;background:var(--faint);margin-top:22px;position:relative}#pre .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--ink);width:0}
 #pre .row{display:flex;justify-content:space-between;margin-top:18px}
 
@@ -71,6 +72,16 @@ p.body{margin-top:26px;color:var(--dim);font-size:clamp(19px,1.6vw,22px)}
 
 /* hero */
 .hero h1{font:100 clamp(64px,13vw,168px)/1 var(--name);color:var(--y);letter-spacing:0}
+/* the mark: a hand-built glyph script, stems like blades, hairline joins */
+.wm{display:block;width:clamp(240px,48vw,620px);height:auto;margin:0 auto;overflow:visible}
+.wm .b{fill:var(--y)}
+.wm .h{fill:none;stroke:var(--y);stroke-width:1.5;stroke-linecap:round}
+.wm .k{fill:var(--y)}
+.wm .base{fill:none;stroke:rgba(236,228,208,.35);stroke-width:1}
+.wm[data-draw] .b,.wm[data-draw] .k{opacity:0;transform:scaleY(.2);transform-box:fill-box;transform-origin:50% 0;transition:opacity 1.2s var(--ease),transform 1.4s var(--ease)}
+.wm[data-draw] .h,.wm[data-draw] .base{stroke-dasharray:var(--l);stroke-dashoffset:var(--l);transition:stroke-dashoffset 1.6s var(--ease)}
+.wm.go .b,.wm.go .k{opacity:1;transform:none}
+.wm.go .h,.wm.go .base{stroke-dashoffset:0}
 .hero .sub{margin-top:30px;color:var(--ink)}
 .hero .sub i{font-style:normal;color:var(--o);padding:0 .9em}
 .rd{background:rgba(236,228,208,.14);color:transparent;padding:0 .15em;cursor:help;transition:all .4s;-webkit-box-decoration-break:clone;box-decoration-break:clone}
@@ -127,7 +138,7 @@ footer a{color:var(--ink)}
 </head>
 <body>
 
-<div id="pre" aria-hidden="true"><div class="n">Longevity</div><div class="bar"><i id="bar"></i></div><div class="row mono dim"><span>Kemet — Los Angeles — Everywhere</span><span id="pct">000</span></div></div>
+<div id="pre" aria-hidden="true"><div class="n"><svg class="wm" aria-hidden="true"></svg></div><div class="bar"><i id="bar"></i></div><div class="row mono dim"><span>Kemet — Los Angeles — Everywhere</span><span id="pct">000</span></div></div>
 <canvas id="gl" aria-hidden="true"></canvas>
 <div class="cur" id="cur" aria-hidden="true"></div>
 
@@ -137,7 +148,7 @@ footer a{color:var(--ink)}
 <main>
 <section class="scene c hero" data-i="0" data-yr="2026">
   <div>
-    <h1 class="rv">Longevity</h1>
+    <h1 class="rv mark" aria-label="Longevity"><svg class="wm" data-draw aria-hidden="true"></svg></h1>
     <div class="sub mono rv d1">MC<i>—</i>Producer<i>—</i>Beatmaker</div>
     <div class="sub mono dim rv d2"><span class="rd" tabindex="0">Eclipse</span> &nbsp;·&nbsp; Los Angeles &nbsp;·&nbsp; MMXXVI</div>
   </div>
@@ -310,7 +321,7 @@ enter(0,'2026');
 
 // ---------- preloader
 const pre=$('#pre'),pct=$('#pct');let pv=0;
-function done(){pre.classList.add('out');setTimeout(()=>pre.remove(),1600);$$('.hero .rv').forEach(el=>el.classList.add('in'))}
+function done(){pre.classList.add('out');setTimeout(()=>window.__drawMark&&window.__drawMark(),500);setTimeout(()=>pre.remove(),1600);$$('.hero .rv').forEach(el=>el.classList.add('in'))}
 if(RM){done()}else{const st=performance.now(),iv=setInterval(()=>{pv=Math.min(100,Math.round((performance.now()-st)/14));pct.textContent=String(pv).padStart(3,'0');$('#bar').style.width=pv+'%';if(pv>=100){clearInterval(iv);(document.fonts?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(done,250))}},30)}
 
 // ---------- cursor
@@ -318,6 +329,42 @@ const cu=$('#cur');let cx=-100,cy=-100,tx=-100,ty=-100;
 addEventListener('pointermove',e=>{tx=e.clientX;ty=e.clientY});
 (function cl(){cx=L(cx,tx,.18);cy=L(cy,ty,.18);cu.style.transform=`translate(${cx}px,${cy}px)`;requestAnimationFrame(cl)})();
 $$('a,.rd,iframe').forEach(el=>{el.addEventListener('pointerenter',()=>cu.classList.add('on'));el.addEventListener('pointerleave',()=>cu.classList.remove('on'))});
+
+// ---------- the mark: blades + hairlines, built letter by letter
+(function(){
+  const NS='http://www.w3.org/2000/svg';
+  const blade=(x1,y1,x2,y2,w)=>{const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy),nx=-dy/L*w/2,ny=dx/L*w/2,
+    a=[x1+dx*.18,y1+dy*.18],b=[x1+dx*.82,y1+dy*.82];
+    return ['b',`${x1},${y1} ${a[0]+nx},${a[1]+ny} ${b[0]+nx},${b[1]+ny} ${x2},${y2} ${b[0]-nx},${b[1]-ny} ${a[0]-nx},${a[1]-ny}`]};
+  const hair=(x1,y1,x2,y2)=>['h',[x1,y1,x2,y2]];
+  const dia=(x,y,s=4)=>['k',`${x},${y-s} ${x+s*.7},${y} ${x},${y+s} ${x-s*.7},${y}`];
+  const G={
+    L:(x)=>[blade(x,0,x,140,7),blade(x,140,x+32,126,6),dia(x,-16)],
+    o:(x)=>[blade(x,22,x,118,7),blade(x+30,22,x+30,118,7),hair(x,22,x+15,0),hair(x+15,0,x+30,22),hair(x,118,x+15,140),hair(x+15,140,x+30,118)],
+    n:(x)=>[blade(x,0,x,140,7),blade(x+30,0,x+30,140,7),blade(x,4,x+30,136,5)],
+    g:(x)=>[blade(x,14,x,126,7),hair(x,14,x+15,0),hair(x+15,0,x+30,14),blade(x+30,14,x+30,40,6),hair(x,126,x+15,140),hair(x+15,140,x+30,126),blade(x+30,78,x+30,126,6.5),hair(x+12,78,x+30,78)],
+    e:(x)=>[blade(x,0,x,140,7),blade(x,2,x+30,2,5),blade(x,70,x+22,70,5),blade(x,138,x+30,138,5)],
+    v:(x)=>[blade(x,0,x+15,140,6.5),blade(x+30,0,x+15,140,6)],
+    i:(x)=>[blade(x,0,x,140,7),dia(x,-16)],
+    t:(x)=>[blade(x-4,2,x+34,2,5),blade(x+15,0,x+15,140,7)],
+    y:(x)=>[blade(x,0,x+15,72,7),blade(x+30,0,x+15,72,5),blade(x+15,72,x+15,178,7),hair(x+15,178,x+1,192)]
+  };
+  const word=[['L',32],['o',30],['n',30],['g',30],['e',30],['v',30],['i',0],['t',30],['y',30]];
+  let x=0,parts=[];word.forEach(([c,w])=>{parts.push(...G[c](x));x+=w+18});
+  const end=x-18;
+  document.querySelectorAll('svg.wm').forEach(svg=>{
+    svg.setAttribute('viewBox',`-24 -34 ${end+48} 240`);
+    const base=document.createElementNS(NS,'path');base.setAttribute('class','base');base.setAttribute('d',`M-20 156 H${end+20}`);base.style.setProperty('--l',end+40);svg.appendChild(base);
+    [dia(-20,156,3),dia(end+20,156,3)].forEach(([c,pts])=>{const e=document.createElementNS(NS,'polygon');e.setAttribute('class','k');e.setAttribute('points',pts);svg.appendChild(e)});
+    parts.forEach(([c,v],i)=>{let e;
+      if(c==='h'){e=document.createElementNS(NS,'line');const[x1,y1,x2,y2]=v;e.setAttribute('x1',x1);e.setAttribute('y1',y1);e.setAttribute('x2',x2);e.setAttribute('y2',y2);e.style.setProperty('--l',Math.ceil(Math.hypot(x2-x1,y2-y1)))}
+      else{e=document.createElementNS(NS,'polygon');e.setAttribute('points',v)}
+      e.setAttribute('class',c);e.style.transitionDelay=(i*.035)+'s';svg.appendChild(e)});
+  });
+  const draw=document.querySelector('svg.wm[data-draw]');
+  window.__drawMark=()=>draw&&requestAnimationFrame(()=>draw.classList.add('go'));
+  if(RM)draw&&draw.classList.add('go');
+})();
 
 // ---------- redactions
 $$('.rd').forEach(r=>{r.addEventListener('click',()=>r.classList.toggle('on'));r.addEventListener('keydown',e=>{if(e.key==='Enter')r.classList.toggle('on')})});
