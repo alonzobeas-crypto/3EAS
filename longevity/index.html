@@ -10,12 +10,12 @@
 <meta name="description" content="LA TRAFFIC. 110 North. After dark.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sedgwick+Ave+Display&family=Bungee&family=Overpass:wght@700;900&family=Special+Elite&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Sedgwick+Ave+Display&family=DotGothic16&family=Bungee&family=Overpass:wght@700;900&family=Special+Elite&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --night:#07070a; --ink:#ece7dc; --dim:#8b857a; --spray:#e8452c; --lime:#b6e14a; --chrome:#d9dde2;
+  --night:#07070a; --ink:#ece7dc; --dim:#8b857a; --spray:#f26a21; --lime:#f7b51c; --rtdred:#c8202f; --rtdwhite:#f3efe6; --chrome:#d9dde2;
   --sodium:#f3a640; --sign:#0f6b3c; --tape:#f2d23c; --paper:#e7dfcc;
-  --hand:'Sedgwick Ave Display',cursive; --block:'Bungee',Impact,sans-serif; --hwy:'Overpass',Arial,sans-serif;
+  --hand:'Permanent Marker',cursive; --scrawl:'Sedgwick Ave Display',cursive; --dot:'DotGothic16',monospace; --block:'Bungee',Impact,sans-serif; --hwy:'Overpass',Arial,sans-serif;
   --type:'Special Elite',ui-monospace,monospace; --mono:'IBM Plex Mono',ui-monospace,monospace;
   --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .6 0 0 0 0 .58 0 0 0 0 .55 0 0 0 .14 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
@@ -50,7 +50,7 @@ a{color:inherit}
 /* radio, always on */
 .radio{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:70;display:flex;gap:12px;align-items:center;
   background:rgba(5,5,6,.82);border:1px solid #2b2b2b;border-radius:999px;padding:8px 16px;backdrop-filter:blur(6px);
-  font:11px var(--mono);letter-spacing:.14em;color:var(--lime);white-space:nowrap;max-width:calc(100vw - 24px);box-shadow:0 0 20px rgba(182,225,74,.08)}
+  font:11px var(--mono);letter-spacing:.14em;color:var(--lime);white-space:nowrap;max-width:calc(100vw - 24px);box-shadow:0 0 20px rgba(247,181,28,.08)}
 .radio .dot{width:7px;height:7px;border-radius:50%;background:var(--spray);box-shadow:0 0 8px var(--spray);animation:blink 1.6s infinite}
 .radio .st{color:var(--ink)} .radio .t{color:var(--dim)}
 @keyframes blink{50%{opacity:.25}}
@@ -76,6 +76,31 @@ a{color:inherit}
 @keyframes drip{0%,40%{transform:scaleY(0)}100%{transform:scaleY(1)}}
 .handtag{position:absolute;right:-4%;bottom:-38%;font:clamp(34px,7vw,86px) var(--hand);color:var(--spray);transform:rotate(-9deg);text-shadow:2px 2px 0 #000}
 .whisper{position:relative;z-index:3;margin-top:clamp(84px,12vw,130px);font:12px var(--mono);letter-spacing:.32em;text-transform:uppercase;color:var(--dim);pointer-events:auto}
+
+/* RTD stripes */
+.rtd{height:18px;background:linear-gradient(180deg,var(--lime) 0 33%,var(--spray) 33% 66%,var(--rtdred) 66%);box-shadow:0 0 30px rgba(242,106,33,.25)}
+.rtd.thin{height:9px}
+.scene>.rtd{position:absolute;left:0;right:0;bottom:0;z-index:1;opacity:.9}
+
+/* EXIT 4 — bus stop / the rumor */
+#stop .in{text-align:center}
+.bus{position:relative;max-width:980px;margin:0 auto;background:var(--rtdwhite);border-radius:18px 34px 10px 10px;padding:20px 18px 48px;box-shadow:0 40px 80px rgba(0,0,0,.7);transform:translateX(30%);opacity:0;transition:transform 2.2s cubic-bezier(.15,.7,.2,1),opacity 1s}
+.bus.seen{transform:none;opacity:1}
+.flip{background:#0b0b0b;border-radius:4px;padding:8px 14px;margin:0 0 14px auto;width:max-content;max-width:100%;font:clamp(16px,2.6vw,26px) var(--dot);color:#ffb52e;letter-spacing:.12em;text-shadow:0 0 6px rgba(255,181,46,.7);text-align:left;min-width:min(100%,330px)}
+.wins{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.win{position:relative;aspect-ratio:1.25;background:linear-gradient(160deg,#1a1f24,#0b0d10 60%,#14181c);border-radius:6px;overflow:hidden;display:grid;place-items:center;padding:10px;box-shadow:inset 0 0 0 3px #2b2b2b}
+.win::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.07) 40%,transparent 50%)}
+.win span{position:relative;font:clamp(15px,1.9vw,21px)/1.2 var(--scrawl);color:rgba(230,236,240,.78);transform:rotate(var(--r,-4deg));text-shadow:0 0 1px #fff}
+.win.door{background:linear-gradient(90deg,#0b0d10 49%,#3a3a3a 49% 51%,#0b0d10 51%)}
+.bus .rtd{margin:16px -18px 0}
+.bus .num{position:absolute;left:22px;bottom:12px;font:14px var(--block);color:#222;letter-spacing:.1em}
+.bus .rtdlogo{position:absolute;right:24px;bottom:10px;font:900 16px var(--hwy);color:var(--rtdred);letter-spacing:.2em}
+.wheels{position:absolute;left:0;right:0;bottom:-26px;display:flex;justify-content:space-between;padding:0 20%}
+.wheels i{width:56px;height:56px;border-radius:50%;background:radial-gradient(circle,#777 0 24%,#111 26% 100%);box-shadow:0 0 0 4px #000}
+.bench{margin:62px auto 0;max-width:640px;background:#1a1a1a;border-top:8px solid var(--lime);padding:16px 18px;transform:rotate(-1deg)}
+.bench p{font:clamp(20px,3.4vw,34px)/1.1 var(--hand);color:var(--ink)}
+.bench small{display:block;margin-top:8px;font:10px var(--mono);letter-spacing:.3em;color:var(--dim)}
+@media (max-width:820px){.wins{grid-template-columns:repeat(2,1fr)}.win{aspect-ratio:1.7}.win.door{display:none}.wheels i{width:42px;height:42px}}
 
 /* EXIT 1 — eclipse */
 .lines p{font:clamp(20px,3vw,30px)/1.45 var(--type);max-width:760px;margin:0 auto 26px;text-align:center;filter:blur(8px);opacity:.1;transition:filter 1.4s,opacity 1.4s}
@@ -115,7 +140,8 @@ a{color:inherit}
 .tags{position:relative;height:min(74vh,640px);z-index:1}
 .tags > *{position:absolute;text-decoration:none;line-height:.9;white-space:nowrap;transform:rotate(var(--r,0deg));transition:filter .3s}
 .tags a:hover{filter:drop-shadow(0 0 12px currentColor)}
-.t-hand{font-family:var(--hand)} .t-block{font-family:var(--block)} .t-type{font-family:var(--type)}
+.t-hand{font-family:var(--hand)}
+.fat,.t-hand,.handtag,.dm,.stk,.plate .tg{text-shadow:0 0 1px currentColor,0 0 3px currentColor,3px 3px 0 #000!important;-webkit-text-stroke:.6px currentColor} .t-block{font-family:var(--block)} .t-type{font-family:var(--type)}
 .throw{font-family:var(--block);color:#111;-webkit-text-stroke:2px var(--ink);paint-order:stroke;text-shadow:5px 5px 0 var(--spray)}
 
 /* EXIT 4 — drive-in */
@@ -191,10 +217,11 @@ footer a{color:var(--dim)}
   <div class="in">
     <div class="orb" aria-hidden="true"></div>
     <div class="title"><h1>LONGEVITY</h1><div class="drips" id="drips" aria-hidden="true"></div><span class="handtag" aria-hidden="true">LA Traffic</span></div>
-    <div class="whisper"><span class="rd" tabindex="0">ECLIPSE</span> was here</div>
+    <div class="whisper"><span class="rd" tabindex="0">ECLIPSE</span> was here · ask around</div>
   </div>
 </section>
 
+<div class="rtd" aria-hidden="true"></div>
 <section class="scene" id="eclipse" data-st="EXIT 1 · ECLIPSE">
   <div class="exit"><div class="plate"><small>EXIT 1</small><b>ECLIPSE</b><span class="ar">↗</span></div></div>
   <div class="in lines">
@@ -234,8 +261,32 @@ footer a{color:var(--dim)}
   </div>
 </section>
 
-<section class="scene" id="drivein" data-st="EXIT 4 · DRIVE-IN">
-  <div class="exit"><div class="plate"><small>EXIT 4</small><b>DRIVE-IN</b><span class="ar">↗</span></div></div>
+<section class="scene" id="stop" data-st="EXIT 4 · BUS STOP">
+  <div class="exit"><div class="plate"><small>EXIT 4</small><b>CRENSHAW / 43RD</b><span class="ar">↗</span></div></div>
+  <div class="in">
+    <div class="bus" id="bus">
+      <div class="flip" id="flip">NOT IN SERVICE</div>
+      <div class="wins">
+        <div class="win"><span style="--r:-6deg">seen him at blowed. once.</span></div>
+        <div class="win"><span style="--r:4deg">your favorite producer knows</span></div>
+        <div class="win door"></div>
+        <div class="win"><span style="--r:-3deg">is he still around??</span></div>
+        <div class="win"><span style="--r:5deg">he never left</span></div>
+        <div class="win"><span style="--r:-5deg">ask somebody from leimert</span></div>
+        <div class="win"><span style="--r:3deg">credits don't say</span></div>
+        <div class="win"><span style="--r:-4deg">IYKYK</span></div>
+      </div>
+      <div class="rtd" aria-hidden="true"></div>
+      <span class="num">110</span><span class="rtdlogo">LA TRAFFIC</span>
+      <div class="wheels" aria-hidden="true"><i></i><i></i></div>
+    </div>
+    <div class="bench"><p>Everybody has a story about him. Nobody has the whole one.</p><small>BUS BENCH · CRENSHAW</small></div>
+  </div>
+  <div class="rtd thin" aria-hidden="true"></div>
+</section>
+
+<section class="scene" id="drivein" data-st="EXIT 5 · DRIVE-IN">
+  <div class="exit"><div class="plate"><small>EXIT 5</small><b>DRIVE-IN</b><span class="ar">↗</span></div></div>
   <div class="in">
     <div class="marquee"><i>tonight only</i><b>AUDIO CINEMA</b><i>+ "THE MASK" · <a href="https://3eascortex.com" target="_blank" rel="noopener">3EAS</a> cut</i><small>ALPHA PUP PICTURES</small></div>
     <div class="screen-wrap">
@@ -253,9 +304,9 @@ footer a{color:var(--dim)}
   </div>
 </section>
 
-<section class="scene" id="case" data-st="EXIT 5 · ROAD CLOSED">
+<section class="scene" id="case" data-st="EXIT 6 · ROAD CLOSED">
   <div class="siren" aria-hidden="true"></div>
-  <div class="exit"><div class="plate"><small>EXIT 5</small><b>ROAD CLOSED</b><span class="ar">✕</span></div></div>
+  <div class="exit"><div class="plate"><small>EXIT 6</small><b>ROAD CLOSED</b><span class="ar">✕</span></div></div>
   <div class="ctape a" aria-hidden="true"><span>LA TRAFFIC · DO NOT CROSS · BLACK ON BLACK CRIME · DO NOT CROSS · LA TRAFFIC · DO NOT CROSS · BLACK ON BLACK CRIME · DO NOT CROSS · LA TRAFFIC · DO NOT CROSS · BLACK ON BLACK CRIME · DO NOT CROSS ·&nbsp;</span></div>
   <div class="ctape b" aria-hidden="true"><span>UNDER INVESTIGATION · KING · UNDER INVESTIGATION · LONGEVITY · UNDER INVESTIGATION · KING · UNDER INVESTIGATION · LONGEVITY · UNDER INVESTIGATION · KING · UNDER INVESTIGATION · LONGEVITY ·&nbsp;</span></div>
   <div class="in">
@@ -328,6 +379,12 @@ const m=$('#meters'),s=$('#strips');
 for(let i=0;i<16;i++){const b=document.createElement('i');b.style.setProperty('--h',(45+Math.random()*50)+'%');b.style.animationDuration=(.4+Math.random()*.9)+'s';m.appendChild(b)}
 ['KICK','SNR','HAT','BASS','KEYS','VOX','DUB','FX'].forEach(n=>{const e=document.createElement('div');e.className='strip';const k=()=>(Math.random()*240-120|0);
   e.innerHTML=`<div class="knob" style="--r:${k()}deg"></div><div class="knob" style="--r:${k()}deg"></div><div class="track"><div class="cap" style="--a:${30+Math.random()*55|0}%;--b:${5+Math.random()*40|0}%;animation-duration:${(3+Math.random()*5).toFixed(1)}s"></div></div><span>${n}</span>`;s.appendChild(e)});
+
+// bus pulls in; flip-dot sign
+const bus=$('#bus'),flip=$('#flip');
+if('IntersectionObserver' in window&&!RM){const bo=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){bus.classList.add('seen');bo.disconnect()}}),{threshold:.25});bo.observe(bus)}else bus.classList.add('seen');
+const fl=['NOT IN SERVICE','LONGEVITY','110 N · AFTER DARK','NOT IN SERVICE','ASK AROUND'];let fi=0;
+if(!RM)setInterval(()=>{fi=(fi+1)%fl.length;flip.textContent=fl[fi]},2400);
 
 // payphone screen
 const lcd=$('#lcd'),msgs=['NO SERVICE','INSERT COIN','LINE BUSY',"DON'T CALL",'DM @GEVITY'];let li=0;
