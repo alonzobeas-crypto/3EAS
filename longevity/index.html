@@ -38,7 +38,13 @@ a{color:inherit}
 .rd{background:#000;color:transparent;padding:0 .2em;cursor:help;transition:color .25s,background .25s;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .rd:hover,.rd.on{background:transparent;color:var(--spray)}
 
-/* overhead exit sign that opens every scene */
+/* chapter mark */
+.mark{position:absolute;top:44px;left:0;right:0;z-index:3;display:flex;justify-content:center;align-items:center;gap:14px;pointer-events:none}
+.mark::before,.mark::after{content:"";width:min(18vw,120px);height:1px;background:linear-gradient(90deg,transparent,rgba(236,231,220,.35))}
+.mark::after{transform:scaleX(-1)}
+.mark .n{font:13px var(--block);color:var(--spray);letter-spacing:.08em}
+.mark .nm{font:11px var(--mono);letter-spacing:.4em;color:var(--dim);text-transform:uppercase}
+/* (old exit sign styles, unused) */
 .exit{position:absolute;top:30px;left:0;right:0;z-index:3;display:flex;flex-direction:column;align-items:center;pointer-events:none}
 .exit::before{content:"";align-self:stretch;height:9px;background:repeating-linear-gradient(90deg,#2f2f2f 0 14px,#1d1d1d 14px 18px);margin-bottom:10px}
 .plate{position:relative;background:var(--sign);color:#fff;border:3px solid #fff;outline:3px solid var(--sign);border-radius:9px;padding:8px 30px 10px 22px;font-family:var(--hwy);text-align:center;box-shadow:0 14px 30px rgba(0,0,0,.6)}
@@ -226,8 +232,8 @@ footer a{color:var(--dim)}
 </section>
 
 <div class="rtd" aria-hidden="true"></div>
-<section class="scene" id="eclipse" data-st="EXIT 1 · ECLIPSE">
-  <div class="exit"><div class="plate"><small>EXIT 1</small><b>ECLIPSE</b><span class="ar">↗</span></div></div>
+<section class="scene" id="eclipse" data-st="I · ECLIPSE">
+  <div class="mark"><span class="n">I</span><span class="nm">ECLIPSE</span></div>
   <div class="in lines">
     <p class="dk">For a while, the light started going out.</p>
     <p class="dk">Edges went soft. Everything narrowed down to sound.</p>
@@ -236,8 +242,8 @@ footer a{color:var(--dim)}
   </div>
 </section>
 
-<section class="scene" id="room" data-st="EXIT 2 · THE ROOM">
-  <div class="exit"><div class="plate"><small>EXIT 2</small><b>THE ROOM</b><span class="ar">↗</span></div></div>
+<section class="scene" id="room" data-st="II · THE ROOM">
+  <div class="mark"><span class="n">II</span><span class="nm">THE ROOM</span></div>
   <div class="in">
     <div>
       <div class="onair">● RECORDING</div>
@@ -249,8 +255,8 @@ footer a{color:var(--dim)}
   </div>
 </section>
 
-<section class="scene" id="drivein" data-st="EXIT 3 · DRIVE-IN">
-  <div class="exit"><div class="plate"><small>EXIT 3</small><b>DRIVE-IN</b><span class="ar">↗</span></div></div>
+<section class="scene" id="drivein" data-st="III · DRIVE-IN">
+  <div class="mark"><span class="n">III</span><span class="nm">DRIVE-IN</span></div>
   <div class="in">
     <div class="marquee"><i>tonight only</i><b>AUDIO CINEMA</b><i>+ "THE MASK" · <a href="https://3eascortex.com" target="_blank" rel="noopener">3EAS</a> cut</i><small>ALPHA PUP PICTURES</small></div>
     <div class="screen-wrap">
@@ -268,9 +274,9 @@ footer a{color:var(--dim)}
   </div>
 </section>
 
-<section class="scene" id="case" data-st="EXIT 4 · ROAD CLOSED">
+<section class="scene" id="case" data-st="IV · ROAD CLOSED">
   <div class="siren" aria-hidden="true"></div>
-  <div class="exit"><div class="plate"><small>EXIT 4</small><b>ROAD CLOSED</b><span class="ar">✕</span></div></div>
+  <div class="mark"><span class="n">IV</span><span class="nm">ROAD CLOSED</span></div>
   <div class="ctape a" aria-hidden="true"><span>LA TRAFFIC · DO NOT CROSS · BLACK ON BLACK CRIME · DO NOT CROSS · LA TRAFFIC · DO NOT CROSS · BLACK ON BLACK CRIME · DO NOT CROSS · LA TRAFFIC · DO NOT CROSS · BLACK ON BLACK CRIME · DO NOT CROSS ·&nbsp;</span></div>
   <div class="ctape b" aria-hidden="true"><span>UNDER INVESTIGATION · KING · UNDER INVESTIGATION · LONGEVITY · UNDER INVESTIGATION · KING · UNDER INVESTIGATION · LONGEVITY · UNDER INVESTIGATION · KING · UNDER INVESTIGATION · LONGEVITY ·&nbsp;</span></div>
   <div class="in">
@@ -284,8 +290,8 @@ footer a{color:var(--dim)}
   </div>
 </section>
 
-<section class="scene" id="stop" data-st="EXIT 5 · BUS STOP">
-  <div class="exit"><div class="plate"><small>EXIT 5</small><b>CRENSHAW / 43RD</b><span class="ar">↗</span></div></div>
+<section class="scene" id="stop" data-st="V · BUS STOP">
+  <div class="mark"><span class="n">V</span><span class="nm">CRENSHAW / 43RD</span></div>
   <div class="in">
     <div class="bus" id="bus">
       <div class="flip" id="flip">NOT IN SERVICE</div>
@@ -308,8 +314,8 @@ footer a{color:var(--dim)}
   <div class="rtd thin" aria-hidden="true"></div>
 </section>
 
-<section class="scene" id="alley" data-st="EXIT 6 · THE ALLEY">
-  <div class="exit"><div class="plate"><small>EXIT 6</small><b>LEIMERT · CRENSHAW</b><span class="ar">↗</span></div></div>
+<section class="scene" id="alley" data-st="VI · THE ALLEY">
+  <div class="mark"><span class="n">VI</span><span class="nm">LEIMERT · CRENSHAW</span></div>
   <div class="in tags">
     <span class="t-block throw" style="--r:-4deg;left:2%;top:4%;font-size:clamp(40px,8vw,96px)">BLOWED</span>
     <a class="t-hand" href="https://vulgar.bandcamp.com/album/darkleaf-kimetic-principles-lp" target="_blank" rel="noopener" style="--r:6deg;right:3%;top:18%;font-size:clamp(44px,9vw,110px);color:var(--lime)">Darkleaf</a>
@@ -324,8 +330,8 @@ footer a{color:var(--dim)}
 </section>
 
 
-<section class="scene" id="phone" data-st="LAST EXIT · PAYPHONE">
-  <div class="exit"><div class="plate"><small>LAST EXIT</small><b>PAYPHONE</b><span class="ar">↗</span></div></div>
+<section class="scene" id="phone" data-st="VII · PAYPHONE">
+  <div class="mark"><span class="n">VII</span><span class="nm">PAYPHONE</span></div>
   <div class="in">
     <div class="booth">
       <span class="hand" aria-hidden="true"></span><span class="cord" aria-hidden="true"></span>
