@@ -73,12 +73,12 @@ p.body{margin-top:26px;color:var(--dim);font-size:clamp(19px,1.6vw,22px)}
 /* hero */
 .hero h1{font:100 clamp(64px,13vw,168px)/1 var(--name);color:var(--y);letter-spacing:0}
 /* the mark: a hand-built glyph script, stems like blades, hairline joins */
-.wm{display:block;width:clamp(240px,48vw,620px);height:auto;margin:0 auto;overflow:visible}
+.wm{display:block;width:clamp(290px,62vw,820px);height:auto;margin:0 auto;overflow:visible}
 .wm{filter:url(#spray)}
-.wm .b{fill:var(--y)}
+.wm .fa{fill:var(--y)}.wm .fb{fill:var(--o)}
 .wm .h{fill:none;stroke:var(--y);stroke-width:1.5;stroke-linecap:round}
 .wm .k{fill:var(--y)}
-.wm .base{fill:none;stroke:rgba(236,228,208,.35);stroke-width:1}
+.wm .base{fill:none;stroke:var(--y);stroke-width:1.2;opacity:.8}
 .wm[data-draw] .b,.wm[data-draw] .k{opacity:0;transform:scaleY(.2);transform-box:fill-box;transform-origin:50% 0;transition:opacity 1.2s var(--ease),transform 1.4s var(--ease)}
 .wm[data-draw] .h,.wm[data-draw] .base{stroke-dasharray:var(--l);stroke-dashoffset:var(--l);transition:stroke-dashoffset 1.6s var(--ease)}
 .wm.go .b,.wm.go .k{opacity:1;transform:none}
@@ -143,8 +143,8 @@ footer a{color:var(--ink)}
 <canvas id="gl" aria-hidden="true"></canvas>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="spray" x="-10%" y="-20%" width="120%" height="140%">
   <feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="2" seed="7" result="n"/>
-  <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G" result="cut"/>
-  <feGaussianBlur in="cut" stdDeviation="2.6" result="haze"/>
+  <feDisplacementMap in="SourceGraphic" in2="n" scale="1.2" xChannelSelector="R" yChannelSelector="G" result="cut"/>
+  <feGaussianBlur in="cut" stdDeviation="2" result="haze"/>
   <feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="1" seed="3" result="dots"/>
   <feComposite in="haze" in2="dots" operator="arithmetic" k1="1.4" k2="0" k3="0" k4="0" result="over"/>
   <feMerge><feMergeNode in="over"/><feMergeNode in="cut"/></feMerge>
@@ -345,33 +345,37 @@ $$('a,.rd,iframe').forEach(el=>{el.addEventListener('pointerenter',()=>cu.classL
 // ---------- the mark: blades + hairlines, built letter by letter
 (function(){
   const NS='http://www.w3.org/2000/svg';
+  // chiseled blade: two facets, lit side yellow, shadow side orange
   const blade=(x1,y1,x2,y2,w)=>{const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy),nx=-dy/L*w/2,ny=dx/L*w/2,
-    a=[x1+dx*.18,y1+dy*.18],b=[x1+dx*.82,y1+dy*.82];
-    return ['b',`${x1},${y1} ${a[0]+nx},${a[1]+ny} ${b[0]+nx},${b[1]+ny} ${x2},${y2} ${b[0]-nx},${b[1]-ny} ${a[0]-nx},${a[1]-ny}`]};
+    a=[x1+dx*.16,y1+dy*.16],b=[x1+dx*.84,y1+dy*.84],f=v=>v.toFixed(1);
+    return ['b',[`${x1},${y1} ${f(a[0]+nx)},${f(a[1]+ny)} ${f(b[0]+nx)},${f(b[1]+ny)} ${x2},${y2}`,`${x1},${y1} ${f(a[0]-nx)},${f(a[1]-ny)} ${f(b[0]-nx)},${f(b[1]-ny)} ${x2},${y2}`]]};
   const hair=(x1,y1,x2,y2)=>['h',[x1,y1,x2,y2]];
   const dia=(x,y,s=4)=>['k',`${x},${y-s} ${x+s*.7},${y} ${x},${y+s} ${x-s*.7},${y}`];
+  const S=13;
   const G={
-    L:(x)=>[blade(x,0,x,140,7),blade(x,140,x+32,126,6),dia(x,-16)],
-    o:(x)=>[blade(x,22,x,118,7),blade(x+30,22,x+30,118,7),hair(x,22,x+15,0),hair(x+15,0,x+30,22),hair(x,118,x+15,140),hair(x+15,140,x+30,118)],
-    n:(x)=>[blade(x,0,x,140,7),blade(x+30,0,x+30,140,7),blade(x,4,x+30,136,5)],
-    g:(x)=>[blade(x,14,x,126,7),hair(x,14,x+15,0),hair(x+15,0,x+30,14),blade(x+30,14,x+30,40,6),hair(x,126,x+15,140),hair(x+15,140,x+30,126),blade(x+30,78,x+30,126,6.5),hair(x+12,78,x+30,78)],
-    e:(x)=>[blade(x,0,x,140,7),blade(x,2,x+30,2,5),blade(x,70,x+22,70,5),blade(x,138,x+30,138,5)],
-    v:(x)=>[blade(x,0,x+15,140,6.5),blade(x+30,0,x+15,140,6)],
-    i:(x)=>[blade(x,0,x,140,7),dia(x,-16)],
-    t:(x)=>[blade(x-4,2,x+34,2,5),blade(x+15,0,x+15,140,7)],
-    y:(x)=>[blade(x,0,x+15,72,7),blade(x+30,0,x+15,72,5),blade(x+15,72,x+15,178,7),hair(x+15,178,x+1,192)]
+    L:(x)=>[blade(x,0,x,150,S),blade(x+2,150,x+40,136,9),dia(x,-20,5)],
+    o:(x)=>[blade(x,26,x,124,12),blade(x+32,26,x+32,124,12),blade(x,26,x+16,0,4),blade(x+16,0,x+32,26,4),blade(x,124,x+16,150,4),blade(x+16,150,x+32,124,4),dia(x+16,75,4)],
+    n:(x)=>[blade(x,0,x,150,S),blade(x+34,0,x+34,150,S),blade(x+2,6,x+32,144,8)],
+    g:(x)=>[blade(x,18,x,132,12),blade(x,18,x+17,0,4),blade(x+17,0,x+34,18,4),blade(x+34,18,x+34,46,8),blade(x,132,x+17,150,4),blade(x+17,150,x+34,132,4),blade(x+34,84,x+34,132,11),blade(x+12,84,x+42,84,5)],
+    e:(x)=>[blade(x,0,x,150,S),blade(x,3,x+34,3,7),blade(x,75,x+26,75,6),blade(x,147,x+38,147,7)],
+    v:(x)=>[blade(x-2,0,x+19,154,11),blade(x+38,0,x+15,154,6)],
+    i:(x)=>[blade(x,0,x,150,S),dia(x,-20,5)],
+    t:(x)=>[blade(x-10,3,x+40,3,7),blade(x+15,0,x+15,150,S)],
+    y:(x)=>[blade(x,0,x+17,80,10),blade(x+34,0,x+17,80,6),blade(x+17,80,x+17,192,12),blade(x+17,192,x-70,210,7),blade(x-70,210,x-300,214,3)]
   };
-  const word=[['L',32],['o',30],['n',30],['g',30],['e',30],['v',30],['i',0],['t',30],['y',30]];
-  let x=0,parts=[];word.forEach(([c,w])=>{parts.push(...G[c](x));x+=w+18});
-  const end=x-18;
+  const word=[['L',30],['o',32],['n',34],['g',34],['e',34],['v',36],['i',0],['t',30],['y',34]];
+  let x=0,parts=[];word.forEach(([c,w])=>{parts.push(...G[c](x));x+=w+15});
+  const end=x-15;
+  const mk=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e};
   document.querySelectorAll('svg.wm').forEach(svg=>{
-    svg.setAttribute('viewBox',`-24 -34 ${end+48} 240`);
-    const base=document.createElementNS(NS,'path');base.setAttribute('class','base');base.setAttribute('d',`M-20 156 H${end+20}`);base.style.setProperty('--l',end+40);svg.appendChild(base);
-    [dia(-20,156,3),dia(end+20,156,3)].forEach(([c,pts])=>{const e=document.createElementNS(NS,'polygon');e.setAttribute('class','k');e.setAttribute('points',pts);svg.appendChild(e)});
+    svg.setAttribute('viewBox',`-30 -40 ${end+60} 270`);
+    const bar=mk('path',{class:'base',d:`M-22 -10 H${end+22}`});bar.style.setProperty('--l',end+44);svg.appendChild(bar);
+    [dia(-22,-10,3),dia(end+22,-10,3)].forEach(([c,pts])=>svg.appendChild(mk('polygon',{class:'k',points:pts})));
     parts.forEach(([c,v],i)=>{let e;
-      if(c==='h'){e=document.createElementNS(NS,'line');const[x1,y1,x2,y2]=v;e.setAttribute('x1',x1);e.setAttribute('y1',y1);e.setAttribute('x2',x2);e.setAttribute('y2',y2);e.style.setProperty('--l',Math.ceil(Math.hypot(x2-x1,y2-y1)))}
-      else{e=document.createElementNS(NS,'polygon');e.setAttribute('points',v)}
-      e.setAttribute('class',c);e.style.transitionDelay=(i*.035)+'s';svg.appendChild(e)});
+      if(c==='h'){const[x1,y1,x2,y2]=v;e=mk('line',{x1,y1,x2,y2});e.style.setProperty('--l',Math.ceil(Math.hypot(x2-x1,y2-y1)))}
+      else if(c==='b'){e=mk('g',{});e.appendChild(mk('polygon',{class:'fa',points:v[0]}));e.appendChild(mk('polygon',{class:'fb',points:v[1]}))}
+      else e=mk('polygon',{points:v});
+      e.setAttribute('class',c);e.style.transitionDelay=(i*.03)+'s';svg.appendChild(e)});
   });
   const draw=document.querySelector('svg.wm[data-draw]');
   window.__drawMark=()=>draw&&requestAnimationFrame(()=>draw.classList.add('go'));
