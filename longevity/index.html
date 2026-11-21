@@ -10,12 +10,14 @@
 <meta name="description" content="Longevity. MC, producer. Los Angeles.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@100&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Montserrat:wght@700;800&family=Noto+Sans+Egyptian+Hieroglyphs&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@100&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=VT323&family=Share+Tech+Mono&family=Noto+Sans+Egyptian+Hieroglyphs&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#070706; --ink:#e9e4d8; --dim:#86806f; --faint:#2a2823; --gold:#e4d77a; --gold2:#b9ab55;
-  --o:#f26a21; --y:#f7b51c; --r:#c8202f;
-  --name:'Grenze Gotisch',serif; --serif:'Cormorant Garamond',Georgia,serif; --sans:'Montserrat',Arial,sans-serif; --glyph:'Noto Sans Egyptian Hieroglyphs',serif;
+  /* 5 colors: black · bus cream · RTD yellow · RTD orange · RTD red */
+  --bg:#000000; --ink:#ece4d0; --gold:#f6b21b; --o:#ef6a23; --r:#c9262c;
+  --y:var(--gold); --gold2:var(--o);
+  --dim:rgba(236,228,208,.52); --faint:rgba(236,228,208,.12);
+  --name:'Grenze Gotisch',serif; --serif:'Cormorant Garamond',Georgia,serif; --sans:'Share Tech Mono',ui-monospace,monospace; --vt:'VT323',monospace; --glyph:'Noto Sans Egyptian Hieroglyphs',serif;
   --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .6 0 0 0 0 .58 0 0 0 0 .5 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -28,7 +30,7 @@ a{color:inherit;text-decoration:none}
 
 .caps{font:600 12px var(--serif);letter-spacing:.5em;text-transform:uppercase}
 .label{font:800 10px var(--sans);letter-spacing:.32em;text-transform:uppercase;color:var(--dim)}
-.rd{background:#3b3727;color:transparent;padding:0 .15em;cursor:help;transition:all .3s;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.rd{background:rgba(236,228,208,.16);color:transparent;padding:0 .15em;cursor:help;transition:all .3s;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .rd:hover,.rd.on{background:transparent;color:var(--gold)}
 
 /* header */
@@ -36,6 +38,8 @@ header.top{position:fixed;top:0;left:0;right:0;z-index:40;transition:background 
 header.top.solid{background:rgba(7,7,6,.86);backdrop-filter:blur(8px)}
 header.top .wrap{display:flex;justify-content:space-between;align-items:center;height:60px}
 header.top .caps{color:var(--ink)}
+header.top .dest{font:22px var(--vt);letter-spacing:.14em;color:var(--gold);text-shadow:0 0 8px rgba(246,178,27,.55)}
+header.top .dest i{font-style:normal;color:var(--o);padding:0 .4em}
 header.top a.caps{color:var(--dim)} header.top a.caps:hover{color:var(--gold)}
 
 /* hero */
@@ -43,25 +47,25 @@ header.top a.caps{color:var(--dim)} header.top a.caps:hover{color:var(--gold)}
 .hero .in{position:relative;z-index:2;animation:wake 3.6s cubic-bezier(.2,.7,.2,1) both}
 @keyframes wake{0%{filter:blur(18px) brightness(.15);opacity:.3}60%{filter:blur(3px) brightness(.8)}100%{filter:none;opacity:1}}
 .ring{position:absolute;left:50%;top:50%;width:min(76vw,460px);aspect-ratio:1;transform:translate(-50%,-56%);border-radius:50%;z-index:1;
-  box-shadow:0 0 0 1px rgba(228,215,122,.18),0 0 70px 6px rgba(228,215,122,.12),inset 0 0 50px rgba(0,0,0,.9)}
-.ring::after{content:"";position:absolute;inset:-2px;border-radius:50%;background:conic-gradient(from 200deg,transparent 0 72%,rgba(228,215,122,.7) 84%,transparent 94%);
+  box-shadow:0 0 0 1px rgba(246,178,27,.18),0 0 70px 6px rgba(246,178,27,.12),inset 0 0 50px rgba(0,0,0,.9)}
+.ring::after{content:"";position:absolute;inset:-2px;border-radius:50%;background:conic-gradient(from 200deg,transparent 0 72%,rgba(246,178,27,.7) 84%,transparent 94%);
   -webkit-mask:radial-gradient(circle,transparent 69%,#000 70.5%);mask:radial-gradient(circle,transparent 69%,#000 70.5%);animation:spin 26s linear infinite}
 @keyframes spin{to{transform:rotate(1turn)}}
-h1{font:100 clamp(78px,18vw,220px)/1 var(--name);color:var(--gold);letter-spacing:-.01em;text-shadow:0 0 22px rgba(228,215,122,.32),0 0 70px rgba(228,215,122,.14)}
+h1{font:100 clamp(78px,18vw,220px)/1 var(--name);color:var(--gold);letter-spacing:-.01em;text-shadow:0 0 22px rgba(246,178,27,.32),0 0 70px rgba(246,178,27,.14)}
 .role{margin-top:26px;color:var(--ink)}
 .role i{font-style:normal;color:var(--gold2);padding:0 .6em}
 .where{margin-top:14px;color:var(--dim)}
 .ankh{display:block;margin-top:34px;font:20px var(--glyph);color:var(--gold2);opacity:.8}
-.stripe{position:absolute;left:0;right:0;bottom:0;height:6px;background:linear-gradient(180deg,var(--y) 0 33%,var(--o) 33% 66%,var(--r) 66%);opacity:.85;z-index:2}
+.stripe{position:absolute;left:0;right:0;bottom:0;height:15px;background:linear-gradient(180deg,var(--gold) 0 4px,var(--bg) 4px 5px,var(--o) 5px 9px,var(--bg) 9px 10px,var(--r) 10px 15px);z-index:2}
 .down{position:absolute;bottom:34px;left:0;right:0;z-index:2;color:var(--dim)}
 
 /* chapters */
 section.ch{padding:140px 0;border-top:1px solid var(--faint);position:relative}
 .head{display:flex;align-items:center;gap:14px;margin-bottom:56px}
 .head .g{font:18px var(--glyph);color:var(--gold2)}
-.head .n{font:800 11px var(--sans);letter-spacing:.3em;color:var(--gold)}
+.head .n{font:20px var(--vt);letter-spacing:.12em;color:var(--gold)}
 .head .t{color:var(--dim)}
-.head::after{content:"";flex:1;height:1px;background:var(--faint)}
+.head::after{content:"";flex:1;height:5px;background:linear-gradient(180deg,var(--gold) 0 1px,transparent 1px 2px,var(--o) 2px 3px,transparent 3px 4px,var(--r) 4px 5px);opacity:.75}
 h2{font:500 clamp(34px,5.4vw,60px)/1.08 var(--serif);letter-spacing:.01em;max-width:780px}
 h2 em{font-style:italic;color:var(--gold)}
 .lede{font:italic 400 clamp(20px,2.4vw,25px)/1.55 var(--serif);color:var(--dim);max-width:620px;margin-top:22px}
@@ -86,15 +90,15 @@ h2 em{font-style:italic;color:var(--gold)}
 .feat{margin-top:28px;font:800 12px/2 var(--sans);letter-spacing:.18em;text-transform:uppercase}
 .feat span{color:var(--dim);font-weight:700}
 .mask{margin-top:28px;padding-top:20px;border-top:1px solid var(--faint);font-size:18px}
-.mask a{color:var(--gold);border-bottom:1px solid rgba(228,215,122,.3)}
-.player{border:1px solid var(--faint);border-radius:12px;overflow:hidden;background:#0d0d0c}
+.mask a{color:var(--gold);border-bottom:1px solid rgba(246,178,27,.3)}
+.player{border:1px solid var(--faint);border-radius:12px;overflow:hidden;background:var(--bg)}
 .player iframe{display:block;width:100%;height:450px;border:0}
 
 /* IV — next */
 .next{max-width:640px}
 .file{margin-top:40px;border-top:1px solid var(--faint)}
 .file div{display:grid;grid-template-columns:140px 1fr;padding:16px 0;border-bottom:1px solid var(--faint);font-size:19px}
-.status{display:inline-flex;align-items:center;gap:10px;margin-top:30px}
+.status{display:inline-flex;align-items:center;gap:10px;margin-top:30px;font:20px var(--vt)!important;letter-spacing:.14em!important;color:var(--o)!important}
 .status::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--o);box-shadow:0 0 10px var(--o);animation:pulse 2s infinite}
 @keyframes pulse{50%{opacity:.3}}
 
@@ -107,11 +111,11 @@ h2 em{font-style:italic;color:var(--gold)}
 
 /* contact */
 .contact{text-align:center;padding:170px 0 150px;border-top:1px solid var(--faint)}
-.contact a.ig{font:100 clamp(56px,12vw,140px)/1 var(--name);color:var(--gold);text-shadow:0 0 22px rgba(228,215,122,.28);transition:text-shadow .3s}
-.contact a.ig:hover{text-shadow:0 0 34px rgba(228,215,122,.6)}
+.contact a.ig{font:100 clamp(56px,12vw,140px)/1 var(--name);color:var(--gold);text-shadow:0 0 22px rgba(246,178,27,.28);transition:text-shadow .3s}
+.contact a.ig:hover{text-shadow:0 0 34px rgba(246,178,27,.6)}
 .contact .label{margin-top:22px;display:block}
 
-footer{border-top:1px solid var(--faint);padding:30px 0 40px;color:#57524a;font:700 10px/1.9 var(--sans);letter-spacing:.14em;text-transform:uppercase}
+footer{border-top:1px solid var(--faint);padding:30px 0 40px;color:var(--dim);font:400 11px/1.9 var(--sans);letter-spacing:.14em;text-transform:uppercase}
 footer .wrap{display:flex;flex-direction:column;gap:4px}
 footer a{color:var(--dim)}
 
@@ -131,7 +135,7 @@ footer a{color:var(--dim)}
 <div class="grain" aria-hidden="true"></div>
 
 <header class="top" id="top"><div class="wrap">
-  <span class="caps">Longevity</span>
+  <span class="dest">110<i>·</i>LONGEVITY</span>
   <a class="caps" href="https://www.instagram.com/gevity/" target="_blank" rel="noopener">@gevity</a>
 </div></header>
 
@@ -236,10 +240,11 @@ if('IntersectionObserver' in window&&!RM){const io=new IntersectionObserver(es=>
 const c=$('#wave'),x=c.getContext('2d'),dpr=Math.min(devicePixelRatio||1,2);let W,H,t=0,vis=false;
 const fit=()=>{W=c.clientWidth;H=c.clientHeight;c.width=W*dpr;c.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0)};fit();addEventListener('resize',fit);
 function draw(){x.clearRect(0,0,W,H);const mid=H/2;
-  for(let k=0;k<3;k++){x.beginPath();x.strokeStyle=k?`rgba(228,215,122,${.18/k})`:'rgba(228,215,122,.85)';x.lineWidth=k?1:1.4;
-    for(let i=0;i<=W;i+=2){const p=i/W,env=Math.sin(Math.PI*p)**1.6,y=mid+env*(Math.sin(p*22+t*1.3+k)*.5+Math.sin(p*57-t*2.1)*.3+Math.sin(p*9+t*.6)*.2)*(H*.38)*(1-k*.25);i?x.lineTo(i,y):x.moveTo(i,y)}
+  const C=['246,178,27','239,106,35','201,38,44'];
+  for(let k=0;k<3;k++){x.beginPath();x.strokeStyle=`rgba(${C[k]},.9)`;x.lineWidth=1.6;
+    for(let i=0;i<=W;i+=2){const p=i/W,env=Math.sin(Math.PI*p)**1.6,y=mid+(k-1)*9+env*(Math.sin(p*22+t*1.3)*.5+Math.sin(p*57-t*2.1)*.3+Math.sin(p*9+t*.6)*.2)*(H*.36);i?x.lineTo(i,y):x.moveTo(i,y)}
     x.stroke()}
-  x.fillStyle='rgba(228,215,122,.12)';x.fillRect(0,mid,W,1)}
+  }
 if('IntersectionObserver' in window)new IntersectionObserver(es=>{vis=es[0].isIntersecting}).observe(c);
 (function loop(){if(vis||t===0){draw();if(!RM)t+=.016}requestAnimationFrame(loop)})();
 })();
