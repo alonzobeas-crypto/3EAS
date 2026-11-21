@@ -83,7 +83,23 @@ h2 em{font-style:italic;color:var(--gold)}
 .facts dt{white-space:nowrap}
 .facts dd{font-size:19px}
 
-/* III — audio cinema */
+/* time readout (fixed) */
+.era{position:fixed;left:14px;bottom:14px;z-index:45;background:rgba(0,0,0,.82);border:1px solid var(--faint);border-radius:4px;padding:2px 10px 0;font:20px var(--vt);letter-spacing:.12em;color:var(--o);text-shadow:0 0 8px rgba(239,106,35,.5);pointer-events:none}
+.era small{font:11px var(--sans);letter-spacing:.3em;color:var(--dim);margin-right:10px;text-shadow:none}
+
+/* II — channel */
+.chan{display:grid;grid-template-columns:220px 1fr;gap:56px;align-items:center}
+.pulse{position:relative;width:220px;aspect-ratio:1;display:grid;place-items:center}
+.pulse span{font:44px var(--glyph);color:var(--gold);text-shadow:0 0 18px rgba(246,178,27,.6);position:relative}
+.pulse i{position:absolute;inset:0;border:1px solid var(--gold);border-radius:50%;opacity:0;animation:wave 4.5s cubic-bezier(.2,.6,.3,1) infinite}
+.pulse i:nth-child(2){animation-delay:1.5s;border-color:var(--o)}.pulse i:nth-child(3){animation-delay:3s;border-color:var(--r)}
+@keyframes wave{0%{transform:scale(.2);opacity:.9}100%{transform:scale(1);opacity:0}}
+.msg{font:italic 400 clamp(26px,3.8vw,42px)/1.35 var(--serif);margin:18px 0;min-height:3em}
+.msg .gl{font:normal .8em var(--glyph);color:var(--gold);opacity:.85}
+.rx{color:var(--dim)} #rx2{color:var(--o)}
+@media (max-width:820px){.chan{grid-template-columns:1fr;gap:30px}.pulse{width:160px;margin:0 auto}}
+
+/* IV — audio cinema */
 .album{display:grid;grid-template-columns:1fr 1.1fr;gap:56px;align-items:start}
 .album .title{font:500 clamp(26px,3.6vw,40px) var(--serif);letter-spacing:.42em;line-height:1.3}
 .meta{margin-top:18px;color:var(--dim);font-size:17px}
@@ -133,13 +149,14 @@ footer a{color:var(--dim)}
 </head>
 <body>
 <div class="grain" aria-hidden="true"></div>
+<div class="era" aria-hidden="true"><small>T</small><span id="yr">2026</span></div>
 
 <header class="top" id="top"><div class="wrap">
   <span class="dest" id="dest">LONGEVITY</span>
   <a class="caps" href="https://www.instagram.com/gevity/" target="_blank" rel="noopener">@gevity</a>
 </div></header>
 
-<section class="hero">
+<section class="hero" data-yr="2026">
   <div class="ring" aria-hidden="true"></div>
   <div class="in">
     <h1>Longevity</h1>
@@ -151,7 +168,7 @@ footer a{color:var(--dim)}
   <div class="stripe" aria-hidden="true"></div>
 </section>
 
-<section class="ch" id="eclipse"><div class="wrap">
+<section class="ch" id="eclipse" data-yr="????"><div class="wrap">
   <div class="head"><span class="g" aria-hidden="true">𓆣</span><span class="n">I</span><span class="t caps">Eclipse</span></div>
   <div class="lines">
     <p class="dk">For a while, the light started going out.</p>
@@ -161,8 +178,20 @@ footer a{color:var(--dim)}
   </div>
 </div></section>
 
-<section class="ch" id="work"><div class="wrap">
-  <div class="head"><span class="g" aria-hidden="true">𓊽</span><span class="n">II</span><span class="t caps">The Work</span></div>
+<section class="ch" id="channel" data-yr="−3100"><div class="wrap">
+  <div class="head"><span class="g" aria-hidden="true">𓅃</span><span class="n">II</span><span class="t caps">Channel</span></div>
+  <div class="chan">
+    <div class="pulse" aria-hidden="true"><i></i><i></i><i></i><span>𓋹</span></div>
+    <div>
+      <p class="rx label">Incoming · source unknown · signal steady</p>
+      <p class="msg" id="msg" data-t="Before the city, we were the signal. Write it down. Make it last."></p>
+      <p class="rx label" id="rx2">Decoding…</p>
+    </div>
+  </div>
+</div></section>
+
+<section class="ch" id="work" data-yr="1993→"><div class="wrap">
+  <div class="head"><span class="g" aria-hidden="true">𓊽</span><span class="n">III</span><span class="t caps">The Work</span></div>
   <div class="work">
     <div>
       <h2>Writes the bars. <em>Builds the room</em> they live in.</h2>
@@ -177,8 +206,8 @@ footer a{color:var(--dim)}
   </div>
 </div></section>
 
-<section class="ch" id="cinema"><div class="wrap">
-  <div class="head"><span class="g" aria-hidden="true">𓁹</span><span class="n">III</span><span class="t caps">Latest</span></div>
+<section class="ch" id="cinema" data-yr="2021"><div class="wrap">
+  <div class="head"><span class="g" aria-hidden="true">𓁹</span><span class="n">IV</span><span class="t caps">Latest</span></div>
   <div class="album">
     <div>
       <div class="title">AUDIO<br>CINEMA</div>
@@ -190,8 +219,8 @@ footer a{color:var(--dim)}
   </div>
 </div></section>
 
-<section class="ch" id="next"><div class="wrap">
-  <div class="head"><span class="g" aria-hidden="true">𓆄</span><span class="n">IV</span><span class="t caps">Next</span></div>
+<section class="ch" id="next" data-yr="20██"><div class="wrap">
+  <div class="head"><span class="g" aria-hidden="true">𓆄</span><span class="n">V</span><span class="t caps">Next</span></div>
   <div class="next">
     <h2>Black on <em>Black</em> Crime</h2>
     <div class="file">
@@ -203,8 +232,8 @@ footer a{color:var(--dim)}
   </div>
 </div></section>
 
-<section class="ch" id="lineage"><div class="wrap">
-  <div class="head"><span class="g" aria-hidden="true">𓉐</span><span class="n">V</span><span class="t caps">Origin</span></div>
+<section class="ch" id="lineage" data-yr="1991"><div class="wrap">
+  <div class="head"><span class="g" aria-hidden="true">𓉐</span><span class="n">VI</span><span class="t caps">Origin</span></div>
   <p class="lede" style="margin:0 0 30px">Every world starts somewhere. His started here.</p>
   <p class="lineage">
     <span>Good Life</span> <span class="sep">/</span> <span>Project Blowed</span> <span class="sep">/</span> <a href="https://vulgar.bandcamp.com/album/darkleaf-kimetic-principles-lp" target="_blank" rel="noopener">Darkleaf</a> <span class="sep">/</span> <span>Lodge Infinite</span> <span class="sep">/</span> <a href="https://www.discogs.com/release/51193-Darkleaf-F-The-People" target="_blank" rel="noopener"><i>F… The People</i></a> <span class="sep">/</span> <a href="https://soundcloud.com/longevity-1/no-surrender-featuring-2mex" target="_blank" rel="noopener"><i>No Surrender</i></a>
@@ -212,7 +241,7 @@ footer a{color:var(--dim)}
   <p class="quote">Everybody has a story about him. Nobody has the whole one.</p>
 </div></section>
 
-<section class="contact"><div class="wrap">
+<section class="contact" data-yr="∞"><div class="wrap">
   <a class="ig" href="https://www.instagram.com/gevity/" target="_blank" rel="noopener">@gevity</a>
   <span class="label">Direct message only</span>
 </div></section>
@@ -233,6 +262,19 @@ const top=$('#top');addEventListener('scroll',()=>top.classList.toggle('solid',s
 // destination sign: one route, every stop
 const dest=$('#dest'),stops=['LONGEVITY','KEMET','LOS ANGELES','ALL CITIES','LONGEVITY','NOT IN SERVICE'];let si=0;
 if(!RM)setInterval(()=>{si=(si+1)%stops.length;dest.textContent=stops[si]},2600);
+
+// time travel: the year rolls as you move through his world
+const yr=$('#yr'),G='0123456789█?';let roll=null;
+function travel(to){if(RM){yr.textContent=to;return}clearInterval(roll);let n=0;roll=setInterval(()=>{if(++n>14){clearInterval(roll);yr.textContent=to;return}yr.textContent=[...to].map(c=>/[0-9?█]/.test(c)?G[Math.random()*G.length|0]:c).join('')},45)}
+if('IntersectionObserver' in window){const eo=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)travel(e.target.dataset.yr)}),{threshold:.5});$$('[data-yr]').forEach(s=>eo.observe(s))}
+
+// channel: ancestral message decodes from glyphs
+const msg=$('#msg'),rx2=$('#rx2'),T=msg.dataset.t,GL=[...'𓀀𓁹𓂀𓃭𓅃𓆣𓇳𓈖𓊽𓋹𓌀𓍯𓎛𓏏'];
+function decode(){if(RM){msg.textContent=T;rx2.textContent='Received.';return}
+  const order=[...T].map((c,i)=>i).sort(()=>Math.random()-.5),done=new Set();let k=0;
+  const paint=()=>{msg.innerHTML=[...T].map((c,i)=>done.has(i)||c===' '?c:'<span class="gl">'+GL[Math.random()*GL.length|0]+'</span>').join('')};
+  paint();const iv=setInterval(()=>{for(let j=0;j<2&&k<order.length;j++)done.add(order[k++]);paint();if(k>=order.length){clearInterval(iv);rx2.textContent='Received. Source: the ancestors.'}},55)}
+if('IntersectionObserver' in window){const mo=new IntersectionObserver(es=>{if(es[0].isIntersecting){decode();mo.disconnect()}},{threshold:.5});mo.observe(msg)}else decode();
 
 // redactions
 $$('.rd').forEach(r=>{r.addEventListener('click',()=>r.classList.toggle('on'));r.addEventListener('keydown',e=>{if(e.key==='Enter')r.classList.toggle('on')})});
