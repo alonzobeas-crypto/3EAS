@@ -67,6 +67,16 @@ h2{font-family:Anton,sans-serif;font-weight:400;font-size:clamp(34px,6vw,58px);l
 .card a{margin-top:auto;padding-top:10px;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
 .flag{display:inline-block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ember);border:1px solid var(--ember);padding:1px 6px;width:max-content}
 
+.feature{display:grid;grid-template-columns:1fr 1.1fr;gap:28px;align-items:center;border:1px solid var(--line);background:var(--panel);padding:26px;margin-bottom:22px}
+.feature .t{font-family:Anton,sans-serif;font-size:clamp(40px,7vw,72px);letter-spacing:.04em;line-height:.95}
+.feature .m{color:var(--dim);font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin:8px 0 14px}
+.feature ol{list-style:none;font-size:13px;counter-reset:t}
+.feature li{counter-increment:t;padding:4px 0;border-bottom:1px solid var(--line)}
+.feature li::before{content:"▸ ";color:var(--ember)}
+.feature li i{font-style:normal;color:var(--dim)}
+.feature iframe{width:100%;height:450px;border:0;border-radius:10px;overflow:hidden;background:transparent}
+.feature .note{font-size:11px;color:var(--dim);margin-top:10px}
+@media (max-width:760px){.feature{grid-template-columns:1fr}}
 .embed{margin-top:28px;border:1px solid var(--line)}
 .embed iframe{display:block;width:100%;height:166px;border:0}
 
@@ -79,7 +89,8 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 
 @media (max-width:760px){
   .cols{grid-template-columns:1fr;gap:28px}
-  nav ul{gap:12px;font-size:10px}
+  nav ul{gap:10px;font-size:10px;letter-spacing:.06em}
+  nav ul li:first-child{display:none}
   section{padding:64px 0}
 }
 /* SIGHT: page opens blind, then focuses */
@@ -136,19 +147,20 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
   <h2>FROM THE OTHER HALF OF UNITY COMMITTEE</h2>
   <div class="cols">
     <div>
-      <p>In the early '90s, the LA crew Unity Committee split in two. One half became Jurassic 5. The other went darker and became <b>Darkleaf</b>. Longevity was one of its two producer-lyricists, building the beats and writing the bars alongside Jahli, with Kemit and Metalogik on the mic and Mixmaster Wolf (also of Breakestra) on the decks.</p>
+      <p>In the early '90s, the LA crew Unity Committee split in two. One half became Jurassic 5. The other went darker and became <b>Darkleaf</b>. Longevity was one of its two producer-lyricists, building the beats and writing the bars alongside Jahli, with Kemit and Metalogik on the mic and Mixmaster Wolf (also of Breakestra) on the decks. They came out of the Good Life Cafe era, the Crenshaw open mic that came before Blowed.</p>
       <p>He also came up through <b>Project Blowed</b>, the Thursday-night open-mic workshop at KAOS Network in Leimert Park, started in 1994 by Aceyalone and Abstract Rude. It was where LA MCs went to get tested, and where weak verses got cut off mid-bar.</p>
       <p>After self-released records and a spot on the <i>Beneath The Surface</i> compilation, Darkleaf dropped <i>F… The People</i> on Ubiquity in 2002. It was dense and disorienting, with swirling rhythms and rhymes that made people uneasy, and it carried the crew's sound past the LA underground.</p>
       <p>Longevity kept going: as one half of the production duo <b>Lodge Infinite</b> with Jahli, and solo, working with LA heads like 2Mex.</p>
+      <p>His latest, <b><i>Audio Cinema</i></b>, came out on <b>Alpha Pup Records</b>: nine tracks you watch with your ears, with MF DOOM and Prince Po on "Street Strangers" and Alph Tha Alien on "Holy G".</p>
     </div>
     <dl class="facts">
       <dt>Role</dt><dd>MC / Producer</dd>
       <dt>City</dt><dd>Los Angeles</dd>
       <dt>Groups</dt><dd>Darkleaf · Lodge Infinite (w/ Jahli)</dd>
       <dt>Roots</dt><dd>Unity Committee · Project Blowed (KAOS Network, Leimert Park)</dd>
-      <dt>Labels</dt><dd>Ubiquity · Vulgar</dd>
+      <dt>Labels</dt><dd>Alpha Pup · Ubiquity · Vulgar</dd>
       <dt>Instagram</dt><dd><a href="https://www.instagram.com/gevity/" target="_blank" rel="noopener">@gevity</a></dd>
-      <dt>Collaborators</dt><dd>Jahli, Kemit, Metalogik, Mixmaster Wolf, 2Mex</dd>
+      <dt>Collaborators</dt><dd>MF DOOM, Prince Po, Alph Tha Alien, 2Mex, Jahli, Kemit, Metalogik, Mixmaster Wolf</dd>
     </dl>
   </div>
 </div></section>
@@ -157,19 +169,40 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
   <div class="kicker">03 / Lineage</div>
   <h2>SIGNAL PATH</h2>
   <ol class="timeline">
-    <li><div class="yr">EARLY '90s</div><p>Unity Committee splits. Jurassic 5 on one side, Darkleaf on the other.</p></li>
+    <li><div class="yr">EARLY '90s</div><p>Unity Committee splits. Jurassic 5 on one side, Darkleaf on the other. Good Life Cafe era, Crenshaw.</p></li>
     <li><div class="yr">MID '90s</div><p>Project Blowed, Thursday nights at KAOS Network, Leimert Park. The open mic that made LA's underground MCs.</p></li>
-    <li><div class="yr">'90s</div><p>Darkleaf puts out its own records and lands on the <i>Beneath The Surface</i> comp.</p></li>
-    <li><div class="yr">2002</div><p><i>F… The People</i> comes out on Ubiquity (URLP099). Longevity has vocal credits on "Commercial" and "Triple Stages".</p></li>
+    <li><div class="yr">1997</div><p>Darkleaf records <i>Kimetic Principles</i>, with Lodge Infinite (Jahli &amp; Longevity) producing.</p></li>
+    <li><div class="yr">1999</div><p>First official appearance on the <i>Beneath The Surface</i> compilation.</p></li>
+    <li><div class="yr">2002</div><p><i>F… The People</i> on Ubiquity (URLP099). Longevity has vocal credits on "Commercial" and "Triple Stages". <i>Kimetic Principles II</i> follows.</p></li>
+    <li><div class="yr">2003</div><p>Darkleaf featured on Existereo's <i>Dirty Deeds &amp; Dead Flowers</i>.</p></li>
     <li><div class="yr">2008</div><p>Credited on <i>The Game Manual 9.0</i>.</p></li>
-    <li><div class="yr">LATER</div><p><i>Kimetic Principles</i> LP on Vulgar, with Lodge Infinite (Jahli &amp; Longevity) producing and Kemit Qutob on the mic.</p></li>
-    <li><div class="yr">SOLO</div><p>Solo work, including "No Surrender" featuring 2Mex. Debut solo album: <i>Warrior Music</i>.</p></li>
+    <li><div class="yr">2019</div><p>Vulgar presses <i>Kimetic Principles</i> to vinyl for the first time, with Cawzaone artwork and an interview with Longevity in the insert.</p></li>
+    <li><div class="yr">SOLO</div><p>"No Surrender" featuring 2Mex. Debut solo album: <i>Warrior Music</i>.</p></li>
+    <li><div class="yr">NOW</div><p><i>Audio Cinema</i> on Alpha Pup Records. MF DOOM, Prince Po, Alph Tha Alien.</p></li>
   </ol>
 </div></section>
 
 <section id="music"><div class="wrap">
   <div class="kicker">04 / Music</div>
   <h2>TRANSMISSIONS</h2>
+  <div class="feature">
+    <div>
+      <div class="kicker">Latest</div>
+      <div class="t">AUDIO CINEMA</div>
+      <div class="m">Longevity · Alpha Pup Records · 9 tracks · 25 min</div>
+      <ol>
+        <li>Sheet Music <i>ft. Peyote Cody</i></li>
+        <li>Holy G <i>ft. Alph Tha Alien</i></li>
+        <li>Street Strangers <i>ft. MF DOOM &amp; Prince Po</i></li>
+        <li>This Town <i>ft. Clive Aden</i></li>
+        <li>Fever Dreams</li>
+        <li>The Mask</li>
+      </ol>
+      <p class="note">Partial tracklist. Full album on <a href="https://music.apple.com/us/album/audio-cinema/1695696435" target="_blank" rel="noopener">Apple Music →</a></p>
+    </div>
+    <iframe title="Audio Cinema" loading="lazy" allow="autoplay *; encrypted-media *; clipboard-write" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
+      src="https://embed.music.apple.com/us/album/audio-cinema/1695696435"></iframe>
+  </div>
   <div class="grid">
     <div class="card"><span class="t">WARRIOR MUSIC</span><span class="m">Longevity · solo debut</span><span class="flag">title unconfirmed</span><a href="https://soundcloud.com/longevity-1" target="_blank" rel="noopener">SoundCloud →</a></div>
     <div class="card"><span class="t">NO SURRENDER</span><span class="m">Longevity ft. 2Mex</span><a href="https://soundcloud.com/longevity-1/no-surrender-featuring-2mex" target="_blank" rel="noopener">Listen →</a></div>
