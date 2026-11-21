@@ -34,7 +34,8 @@ main,header,footer,.hud{position:relative;z-index:2}
 /* preloader */
 #pre{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;justify-content:flex-end;padding:28px;transition:transform 1.3s var(--ease) .1s}
 #pre.out{transform:translateY(-100%)}
-#pre .n{font:100 clamp(80px,20vw,260px)/.8 var(--name);color:var(--y)}
+#pre .n{font:100 clamp(60px,12vw,150px)/.9 var(--name);color:var(--y)}
+#pre .bar{height:1px;background:var(--faint);margin-top:22px;position:relative}#pre .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--ink);width:0}
 #pre .row{display:flex;justify-content:space-between;margin-top:18px}
 
 /* header + hud */
@@ -53,20 +54,23 @@ header{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-be
 .scene .col{width:min(560px,100%)}
 .scene.r{justify-content:flex-end}
 .scene.c{justify-content:center;text-align:center}
-.tag{display:flex;gap:16px;align-items:center;margin-bottom:40px;color:var(--dim)}
+.tag{display:flex;gap:16px;align-items:center;margin-bottom:46px;color:var(--dim)}
+/* editorial numerals */
+.col,.album>div:first-child{position:relative}
+[data-n]::before{content:attr(data-n);position:absolute;left:-.04em;top:-.62em;font:300 clamp(150px,20vw,300px)/1 var(--serif);color:rgba(236,228,208,.055);letter-spacing:-.04em;pointer-events:none;z-index:-1}
 .tag .g{font:16px var(--glyph);color:var(--y);letter-spacing:0;text-transform:none}
 .tag .yr{margin-left:auto;color:var(--o)}
-h2{font:400 clamp(38px,5vw,64px)/1.06 var(--serif);letter-spacing:-.005em}
+h2{font:400 clamp(40px,5.6vw,76px)/1.02 var(--serif);letter-spacing:-.015em}
 h2 em{font-style:italic;color:var(--y)}
 p.body{margin-top:26px;color:var(--dim);font-size:clamp(19px,1.6vw,22px)}
 
 /* reveal */
-.rv{opacity:0;transform:translateY(40px);transition:opacity 1.4s var(--ease),transform 1.4s var(--ease)}
+.rv{opacity:0;transform:translateY(22px);transition:opacity 1.8s var(--ease),transform 1.8s var(--ease)}
 .rv.in{opacity:1;transform:none}
 .rv.d1{transition-delay:.12s}.rv.d2{transition-delay:.24s}.rv.d3{transition-delay:.36s}.rv.d4{transition-delay:.48s}
 
 /* hero */
-.hero h1{font:100 clamp(84px,19vw,250px)/1 var(--name);color:var(--y);letter-spacing:-.01em;text-shadow:0 0 40px rgba(246,178,27,.25)}
+.hero h1{font:100 clamp(64px,13vw,168px)/1 var(--name);color:var(--y);letter-spacing:0}
 .hero .sub{margin-top:30px;color:var(--ink)}
 .hero .sub i{font-style:normal;color:var(--o);padding:0 .9em}
 .rd{background:rgba(236,228,208,.14);color:transparent;padding:0 .15em;cursor:help;transition:all .4s;-webkit-box-decoration-break:clone;box-decoration-break:clone}
@@ -123,7 +127,7 @@ footer a{color:var(--ink)}
 </head>
 <body>
 
-<div id="pre" aria-hidden="true"><div class="n">Longevity</div><div class="row mono dim"><span>Kemet → Los Angeles → Everywhere</span><span id="pct">000</span></div></div>
+<div id="pre" aria-hidden="true"><div class="n">Longevity</div><div class="bar"><i id="bar"></i></div><div class="row mono dim"><span>Kemet — Los Angeles — Everywhere</span><span id="pct">000</span></div></div>
 <canvas id="gl" aria-hidden="true"></canvas>
 <div class="cur" id="cur" aria-hidden="true"></div>
 
@@ -134,13 +138,13 @@ footer a{color:var(--ink)}
 <section class="scene c hero" data-i="0" data-yr="2026">
   <div>
     <h1 class="rv">Longevity</h1>
-    <div class="sub mono rv d1">MC<i>/</i>Producer<i>/</i>Beatmaker</div>
-    <div class="sub mono dim rv d2"><span class="rd" tabindex="0">Eclipse</span> &nbsp;·&nbsp; Los Angeles &nbsp;·&nbsp; LA Traffic</div>
+    <div class="sub mono rv d1">MC<i>—</i>Producer<i>—</i>Beatmaker</div>
+    <div class="sub mono dim rv d2"><span class="rd" tabindex="0">Eclipse</span> &nbsp;·&nbsp; Los Angeles &nbsp;·&nbsp; MMXXVI</div>
   </div>
 </section>
 
 <section class="scene" data-i="1" data-yr="????">
-  <div class="col">
+  <div data-n="01" class="col">
     <div class="tag mono rv"><span class="g">𓆣</span><span>01 — Eclipse</span></div>
     <div class="lines">
       <p class="dk rv">For a while, the light started going out.</p>
@@ -152,7 +156,7 @@ footer a{color:var(--ink)}
 </section>
 
 <section class="scene r" data-i="2" data-yr="−3100">
-  <div class="col">
+  <div data-n="02" class="col">
     <div class="tag mono rv"><span class="g">𓅃</span><span>02 — Channel</span></div>
     <p class="mono dim rv">Incoming · source unknown</p>
     <h2 class="rv d1" style="margin-top:22px"><em>Before the city,</em> we were the signal. Write it down. Make it last.</h2>
@@ -161,7 +165,7 @@ footer a{color:var(--ink)}
 </section>
 
 <section class="scene" data-i="3" data-yr="1993 →">
-  <div class="col">
+  <div data-n="03" class="col">
     <div class="tag mono rv"><span class="g">𓊽</span><span>03 — The Work</span></div>
     <h2 class="rv d1">Writes the bars. <em>Builds the room</em> they live in.</h2>
     <p class="body rv d2">Three decades deep. Big rooms, no names. Some of it you've heard without knowing whose hands were on it.</p>
@@ -175,7 +179,7 @@ footer a{color:var(--ink)}
 
 <section class="scene" data-i="4" data-yr="2021">
   <div class="album">
-    <div>
+    <div data-n="04">
       <div class="tag mono rv"><span class="g">𓁹</span><span>04 — Latest</span></div>
       <div class="t rv d1">AUDIO<br>CINEMA</div>
       <div class="meta mono rv d2">Alpha Pup Records · 2021 · 9 tracks · 25:02</div>
@@ -187,7 +191,7 @@ footer a{color:var(--ink)}
 </section>
 
 <section class="scene r" data-i="5" data-yr="20██">
-  <div class="col">
+  <div data-n="05" class="col">
     <div class="tag mono rv"><span class="g">𓆄</span><span>05 — Next</span></div>
     <h2 class="rv d1">Black on <em>Black</em> Crime</h2>
     <div class="rows rv d2">
@@ -200,7 +204,7 @@ footer a{color:var(--ink)}
 </section>
 
 <section class="scene" data-i="6" data-yr="1991">
-  <div class="col" style="width:min(900px,100%)">
+  <div data-n="06" class="col" style="width:min(900px,100%)">
     <div class="tag mono rv"><span class="g">𓉐</span><span>06 — Origin</span></div>
     <p class="body rv d1" style="margin:0 0 26px">Every world starts somewhere. His started here.</p>
     <p class="origin rv d2"><span>Good Life</span> <span class="s">/</span> <span>Project Blowed</span> <span class="s">/</span> <a href="https://vulgar.bandcamp.com/album/darkleaf-kimetic-principles-lp" target="_blank" rel="noopener">Darkleaf</a> <span class="s">/</span> <span>Lodge Infinite</span> <span class="s">/</span> <a href="https://www.discogs.com/release/51193-Darkleaf-F-The-People" target="_blank" rel="noopener"><i>F… The People</i></a> <span class="s">/</span> <a href="https://soundcloud.com/longevity-1/no-surrender-featuring-2mex" target="_blank" rel="noopener"><i>No Surrender</i></a></p>
@@ -233,17 +237,17 @@ void main(){
   vec2 p=uv-C.xy-M*.025;
   float d=length(p),a=atan(p.y,p.x),r=C.z,tt=T*DIR;
   vec2 q=vec2(cos(a),sin(a));
-  float rays=fbm(q*2.2+vec2(d*3.-tt*.12,tt*.03))*.9+fbm(q*7.+vec2(d*9.,-tt*.05))*.35;
+  float rays=fbm(q*2.2+vec2(d*3.-tt*.08,tt*.02))*.6+fbm(q*7.+vec2(d*9.,-tt*.03))*.2;
   float o=max(d-r,0.);
-  float cor=exp(-o*(11.-rays*7.)/max(r*3.2,.12))*G;
+  float cor=exp(-o*(16.-rays*8.)/max(r*3.2,.12))*G*.62;
   cor*=smoothstep(r-.003,r+.004,d);
   vec3 Y=vec3(.965,.698,.106),O=vec3(.937,.416,.137),Rd=vec3(.788,.149,.173);
   vec3 col=mix(Rd,O,smoothstep(.04,.35,cor));
   col=mix(col,Y,smoothstep(.35,.95,cor));
   col*=cor;
-  col+=Y*exp(-abs(d-r)*260.)*.55*G;
+  vec3 Cr=vec3(.925,.894,.816);col+=Cr*exp(-abs(d-r)*420.)*.7*G;
   col+=O*RP*.07*smoothstep(0.,.03,o)*(.5+.5*sin(d*55.-T*1.6))*exp(-o*2.5);
-  col+=(h(gl_FragCoord.xy+fract(T)*100.)-.5)*.03;
+  col+=(h(gl_FragCoord.xy+fract(T)*100.)-.5)*.045;
   col*=1.-.45*dot(uv,uv);
   gl_FragColor=vec4(max(col,0.),1.);
 }
@@ -307,7 +311,7 @@ enter(0,'2026');
 // ---------- preloader
 const pre=$('#pre'),pct=$('#pct');let pv=0;
 function done(){pre.classList.add('out');setTimeout(()=>pre.remove(),1600);$$('.hero .rv').forEach(el=>el.classList.add('in'))}
-if(RM){done()}else{const st=performance.now(),iv=setInterval(()=>{pv=Math.min(100,Math.round((performance.now()-st)/14));pct.textContent=String(pv).padStart(3,'0');if(pv>=100){clearInterval(iv);(document.fonts?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(done,250))}},30)}
+if(RM){done()}else{const st=performance.now(),iv=setInterval(()=>{pv=Math.min(100,Math.round((performance.now()-st)/14));pct.textContent=String(pv).padStart(3,'0');$('#bar').style.width=pv+'%';if(pv>=100){clearInterval(iv);(document.fonts?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(done,250))}},30)}
 
 // ---------- cursor
 const cu=$('#cur');let cx=-100,cy=-100,tx=-100,ty=-100;
