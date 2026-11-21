@@ -82,27 +82,62 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
   nav ul{gap:12px;font-size:10px}
   section{padding:64px 0}
 }
-@media (prefers-reduced-motion:reduce){.eclipse::after{animation:none}}
+/* SIGHT: page opens blind, then focuses */
+.hero .wrap{animation:wake 4.2s cubic-bezier(.2,.7,.2,1) both}
+@keyframes wake{0%{filter:blur(22px) brightness(.15);opacity:.4}45%{filter:blur(9px) brightness(.45)}70%{filter:blur(3px) brightness(.8)}100%{filter:none;opacity:1}}
+.eclipse{animation:corona 5s ease-out both}
+@keyframes corona{0%{box-shadow:0 0 0 1px rgba(233,230,223,0),0 0 0 0 rgba(200,69,44,0),0 0 0 0 rgba(127,174,90,0)}}
+.sight{background:radial-gradient(ellipse at 50% 100%,rgba(233,230,223,.07),transparent 60%)}
+.sight .lines p{font-size:clamp(18px,2.6vw,26px);line-height:1.45;max-width:760px;margin-bottom:26px;
+  filter:blur(8px);opacity:.15;transition:filter 1.4s ease,opacity 1.4s ease}
+.sight .lines p.seen{filter:none;opacity:1}
+.sight .lines em{font-style:normal;color:var(--leaf)}
+.sight .dark{color:var(--dim)}
+.sight .split{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:40px}
+.sight .split div{border:1px solid var(--line);padding:22px;background:var(--panel)}
+.sight .split b{font-family:Anton,sans-serif;font-weight:400;font-size:30px;letter-spacing:.06em;display:block}
+.sight .split .e b{color:var(--dim)}
+.sight .split .l b{color:var(--ink);text-shadow:0 0 18px rgba(127,174,90,.5)}
+.sight .split span{font-size:12px;color:var(--dim)}
+@media (max-width:760px){.sight .split{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.eclipse::after,.hero .wrap,.eclipse{animation:none}.sight .lines p{filter:none;opacity:1;transition:none}}
 </style>
 </head>
 <body>
 
 <nav><div class="wrap"><b>LONGEVITY</b>
-<ul><li><a href="#bio">Bio</a></li><li><a href="#lineage">Lineage</a></li><li><a href="#music">Music</a></li><li><a href="#book">Book</a></li></ul></div></nav>
+<ul><li><a href="#sight">Sight</a></li><li><a href="#bio">Bio</a></li><li><a href="#lineage">Lineage</a></li><li><a href="#music">Music</a></li><li><a href="#book">Book</a></li></ul></div></nav>
 
 <header class="hero"><div class="wrap">
   <div class="eclipse" aria-hidden="true"></div>
   <h1>LONGEVITY</h1>
-  <div class="aka">fka <span>ECLIPSE</span> &nbsp;//&nbsp; DARKLEAF &nbsp;//&nbsp; LODGE INFINITE</div>
-  <p class="tag">MC. Producer. Built in the Los Angeles underground, from the same split that made Jurassic 5. Still transmitting.</p>
+  <div class="aka">fka <span>ECLIPSE</span> &nbsp;//&nbsp; DARKLEAF &nbsp;//&nbsp; PROJECT BLOWED &nbsp;//&nbsp; LODGE INFINITE</div>
+  <p class="tag">He almost lost his sight. He came back seeing further.<br>MC. Producer. Los Angeles underground, from the same split that made Jurassic 5.</p>
 </div></header>
 
+<section id="sight" class="sight"><div class="wrap">
+  <div class="kicker">01 / Sight</div>
+  <h2>THE ECLIPSE</h2>
+  <div class="lines">
+    <p class="dark">For an artist who lived inside the beat, the light started going out.</p>
+    <p class="dark">Shapes went soft. Faces blurred. The world closed down to sound.</p>
+    <p>He came close to losing his eyesight. That was the eclipse: the dark passing over everything.</p>
+    <p>But an eclipse ends. The light comes back around the edge first, a thin ring, then all of it.</p>
+    <p>He came back. New name, same fire: <em>LONGEVITY</em>. The one who outlasts the dark.</p>
+  </div>
+  <div class="split">
+    <div class="e"><b>ECLIPSE</b><span>The dark years. Project Blowed. Darkleaf. The underground.</span></div>
+    <div class="l"><b>LONGEVITY</b><span>The return. Seeing further than before.</span></div>
+  </div>
+</div></section>
+
 <section id="bio"><div class="wrap">
-  <div class="kicker">01 / Bio</div>
+  <div class="kicker">02 / Bio</div>
   <h2>FROM THE OTHER HALF OF UNITY COMMITTEE</h2>
   <div class="cols">
     <div>
       <p>In the early '90s, the LA crew Unity Committee split in two. One half became Jurassic 5. The other went darker and became <b>Darkleaf</b>. Longevity was one of its two producer-lyricists, building the beats and writing the bars alongside Jahli, with Kemit and Metalogik on the mic and Mixmaster Wolf (also of Breakestra) on the decks.</p>
+      <p>He also came up through <b>Project Blowed</b>, the Thursday-night open-mic workshop at KAOS Network in Leimert Park, started in 1994 by Aceyalone and Abstract Rude. It was where LA MCs went to get tested, and where weak verses got cut off mid-bar.</p>
       <p>After self-released records and a spot on the <i>Beneath The Surface</i> compilation, Darkleaf dropped <i>F… The People</i> on Ubiquity in 2002. It was dense and disorienting, with swirling rhythms and rhymes that made people uneasy, and it carried the crew's sound past the LA underground.</p>
       <p>Longevity kept going: as one half of the production duo <b>Lodge Infinite</b> with Jahli, and solo, working with LA heads like 2Mex.</p>
     </div>
@@ -110,7 +145,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
       <dt>Role</dt><dd>MC / Producer</dd>
       <dt>City</dt><dd>Los Angeles</dd>
       <dt>Groups</dt><dd>Darkleaf · Lodge Infinite (w/ Jahli)</dd>
-      <dt>Roots</dt><dd>Unity Committee</dd>
+      <dt>Roots</dt><dd>Unity Committee · Project Blowed (KAOS Network, Leimert Park)</dd>
       <dt>Labels</dt><dd>Ubiquity · Vulgar</dd>
       <dt>Collaborators</dt><dd>Jahli, Kemit, Metalogik, Mixmaster Wolf, 2Mex</dd>
     </dl>
@@ -118,10 +153,11 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 </div></section>
 
 <section id="lineage"><div class="wrap">
-  <div class="kicker">02 / Lineage</div>
+  <div class="kicker">03 / Lineage</div>
   <h2>SIGNAL PATH</h2>
   <ol class="timeline">
     <li><div class="yr">EARLY '90s</div><p>Unity Committee splits. Jurassic 5 on one side, Darkleaf on the other.</p></li>
+    <li><div class="yr">MID '90s</div><p>Project Blowed, Thursday nights at KAOS Network, Leimert Park. The open mic that made LA's underground MCs.</p></li>
     <li><div class="yr">'90s</div><p>Darkleaf puts out its own records and lands on the <i>Beneath The Surface</i> comp.</p></li>
     <li><div class="yr">2002</div><p><i>F… The People</i> comes out on Ubiquity (URLP099). Longevity has vocal credits on "Commercial" and "Triple Stages".</p></li>
     <li><div class="yr">2008</div><p>Credited on <i>The Game Manual 9.0</i>.</p></li>
@@ -131,7 +167,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 </div></section>
 
 <section id="music"><div class="wrap">
-  <div class="kicker">03 / Music</div>
+  <div class="kicker">04 / Music</div>
   <h2>TRANSMISSIONS</h2>
   <div class="grid">
     <div class="card"><span class="t">WARRIOR MUSIC</span><span class="m">Longevity · solo debut</span><span class="flag">title unconfirmed</span><a href="https://soundcloud.com/longevity-1" target="_blank" rel="noopener">SoundCloud →</a></div>
@@ -146,12 +182,18 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 </div></section>
 
 <section id="book" class="book"><div class="wrap">
-  <div class="kicker">04 / Book</div>
+  <div class="kicker">05 / Book</div>
   <h2>SHOWS · FEATURES · BEATS</h2>
   <p>Live sets, features, production and licensing.</p>
   <a class="btn" href="https://soundcloud.com/longevity-1" target="_blank" rel="noopener">REACH OUT</a>
 </div></section>
 
 <footer><div class="wrap"><span>LONGEVITY · LOS ANGELES · DARKLEAF // LODGE INFINITE</span><span>SITE DESIGNED &amp; BUILT BY <a href="https://3eascortex.com" target="_blank" rel="noopener">3EASCORTEX.COM</a></span><span>© 2026 3EASCORTEX.COM · Concept design &amp; code. Longevity name, music &amp; likeness © Longevity. Unofficial concept, not affiliated.</span></div></footer>
+<script>
+(()=>{const ps=document.querySelectorAll('.sight .lines p');
+if(!('IntersectionObserver' in window)){ps.forEach(p=>p.classList.add('seen'));return}
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('seen');io.unobserve(e.target)}}),{rootMargin:'0px 0px -25% 0px'});
+ps.forEach(p=>io.observe(p))})();
+</script>
 </body>
 </html>
