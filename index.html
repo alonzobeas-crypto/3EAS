@@ -965,6 +965,23 @@ body{
 .dview-open.ok{border-color:var(--accent)}
 .dview-hash{color:var(--accent);word-break:break-all;letter-spacing:1px}
 body.lang-glitch .scene{animation:langJit .7s steps(3) 2}
+/* ─── COLLAPSED MODE (preview only: ?collapsed=1) ─── */
+.cx-row,.cx-close{display:none}
+html.cx #scroll{scroll-snap-type:none!important}
+html.cx .scene:not(#s1){border-top:1px solid var(--dimmer)}
+html.cx .scene:not(#s1):not(.cx-open){height:auto!important;min-height:0!important;padding:0!important;display:block!important;overflow:hidden!important}
+html.cx .scene:not(#s1):not(.cx-open)>*:not(.cx-row){display:none!important}
+html.cx .scene:not(#s1):not(.cx-open)>.cx-row{display:flex}
+.cx-row{width:100%;align-items:baseline;gap:28px;padding:22px 60px;background:none;border:0;color:inherit;text-align:left;cursor:pointer;font:inherit}
+.cx-num{font-family:var(--mono);font-size:11px;letter-spacing:4px;color:var(--accent);min-width:36px}
+.cx-tt{font-family:var(--vt);font-size:clamp(40px,8vw,118px);letter-spacing:4px;color:var(--fg);line-height:.95;text-transform:uppercase;transition:color .15s}
+.cx-sub{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--dim2);text-transform:uppercase}
+.cx-row:hover .cx-tt,.cx-row:focus-visible .cx-tt{color:var(--hot);text-shadow:3px 0 var(--accent),-3px 0 #0ff}
+html.cx .scene.cx-open>.cx-close{display:block;position:absolute;top:12px;right:24px;z-index:30;font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--accent);background:rgba(0,0,0,.85);border:1px solid var(--dimmer);padding:8px 12px;cursor:pointer}
+html.cx .scene.cx-open :is(.scene-eyebrow,.scene-title,.s2-body,.vgrid,.acq-layout,.s5-grid,.s5-top,.s6-body){opacity:1!important;transform:none!important}
+html.cx .scene-counter{display:none}
+@media(max-width:768px){.cx-row{padding:18px 22px;gap:14px;flex-wrap:wrap}.cx-sub{margin-left:50px;width:100%}html.cx .scene.cx-open>.cx-close{top:8px;right:12px}}
+
 @keyframes langJit{0%,100%{transform:none}30%{transform:translateX(3px)}60%{transform:translateX(-2px)}}
 #phishVeil{position:fixed;inset:0;z-index:99990;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);pointer-events:none;opacity:0;transition:opacity .15s}
 #phishVeil.on{opacity:1}
@@ -2102,6 +2119,41 @@ function onScroll(){
   drawWavePl();
 }
 scroll.addEventListener('scroll',onScroll,{passive:true});
+
+/* ─── COLLAPSED MODE (preview only: ?collapsed=1) ───
+   Every section below the hero folds into one title row. Tap a row to open it
+   (one at a time); it folds back after a minute with no activity. */
+(function(){
+  let on=false;try{on=new URLSearchParams(location.search).has('collapsed')}catch(e){}
+  if(!on)return;
+  document.documentElement.classList.add('cx');
+  const META={s2:['01','TRANSMISSIONS','sound'],s3:['02','VISUALS','video // stills'],s4:['03','ACQUISITIONS','merch // commissions'],s7:['04','DISPATCH','transmissions'],sLab:['05','BEAT LAB','interactive'],s5:['06','SIGNAL','frequency'],s6:['07','ACCESS','join the frequency']};
+  const list=[...scenes];
+  const topPad=()=>innerWidth<=768?62:52;
+  function cxOpen(sc){
+    list.forEach(s=>{if(s!==sc)s.classList.remove('cx-open')});
+    sc.classList.add('cx-open','active');cxLast=Date.now();
+    requestAnimationFrame(()=>{scroll.scrollTo({top:sc.offsetTop-topPad(),behavior:'smooth'});window.dispatchEvent(new Event('resize'))});
+  }
+  function cxClose(sc){
+    sc.classList.remove('cx-open');
+    requestAnimationFrame(()=>scroll.scrollTo({top:Math.max(0,sc.offsetTop-topPad()-80),behavior:'smooth'}));
+  }
+  list.forEach(sc=>{const m=META[sc.id];if(!m)return;
+    const r=document.createElement('button');r.type='button';r.className='cx-row';
+    r.innerHTML='<span class="cx-num">'+m[0]+'</span><span class="cx-tt">'+m[1]+'</span><span class="cx-sub">'+m[2]+'</span>';
+    r.onclick=()=>cxOpen(sc);sc.prepend(r);
+    const x=document.createElement('button');x.type='button';x.className='cx-close';x.textContent='× CLOSE';
+    x.onclick=()=>cxClose(sc);sc.appendChild(x);
+  });
+  window.goScene=function(n){
+    if(n===0){list.forEach(s=>s.classList.remove('cx-open'));scroll.scrollTo({top:0,behavior:'smooth'});return}
+    if(list[n])cxOpen(list[n]);
+  };
+  let cxLast=Date.now();
+  ['pointerdown','wheel','touchstart','keydown'].forEach(ev=>document.addEventListener(ev,()=>{cxLast=Date.now()},{passive:true,capture:true}));
+  setInterval(()=>{if(Date.now()-cxLast>60000)list.forEach(s=>{if(s.classList.contains('cx-open'))cxClose(s)})},4000);
+})();
 // Exposed so the auto-glitch family (this script and the separately-scoped
 // SIGNAL GLITCH script) can check "is the visitor currently looking at Beat
 // Lab" before firing anything disruptive there.
