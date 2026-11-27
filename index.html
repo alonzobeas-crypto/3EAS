@@ -1950,8 +1950,12 @@ function initHP(){
   legacyParticle.legacyFrozen=false;
 }
 resizeHero();window.addEventListener('resize',resizeHero);
-function heroLoop(){
-  ht+=.003;hx.clearRect(0,0,hw,hh);
+const HERO_LOW=matchMedia('(max-width:768px), (pointer:coarse)').matches;
+let heroLast=0;
+function heroLoop(now){
+  if(HERO_LOW&&now&&now-heroLast<31){requestAnimationFrame(heroLoop);return}   // 30fps on phones
+  heroLast=now||0;
+  ht+=HERO_LOW?.006:.003;hx.clearRect(0,0,hw,hh);
   if(hfx==='waves')drawHW();
   else if(hfx==='particles')drawHP();
   else if(hfx==='scan')drawScan();
@@ -1983,6 +1987,7 @@ function drawHP(){
   const maxSp=.4+band.level*1.2;        // overall energy = faster ceiling
   const rBoost=band.bass*2.6;            // bass = particle "kick" size pulse
   const op=.6+band.treble*.4;            // treble = sparkle/opacity
+  const dotPath=new Path2D();
   hpart.forEach(p=>{
     if(!(p.legacy&&p.legacyFrozen)){
       const dx=mx-p.x,dy=my-p.y,d=Math.sqrt(dx*dx+dy*dy);
@@ -2008,7 +2013,7 @@ function drawHP(){
       const sp=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
       const spCap=p.legacy?maxSp*1.6:maxSp;
       if(sp>spCap){p.vx=p.vx/sp*spCap;p.vy=p.vy/sp*spCap;}
-      p.x+=p.vx;p.y+=p.vy;
+      const st=HERO_LOW?2:1;p.x+=p.vx*st;p.y+=p.vy*st;   // same speed at 30fps
       if(p.legacy){
         // Bounce off soft walls well inside the viewport instead of
         // wrapping edge-to-edge -- the full-bleed wrap let it drift under
@@ -2040,14 +2045,31 @@ function drawHP(){
       hx.beginPath();hx.arc(p.x,p.y,coreR,0,Math.PI*2);
       hx.fillStyle=`rgba(${lr},${lg},${lb},${Math.min(1,op+.25)})`;hx.fill();
     }else if(!p.legacy){
-      hx.beginPath();hx.arc(p.x,p.y,p.r*(1.9+rBoost),0,Math.PI*2);
-      hx.fillStyle=`rgba(200,186,140,${op})`;hx.fill();
+      // batched: added to one shared path, filled once below
+      const rr=p.r*(1.9+rBoost);dotPath.moveTo(p.x+rr,p.y);dotPath.arc(p.x,p.y,rr,0,Math.PI*2);
     }
   });
-  for(let i=0;i<hpart.length;i++)for(let j=i+1;j<hpart.length;j++){
-    const dx=hpart[i].x-hpart[j].x,dy=hpart[i].y-hpart[j].y,d=Math.sqrt(dx*dx+dy*dy);
-    if(d<120){hx.beginPath();hx.strokeStyle=`rgba(184,168,120,${.26*(1-d/120)})`;hx.lineWidth=.9;hx.moveTo(hpart[i].x,hpart[i].y);hx.lineTo(hpart[j].x,hpart[j].y);hx.stroke()}
+  hx.fillStyle=`rgba(200,186,140,${op})`;hx.fill(dotPath);
+  // Lines between nearby particles. Same look as before (fade with distance,
+  // cutoff 120px) but particles are binned into 120px cells so only neighbours
+  // are compared, and lines are drawn in 10 opacity bands (one stroke each)
+  // instead of one stroke call per line — the big phone-performance win.
+  const CELL=120,cols=Math.ceil(hw/CELL)+1,grid=new Map();
+  for(let i=0;i<hpart.length;i++){const p=hpart[i],k=((p.y/CELL)|0)*cols+((p.x/CELL)|0);let a=grid.get(k);if(!a)grid.set(k,a=[]);a.push(i);}
+  const BANDS=10,paths=Array.from({length:BANDS},()=>new Path2D());
+  for(const [k,arr] of grid){
+    const cx0=k%cols,cy0=(k/cols)|0;
+    for(let oy=0;oy<=1;oy++)for(let ox=-1;ox<=1;ox++){
+      if(oy===0&&ox<0)continue;
+      const other=(oy===0&&ox===0)?arr:grid.get((cy0+oy)*cols+(cx0+ox));if(!other)continue;
+      for(let a=0;a<arr.length;a++){const P=hpart[arr[a]];
+        for(let b=(other===arr?a+1:0);b<other.length;b++){const Q=hpart[other[b]];
+          const dx=P.x-Q.x,dy=P.y-Q.y,dd=dx*dx+dy*dy;if(dd>=14400)continue;
+          const band=Math.min(BANDS-1,((1-Math.sqrt(dd)/120)*BANDS)|0);
+          paths[band].moveTo(P.x,P.y);paths[band].lineTo(Q.x,Q.y);}}}
   }
+  hx.lineWidth=.9;
+  for(let i=0;i<BANDS;i++){hx.strokeStyle=`rgba(184,168,120,${(.26*(i+.5)/BANDS).toFixed(3)})`;hx.stroke(paths[i]);}
 }
 // Click/tap the pulsing legacy particle to stop it in place -- generous
 // hit radius since the dot itself renders only a few px across.
@@ -2121,6 +2143,19 @@ function onScroll(){
   drawWavePl();
 }
 scroll.addEventListener('scroll',onScroll,{passive:true});
+// Hero videos only play while the first page is on screen (they're 1080p and
+// three copies run for the RGB split, which is heavy on phones).
+(function(){
+  const s1=document.getElementById('s1');if(!s1||!('IntersectionObserver' in window))return;
+  const vids=()=>[...s1.querySelectorAll('video')].filter(v=>v.autoplay||v.dataset.wasPlaying);
+  new IntersectionObserver(es=>{
+    const vis=es[0].isIntersecting&&es[0].intersectionRatio>.15;   // a sliver under the nav bar doesn't count
+    vids().forEach(v=>{
+      if(!vis){if(!v.paused){v.dataset.wasPlaying='1';v.pause();}}
+      else if(v.dataset.wasPlaying){delete v.dataset.wasPlaying;v.play().catch(()=>{});}
+    });
+  },{threshold:[0,.15,.3]}).observe(s1);
+})();
 
 /* ─── COLLAPSED MODE (default; ?full=1 for the old layout) ───
    Every section below the hero folds into one title row. Tap a row to open it
@@ -6792,12 +6827,13 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
   // where it left off afterwards. The whole box moves, so the words reveal wherever it is.
   const hero=d.offsetParent||d.parentElement;
   const ph=[Math.random()*6.28,Math.random()*6.28,Math.random()*6.28,Math.random()*6.28];
-  let wt=Math.random()*100,wPrev=0,wRaf=0,wx=null,wy=null;
+  let wt=Math.random()*100,wPrev=0,wRaf=0,wx=null,wy=null,wDim=null,wDimT=0,wDimOn=null;
   function wander(now){
     wRaf=0;
     const dt=Math.min(.05,(now-(wPrev||now))/1000);wPrev=now;
     if(!on&&!reduce)wt+=dt;
-    const SW=hero.clientWidth,SH=hero.clientHeight,bw=d.offsetWidth,bh=d.offsetHeight;
+    if(!wDim||now-wDimT>500||on!==wDimOn){wDim=[hero.clientWidth,hero.clientHeight,d.offsetWidth,d.offsetHeight];wDimT=now;wDimOn=on;}  // no forced layout every frame
+    const [SW,SH,bw,bh]=wDim;
     const fx=.5+.4*Math.sin(wt*.22+ph[0])+.08*Math.sin(wt*.57+ph[1]);
     const fy=.5+.36*Math.sin(wt*.17+ph[2])+.08*Math.sin(wt*.47+ph[3]);
     // idle: only the dot has to stay on screen, so it can roam edge to edge;
@@ -8108,11 +8144,15 @@ window.parent.postMessage({type:'__edit_mode_available'},'*');
     }
   }
 
+  const NET_LOW = matchMedia('(max-width:768px), (pointer:coarse)').matches;
+  let netLast = 0;
   function loop(t) {
+    if (NET_LOW && t - netLast < 31) { rafId = requestAnimationFrame(loop); return; }   // 30fps on phones
+    netLast = t;
     ctx.clearRect(0, 0, W, H);
     frame++;
     drawGrid(t);
-    particles.forEach(p => p.step(t));
+    particles.forEach(p => { p.step(t); if (NET_LOW) p.step(t); });
     const maxDist = currentConnectDist * dpr;
     const grid = buildGrid(maxDist);
     drawConnections(grid, maxDist);
