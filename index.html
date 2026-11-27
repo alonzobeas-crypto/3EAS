@@ -182,9 +182,11 @@ body{
 #scroll{
   position:fixed;inset:0;z-index:2;
   overflow-y:scroll;
+  overflow-x:hidden;overscroll-behavior-x:none; /* lock sideways drift on phones */
   scroll-snap-type:y mandatory;
   -ms-overflow-style:none;scrollbar-width:none;
 }
+.scene{overflow-x:clip} /* nothing in a section may widen the page */
 #scroll::-webkit-scrollbar{display:none}
 
 /* ── SCENES ── */
@@ -835,8 +837,10 @@ body{
 .bl-cell.playing{border-color:var(--hot)}
 .bl-cell.on.playing{background:var(--hot);box-shadow:0 0 10px var(--hot)}
 @media(max-width:760px){
-  .bl-row{grid-template-columns:56px repeat(16,1fr);min-width:0}
+  .bl-row{grid-template-columns:44px repeat(16,1fr);min-width:0;gap:2px}
   .bl-row-label{font-size:8px}
+  .bl-grid{max-width:100%;min-width:0;padding:10px 8px}
+  .bl-cell{min-width:0}
 }
 
 /* ══════════════════════════════
