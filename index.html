@@ -965,6 +965,7 @@ body{
 .dview-open.ok{border-color:var(--accent)}
 .dview-hash{color:var(--accent);word-break:break-all;letter-spacing:1px}
 body.lang-glitch .scene{animation:langJit .7s steps(3) 2}
+body.lang-glitch :is(#scroll,#topbar,.tb,nav,#ticker,#jb,.jb) *{text-shadow:2px 0 var(--accent),-2px 0 #0ff}
 /* ─── COLLAPSED MODE (default; ?full=1 for the old layout) ─── */
 .cx-row,.cx-close{display:none}
 html.cx #scroll{scroll-snap-type:none!important}
@@ -3332,15 +3333,17 @@ loadDispatch();
       o.target=(isHead&&!headDone)?(headDone=true,L.line):translateLike(o.orig,L);
     });
     const glyph=s=>s.replace(/[A-Za-z]/g,c=>Math.random()<0.5?L.words[0][Math.floor(Math.random()*L.words[0].length)]||c:c);
+    const POOL=[...L.words.join('')],SYM='#@$%&*/\\|<>_=+';
+    const corrupt=s=>[...s].map(c=>{if(c===' '||Math.random()>.14)return c;const r=Math.random();return r<.6?POOL[Math.floor(Math.random()*POOL.length)]:r<.85?SYM[Math.floor(Math.random()*SYM.length)]:(r<.93?c.toLowerCase():c.toUpperCase())}).join('');
     document.body.classList.add('lang-glitch');
     let ticks=0;
     const tick=()=>{ticks++;nodes.forEach(o=>{
       if(o.drop)return;
       if(!o.n.isConnected||(o.last!==null&&o.n.textContent!==o.last)){o.drop=true;return}
-      // two frames of breakup, then the translation holds
-      o.last=ticks<3?glyph(o.orig):o.target;
+      // two frames of breakup, then the translation keeps corrupting while it's up
+      o.last=ticks<3?glyph(o.orig):corrupt(o.target);
       o.n.textContent=o.last})};
-    tick();const iv=setInterval(tick,90);
+    tick();const iv=setInterval(tick,110);
     setTimeout(()=>{
       clearInterval(iv);
       nodes.forEach(o=>{if(!o.drop&&o.n.isConnected&&o.n.textContent===o.last)o.n.textContent=o.orig});
