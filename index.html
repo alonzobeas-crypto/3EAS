@@ -930,12 +930,18 @@ body{
 .dview-body a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(184,168,120,.3);transition:border-color .15s}
 .dview-body a:hover{border-color:var(--accent)}
 .dview-body strong{color:var(--hot)}
+.dview-body.sealed{max-height:330px;overflow:hidden;cursor:pointer;-webkit-mask-image:linear-gradient(#000 45%,transparent);mask-image:linear-gradient(#000 45%,transparent);animation:dsealJit 3.2s steps(1) infinite}
+@keyframes dsealJit{0%,100%{transform:none;text-shadow:none}7%{transform:translateX(2px);text-shadow:2px 0 var(--accent),-2px 0 #0ff}9%{transform:translateX(-3px)}11%{transform:none;text-shadow:none}53%{text-shadow:-2px 0 var(--hot),2px 0 #0ff}55%{text-shadow:none}}
+.dview-open{display:inline-block;margin-top:6px;font-family:var(--mono);font-size:11px;letter-spacing:4px;color:var(--accent);border:1px solid var(--dimmer);padding:10px 16px;background:none;cursor:pointer;text-transform:uppercase}
+.dview-open:hover{border-color:var(--accent);background:rgba(184,168,120,.05)}
+.dview-body.unsealing{animation:dUnseal .5s steps(6)}
+@keyframes dUnseal{0%{opacity:.2;filter:blur(2px);text-shadow:4px 0 var(--accent),-4px 0 #0ff}100%{opacity:1;filter:none;text-shadow:none}}
 .dview-tags{display:flex;gap:6px;margin-top:32px;flex-wrap:wrap}
 .dispatch-loading{font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--dim2);padding:32px 24px;animation:pulse 1.5s infinite}
 @media(max-width:768px){
   .s7-body{grid-template-columns:1fr}
   .dispatch-list{border-right:none;border-bottom:1px solid var(--dimmer);max-height:38vh}
-  .dispatch-view{padding:32px 24px}
+  .dispatch-view{padding:32px 24px 170px}
 }
 
 /* ══════════════════════════════
@@ -2916,10 +2922,38 @@ function showDispatch(id){
     </div>
     <h1 class="dview-title">${p.title||'—'}</h1>
     <div class="dview-divider"></div>
-    <div class="dview-body">${p.body||''}</div>
+    <div class="dview-body" id="dviewBody">${p.body||''}</div>
+    <button class="dview-open" id="dviewOpen" hidden onclick="unsealDispatch()">▸ DECRYPT FULL TRANSMISSION</button>
     ${p.tags&&p.tags.length?`<div class="dview-tags">${p.tags.map(t=>`<span class="dtag">${t}</span>`).join('')}</div>`:''}
   `;
   history.replaceState(null,'','#dispatch-'+id);
+  sealDispatch();
+}
+// Long dispatches open sealed: a glitching preview, full text on click.
+let dSealTimer=null;
+function sealDispatch(){
+  clearInterval(dSealTimer);
+  const body=document.getElementById('dviewBody'),btn=document.getElementById('dviewOpen');
+  if(!body||!btn||body.scrollHeight<520)return;
+  body.classList.add('sealed');
+  body.onclick=unsealDispatch;
+  btn.hidden=false;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches||!window.dpCorruptNode)return;
+  dSealTimer=setInterval(()=>{
+    if(document.hidden||!body.classList.contains('sealed'))return;
+    const nodes=window.dpTextNodesIn(body).filter(n=>!window.dpIsBusy(n));
+    if(nodes.length)window.dpCorruptNode(nodes[Math.floor(Math.random()*nodes.length)]);
+  },650);
+}
+function unsealDispatch(){
+  clearInterval(dSealTimer);
+  const body=document.getElementById('dviewBody'),btn=document.getElementById('dviewOpen');
+  if(!body)return;
+  body.classList.remove('sealed');
+  body.onclick=null;
+  body.classList.add('unsealing');
+  setTimeout(()=>body.classList.remove('unsealing'),520);
+  if(btn)btn.hidden=true;
 }
 loadDispatch();
 
@@ -2998,6 +3032,7 @@ loadDispatch();
     dpCorruptNode(nodes[Math.floor(Math.random()*nodes.length)]);
   }
   setInterval(dpGlitchTick,1800+Math.random()*1200);
+  window.dpCorruptNode=dpCorruptNode;window.dpTextNodesIn=dpTextNodesIn;window.dpIsBusy=n=>dpBusy.has(n);
 })();
 
 // Same ticker-style live corruption glitch on the section headings --
