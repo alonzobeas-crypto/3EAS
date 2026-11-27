@@ -907,6 +907,7 @@ body{
 .dcard .dpost-sum{font-size:18px;margin-bottom:18px;max-width:680px}
 .dcard .dview-open{margin:0 0 4px}
 .dcard.open .dview-open{display:none}
+.dcard.open .dpost-sum{display:none}
 .dcard-body{display:none;margin:8px 0 6px}
 .dcard.open .dcard-body{display:block}
 .dcard.unsealing .dcard-body{animation:dUnseal .5s steps(6)}
@@ -960,9 +961,6 @@ body{
 .dview-hash{color:var(--accent);word-break:break-all;letter-spacing:1px}
 body.lang-glitch .scene{animation:langJit .7s steps(3) 2}
 @keyframes langJit{0%,100%{transform:none}30%{transform:translateX(3px)}60%{transform:translateX(-2px)}}
-#langFlash{position:fixed;inset:0;z-index:99980;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .12s;background:rgba(0,0,0,.35)}
-#langFlash.on{opacity:1}
-#langFlash span{font-family:var(--vt);font-size:clamp(28px,6vw,72px);letter-spacing:4px;color:var(--hot);text-shadow:3px 0 var(--accent),-3px 0 #0ff;text-align:center;padding:0 6vw;line-height:1.2}
 #phishVeil{position:fixed;inset:0;z-index:99990;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);pointer-events:none;opacity:0;transition:opacity .15s}
 #phishVeil.on{opacity:1}
 #phishVeil .pbox{width:min(360px,86vw);background:rgba(0,0,0,.94);color:var(--fg);border:1px solid var(--accent);padding:22px 22px 18px;font-family:var(--mono);box-shadow:0 0 40px rgba(184,168,120,.12)}
@@ -3055,7 +3053,7 @@ loadDispatch();
   }
 
   function dpGlitchTick(){
-    if(dpReduced||document.hidden)return;
+    if(dpReduced||document.hidden||window.babelRunning)return;
     const scene=document.getElementById('s7');
     if(!scene)return;
     const rect=scene.getBoundingClientRect();
@@ -3093,7 +3091,7 @@ loadDispatch();
     },1400);
   }
   setInterval(()=>{
-    if(dpReduced||document.hidden)return;
+    if(dpReduced||document.hidden||window.babelRunning)return;
     const scene=document.getElementById('s7');if(!scene)return;
     const r=scene.getBoundingClientRect();if(r.bottom<0||r.top>window.innerHeight)return;
     const body=document.querySelector('#dispatchList .dcard.open .dcard-body');if(!body)return;
@@ -3122,52 +3120,77 @@ loadDispatch();
   }
 })();
 
-// Babel glitch: every minute or two, all visible text breaks into one of the
-// world's five most spoken languages for a moment, with one line flashed in it.
+// Babel glitch: every minute or two, the whole page (every line of text, nav,
+// ticker, buttons) turns into one of the world's five most spoken languages for
+// a moment. Headings carry the full line; everything else becomes words in that
+// language. Other text glitches pause while it runs so nothing gets stuck.
 (function(){
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   const LANGS=[
-    {chars:'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@$%&',line:'THE SIGNAL CANNOT BE OWNED'},
-    {chars:'信号无法被占有我们的声音数据记忆灵魂网络心火光',line:'信号无法被占有'},
-    {chars:'अआइईउऊएऐओऔकखगघचछजझटठडढतथदधनपफबभमयरलवशसह',line:'सिग्नल पर किसी का कब्ज़ा नहीं हो सकता'},
-    {chars:'ÁÉÍÓÚÑÜ¿¡ABCDEFGHIJLMNOPQRSTUVZ',line:'LA SEÑAL NO TIENE DUEÑO'},
-    {chars:'ابتثجحخدذرزسشصضطظعغفقكلمنهوي',line:'الإشارة لا يملكها أحد',rtl:true}
+    {code:'en',line:'THE SIGNAL CANNOT BE OWNED',sep:' ',cjk:false,
+     words:['SIGNAL','MEMORY','DATA','SOUL','NETWORK','VOICE','FREEDOM','LIGHT','FIRE','ANCESTORS','FREQUENCY','TRANSMISSION','WE','HEART','NO','OWNER']},
+    {code:'zh',line:'信号无法被占有',sep:'',cjk:true,
+     words:['信号','记忆','数据','灵魂','网络','声音','自由','光','火','祖先','频率','传输','我们','心','无法','占有']},
+    {code:'hi',line:'सिग्नल पर किसी का कब्ज़ा नहीं हो सकता',sep:' ',cjk:false,
+     words:['सिग्नल','याद','डेटा','आत्मा','नेटवर्क','आवाज़','आज़ादी','रोशनी','आग','पूर्वज','आवृत्ति','प्रसारण','हम','दिल']},
+    {code:'es',line:'LA SEÑAL NO TIENE DUEÑO',sep:' ',cjk:false,
+     words:['SEÑAL','MEMORIA','DATOS','ALMA','RED','VOZ','LIBERTAD','LUZ','FUEGO','ANCESTROS','FRECUENCIA','TRANSMISIÓN','NOSOTROS','CORAZÓN','SIN','DUEÑO']},
+    {code:'ar',line:'الإشارة لا يملكها أحد',sep:' ',cjk:false,rtl:true,
+     words:['الإشارة','الذاكرة','البيانات','الروح','الشبكة','الصوت','الحرية','النور','النار','الأجداد','التردد','البث','نحن','القلب']}
   ];
-  const SKIP='script,style,noscript,textarea,input,select,#ticker,#phishVeil,#langFlash,svg';
+  const SKIP='script,style,noscript,textarea,input,select,#phishVeil,.tk-perma,.tk-dyor,svg';
+  const HEAD='.scene-title,.ac-name,.dpost-tt,.lab-cs-title,h1,h2,h3';
   function visibleTextNodes(){
     const out=[],vh=window.innerHeight;
     const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode(n){
-      const t=n.textContent;if(!t||!t.trim()||t.length>400)return NodeFilter.FILTER_REJECT;
+      const t=n.textContent;if(!t||!t.trim()||t.length>600)return NodeFilter.FILTER_REJECT;
+      if(!/[A-Za-z]/.test(t))return NodeFilter.FILTER_REJECT; // numbers/clocks/symbols stay
       const p=n.parentElement;if(!p||p.closest(SKIP))return NodeFilter.FILTER_REJECT;
       if(window.dpIsBusy&&window.dpIsBusy(n))return NodeFilter.FILTER_REJECT;
       const r=p.getBoundingClientRect();
       if(r.bottom<0||r.top>vh||r.width===0)return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT}});
-    let n;while((n=w.nextNode())&&out.length<500)out.push(n);
+    let n;while((n=w.nextNode())&&out.length<800)out.push(n);
     return out;
   }
-  let running=false;
+  // Words in the target language, about as long as the original line.
+  function translateLike(orig,L){
+    const lead=orig.match(/^\s*/)[0],trail=orig.match(/\s*$/)[0],core=orig.trim();
+    if(core.length<=2){const pool=L.words.join('');return lead+pool[Math.floor(Math.random()*pool.length)]+trail} // per-letter spans (marquees) get one glyph each
+    const target=L.cjk?Math.max(1,Math.round(core.length/2)):core.length;
+    const lower=core===core.toLowerCase()||(core[0]===core[0].toUpperCase()&&core.slice(1)!==core.slice(1).toUpperCase());
+    let out='',i=Math.floor(Math.random()*L.words.length);
+    while(out.length<target){out+=(out&&L.sep)+L.words[i%L.words.length];i+=1+Math.floor(Math.random()*3)}
+    if(L.code==='en'||L.code==='es')out=lower?out.toLowerCase().replace(/^./,c=>c.toUpperCase()):out;
+    return lead+out+trail;
+  }
   function babel(){
-    if(running||document.hidden)return;
-    running=true;
+    if(window.babelRunning||document.hidden)return;
+    window.babelRunning=true;
     const L=LANGS[Math.floor(Math.random()*LANGS.length)];
-    const nodes=visibleTextNodes().map(n=>({n,orig:n.textContent,last:null}));
-    const scramble=s=>s.replace(/[A-Za-z0-9]/g,c=>Math.random()<0.55?L.chars[Math.floor(Math.random()*L.chars.length)]:c);
-    const flash=document.createElement('div');flash.id='langFlash';
-    const sp=document.createElement('span');sp.textContent=L.line;if(L.rtl)sp.dir='rtl';sp.lang=['en','zh','hi','es','ar'][LANGS.indexOf(L)];
-    flash.appendChild(sp);document.body.appendChild(flash);
+    const nodes=visibleTextNodes().map(n=>({n,orig:n.textContent,last:null,drop:false}));
+    let headDone=false;
+    nodes.sort((a,b)=>b.n.parentElement.getBoundingClientRect().height-a.n.parentElement.getBoundingClientRect().height);
+    nodes.forEach(o=>{
+      const isHead=!!o.n.parentElement.closest(HEAD);
+      o.target=(isHead&&!headDone)?(headDone=true,L.line):translateLike(o.orig,L);
+    });
+    const glyph=s=>s.replace(/[A-Za-z]/g,c=>Math.random()<0.5?L.words[0][Math.floor(Math.random()*L.words[0].length)]||c:c);
     document.body.classList.add('lang-glitch');
-    requestAnimationFrame(()=>flash.classList.add('on'));
-    const tick=()=>nodes.forEach(o=>{
+    let ticks=0;
+    const tick=()=>{ticks++;nodes.forEach(o=>{
+      if(o.drop)return;
       if(!o.n.isConnected||(o.last!==null&&o.n.textContent!==o.last)){o.drop=true;return}
-      if(o.drop)return;o.last=scramble(o.orig);o.n.textContent=o.last});
+      // two frames of breakup, then the translation holds
+      o.last=ticks<3?glyph(o.orig):o.target;
+      o.n.textContent=o.last})};
     tick();const iv=setInterval(tick,90);
     setTimeout(()=>{
       clearInterval(iv);
       nodes.forEach(o=>{if(!o.drop&&o.n.isConnected&&o.n.textContent===o.last)o.n.textContent=o.orig});
-      flash.classList.remove('on');document.body.classList.remove('lang-glitch');
-      setTimeout(()=>{flash.remove();running=false},150);
-    },1400);
+      document.body.classList.remove('lang-glitch');
+      window.babelRunning=false;
+    },1900);
   }
   const next=()=>setTimeout(()=>{babel();next()},70000+Math.random()*70000);
   next();
@@ -3218,7 +3241,7 @@ loadDispatch();
   }
 
   function hgTick(){
-    if(hgReduced||document.hidden)return;
+    if(hgReduced||document.hidden||window.babelRunning)return;
     const candidates=hgSelectors.map(s=>document.querySelector(s)).filter(el=>el&&!hgBusy.has(el)&&hgOnScreen(el));
     if(!candidates.length)return;
     hgCorrupt(candidates[Math.floor(Math.random()*candidates.length)]);
@@ -6004,6 +6027,7 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
 
   // Occasional real-time glitch: briefly flip some visible phrases to a random language
   glitchTranslate=function(){
+    if(window.babelRunning)return;
     [document.getElementById('ti1'),document.getElementById('ti2')].forEach(el=>{
       if(!el)return;
       const spans=Array.from(el.children).filter(c=>c.tagName==='SPAN'&&!c.classList.contains('sep'));
@@ -6478,6 +6502,7 @@ var ICE_FY_LABEL=Date.now()>=ICE_FY27_START?'FY27':'FY26';
     });
   },130);
   glitchCorrupt=function(){
+    if(window.babelRunning)return;
     [document.getElementById('ti1'),document.getElementById('ti2')].forEach(el=>{
       if(!el)return;
       const spans=Array.from(el.children).filter(c=>c.tagName==='SPAN'&&!c.classList.contains('sep'));
