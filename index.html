@@ -980,6 +980,7 @@ html.cx .scene:not(#s1):not(.cx-open)>.cx-row{display:flex}
 html.cx .scene.cx-open>.cx-close{display:block;position:absolute;top:12px;right:24px;z-index:30;font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--accent);background:rgba(0,0,0,.85);border:1px solid var(--dimmer);padding:8px 12px;cursor:pointer}
 html.cx .scene.cx-open :is(.scene-eyebrow,.scene-title,.s2-body,.vgrid,.acq-layout,.s5-grid,.s5-top,.s6-body){opacity:1!important;transform:none!important}
 html.cx .scene-counter{display:none}
+html.cx #s6{margin-bottom:var(--cx-tail,240px)} /* keep the last row clear of the jukebox + ticker */
 @media(max-width:768px){.cx-row{padding:18px 22px;gap:14px;flex-wrap:wrap}.cx-sub{margin-left:50px;width:100%}html.cx .scene.cx-open>.cx-close{top:8px;right:12px}}
 
 @keyframes langJit{0%,100%{transform:none}30%{transform:translateX(3px)}60%{transform:translateX(-2px)}}
@@ -2151,6 +2152,18 @@ scroll.addEventListener('scroll',onScroll,{passive:true});
     if(list[n])cxOpen(list[n]);
   };
   let cxLast=Date.now();
+  // every title and label in the collapsed list keeps corrupting, a few at a time
+  setInterval(()=>{
+    if(document.hidden||window.babelRunning||!window.dpCorruptNode)return;
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    const vh=innerHeight;
+    const els=[...document.querySelectorAll('.scene:not(.cx-open)>.cx-row .cx-tt,.scene:not(.cx-open)>.cx-row .cx-sub,.scene:not(.cx-open)>.cx-row .cx-num')].filter(e=>{const r=e.getBoundingClientRect();return r.bottom>0&&r.top<vh});
+    for(let k=0;k<2&&els.length;k++){
+      const el=els.splice(Math.floor(Math.random()*els.length),1)[0];
+      const n=window.dpTextNodesIn(el).filter(t=>!window.dpIsBusy(t));
+      if(n.length)window.dpCorruptNode(n[0]);
+    }
+  },550);
   if(/^#dispatch-/i.test(location.hash)){const d=document.getElementById('s7');if(d)setTimeout(()=>cxOpen(d),300)} // shared dispatch links open Dispatch
   ['pointerdown','wheel','touchstart','keydown'].forEach(ev=>document.addEventListener(ev,()=>{cxLast=Date.now()},{passive:true,capture:true}));
   setInterval(()=>{if(Date.now()-cxLast>60000)list.forEach(s=>{if(s.classList.contains('cx-open'))cxClose(s)})},4000);
