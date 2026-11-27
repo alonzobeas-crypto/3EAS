@@ -359,6 +359,7 @@ body{
 ══════════════════════════════ */
 #s1{justify-content:center;align-items:center;text-align:center;padding:0 60px}
 #s1-canvas{position:fixed;inset:0;z-index:1;pointer-events:none}
+#visionCanvas{position:fixed;inset:0;z-index:3;pointer-events:none;width:100%;height:100%;mix-blend-mode:screen}
 /* One particle in the ambient hero field pulses red->blue (the site's own
    legacy signal colors, #a8695a/#0ff, already used for the ticker's links
    and the corruption-glitch cyan) instead of the field's usual tan. Find
@@ -1426,6 +1427,7 @@ body.lang-glitch .scene{animation:langJit .7s steps(3) 2}
 <canvas id="matrixRain"></canvas>
 <div id="hackedGlitch"><div id="hackedGlitchText"></div></div>
 <canvas id="s1-canvas"></canvas>
+<canvas id="visionCanvas" aria-hidden="true"></canvas>
 <div id="threads" aria-hidden="true">
   <div class="tech-v"></div>
   <div class="tech-h"></div>
@@ -3122,6 +3124,80 @@ loadDispatch();
     const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting&&e.intersectionRatio>.5)){io.disconnect();setTimeout(dpPhish,900)}},{threshold:[.5]});
     io.observe(s7);
   }
+})();
+
+// Visions: every minute or so one of the artifact images glitches in behind the
+// page, turns into gold dots, and drifts apart into the particle field. <5s.
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const SRC=['assets/visions/stele-cables.jpg','assets/visions/temple-server.jpg'];
+  const cv=document.getElementById('visionCanvas');if(!cv)return;
+  const ctx=cv.getContext('2d');
+  const imgs={};let idx=Math.floor(Math.random()*SRC.length),busy=false;
+  function load(src){return imgs[src]||(imgs[src]=new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src}))}
+  function size(){const d=Math.min(2,window.devicePixelRatio||1);cv.width=innerWidth*d;cv.height=innerHeight*d;ctx.setTransform(d,0,0,d,0,0)}
+  async function vision(){
+    if(busy||document.hidden||window.babelRunning)return;
+    busy=true;
+    let img;try{img=await load(SRC[idx++%SRC.length])}catch(e){busy=false;return}
+    size();
+    const W=innerWidth,H=innerHeight;
+    const S=Math.min(W*0.82,H*0.72);
+    const ox=(W-S)/2+(Math.random()-.5)*W*0.18,oy=(H-S)/2+(Math.random()-.5)*H*0.08;
+    // sample brightness into a dot grid
+    const step=Math.max(5,Math.round(S/120));
+    const n=Math.ceil(S/step);
+    const off=document.createElement('canvas');off.width=n;off.height=n;
+    const oc=off.getContext('2d');oc.drawImage(img,0,0,n,n);
+    const px=oc.getImageData(0,0,n,n).data;
+    const dots=[];
+    for(let y=0;y<n;y++)for(let x=0;x<n;x++){
+      const i=(y*n+x)*4,b=(px[i]*.3+px[i+1]*.59+px[i+2]*.11)/255;
+      if(b<.14)continue;
+      const a=Math.random()*Math.PI*2,sp=20+Math.random()*90;
+      dots.push({x:ox+x*step,y:oy+y*step,b,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-15});
+    }
+    const T0=performance.now(),DUR=4600,MAXA=.5;
+    const ease=t=>t<0?0:t>1?1:t*t*(3-2*t);
+    function frame(now){
+      const t=(now-T0)/1000;
+      ctx.clearRect(0,0,W,H);
+      // 1) glitch-in: the picture arrives in torn slices
+      const imgA=t<.5?ease(t/.5):t<1.6?1-ease((t-.5)/1.1):0;
+      if(imgA>0){
+        ctx.save();ctx.globalAlpha=imgA*MAXA;
+        try{ctx.filter='grayscale(1) sepia(.55) brightness(.95) contrast(1.1)'}catch(e){}
+        const slices=12;
+        for(let s=0;s<slices;s++){
+          const sy=s*(img.height/slices),dy=oy+s*(S/slices);
+          const jx=(Math.random()<.35?(Math.random()-.5)*S*.12*(1-ease(t/1.2)):0);
+          ctx.drawImage(img,0,sy,img.width,img.height/slices,ox+jx,dy,S,S/slices+1);
+        }
+        ctx.restore();
+        if(Math.random()<.5){ctx.fillStyle='rgba(0,255,255,'+(.18*imgA)+')';ctx.fillRect(ox,oy+Math.random()*S,S,1+Math.random()*3)}
+      }
+      // 2) the picture becomes dots, 3) the dots drift apart into the field
+      const dotA=t<.5?0:t<1.6?ease((t-.5)/1.1):t<3?1:1-ease((t-3)/1.6);
+      if(dotA>0){
+        const drift=t>3?ease((t-3)/1.6):0;
+        const r=Math.max(1.5,step*.45);
+        for(const d of dots){
+          const jit=t<3?(Math.random()-.5)*.8:0;
+          const x=d.x+d.vx*drift*1.6+jit,y=d.y+d.vy*drift*1.6+jit;
+          ctx.fillStyle='rgba(203,187,136,'+Math.min(1,(.25+d.b)*dotA*.7)+')';
+          ctx.fillRect(x,y,r*(1-drift*.5),r*(1-drift*.5));
+        }
+        // a torn scanline now and then while it holds
+        if(t>1.6&&t<3&&Math.random()<.12){const yy=oy+Math.random()*S,hh=4+Math.random()*14;const g=ctx.getImageData(0,yy*(cv.width/W),cv.width,hh*(cv.width/W));ctx.putImageData(g,(Math.random()-.5)*40*(cv.width/W),yy*(cv.width/W))}
+      }
+      if(now-T0<DUR)requestAnimationFrame(frame);
+      else{ctx.clearRect(0,0,W,H);busy=false}
+    }
+    requestAnimationFrame(frame);
+  }
+  const next=()=>setTimeout(()=>{vision();next()},45000+Math.random()*55000);
+  setTimeout(()=>{vision();next()},20000+Math.random()*20000);
+  window.visionGlitch=vision;
 })();
 
 // Babel glitch: every minute or two, the whole page (every line of text, nav,
