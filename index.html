@@ -3247,11 +3247,12 @@ loadDispatch();
     const W=innerWidth,H=innerHeight;
     // the pyramid comes in big; it sways left and right and pulses in size the whole time
     const big=/temple/.test(src);
-    const S=big?Math.min(W*1.15,H*0.95):Math.min(W*0.85,H*0.75);
+    const S=big?Math.min(W*1.3,H*1.05):Math.min(W*1.15,H*0.95);   // both bigger
+    const LOWV=matchMedia('(max-width:768px), (pointer:coarse)').matches;
     const ph=Math.random()*6.28,ph2=Math.random()*6.28,dir=Math.random()<.5?-1:1;
     let jumpX=0,jumpS=1,jumpUntil=0;
     // sample brightness into a dot grid (positions kept relative, 0..1)
-    const step=Math.max(5,Math.round(S/120));
+    const step=Math.max(5,Math.round(S/(LOWV?90:120)));   // fewer dots on phones: two copies are drawn
     const n=Math.ceil(S/step);
     const off=document.createElement('canvas');off.width=n;off.height=n;
     const oc=off.getContext('2d');oc.drawImage(img,0,0,n,n);
@@ -3273,7 +3274,11 @@ loadDispatch();
       const jumping=now<jumpUntil;
       const dx=dir*W*.2*Math.sin(t*1.7+ph)+(jumping?jumpX:0);
       const sc=(1+.2*Math.sin(t*2.6+ph2))*(jumping?jumpS:1);
-      const Sd=S*sc,ox=W/2+dx-Sd/2,oy=H/2-Sd/2;
+      const Sd=S*sc,oy=H/2-Sd/2;
+      // two copies, mirror images of each other across the middle of the screen
+      const spread=Sd*.3;
+      const ox=W/2+spread+dx-Sd/2;          // original, right of centre
+      const mox=W/2-spread-dx-Sd/2;         // mirrored copy, left of centre, moving opposite
       // 1) glitch-in: the picture arrives in torn slices
       const imgA=t<.5?ease(t/.5):t<1.6?1-ease((t-.5)/1.1):0;
       if(imgA>0){
@@ -3284,6 +3289,10 @@ loadDispatch();
           const sy=s*(img.height/slices),dy=oy+s*(Sd/slices);
           const jx=(Math.random()<.35?(Math.random()-.5)*Sd*.12*(1-ease(t/1.2)):0);
           ctx.drawImage(img,0,sy,img.width,img.height/slices,ox+jx,dy,Sd,Sd/slices+1);
+          // mirrored copy: flip horizontally around its own centre
+          ctx.save();ctx.translate(mox+Sd/2,0);ctx.scale(-1,1);
+          ctx.drawImage(img,0,sy,img.width,img.height/slices,-Sd/2-jx,dy,Sd,Sd/slices+1);
+          ctx.restore();
         }
         ctx.restore();
         if(Math.random()<.5){ctx.fillStyle='rgba(0,255,255,'+(.18*imgA)+')';ctx.fillRect(ox,oy+Math.random()*Sd,Sd,1+Math.random()*3)}
@@ -3295,9 +3304,10 @@ loadDispatch();
         const r=Math.max(1.5,step*.45*sc);
         for(const d of dots){
           const jit=t<3?(Math.random()-.5)*.8:0;
-          const x=ox+d.u*Sd+d.vx*drift*1.6+jit,y=oy+d.v*Sd+d.vy*drift*1.6+jit;
+          const y=oy+d.v*Sd+d.vy*drift*1.6+jit,rs=r*(1-drift*.5);
           ctx.fillStyle='rgba(203,187,136,'+Math.min(1,(.25+d.b)*dotA*.7)+')';
-          ctx.fillRect(x,y,r*(1-drift*.5),r*(1-drift*.5));
+          ctx.fillRect(ox+d.u*Sd+d.vx*drift*1.6+jit,y,rs,rs);
+          ctx.fillRect(mox+(1-d.u)*Sd-d.vx*drift*1.6-jit,y,rs,rs);   // mirror
         }
         // a torn scanline now and then while it holds
         if(t>1.6&&t<3&&Math.random()<.12){const k=cv.width/W,yy=Math.max(0,oy+Math.random()*Sd),hh=4+Math.random()*14;if(yy<H){const g=ctx.getImageData(0,yy*k,cv.width,hh*k);ctx.putImageData(g,(Math.random()-.5)*40*k,yy*k)}}
