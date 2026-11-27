@@ -921,6 +921,8 @@ body{
 .dview-empty{font-family:var(--mono);font-size:13px;letter-spacing:4px;color:var(--dim2);text-transform:uppercase;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;line-height:2}
 .dview-meta{font-family:var(--mono);font-size:10px;letter-spacing:4px;color:var(--accent);margin-bottom:14px;display:flex;gap:14px;align-items:center}
 .dview-meta .sep{color:var(--dimmer)}
+.dview-meta{flex-wrap:wrap;row-gap:6px}
+.dview-meta span{white-space:nowrap}
 .dview-title{font-family:var(--vt);font-size:clamp(36px,5vw,64px);letter-spacing:3px;color:var(--hot);line-height:1;margin-bottom:24px;text-transform:uppercase}
 .dview-divider{height:1px;background:var(--dimmer);margin:28px 0;max-width:240px}
 .dview-body{font-family:var(--body);font-size:20px;line-height:2;color:var(--fg);max-width:680px}
@@ -2909,6 +2911,7 @@ function showDispatch(id){
     <div class="dview-meta">
       <span>DISP-${String(p.id).padStart(3,'0')}</span><span class="sep">//</span>
       <span>${(p.date||'').replace(/-/g,'.')}</span><span class="sep">//</span>
+      ${p.time?`<span>${p.time}</span><span class="sep">//</span>`:''}
       <span>FROM 3EAS-001</span>
     </div>
     <h1 class="dview-title">${p.title||'—'}</h1>
