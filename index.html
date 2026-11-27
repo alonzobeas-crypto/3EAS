@@ -958,6 +958,11 @@ body{
 @keyframes fpNudge{0%,100%{transform:none}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 .dview-open.ok{border-color:var(--accent)}
 .dview-hash{color:var(--accent);word-break:break-all;letter-spacing:1px}
+body.lang-glitch .scene{animation:langJit .7s steps(3) 2}
+@keyframes langJit{0%,100%{transform:none}30%{transform:translateX(3px)}60%{transform:translateX(-2px)}}
+#langFlash{position:fixed;inset:0;z-index:99980;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .12s;background:rgba(0,0,0,.35)}
+#langFlash.on{opacity:1}
+#langFlash span{font-family:var(--vt);font-size:clamp(28px,6vw,72px);letter-spacing:4px;color:var(--hot);text-shadow:3px 0 var(--accent),-3px 0 #0ff;text-align:center;padding:0 6vw;line-height:1.2}
 #phishVeil{position:fixed;inset:0;z-index:99990;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);pointer-events:none;opacity:0;transition:opacity .15s}
 #phishVeil.on{opacity:1}
 #phishVeil .pbox{width:min(360px,86vw);background:rgba(0,0,0,.94);color:var(--fg);border:1px solid var(--accent);padding:22px 22px 18px;font-family:var(--mono);box-shadow:0 0 40px rgba(184,168,120,.12)}
@@ -3115,6 +3120,58 @@ loadDispatch();
     const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting&&e.intersectionRatio>.5)){io.disconnect();setTimeout(dpPhish,900)}},{threshold:[.5]});
     io.observe(s7);
   }
+})();
+
+// Babel glitch: every minute or two, all visible text breaks into one of the
+// world's five most spoken languages for a moment, with one line flashed in it.
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const LANGS=[
+    {chars:'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#@$%&',line:'THE SIGNAL CANNOT BE OWNED'},
+    {chars:'信号无法被占有我们的声音数据记忆灵魂网络心火光',line:'信号无法被占有'},
+    {chars:'अआइईउऊएऐओऔकखगघचछजझटठडढतथदधनपफबभमयरलवशसह',line:'सिग्नल पर किसी का कब्ज़ा नहीं हो सकता'},
+    {chars:'ÁÉÍÓÚÑÜ¿¡ABCDEFGHIJLMNOPQRSTUVZ',line:'LA SEÑAL NO TIENE DUEÑO'},
+    {chars:'ابتثجحخدذرزسشصضطظعغفقكلمنهوي',line:'الإشارة لا يملكها أحد',rtl:true}
+  ];
+  const SKIP='script,style,noscript,textarea,input,select,#ticker,#phishVeil,#langFlash,svg';
+  function visibleTextNodes(){
+    const out=[],vh=window.innerHeight;
+    const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode(n){
+      const t=n.textContent;if(!t||!t.trim()||t.length>400)return NodeFilter.FILTER_REJECT;
+      const p=n.parentElement;if(!p||p.closest(SKIP))return NodeFilter.FILTER_REJECT;
+      if(window.dpIsBusy&&window.dpIsBusy(n))return NodeFilter.FILTER_REJECT;
+      const r=p.getBoundingClientRect();
+      if(r.bottom<0||r.top>vh||r.width===0)return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT}});
+    let n;while((n=w.nextNode())&&out.length<500)out.push(n);
+    return out;
+  }
+  let running=false;
+  function babel(){
+    if(running||document.hidden)return;
+    running=true;
+    const L=LANGS[Math.floor(Math.random()*LANGS.length)];
+    const nodes=visibleTextNodes().map(n=>({n,orig:n.textContent,last:null}));
+    const scramble=s=>s.replace(/[A-Za-z0-9]/g,c=>Math.random()<0.55?L.chars[Math.floor(Math.random()*L.chars.length)]:c);
+    const flash=document.createElement('div');flash.id='langFlash';
+    const sp=document.createElement('span');sp.textContent=L.line;if(L.rtl)sp.dir='rtl';sp.lang=['en','zh','hi','es','ar'][LANGS.indexOf(L)];
+    flash.appendChild(sp);document.body.appendChild(flash);
+    document.body.classList.add('lang-glitch');
+    requestAnimationFrame(()=>flash.classList.add('on'));
+    const tick=()=>nodes.forEach(o=>{
+      if(!o.n.isConnected||(o.last!==null&&o.n.textContent!==o.last)){o.drop=true;return}
+      if(o.drop)return;o.last=scramble(o.orig);o.n.textContent=o.last});
+    tick();const iv=setInterval(tick,90);
+    setTimeout(()=>{
+      clearInterval(iv);
+      nodes.forEach(o=>{if(!o.drop&&o.n.isConnected&&o.n.textContent===o.last)o.n.textContent=o.orig});
+      flash.classList.remove('on');document.body.classList.remove('lang-glitch');
+      setTimeout(()=>{flash.remove();running=false},150);
+    },1400);
+  }
+  const next=()=>setTimeout(()=>{babel();next()},70000+Math.random()*70000);
+  next();
+  window.babelGlitch=babel;
 })();
 
 // Same ticker-style live corruption glitch on the section headings --
