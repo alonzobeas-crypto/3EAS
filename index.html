@@ -965,7 +965,7 @@ body{
 .dview-open.ok{border-color:var(--accent)}
 .dview-hash{color:var(--accent);word-break:break-all;letter-spacing:1px}
 body.lang-glitch .scene{animation:langJit .7s steps(3) 2}
-/* ─── COLLAPSED MODE (preview only: ?collapsed=1) ─── */
+/* ─── COLLAPSED MODE (default; ?full=1 for the old layout) ─── */
 .cx-row,.cx-close{display:none}
 html.cx #scroll{scroll-snap-type:none!important}
 html.cx .scene:not(#s1){border-top:1px solid var(--dimmer)}
@@ -2120,11 +2120,11 @@ function onScroll(){
 }
 scroll.addEventListener('scroll',onScroll,{passive:true});
 
-/* ─── COLLAPSED MODE (preview only: ?collapsed=1) ───
+/* ─── COLLAPSED MODE (default; ?full=1 for the old layout) ───
    Every section below the hero folds into one title row. Tap a row to open it
    (one at a time); it folds back after a minute with no activity. */
 (function(){
-  let on=false;try{on=new URLSearchParams(location.search).has('collapsed')}catch(e){}
+  let on=true;try{on=!new URLSearchParams(location.search).has('full')}catch(e){} // collapsed is the default; ?full=1 shows the old layout
   if(!on)return;
   document.documentElement.classList.add('cx');
   const META={s2:['01','TRANSMISSIONS','sound'],s3:['02','VISUALS','video // stills'],s4:['03','ACQUISITIONS','merch // commissions'],s7:['04','DISPATCH','transmissions'],sLab:['05','BEAT LAB','interactive'],s5:['06','SIGNAL','frequency'],s6:['07','ACCESS','join the frequency']};
@@ -2151,6 +2151,7 @@ scroll.addEventListener('scroll',onScroll,{passive:true});
     if(list[n])cxOpen(list[n]);
   };
   let cxLast=Date.now();
+  if(/^#dispatch-/i.test(location.hash)){const d=document.getElementById('s7');if(d)setTimeout(()=>cxOpen(d),300)} // shared dispatch links open Dispatch
   ['pointerdown','wheel','touchstart','keydown'].forEach(ev=>document.addEventListener(ev,()=>{cxLast=Date.now()},{passive:true,capture:true}));
   setInterval(()=>{if(Date.now()-cxLast>60000)list.forEach(s=>{if(s.classList.contains('cx-open'))cxClose(s)})},4000);
 })();
